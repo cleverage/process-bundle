@@ -1,0 +1,8 @@
+services:
+    cleverage_process.registry.process_configuration:
+        class: CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry
+        arguments:
+            - ~
+
+    cleverage_process.registry.transformer:
+        class: CleverAge\ProcessBundle\Registry\TransformerRegistry

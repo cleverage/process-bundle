@@ -1,0 +1,7 @@
+services:
+    cleverage_process.transformer.mapping:
+        class: CleverAge\ProcessBundle\Transformer\MappingTransformer
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: cleverage.transformer }

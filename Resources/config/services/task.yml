@@ -1,0 +1,45 @@
+services:
+    cleverage_process.task.constant_output:
+        class: CleverAge\ProcessBundle\Task\ConstantOutputTask
+        shared: false
+
+    cleverage_process.task.debug:
+        class: CleverAge\ProcessBundle\Task\DebugTask
+        shared: false
+
+    cleverage_process.task.validator:
+        class: CleverAge\ProcessBundle\Task\ValidatorTask
+        arguments: ['@validator']
+        shared: false
+
+    cleverage_process.task.nornalizer:
+        class: CleverAge\ProcessBundle\Task\NormalizerTask
+        arguments: ['@serializer']
+        shared: false
+
+    cleverage_process.task.property_setter:
+        class: CleverAge\ProcessBundle\Task\PropertySetterTask
+        arguments: ['@property_accessor']
+        shared: false
+
+    cleverage_process.task.csv_reader:
+        class: CleverAge\ProcessBundle\Task\CsvReaderTask
+        shared: false
+
+    cleverage_process.task.csv_writer:
+        class: CleverAge\ProcessBundle\Task\CsvWriterTask
+        shared: false
+
+    cleverage_process.task.doctrine_reader:
+        class: CleverAge\ProcessBundle\Task\DoctrineReaderTask
+        arguments: ['@doctrine.orm.entity_manager']
+        shared: false
+
+    cleverage_process.task.stat_counter:
+        class: CleverAge\ProcessBundle\Task\StatCounterTask
+        shared: false
+
+    cleverage_process.task.transformer:
+        class: CleverAge\ProcessBundle\Task\TransformerTask
+        arguments: ['@cleverage_process.registry.transformer', mapping]
+        shared: false

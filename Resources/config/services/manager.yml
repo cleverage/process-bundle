@@ -1,0 +1,8 @@
+services:
+    cleverage_process.manager.process:
+        class: CleverAge\ProcessBundle\Manager\ProcessManager
+        arguments:
+            - '@service_container'
+            - '@logger'
+            - '@doctrine.orm.default_entity_manager'
+            - '@cleverage_process.registry.process_configuration'
