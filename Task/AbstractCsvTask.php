@@ -26,21 +26,21 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
-* Reads the file path from configuration and iterates over it
-* Ignores any input
+ * Reads the file path from configuration and iterates over it
+ * Ignores any input
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
-*/
+ */
 abstract class AbstractCsvTask extends AbstractConfigurableTask implements FinalizableTaskInterface
 {
     /** @var CsvFile */
     protected $csv;
 
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      */
-    public function finalize(ProcessState $processState)
+    public function finalize(ProcessState $state)
     {
         if ($this->csv instanceof CsvFile) {
             $this->csv->close();
@@ -48,7 +48,7 @@ abstract class AbstractCsvTask extends AbstractConfigurableTask implements Final
     }
 
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      *
      * @throws \UnexpectedValueException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
@@ -56,14 +56,11 @@ abstract class AbstractCsvTask extends AbstractConfigurableTask implements Final
      *
      * @return CsvFile
      */
-    protected function initFile(ProcessState $processState): CsvFile
+    protected function initFile(ProcessState $state): CsvFile
     {
         if (!$this->csv) {
-            $options = $this->getOptions($processState);
-            $headers = $options['headers'];
-            if (null === $headers) {
-                $headers = array_keys($processState->getInput());
-            }
+            $options = $this->getOptions($state);
+            $headers = $this->getHeaders($state, $options);
             $this->csv = new CsvFile(
                 $options['file_path'],
                 $options['delimiter'],
@@ -106,4 +103,12 @@ abstract class AbstractCsvTask extends AbstractConfigurableTask implements Final
         $resolver->setAllowedTypes('headers', ['NULL', 'array']);
         $resolver->setAllowedTypes('mode', ['string']);
     }
+
+    /**
+     * @param ProcessState $state
+     * @param array        $options
+     *
+     * @return array
+     */
+    abstract protected function getHeaders(ProcessState $state, array $options);
 }

@@ -32,9 +32,9 @@ interface IterableTaskInterface extends TaskInterface
      * return true if the task has a next element
      * return false if the task has terminated it's iteration
      *
-     * @param ProcessState $processState
+     * @param ProcessState $state
      *
      * @return bool
      */
-    public function next(ProcessState $processState);
+    public function next(ProcessState $state);
 }

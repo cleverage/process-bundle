@@ -31,7 +31,7 @@ namespace CleverAge\ProcessBundle\Model;
 interface TaskInterface
 {
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      */
-    public function execute(ProcessState $processState);
+    public function execute(ProcessState $state);
 }

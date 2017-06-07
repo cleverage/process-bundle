@@ -87,7 +87,7 @@ class CsvFile
         if (false === $this->handler) {
             throw new \UnexpectedValueException("Unable to open file: '{$filePath}' in {$mode} mode");
         }
-        $this->headers = $this->parseHeaders($headers, $mode);
+        $this->headers = $this->parseHeaders($mode, $headers);
         $this->headerCount = count($this->headers);
     }
 
@@ -380,7 +380,7 @@ class CsvFile
      *
      * @return array
      */
-    protected function parseHeaders(array $headers, $mode)
+    protected function parseHeaders($mode, array $headers = null)
     {
         // If headers are not passed in the constructor but file is readable, try to read headers from file
         if (null === $headers && in_array($mode, ['r', 'r+', 'w+', 'a+', 'x+', 'c+'], true)) {

@@ -23,9 +23,9 @@ override the ```AbstractConfigurableTask::configureOptions()``` method.
 This bundle already implements a lot of basic tasks that can be used out of the box, see dedicated chapter.
 
 ## Running a process
-
+You can execute one or multiple process in a chain:
 ```bash
-$ bin/console cleverage:process:execute process_code
+$ bin/console cleverage:process:execute process_code1 process_code2
 ```
 
 ## Configuration reference
@@ -56,6 +56,16 @@ Simply outputs the same configured value all the time, ignores any input
     options:
         # Required options
         output: <mixed> # Will always output the value configured here
+```
+
+#### ConstantIterableOutputTask
+Same as ConstantOutputTask but only accepts an array of values and iterates over each element.
+```yml
+<task_code>:
+    service: '@cleverage_process.task.constant_iterable_output'
+    options:
+        # Required options
+        output: <array> # Will iterate over the elements
 ```
 
 #### CsvReaderTask
@@ -105,14 +115,11 @@ Dumps the input value to the console, obviously for debug purposes
 ```
 No supported options
 
-#### DoctrinePersisterTask
-@todo
-
 #### DoctrineReaderTask
 Reads data from a Doctrine Repository, iterating over the results. Ignores any input.
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.csv_writer'
+    service: '@cleverage_process.task.doctrine_reader'
     options:
         # Required options
         class_name: <string> # Required, the class name of the entity
@@ -122,19 +129,44 @@ Reads data from a Doctrine Repository, iterating over the results. Ignores any i
         order_by: []
         limit: null
         offset: null
+        entity_manager: null # If the entity manager is not the default one, use this option
 ```
 All the optional options behave like the ```EntityRepository::findBy``` method.
+
+#### DoctrineWriterTask
+Write a Doctrine entity to the database.
+```yml
+<task_code>:
+    service: '@cleverage_process.task.doctrine_writer'
+    options:
+        # Optional options
+        entity_manager: null # If the entity manager is not the default one, use this option
+```
 
 #### NormalizerTask
 Normalize data from the input and pass it to the output
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.csv_writer'
+    service: '@cleverage_process.task.normalizer'
     options:
         # Required options
         format: <string> # Required, format for normalization
 
         # Optional options
+        context: [] # Will be passed directly to the third parameter of the normalize method
+```
+
+#### DenormalizerTask
+Denormalize data from the input and pass it to the output
+```yml
+<task_code>:
+    service: '@cleverage_process.task.denormalizer'
+    options:
+        # Required options
+        class: <string>
+
+        # Optional options
+        format: <string>
         context: [] # Will be passed directly to the third parameter of the normalize method
 ```
 
@@ -180,8 +212,8 @@ Accepts an array or an object as an input and sets values before returning it as
                 constant: null # If you want to output a constant value
                 set_null: false # Because the "null" value cannot be covered by the constant option
                 ignore_missing: false # Will ignore missing properties
-                transformer: null # Accepts the code of a transformer to be applied to the value
-                options: {} # The options for the transformer if set
+                transformers: # Applies a series of other transformers
+                    <transformer_code>: [] # Transformer options
             # ...
 
         # Optional options
@@ -207,6 +239,13 @@ Validate data from the input and pass it to the output
         log_errors: true # Logs any errors encountered
 ```
 
+#### DummyTask
+Passes the input to the output, can be used as an entry point allow multiple tasks to be run at the entry point
+```yml
+<task_code>:
+    service: '@cleverage_process.task.dummy'
+```
+
 ## Creating a custom task
 
 ### Creating the class
@@ -222,9 +261,9 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 class MyTask implements TaskInterface
 {
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      */
-    public function execute(ProcessState $processState)
+    public function execute(ProcessState $state)
     {
         // Do stuff
     }
@@ -259,7 +298,7 @@ clever_age_process:
 
                 normalize:
                     inputs: [read]
-                    service: '@cleverage_process.task.nornalizer'
+                    service: '@cleverage_process.task.normalizer'
                     options:
                         format: csv
 

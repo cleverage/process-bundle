@@ -5,3 +5,13 @@ services:
             - '@property_accessor'
         tags:
             - { name: cleverage.transformer }
+
+    cleverage_process.transformer.slugify:
+        class: CleverAge\ProcessBundle\Transformer\SlugifyTransformer
+        tags:
+            - { name: cleverage.transformer }
+
+    cleverage_process.transformer.explode:
+        class: CleverAge\ProcessBundle\Transformer\ExplodeTransformer
+        tags:
+            - { name: cleverage.transformer }

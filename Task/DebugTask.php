@@ -31,10 +31,10 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 class DebugTask implements TaskInterface
 {
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      */
-    public function execute(ProcessState $processState)
+    public function execute(ProcessState $state)
     {
-        dump($processState->getInput());
+        dump($state->getInput());
     }
 }

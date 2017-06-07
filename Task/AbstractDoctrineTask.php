@@ -19,28 +19,44 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\EntityManager;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
+use Doctrine\ORM\EntityRepository;
+use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\ORM\Internal\Hydration\IterableResult;
 
 /**
- * Always send the same output regardless of the input
+ * Base logic for doctrine related tasks
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class ConstantOutputTask extends AbstractConfigurableTask
+abstract class AbstractDoctrineTask extends AbstractConfigurableTask
 {
+    /** @var Registry */
+    protected $doctrine;
+
     /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @param Registry $doctrine
+     */
+    public function __construct(Registry $doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired([
-            'output',
+        $resolver->setDefaults([
+            'entity_manager' => null,
         ]);
+        $resolver->setAllowedTypes('entity_manager', ['NULL', 'string']);
     }
 
     /**
@@ -48,9 +64,11 @@ class ConstantOutputTask extends AbstractConfigurableTask
      *
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     *
+     * @return EntityManager
      */
-    public function execute(ProcessState $state)
+    protected function getManager(ProcessState $state)
     {
-        $state->setOutput($this->getOption($state, 'output'));
+        return $this->doctrine->getManager($this->getOption($state, 'entity_manager'));
     }
 }

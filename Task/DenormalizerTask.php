@@ -22,25 +22,25 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Normalize input to output with configurable format
+ * Denormalize input to output with configurable class and format
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class NormalizerTask extends AbstractConfigurableTask
+class DenormalizerTask extends AbstractConfigurableTask
 {
-    /** @var NormalizerInterface */
-    protected $normalizer;
+    /** @var DenormalizerInterface */
+    protected $denormalizer;
 
     /**
-     * @param NormalizerInterface $normalizer
+     * @param DenormalizerInterface $denormalizer
      */
-    public function __construct(NormalizerInterface $normalizer)
+    public function __construct(DenormalizerInterface $denormalizer)
     {
-        $this->normalizer = $normalizer;
+        $this->denormalizer = $denormalizer;
     }
 
     /**
@@ -51,8 +51,9 @@ class NormalizerTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $options = $this->getOptions($state);
-        $normalizedData = $this->normalizer->normalize(
+        $normalizedData = $this->denormalizer->denormalize(
             $state->getInput(),
+            $options['class'],
             $options['format'],
             $options['context']
         );
@@ -69,14 +70,16 @@ class NormalizerTask extends AbstractConfigurableTask
     {
         $resolver->setRequired(
             [
-                'format',
+                'class',
             ]
         );
-        $resolver->setAllowedTypes('format', ['string']);
+        $resolver->setAllowedTypes('class', ['string']);
         $resolver->setDefaults(
             [
+                'format' => null,
                 'context' => [],
             ]
         );
+        $resolver->setAllowedTypes('format', ['NULL', 'string']);
     }
 }

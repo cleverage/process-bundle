@@ -31,38 +31,33 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class DoctrinePersisterTask extends AbstractConfigurableTask implements FinalizableTaskInterface
+class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTaskInterface
 {
-    /** @var EntityManagerInterface */
-    protected $manager;
-
     /**
-     * @param EntityManagerInterface $manager
+     * @param ProcessState $state
      */
-    public function __construct(EntityManagerInterface $manager)
-    {
-        $this->manager = $manager;
-    }
-
-    /**
-     * @param ProcessState $processState
-     */
-    public function finalize(ProcessState $processState)
+    public function finalize(ProcessState $state)
     {
         // Need to implement the batch_count first
     }
 
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
+     *
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \InvalidArgumentException
      */
-    public function execute(ProcessState $processState)
+    public function execute(ProcessState $state)
     {
-        $entity = $processState->getInput();
+        $entity = $state->getInput();
+        $manager = $this->getManager($state);
 
-        $this->manager->persist($entity);
-        $this->manager->flush();
+        $manager->persist($entity);
+        $manager->flush();
 
-        $processState->setOutput($entity);
+        $state->setOutput($entity);
     }
 
     /**

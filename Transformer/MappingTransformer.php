@@ -80,9 +80,13 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 $transformedValue = $input[$sourceProperty];
             }
 
-            if (null !== $mapping['transformer']) {
-                $transformer = $this->transformerRegistry->getTransformer($mapping['transformer']);
-                $transformedValue = $transformer->transform($transformedValue, $mapping['options']);
+            /** @noinspection ForeachSourceInspection */
+            foreach ($mapping['transformers'] as $transformerCode => $transformerOptions) {
+                $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+                $transformedValue = $transformer->transform(
+                    $transformedValue,
+                    $transformerOptions ?: []
+                );
             }
 
             if (is_array($result)) {
@@ -126,7 +130,9 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 $this->configureMappingOptions($mappingResolver);
                 /** @var array $value */
                 foreach ($value as $property => $mappingConfig) {
-                    $resolvedMapping[$property] = $mappingResolver->resolve($mappingConfig);
+                    $resolvedMapping[$property] = $mappingResolver->resolve(
+                        null === $mappingConfig ? [] : $mappingConfig
+                    );
                 }
 
                 return $resolvedMapping;
@@ -165,14 +171,12 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 'constant' => null,
                 'set_null' => false, // Because the "null" value cannot be covered by the constant option
                 'ignore_missing' => false,
-                'transformer' => null,
-                'options' => [],
+                'transformers' => [],
             ]
         );
         $resolver->setAllowedTypes('code', ['NULL', 'string']);
         $resolver->setAllowedTypes('set_null', ['boolean']);
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
-        $resolver->setAllowedTypes('transformer', ['NULL', 'string']);
-        $resolver->setAllowedTypes('options', ['array']);
+        $resolver->setAllowedTypes('transformers', ['array']);
     }
 }

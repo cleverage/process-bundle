@@ -1,6 +1,14 @@
 services:
+    cleverage_process.task.dummy:
+        class: CleverAge\ProcessBundle\Task\DummyTask
+        shared: false
+
     cleverage_process.task.constant_output:
         class: CleverAge\ProcessBundle\Task\ConstantOutputTask
+        shared: false
+
+    cleverage_process.task.constant_iterable_output:
+        class: CleverAge\ProcessBundle\Task\ConstantIterableOutputTask
         shared: false
 
     cleverage_process.task.debug:
@@ -12,8 +20,13 @@ services:
         arguments: ['@validator']
         shared: false
 
-    cleverage_process.task.nornalizer:
+    cleverage_process.task.normalizer:
         class: CleverAge\ProcessBundle\Task\NormalizerTask
+        arguments: ['@serializer']
+        shared: false
+
+    cleverage_process.task.denormalizer:
+        class: CleverAge\ProcessBundle\Task\DenormalizerTask
         arguments: ['@serializer']
         shared: false
 
@@ -30,9 +43,19 @@ services:
         class: CleverAge\ProcessBundle\Task\CsvWriterTask
         shared: false
 
+    cleverage_process.task.database_reader:
+        class: CleverAge\ProcessBundle\Task\DatabaseReaderTask
+        arguments: ['@doctrine']
+        shared: false
+
     cleverage_process.task.doctrine_reader:
         class: CleverAge\ProcessBundle\Task\DoctrineReaderTask
-        arguments: ['@doctrine.orm.entity_manager']
+        arguments: ['@doctrine']
+        shared: false
+
+    cleverage_process.task.doctrine_writer:
+        class: CleverAge\ProcessBundle\Task\DoctrineWriterTask
+        arguments: ['@doctrine']
         shared: false
 
     cleverage_process.task.stat_counter:

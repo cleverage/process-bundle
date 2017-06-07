@@ -17,18 +17,24 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace CleverAge\ProcessBundle\Model;
+namespace CleverAge\ProcessBundle\Task;
+
+use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Model\TaskInterface;
 
 /**
- * Allow the task to be initialized before any execution is done
+ * Dummy task that pass the input to the output
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-interface FinalizableTaskInterface extends TaskInterface
+class DummyTask implements TaskInterface
 {
     /**
      * @param ProcessState $state
      */
-    public function finalize(ProcessState $state);
+    public function execute(ProcessState $state)
+    {
+        $state->setOutput($state->getInput());
+    }
 }

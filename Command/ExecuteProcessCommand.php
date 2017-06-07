@@ -44,7 +44,11 @@ class ExecuteProcessCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this->setName('cleverage:process:execute');
-        $this->addArgument('processCode', InputArgument::REQUIRED, 'The code of the process to execute');
+        $this->addArgument(
+            'processCodes',
+            InputArgument::IS_ARRAY | InputArgument::REQUIRED,
+            'The code(s) of the process(es) to execute, separated by a space'
+        );
     }
 
     /**
@@ -70,6 +74,23 @@ class ExecuteProcessCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        return $this->processManager->execute($input->getArgument('processCode'), $output);
+        /** @noinspection ForeachSourceInspection */
+        foreach ($input->getArgument('processCodes') as $code) {
+            if (!$output->isQuiet()) {
+                $output->writeln("<comment>Starting process '{$code}'...</comment>");
+            }
+            $returnValue = $this->processManager->execute($code, $output);
+            if ($returnValue !== 0) {
+                if (!$output->isQuiet()) {
+                    $output->writeln("<error>Process '{$code}' returned an error code</error>");
+                }
+                return $returnValue;
+            }
+            if (!$output->isQuiet()) {
+                $output->writeln("<info>Process '{$code}' executed successfully</info>");
+            }
+        }
+
+        return 0;
     }
 }

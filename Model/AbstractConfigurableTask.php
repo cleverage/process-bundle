@@ -39,31 +39,50 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
     /**
      * Only validate the options at initialization, ensuring that the task will not fail at runtime
      *
-     * @param ProcessState $processState
+     * @param ProcessState $state
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
-    public function initialize(ProcessState $processState)
+    public function initialize(ProcessState $state)
     {
-        $this->getOptions($processState);
+        $this->getOptions($state);
     }
 
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      *
      * @return array
      */
-    protected function getOptions(ProcessState $processState)
+    protected function getOptions(ProcessState $state)
     {
         if (null === $this->options) {
             $resolver = new OptionsResolver();
             $this->configureOptions($resolver);
-            $this->options = $resolver->resolve($processState->getTaskConfiguration()->getOptions());
+            $this->options = $resolver->resolve($state->getTaskConfiguration()->getOptions());
         }
 
         return $this->options;
+    }
+
+    /**
+     * @param ProcessState $state
+     * @param string       $code
+     *
+     * @throws \InvalidArgumentException
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     *
+     * @return mixed
+     */
+    protected function getOption(ProcessState $state, $code)
+    {
+        $options = $this->getOptions($state);
+        if (!array_key_exists($code, $options)) {
+            throw new \InvalidArgumentException("Missing option {$code}");
+        }
+
+        return $options[$code];
     }
 
     /**

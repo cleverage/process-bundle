@@ -45,21 +45,21 @@ class ValidatorTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \UnexpectedValueException
      */
-    public function execute(ProcessState $processState)
+    public function execute(ProcessState $state)
     {
-        $violations = $this->validator->validate($processState->getInput());
-        $options = $this->getOptions($processState);
+        $violations = $this->validator->validate($state->getInput());
+        $options = $this->getOptions($state);
 
         if ($options[AbstractConfigurableTask::LOG_ERRORS]) {
             /** @var  $violation ConstraintViolationInterface */
             foreach ($violations as $violation) {
                 $invalidValue = $violation->getInvalidValue();
-                $processState->log(
+                $state->log(
                     $violation->getMessage(),
                     LogLevel::ERROR,
                     $violation->getPropertyPath(),
@@ -73,14 +73,14 @@ class ValidatorTask extends AbstractConfigurableTask
 
         if (0 < $violations->count()) {
             if ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
-                $processState->stop(
+                $state->stop(
                     new \UnexpectedValueException("{$violations->count()} constraint violations detected on validation")
                 );
             } elseif ($options[AbstractConfigurableTask::SKIP_ON_ERROR]) {
-                $processState->setSkipped(true);
+                $state->setSkipped(true);
             }
         }
 
-        $processState->setOutput($processState->getInput());
+        $state->setOutput($state->getInput());
     }
 }

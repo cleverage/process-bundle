@@ -34,21 +34,29 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 {
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
-    public function execute(ProcessState $processState)
+    public function execute(ProcessState $state)
     {
         try {
             if (!$this->csv instanceof CsvFile) {
-                $this->initFile($processState);
+                $this->initFile($state);
                 $this->csv->writeHeaders();
             }
-            $this->csv->writeLine($this->getInput($processState));
+            $this->csv->writeLine($this->getInput($state));
         } catch (\Exception $e) {
-            $processState->stop($e);
+            $state->stop($e);
         }
+    }
+
+    /**
+     * @param ProcessState $state
+     */
+    public function proceed(ProcessState $state)
+    {
+        $state->setOutput($this->csv->getFilePath());
     }
 
     /**
@@ -69,25 +77,26 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     }
 
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      *
      * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      *
      * @return array
      */
-    protected function getInput(ProcessState $processState)
+    protected function getInput(ProcessState $state)
     {
-        $input = $processState->getInput();
+        $input = $state->getInput();
         if (!is_array($input)) {
             throw new \UnexpectedValueException('Input value is not an array');
         }
-        $options = $this->getOptions($processState);
+        $splitCharacter = $this->getOption($state, 'split_character');
 
         /** @var array $input */
         foreach ($input as $key => &$item) {
             if (is_array($item)) {
-                $item = implode($options['split_character'], $item);
+                $item = implode($splitCharacter, $item);
             }
         }
 
@@ -95,10 +104,18 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     }
 
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
+     * @param array        $options
+     *
+     * @return array
      */
-    public function proceed(ProcessState $processState)
+    protected function getHeaders(ProcessState $state, array $options)
     {
-        $processState->setOutput($this->csv->getFilePath());
+        $headers = $options['headers'];
+        if (null === $headers) {
+            $headers = array_keys($state->getInput());
+        }
+
+        return $headers;
     }
 }

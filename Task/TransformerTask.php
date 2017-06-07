@@ -66,14 +66,14 @@ class TransformerTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
-    public function execute(ProcessState $processState)
+    public function execute(ProcessState $state)
     {
         $output = null;
-        $options = $this->getOptions($processState);
+        $options = $this->getOptions($state);
         $transformerOptions = $options;
         unset(
             $transformerOptions[AbstractConfigurableTask::STOP_ON_ERROR],
@@ -83,24 +83,24 @@ class TransformerTask extends AbstractConfigurableTask
 
         try {
             $output = $this->transformer->transform(
-                $processState->getInput(),
+                $state->getInput(),
                 $transformerOptions
             );
         } catch (\Exception $e) {
             if ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
-                $processState->stop($e);
+                $state->stop($e);
 
                 return;
             }
             if ($options[AbstractConfigurableTask::LOG_ERRORS]) {
-                $processState->log('PropertySetter exception: '.$e->getMessage(), LogLevel::ERROR);
+                $state->log('PropertySetter exception: '.$e->getMessage(), LogLevel::ERROR);
             }
             if ($options[AbstractConfigurableTask::SKIP_ON_ERROR]) {
-                $processState->setSkipped(true);
+                $state->setSkipped(true);
 
                 return;
             }
         }
-        $processState->setOutput($output);
+        $state->setOutput($output);
     }
 }

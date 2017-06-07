@@ -34,33 +34,22 @@ use Doctrine\ORM\Internal\Hydration\IterableResult;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class DoctrineReaderTask extends AbstractConfigurableTask implements IterableTaskInterface
+class DoctrineReaderTask extends AbstractDoctrineTask implements IterableTaskInterface
 {
-    /** @var EntityManager */
-    protected $entityManager;
-
     /** @var IterableResult */
     protected $iterator;
-
-    /**
-     * @param EntityManager $entityManager
-     */
-    public function __construct(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
 
     /**
      * Moves the internal pointer to the next element,
      * return true if the task has a next element
      * return false if the task has terminated it's iteration
      *
-     * @param ProcessState $processState
+     * @param ProcessState $state
      *
      * @return bool
      * @throws \LogicException
      */
-    public function next(ProcessState $processState)
+    public function next(ProcessState $state)
     {
         if (!$this->iterator instanceof IterableResult) {
             throw new \LogicException('No iterator initialized');
@@ -71,15 +60,16 @@ class DoctrineReaderTask extends AbstractConfigurableTask implements IterableTas
     }
 
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      *
+     * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
-    public function execute(ProcessState $processState)
+    public function execute(ProcessState $state)
     {
-        $options = $this->getOptions($processState);
+        $options = $this->getOptions($state);
         if (!$this->iterator) {
-            $repository = $this->entityManager->getRepository($options['class_name']);
+            $repository = $this->getManager($state)->getRepository($options['class_name']);
             $this->initIterator($repository, $options);
         }
 
@@ -87,13 +77,13 @@ class DoctrineReaderTask extends AbstractConfigurableTask implements IterableTas
 
         // Handle empty results
         if (false === $result) {
-            $processState->log('Empty resultset for query', LogLevel::WARNING, $options['class_name'], $options);
-            $processState->setStopped(true);
+            $state->log('Empty resultset for query', LogLevel::WARNING, $options['class_name'], $options);
+            $state->setStopped(true);
 
             return;
         }
 
-        $processState->setOutput($result[0]);
+        $state->setOutput($result[0]);
     }
 
     /**
@@ -101,16 +91,21 @@ class DoctrineReaderTask extends AbstractConfigurableTask implements IterableTas
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired([
-            'class_name',
-        ]);
+        parent::configureOptions($resolver);
+        $resolver->setRequired(
+            [
+                'class_name',
+            ]
+        );
         $resolver->setAllowedTypes('class_name', ['string']);
-        $resolver->setDefaults([
-            'criteria' => [],
-            'order_by' => [],
-            'limit' => null,
-            'offset' => null,
-        ]);
+        $resolver->setDefaults(
+            [
+                'criteria' => [],
+                'order_by' => [],
+                'limit' => null,
+                'offset' => null,
+            ]
+        );
         $resolver->setAllowedTypes('criteria', ['array']);
         $resolver->setAllowedTypes('order_by', ['array']);
         $resolver->setAllowedTypes('limit', ['NULL', 'integer']);
@@ -120,12 +115,17 @@ class DoctrineReaderTask extends AbstractConfigurableTask implements IterableTas
     /**
      * @param EntityRepository $repository
      * @param array            $options
+     *
+     * @throws \UnexpectedValueException
      */
     protected function initIterator(EntityRepository $repository, array $options)
     {
         $qb = $repository->createQueryBuilder('e');
         /** @noinspection ForeachSourceInspection */
         foreach ($options['criteria'] as $field => $value) {
+            if (preg_match('/[^a-zA-Z0-9]/', $field)) {
+                throw new \UnexpectedValueException("Forbidden field name '{$field}'");
+            }
             $parameterName = uniqid('param', false);
             if (null === $value) {
                 $qb->andWhere("e.{$field} IS NULL");

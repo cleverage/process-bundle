@@ -60,37 +60,37 @@ class PropertySetterTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param ProcessState $processState
+     * @param ProcessState $state
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
-    public function execute(ProcessState $processState)
+    public function execute(ProcessState $state)
     {
-        $options = $this->getOptions($processState);
-        $input = $processState->getInput();
+        $options = $this->getOptions($state);
+        $input = $state->getInput();
         /** @noinspection ForeachSourceInspection */
         foreach ($options['values'] as $key => $value) {
             try {
                 $this->accessor->setValue($input, $key, $value);
             } catch (\Exception $e) {
                 if ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
-                    $processState->stop($e);
+                    $state->stop($e);
 
                     return;
                 }
                 if ($options[AbstractConfigurableTask::LOG_ERRORS]) {
-                    $processState->log('PropertySetter exception: '.$e->getMessage(), LogLevel::ERROR, $key, [
+                    $state->log('PropertySetter exception: '.$e->getMessage(), LogLevel::ERROR, $key, [
                         'value' => $value,
                     ]);
                 }
                 if ($options[AbstractConfigurableTask::SKIP_ON_ERROR]) {
-                    $processState->setSkipped(true);
+                    $state->setSkipped(true);
 
                     return;
                 }
             }
         }
 
-        $processState->setOutput($input);
+        $state->setOutput($input);
     }
 }
