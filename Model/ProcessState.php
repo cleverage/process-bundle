@@ -61,6 +61,9 @@ class ProcessState
     /** @var \Exception */
     protected $exception;
 
+    /** @var array */
+    protected $errorContext = [];
+
     /** @var OutputInterface */
     protected $consoleOutput;
 
@@ -124,7 +127,7 @@ class ProcessState
         $taskHistory->setMessage($message);
         $taskHistory->setLevel($level);
         $taskHistory->setReference($reference);
-        $taskHistory->setContext($context);
+        $taskHistory->setContext(array_merge($this->getErrorContext(), $context));
 
         $this->taskHistories[] = $taskHistory;
     }
@@ -232,6 +235,39 @@ class ProcessState
     public function setException(\Exception $exception)
     {
         $this->exception = $exception;
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrorContext()
+    {
+        return $this->errorContext;
+    }
+
+    /**
+     * @param array $errorContext
+     */
+    public function setErrorContext(array $errorContext)
+    {
+        $this->errorContext = $errorContext;
+    }
+
+    /**
+     * @param string|int       $key
+     * @param string|int|array $value
+     */
+    public function addErrorContextValue($key, $value)
+    {
+        $this->errorContext[$key] = $value;
+    }
+
+    /**
+     * @param string|int       $key
+     */
+    public function removeErrorContext($key)
+    {
+        unset($this->errorContext[$key]);
     }
 
     /**

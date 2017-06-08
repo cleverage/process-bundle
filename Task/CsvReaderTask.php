@@ -53,6 +53,8 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         if (null === $output) {
             $state->stop(new \UnexpectedValueException("CSV file {$this->csv} is empty or unreadable"));
         }
+        $state->addErrorContextValue('csv_file', $this->csv->getFilePath());
+        $state->addErrorContextValue('csv_line', $this->csv->getCurrentLine());
         $state->setOutput($output);
     }
 
@@ -74,6 +76,9 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         if (!$this->csv instanceof CsvFile) {
             throw new \LogicException('No CSV File initialized');
         }
+
+        $state->removeErrorContext('csv_file');
+        $state->removeErrorContext('csv_line');
 
         return !$this->csv->isEndOfFile();
     }

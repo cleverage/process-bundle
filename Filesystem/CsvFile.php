@@ -388,6 +388,9 @@ class CsvFile
             if (false === $headers || 0 === count($headers)) {
                 throw new \UnexpectedValueException("Unable to read CSV headers for file: {$this->filePath}");
             }
+            // Remove BOM if any
+            $bom = pack('H*','EFBBBF');
+            $headers[0] = preg_replace("/^{$bom}/", '', $headers[0]);
 
             return $headers;
         }

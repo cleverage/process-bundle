@@ -61,6 +61,7 @@ class ConstantIterableOutputTask extends AbstractConfigurableTask implements Ite
             $this->iterator = new \ArrayIterator($this->getOption($state, 'output'));
         }
 
+        $state->addErrorContextValue('constant_output_key', $this->iterator->key());
         $state->setOutput($this->iterator->current());
     }
 
@@ -76,6 +77,7 @@ class ConstantIterableOutputTask extends AbstractConfigurableTask implements Ite
     public function next(ProcessState $state)
     {
         $this->iterator->next();
+        $state->removeErrorContext('constant_output_key');
 
         return $this->iterator->valid();
     }

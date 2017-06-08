@@ -15,3 +15,8 @@ services:
         class: CleverAge\ProcessBundle\Transformer\ExplodeTransformer
         tags:
             - { name: cleverage.transformer }
+
+    cleverage_process.transformer.trim:
+        class: CleverAge\ProcessBundle\Transformer\TrimTransformer
+        tags:
+            - { name: cleverage.transformer }

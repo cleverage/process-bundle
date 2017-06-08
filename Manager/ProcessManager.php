@@ -131,7 +131,7 @@ class ProcessManager
      */
     protected function process(TaskConfiguration $taskConfiguration, ProcessState $state, $input = null)
     {
-        $state = clone $state;
+        $state = clone $state; // This is probably a bad idea but we can't just keep the reference
         do {
             $output = $this->doProcessTask($taskConfiguration, $state, $input);
             $this->handleState($state);
@@ -292,8 +292,9 @@ class ProcessManager
     protected function handleState(ProcessState $state)
     {
         // save state
+        $consoleOutput = $state->getConsoleOutput();
         foreach ($state->getTaskHistories() as $taskHistory) {
-            if ($consoleOutput = $state->getConsoleOutput()) {
+            if ($consoleOutput && $consoleOutput->isVerbose()) {
                 switch ($taskHistory->getLevel()) {
                     case LogLevel::WARNING:
                     case LogLevel::NOTICE:
@@ -309,6 +310,7 @@ class ProcessManager
                 $msg = "<{$level}>{$taskHistory->getTaskCode()} ({$taskHistory->getLevel()}): ";
                 $msg .= "{$taskHistory->getMessage()} [{$taskHistory->getReference()}]</{$level}>";
                 $consoleOutput->writeln($msg);
+                dump($taskHistory->getContext());
             }
             $this->entityManager->persist($taskHistory);
             $this->entityManager->flush($taskHistory);

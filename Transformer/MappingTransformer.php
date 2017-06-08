@@ -52,7 +52,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
      * @param mixed $input
      * @param array $options
      *
-     * @throws \RuntimeException
+     * @throws \Exception
      *
      * @return mixed $value
      */
@@ -71,13 +71,28 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 $transformedValue = null;
             } else {
                 $sourceProperty = $mapping['code'] === null ? $targetProperty : $mapping['code'];
-                if (!array_key_exists($sourceProperty, $input)) {
-                    if (!$mapping['ignore_missing'] && !$options['ignore_missing']) {
-                        throw new \RuntimeException("Missing property {$sourceProperty}");
+                if (is_array($sourceProperty)) {
+                    $transformedValue = [];
+                    /** @var array $sourceProperty */
+                    foreach ($sourceProperty as $key) {
+                        if (!array_key_exists($key, $input)) {
+                            if (!$mapping['ignore_missing'] && !$options['ignore_missing']) {
+                                throw new \RuntimeException("Missing property {$key}");
+                            }
+                            continue;
+                        }
+                        $transformedValue[] = $input[$key];
                     }
-                    continue;
+
+                } else {
+                    if (!array_key_exists($sourceProperty, $input)) {
+                        if (!$mapping['ignore_missing'] && !$options['ignore_missing']) {
+                            throw new \RuntimeException("Missing property {$sourceProperty}");
+                        }
+                        continue;
+                    }
+                    $transformedValue = $input[$sourceProperty];
                 }
-                $transformedValue = $input[$sourceProperty];
             }
 
             /** @noinspection ForeachSourceInspection */
@@ -174,7 +189,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 'transformers' => [],
             ]
         );
-        $resolver->setAllowedTypes('code', ['NULL', 'string']);
+        $resolver->setAllowedTypes('code', ['NULL', 'string', 'array']);
         $resolver->setAllowedTypes('set_null', ['boolean']);
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
         $resolver->setAllowedTypes('transformers', ['array']);
