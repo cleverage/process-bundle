@@ -22,6 +22,7 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Psr\Log\LogLevel;
 
 /**
  * Reads the file path from configuration and iterates over it
@@ -52,8 +53,14 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         }
 
         if (null === $output) {
-            $state->stop(new \UnexpectedValueException("CSV file {$this->csv->getFilePath()} is empty or unreadable"));
+            $state->log(
+                "Empty line detected at line: {$this->csv->getCurrentLine()}",
+                LogLevel::WARNING,
+                $this->csv->getFilePath()
+            );
+            $state->isSkipped();
         }
+
         $state->addErrorContextValue('csv_file', $this->csv->getFilePath());
         $state->addErrorContextValue('csv_line', $this->csv->getCurrentLine());
         $state->setOutput($output);
