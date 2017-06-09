@@ -21,6 +21,7 @@ namespace CleverAge\ProcessBundle\Manager;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Entity\TaskHistory;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
@@ -329,6 +330,7 @@ class ProcessManager
             $this->entityManager->flush($taskHistory);
         }
         $state->clearTaskHistories();
+        $this->entityManager->clear(TaskHistory::class);
 
         if ($state->getException() || $state->isStopped()) {
             $processHistory->setFailed();

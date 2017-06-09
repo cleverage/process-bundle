@@ -132,7 +132,7 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
 
         if (!$options['global_clear']) {
             foreach ($this->batch as $entity) {
-                $manager->clear($entity);
+                $manager->detach($entity);
             }
         }
 

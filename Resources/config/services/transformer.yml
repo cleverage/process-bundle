@@ -25,3 +25,15 @@ services:
         class: CleverAge\ProcessBundle\Transformer\ArrayMapTransformer
         tags:
             - { name: cleverage.transformer }
+
+    cleverage_process.transformer.array_first:
+        class: CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer
+        tags:
+            - { name: cleverage.transformer }
+
+    cleverage_process.transformer.property_accessor:
+        class: CleverAge\ProcessBundle\Transformer\PropertyAccessorTransformer
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: cleverage.transformer }
