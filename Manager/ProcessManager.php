@@ -318,8 +318,7 @@ class ProcessManager
         $state->clearTaskHistories();
 
         if ($state->getException() || $state->isStopped()) {
-            $processHistory = $state->getProcessHistory();
-            $this->entityManager->merge($processHistory);
+            $processHistory = $this->entityManager->merge($state->getProcessHistory());
             $processHistory->setFailed();
             $this->entityManager->flush($processHistory);
 
@@ -339,8 +338,7 @@ class ProcessManager
      */
     protected function endProcess(ProcessState $state)
     {
-        $processHistory = $state->getProcessHistory();
-        $processHistory = $this->entityManager->merge($processHistory);
+        $processHistory = $this->entityManager->merge($state->getProcessHistory());
         $processHistory->setSuccess();
         $this->entityManager->flush($processHistory);
     }
