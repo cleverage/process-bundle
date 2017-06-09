@@ -285,13 +285,18 @@ class ProcessManager
     }
 
     /**
+     * Save the state of the import process
+     *
      * @param ProcessState $state
      *
      * @throws \Exception
      */
     protected function handleState(ProcessState $state)
     {
-        // save state
+        // Merging the process history back into the unit of work
+        /** @var ProcessHistory $processHistory */
+        $processHistory = $this->entityManager->merge($state->getProcessHistory());
+
         $consoleOutput = $state->getConsoleOutput();
         foreach ($state->getTaskHistories() as $taskHistory) {
             if ($consoleOutput && $consoleOutput->isVerbose()) {
@@ -312,13 +317,13 @@ class ProcessManager
                 $consoleOutput->writeln($msg);
                 dump($taskHistory->getContext());
             }
+            $taskHistory->setProcessHistory($processHistory);
             $this->entityManager->persist($taskHistory);
             $this->entityManager->flush($taskHistory);
         }
         $state->clearTaskHistories();
 
         if ($state->getException() || $state->isStopped()) {
-            $processHistory = $this->entityManager->merge($state->getProcessHistory());
             $processHistory->setFailed();
             $this->entityManager->flush($processHistory);
 

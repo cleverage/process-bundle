@@ -123,7 +123,7 @@ class ProcessState
      */
     public function log(string $message, string $level = LogLevel::ERROR, string $reference = null, array $context = [])
     {
-        $taskHistory = new TaskHistory($this->getProcessHistory(), $this->getTaskConfiguration());
+        $taskHistory = new TaskHistory($this->getTaskConfiguration());
         $taskHistory->setMessage($message);
         $taskHistory->setLevel($level);
         $taskHistory->setReference($reference);

@@ -98,14 +98,10 @@ class TaskHistory
     protected $message;
 
     /**
-     * TaskHistory constructor.
-     *
-     * @param ProcessHistory    $processHistory
      * @param TaskConfiguration $taskConfiguration
      */
-    public function __construct(ProcessHistory $processHistory, TaskConfiguration $taskConfiguration)
+    public function __construct(TaskConfiguration $taskConfiguration)
     {
-        $this->processHistory = $processHistory;
         $this->taskCode = $taskConfiguration->getCode();
         $this->loggedAt = new \DateTime();
     }
@@ -124,6 +120,14 @@ class TaskHistory
     public function getProcessHistory(): ProcessHistory
     {
         return $this->processHistory;
+    }
+
+    /**
+     * @param ProcessHistory $processHistory
+     */
+    public function setProcessHistory(ProcessHistory $processHistory)
+    {
+        $this->processHistory = $processHistory;
     }
 
     /**
