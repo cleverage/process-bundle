@@ -20,3 +20,8 @@ services:
         class: CleverAge\ProcessBundle\Transformer\TrimTransformer
         tags:
             - { name: cleverage.transformer }
+
+    cleverage_process.transformer.array_map:
+        class: CleverAge\ProcessBundle\Transformer\ArrayMapTransformer
+        tags:
+            - { name: cleverage.transformer }

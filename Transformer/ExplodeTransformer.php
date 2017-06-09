@@ -45,16 +45,6 @@ class ExplodeTransformer implements ConfigurableTransformerInterface
         $this->configureOptions($resolver);
         $options = $resolver->resolve($options);
 
-        if (is_array($value) || $value instanceof \Traversable) {
-            $results = [];
-            /** @noinspection ForeachSourceInspection */
-            foreach ($value as $key => $item) {
-                $results[$key] = explode($options['delimiter'], $item);
-            }
-
-            return $results;
-        }
-
         return explode($options['delimiter'], $value);
     }
 

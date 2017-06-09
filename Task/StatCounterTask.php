@@ -39,8 +39,7 @@ class StatCounterTask implements FinalizableTaskInterface
      */
     public function finalize(ProcessState $state)
     {
-        $flatInputs = implode(', ', $state->getTaskConfiguration()->getInputs());
-        $state->log("Processed item count: {$this->counter}", LogLevel::INFO, $flatInputs);
+        $state->log("Processed item count: {$this->counter}", LogLevel::INFO);
     }
 
     /**

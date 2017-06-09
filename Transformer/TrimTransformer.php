@@ -45,16 +45,6 @@ class TrimTransformer implements ConfigurableTransformerInterface
         $this->configureOptions($resolver);
         $options = $resolver->resolve($options);
 
-        if (is_array($value) || $value instanceof \Traversable) {
-            $results = [];
-            /** @noinspection ForeachSourceInspection */
-            foreach ($value as $key => $item) {
-                $results[$key] = trim($item, $options['charlist']);
-            }
-
-            return $results;
-        }
-
         return trim($value, $options['charlist']);
     }
 

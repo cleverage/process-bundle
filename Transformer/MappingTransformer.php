@@ -193,5 +193,24 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
         $resolver->setAllowedTypes('set_null', ['boolean']);
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
         $resolver->setAllowedTypes('transformers', ['array']);
+        $resolver->setNormalizer( // This logic is duplicated from the array_map transformer @todo fix me
+            'transformers',
+            function (Options $options, $transformers) {
+                /** @var array $transformers */
+                foreach ($transformers as $transformerCode => &$transformerOptions) {
+                    $transformerOptionsResolver = new OptionsResolver();
+                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */// @todo remove me sometimes
+                    $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+                    if ($transformer instanceof ConfigurableTransformerInterface) {
+                        $transformer->configureOptions($transformerOptionsResolver);
+                        $transformerOptions = $transformerOptionsResolver->resolve(
+                            null === $transformerOptions ? [] : $transformerOptions
+                        );
+                    }
+                }
+
+                return $transformers;
+            }
+        );
     }
 }

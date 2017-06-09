@@ -42,20 +42,20 @@ class TaskConfiguration
     protected $options = [];
 
     /** @var array */
-    protected $inputs = [];
+    protected $outputs = [];
 
     /**
      * @param string $code
      * @param string $serviceReference
      * @param array  $options
-     * @param array  $inputs
+     * @param array  $outputs
      */
-    public function __construct($code, $serviceReference, array $options, array $inputs)
+    public function __construct($code, $serviceReference, array $options, array $outputs = [])
     {
         $this->code = $code;
         $this->serviceReference = $serviceReference;
         $this->options = $options;
-        $this->inputs = $inputs;
+        $this->outputs = $outputs;
     }
 
     /**
@@ -116,8 +116,8 @@ class TaskConfiguration
     /**
      * @return array
      */
-    public function getInputs(): array
+    public function getOutputs(): array
     {
-        return $this->inputs;
+        return $this->outputs;
     }
 }

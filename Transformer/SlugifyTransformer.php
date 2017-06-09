@@ -45,17 +45,17 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
         $this->configureOptions($resolver);
         $options = $resolver->resolve($options);
 
-        if (is_array($value) || $value instanceof \Traversable) {
-            $results = [];
-            /** @noinspection ForeachSourceInspection */
-            foreach ($value as $key => $item) {
-                $results[$key] = $this->slugify($item, $options);
-            }
+        $transliterator = \Transliterator::create($options['transliterator']);
+        $string = $transliterator->transliterate($value);
 
-            return $results;
-        }
-
-        return $this->slugify($value, $options);
+        return trim(
+            preg_replace(
+                $options['replace'],
+                $options['separator'],
+                strtolower(trim(strip_tags($string)))
+            ),
+            $options['separator']
+        );
     }
 
     /**
@@ -81,27 +81,6 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
                 'replace' => '/[^a-z0-9]+/',
                 'separator' => '_',
             ]
-        );
-    }
-
-    /**
-     * @param string $value
-     * @param array  $options
-     *
-     * @return string
-     */
-    protected function slugify($value, array $options)
-    {
-        $transliterator = \Transliterator::create($options['transliterator']);
-        $string = $transliterator->transliterate($value);
-
-        return trim(
-            preg_replace(
-                $options['replace'],
-                $options['separator'],
-                strtolower(trim(strip_tags($string)))
-            ),
-            $options['separator']
         );
     }
 }

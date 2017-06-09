@@ -112,15 +112,15 @@ class ProcessConfiguration
     /**
      * @param TaskConfiguration $currentTaskConfiguration
      *
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     *
      * @return TaskConfiguration[]
      */
     public function getNextTasks(TaskConfiguration $currentTaskConfiguration)
     {
         $taskConfigurations = [];
-        foreach ($this->taskConfigurations as $taskConfiguration) {
-            if (in_array($currentTaskConfiguration->getCode(), $taskConfiguration->getInputs(), true)) {
-                $taskConfigurations[] = $taskConfiguration;
-            }
+        foreach ($currentTaskConfiguration->getOutputs() as $taskCode) {
+            $taskConfigurations[] = $this->getTaskConfiguration($taskCode);
         }
 
         return $taskConfigurations;

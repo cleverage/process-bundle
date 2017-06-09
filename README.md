@@ -39,12 +39,13 @@ clever_age_process:
             entry_point: <task_code> # Code of the first task to execute
             tasks: # See the next chapter
                 <task_code>:
-                    inputs: [<other_task_code>, ...] # List of the tasks to read the output from
-                    service: '@<reference of the service>'
+                    service: '@<reference of the service>' # The service must implements the TaskInterface
                     options: {} # Options to pass to the task, see each task for more information
+                    outputs: [<other_task_code>, ...] # List of the tasks to pass the output to
 
                 # More tasks
 ```
+Note that orphan tasks will be reported as errors before the process starts
 
 ### Existing tasks
 
@@ -56,6 +57,7 @@ Simply outputs the same configured value all the time, ignores any input
     options:
         # Required options
         output: <mixed> # Will always output the value configured here
+    outputs: [<task_code>] # Array of tasks to pass the output to
 ```
 
 #### ConstantIterableOutputTask
@@ -66,6 +68,7 @@ Same as ConstantOutputTask but only accepts an array of values and iterates over
     options:
         # Required options
         output: <array> # Will iterate over the elements
+    outputs: [<task_code>] # Array of tasks to pass the output to
 ```
 
 #### CsvReaderTask
@@ -83,6 +86,7 @@ Reads a CSV file and iterate on each line, returning an array of key -> values
         escape: '\\'
         headers: null # Use this if you want to manually passed headers
         mode: 'r' # Used by fopen
+    outputs: [<task_code>] # Array of tasks accepting an array as input
 ```
 
 #### CsvWriterTask
@@ -90,7 +94,6 @@ Write to a CSV file, will wait until the end of the previous iteration (this is 
 path.
 ```yml
 <task_code>:
-    inputs: [<task_code>] # Array of tasks returning array outputs
     service: '@cleverage_process.task.csv_writer'
     options:
         # Required options
@@ -103,6 +106,7 @@ path.
         headers: null # Use this if you want to manually passed headers
         mode: 'r' # Used by fopen
         split_character: '|' # Tries to implode array values based on this character
+    outputs: [<task_code>] # This task will output the filepath of the written file
 ```
 If the tasks read anything else than an array as input the process will stops.
 
@@ -110,10 +114,9 @@ If the tasks read anything else than an array as input the process will stops.
 Dumps the input value to the console, obviously for debug purposes
 ```yml
 <task_code>:
-    inputs: [<task_code>] # Array of tasks from which you want to dump the output
     service: '@cleverage_process.task.debug'
 ```
-No supported options
+No supported options, no output.
 
 #### DoctrineReaderTask
 Reads data from a Doctrine Repository, iterating over the results. Ignores any input.
@@ -130,8 +133,9 @@ Reads data from a Doctrine Repository, iterating over the results. Ignores any i
         limit: null
         offset: null
         entity_manager: null # If the entity manager is not the default one, use this option
+    outputs: [<task_code>] # Array of tasks accepting an entity as input
 ```
-All the optional options behave like the ```EntityRepository::findBy``` method.
+All the criteria, order_by, limit and offset options behave like the ```EntityRepository::findBy``` method.
 
 #### DoctrineWriterTask
 Write a Doctrine entity to the database.
@@ -141,6 +145,7 @@ Write a Doctrine entity to the database.
     options:
         # Optional options
         entity_manager: null # If the entity manager is not the default one, use this option
+    outputs: [<task_code>] # Array of tasks accepting an entity as input
 ```
 
 #### NormalizerTask
@@ -154,6 +159,7 @@ Normalize data from the input and pass it to the output
 
         # Optional options
         context: [] # Will be passed directly to the third parameter of the normalize method
+    outputs: [<task_code>] # Array of tasks accepting the normalized data as input
 ```
 
 #### DenormalizerTask
@@ -168,13 +174,13 @@ Denormalize data from the input and pass it to the output
         # Optional options
         format: <string>
         context: [] # Will be passed directly to the third parameter of the normalize method
+    outputs: [<task_code>] # Array of tasks accepting the denormalized data as input
 ```
 
 #### PropertySetterTask
 Accepts an array or an object as an input and sets values before returning it as the output
 ```yml
 <task_code>:
-    inputs: [<task_code>] # Array of tasks that returns an array or an object
     service: '@cleverage_process.task.property_setter'
     options:
         # Required options
@@ -186,6 +192,7 @@ Accepts an array or an object as an input and sets values before returning it as
         stop_on_error: true # Stops the process if an error is encountered
         skip_on_error: true # Skip the current item of an iteration if an error is encountered
         log_errors: true # Logs any errors encountered
+    outputs: [<task_code>] # Array of tasks accepting the same data as the input
 ```
 
 #### StatCounterTask
@@ -193,16 +200,14 @@ Accepts an array or an object as an input and sets values before returning it as
 At the end of the process, during the finalize(), it will log the number of item processed.
 ```yml
 <task_code>:
-    inputs: [<task_code>] # Array of tasks that returns any output
     service: '@cleverage_process.task.stat_counter'
 ```
-No supported options
+No supported options, no output.
 
 #### TransformerTask
-Accepts an array or an object as an input and sets values before returning it as the output
+Accepts an array as input and sets values before returning it as the output
 ```yml
 <task_code>:
-    inputs: [<task_code>] # Array of tasks that returns an array (or an object)
     service: '@cleverage_process.task.transformer'
     options:
         # Required options
@@ -224,19 +229,20 @@ Accepts an array or an object as an input and sets values before returning it as
         stop_on_error: true # Stops the process if an error is encountered
         skip_on_error: true # Skip the current item of an iteration if an error is encountered
         log_errors: true # Logs any errors encountered
+    outputs: [<task_code>] # Array of tasks accepting an array as input
 ```
 
 #### ValidatorTask
 Validate data from the input and pass it to the output
 ```yml
 <task_code>:
-    inputs: [<task_code>] # Array of tasks that returns an object
     service: '@cleverage_process.task.validator'
     options:
         # Optional options
         stop_on_error: true # Stops the process if an error is encountered
         skip_on_error: true # Skip the current item of an iteration if an error is encountered
         log_errors: true # Logs any errors encountered
+    outputs: [<task_code>] # Array of tasks accepting the same data than the input
 ```
 
 #### DummyTask
@@ -244,6 +250,7 @@ Passes the input to the output, can be used as an entry point allow multiple tas
 ```yml
 <task_code>:
     service: '@cleverage_process.task.dummy'
+    outputs: [<task_code>] # Array of tasks to be called, does not pass any input
 ```
 
 ## Creating a custom task
@@ -295,15 +302,15 @@ clever_age_process:
                     service: '@cleverage_process.task.doctrine_reader'
                     options:
                         class_name: MyNamespace\FooBarBundle\Entity\Data
+                    outputs: [normalize]
 
                 normalize:
-                    inputs: [read]
                     service: '@cleverage_process.task.normalizer'
                     options:
                         format: csv
+                    outputs: [write]
 
                 write:
-                    inputs: [normalize]
                     service: '@cleverage_process.task.csv_writer'
                     options:
                         file_path: '%kernel.root_dir%/data/export/data.csv'

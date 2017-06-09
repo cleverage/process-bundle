@@ -319,6 +319,7 @@ class ProcessManager
 
         if ($state->getException() || $state->isStopped()) {
             $processHistory = $state->getProcessHistory();
+            $this->entityManager->merge($processHistory);
             $processHistory->setFailed();
             $this->entityManager->flush($processHistory);
 
@@ -334,10 +335,12 @@ class ProcessManager
      * @param ProcessState $state
      *
      * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
      */
     protected function endProcess(ProcessState $state)
     {
         $processHistory = $state->getProcessHistory();
+        $processHistory = $this->entityManager->merge($processHistory);
         $processHistory->setSuccess();
         $this->entityManager->flush($processHistory);
     }
