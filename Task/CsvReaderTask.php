@@ -37,6 +37,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
      * @param ProcessState $state
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \LogicException
      */
     public function execute(ProcessState $state)
     {
@@ -58,7 +59,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
                 LogLevel::WARNING,
                 $this->csv->getFilePath()
             );
-            $state->isSkipped();
+            $state->setSkipped(true);
         }
 
         $state->addErrorContextValue('csv_file', $this->csv->getFilePath());

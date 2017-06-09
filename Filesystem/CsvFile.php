@@ -60,6 +60,9 @@ class CsvFile
     /** @var bool */
     protected $isClosed;
 
+    /** @var bool */
+    protected $seekCalled = false;
+
     /**
      * @param string $filePath
      * @param string $delimiter
@@ -179,10 +182,16 @@ class CsvFile
     }
 
     /**
+     * @throws \LogicException
+     *
      * @return int
      */
     public function getCurrentLine()
     {
+        if ($this->seekCalled) {
+            throw new \LogicException('Cannot get current line number after calling "seek": the line number is lost');
+        }
+
         return $this->currentLine;
     }
 
@@ -336,6 +345,7 @@ class CsvFile
     public function seek($offset)
     {
         $this->assertOpened();
+        $this->seekCalled = true;
 
         return fseek($this->handler, $offset);
     }

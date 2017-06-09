@@ -47,7 +47,8 @@ class ProcessConfigurationRegistry
                     $taskCode,
                     $rawTaskConfiguration['service'],
                     $rawTaskConfiguration['options'],
-                    $rawTaskConfiguration['outputs']
+                    $rawTaskConfiguration['outputs'],
+                    $rawTaskConfiguration['errors']
                 );
             }
 

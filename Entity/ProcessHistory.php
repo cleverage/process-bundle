@@ -125,7 +125,7 @@ class ProcessHistory
     /**
      * @return \DateTime
      */
-    public function getEndDate(): \DateTime
+    public function getEndDate()
     {
         return $this->endDate;
     }

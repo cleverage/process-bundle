@@ -21,6 +21,7 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -51,13 +52,30 @@ class DenormalizerTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $options = $this->getOptions($state);
-        $normalizedData = $this->denormalizer->denormalize(
-            $state->getInput(),
-            $options['class'],
-            $options['format'],
-            $options['context']
-        );
-        $state->setOutput($normalizedData);
+        try {
+            $normalizedData = $this->denormalizer->denormalize(
+                $state->getInput(),
+                $options['class'],
+                $options['format'],
+                $options['context']
+            );
+            $state->setOutput($normalizedData);
+        } catch (\Exception $e) {
+            $state->setError($state->getInput());
+            if ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
+                $state->stop($e);
+
+                return;
+            }
+            if ($options[AbstractConfigurableTask::LOG_ERRORS]) {
+                $state->log('Denormalizer exception: '.$e->getMessage(), LogLevel::ERROR);
+            }
+            if ($options[AbstractConfigurableTask::SKIP_ON_ERROR]) {
+                $state->setSkipped(true);
+
+                return;
+            }
+        }
     }
 
     /**
@@ -68,6 +86,7 @@ class DenormalizerTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
+        parent::configureOptions($resolver);
         $resolver->setRequired(
             [
                 'class',

@@ -66,6 +66,9 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface, Transform
                 $transformer = $this->transformerRegistry->getTransformer($transformerCode);
                 $item = $transformer->transform($item, $transformerOptions);
             }
+            if (null === $item && $options['skip_null']) {
+                continue;
+            }
             $results[$key] = $item;
         }
 
@@ -95,6 +98,10 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface, Transform
             ]
         );
         $resolver->setAllowedTypes('transformers', ['array']);
+        $resolver->setDefaults([
+            'skip_null' => false,
+        ]);
+        $resolver->setAllowedTypes('skip_null', ['bool']);
         $resolver->setNormalizer(
             'transformers',
             function (Options $options, $transformers) {

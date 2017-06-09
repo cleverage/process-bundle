@@ -73,6 +73,7 @@ class PropertySetterTask extends AbstractConfigurableTask
             try {
                 $this->accessor->setValue($input, $key, $value);
             } catch (\Exception $e) {
+                $state->setError($input);
                 if ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
                     $state->stop($e);
 

@@ -65,7 +65,6 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
         $this->batch[] = $entity;
         if (count($this->batch) >= $this->getOption($state, 'batch_count')) {
             $this->writeBatch($state);
-
         }
 
         $state->setOutput($entity);

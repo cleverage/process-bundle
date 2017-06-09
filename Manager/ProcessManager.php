@@ -133,18 +133,29 @@ class ProcessManager
     {
         $state = clone $state; // This is probably a bad idea but we can't just keep the reference
         do {
-            $output = $this->doProcessTask($taskConfiguration, $state, $input);
+            $this->doProcessTask($taskConfiguration, $state, $input);
+            $output = $state->getOutput();
+            $error = $state->getError();
             $this->handleState($state);
 
             $task = $taskConfiguration->getTask();
 
             // Run child items only if the state is not "skipped" and task is not blocking
-            if (!$state->isSkipped() && !$task instanceof BlockingTaskInterface) {
-                foreach ($state->getProcessConfiguration()->getNextTasks($taskConfiguration) as $nextTask) {
-                    $this->process($nextTask, $state, $output);
+            if (!$task instanceof BlockingTaskInterface) {
+                if ($state->isSkipped()) { // If skipped
+                    if (null !== $error) {
+                        foreach ($state->getProcessConfiguration()->getErrorTasks($taskConfiguration) as $errorTask) {
+                            $this->process($errorTask, $state, $error);
+                        }
+                        $state->setError(null);
+                    }
+                } else {
+                    foreach ($state->getProcessConfiguration()->getNextTasks($taskConfiguration) as $nextTask) {
+                        $this->process($nextTask, $state, $output);
+                    }
                 }
+                $state->setSkipped(false); // Reset skipped state
             }
-            $state->setSkipped(false); // Reset skipped state
 
             $hasMoreItem = false; // By default, a task is not iterable
             if ($task instanceof IterableTaskInterface) {
@@ -249,8 +260,6 @@ class ProcessManager
      * @param TaskConfiguration $taskConfiguration
      * @param ProcessState      $state
      * @param mixed             $input
-     *
-     * @return mixed
      */
     protected function doProcessTask(TaskConfiguration $taskConfiguration, ProcessState $state, $input)
     {
@@ -262,8 +271,6 @@ class ProcessManager
             $state->log($e->getMessage(), LogLevel::CRITICAL);
             $state->stop($e);
         }
-
-        return $state->getOutput();
     }
 
     /**
@@ -315,7 +322,7 @@ class ProcessManager
                 $msg = "<{$level}>{$taskHistory->getTaskCode()} ({$taskHistory->getLevel()}): ";
                 $msg .= "{$taskHistory->getMessage()} [{$taskHistory->getReference()}]</{$level}>";
                 $consoleOutput->writeln($msg);
-                dump($taskHistory->getContext());
+                $consoleOutput->writeln(json_encode($taskHistory->getContext()));
             }
             $taskHistory->setProcessHistory($processHistory);
             $this->entityManager->persist($taskHistory);

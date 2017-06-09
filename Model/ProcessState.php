@@ -49,6 +49,9 @@ class ProcessState
     /** @var mixed */
     protected $output;
 
+    /** @var mixed */
+    protected $error;
+
     /** @var TaskHistory[] */
     protected $taskHistories = [];
 
@@ -178,6 +181,22 @@ class ProcessState
     public function setOutput($output)
     {
         $this->output = $output;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getError()
+    {
+        return $this->error;
+    }
+
+    /**
+     * @param mixed $error
+     */
+    public function setError($error)
+    {
+        $this->error = $error;
     }
 
     /**

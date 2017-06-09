@@ -87,6 +87,7 @@ class TransformerTask extends AbstractConfigurableTask
                 $transformerOptions
             );
         } catch (\Exception $e) {
+            $state->setError($state->getInput());
             if ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
                 $state->stop($e);
 

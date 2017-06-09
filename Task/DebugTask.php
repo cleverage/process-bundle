@@ -35,6 +35,8 @@ class DebugTask implements TaskInterface
      */
     public function execute(ProcessState $state)
     {
-        dump($state->getInput());
+        if (function_exists('dump')) {
+            dump($state->getInput());
+        }
     }
 }

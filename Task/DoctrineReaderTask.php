@@ -21,8 +21,6 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Doctrine\ORM\EntityManager;
-use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use Doctrine\ORM\EntityRepository;
 use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -64,6 +62,7 @@ class DoctrineReaderTask extends AbstractDoctrineTask implements IterableTaskInt
      *
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \UnexpectedValueException
      */
     public function execute(ProcessState $state)
     {

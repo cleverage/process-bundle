@@ -84,8 +84,7 @@ class Configuration implements ConfigurationInterface
     {
         $definition
             ->scalarNode('entry_point')->defaultNull()->end()
-            ->arrayNode('options')->prototype('variable')->end()->end()
-        ;
+            ->arrayNode('options')->prototype('variable')->end()->end();
 
         /** @var ArrayNodeDefinition $tasksArrayDefinition */
         $tasksArrayDefinition = $definition
@@ -112,7 +111,8 @@ class Configuration implements ConfigurationInterface
     {
         $definition
             ->scalarNode('service')->isRequired()->end()
+            ->arrayNode('options')->prototype('variable')->end()->end()
             ->arrayNode('outputs')->prototype('scalar')->defaultValue([])->end()->end()
-            ->arrayNode('options')->prototype('variable')->end()->end();
+            ->arrayNode('errors')->prototype('scalar')->defaultValue([])->end()->end();
     }
 }
