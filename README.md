@@ -313,5 +313,5 @@ clever_age_process:
                 write:
                     service: '@cleverage_process.task.csv_writer'
                     options:
-                        file_path: '%kernel.root_dir%/data/export/data.csv'
+                        file_path: '%kernel.root_dir%/../var/data/export/data.csv'
 ```

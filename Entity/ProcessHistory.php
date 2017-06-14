@@ -171,4 +171,15 @@ class ProcessHistory
         $this->endDate = new \DateTime();
         $this->state = self::STATE_SUCCESS;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        $reference = $this->getProcessCode().'['.$this->getState().']';
+        $time = $this->getStartDate()->format(\DateTime::ISO8601);
+
+        return $reference.': '.$time;
+    }
 }

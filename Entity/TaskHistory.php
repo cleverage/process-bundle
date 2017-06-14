@@ -209,4 +209,15 @@ class TaskHistory
     {
         $this->message = $message;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        $reference = $this->getProcessHistory()->getProcessCode().'/'.$this->getTaskCode();
+        $time = $this->getLoggedAt()->format(\DateTime::ISO8601);
+
+        return $reference.': '.$time;
+    }
 }
