@@ -17,21 +17,18 @@
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace CleverAge\ProcessBundle\Task;
+namespace CleverAge\ProcessBundle\Transformer;
 
-use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Denormalize input to output with configurable class and format
+ * Denormalize the given value based on options
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class DenormalizerTask extends AbstractConfigurableTask
+class DenormalizeTransformer implements ConfigurableTransformerInterface
 {
     /** @var DenormalizerInterface */
     protected $denormalizer;
@@ -45,48 +42,13 @@ class DenormalizerTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param ProcessState $state
-     *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     */
-    public function execute(ProcessState $state)
-    {
-        $options = $this->getOptions($state);
-        try {
-            $normalizedData = $this->denormalizer->denormalize(
-                $state->getInput(),
-                $options['class'],
-                $options['format'],
-                $options['context']
-            );
-            $state->setOutput($normalizedData);
-        } catch (\Exception $e) {
-            $state->setError($state->getInput());
-            if ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
-                $state->stop($e);
-
-                return;
-            }
-            if ($options[AbstractConfigurableTask::LOG_ERRORS]) {
-                $state->log('Denormalizer exception: '.$e->getMessage(), LogLevel::ERROR);
-            }
-            if ($options[AbstractConfigurableTask::SKIP_ON_ERROR]) {
-                $state->setSkipped(true);
-
-                return;
-            }
-        }
-    }
-
-    /**
      * @param OptionsResolver $resolver
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */
-    protected function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
         $resolver->setRequired(
             [
                 'class',
@@ -101,5 +63,37 @@ class DenormalizerTask extends AbstractConfigurableTask
         );
         $resolver->setAllowedTypes('format', ['NULL', 'string']);
         $resolver->setAllowedTypes('context', ['array']);
+    }
+
+    /**
+     * @param mixed $value
+     * @param array $options
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     *
+     * @return mixed
+     */
+    public function transform($value, array $options = [])
+    {
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
+        $options = $resolver->resolve($options);
+
+        return $this->denormalizer->denormalize(
+            $value,
+            $options['class'],
+            $options['format'],
+            $options['context']
+        );
+    }
+
+    /**
+     * Returns the unique code to identify the transformer
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+        return 'denormalize';
     }
 }

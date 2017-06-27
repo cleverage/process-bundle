@@ -37,3 +37,17 @@ services:
             - '@property_accessor'
         tags:
             - { name: cleverage.transformer }
+
+    cleverage_process.transformer.denormalize:
+        class: CleverAge\ProcessBundle\Transformer\DenormalizeTransformer
+        arguments:
+            - '@serializer'
+        tags:
+            - { name: cleverage.transformer }
+
+    cleverage_process.transformer.normalize:
+        class: CleverAge\ProcessBundle\Transformer\NormalizeTransformer
+        arguments:
+            - '@serializer'
+        tags:
+            - { name: cleverage.transformer }
