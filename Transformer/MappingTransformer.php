@@ -74,14 +74,14 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 if (is_array($sourceProperty)) {
                     $transformedValue = [];
                     /** @var array $sourceProperty */
-                    foreach ($sourceProperty as $key) {
-                        if (!array_key_exists($key, $input)) {
+                    foreach ($sourceProperty as $destKey => $srcKey) {
+                        if (!array_key_exists($srcKey, $input)) {
                             if (!$mapping['ignore_missing'] && !$options['ignore_missing']) {
-                                throw new \RuntimeException("Missing property {$key}");
+                                throw new \RuntimeException("Missing property {$srcKey}");
                             }
                             continue;
                         }
-                        $transformedValue[] = $input[$key];
+                        $transformedValue[$destKey] = $input[$srcKey];
                     }
 
                 } else {

@@ -51,3 +51,13 @@ services:
             - '@serializer'
         tags:
             - { name: cleverage.transformer }
+
+    cleverage_process.transformer.convert_value:
+        class: CleverAge\ProcessBundle\Transformer\ConvertValueTransformer
+        tags:
+            - { name: cleverage.transformer }
+
+    cleverage_process.transformer.callback:
+        class: CleverAge\ProcessBundle\Transformer\CallbackTransformer
+        tags:
+            - { name: cleverage.transformer }
