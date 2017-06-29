@@ -337,7 +337,7 @@ class ProcessManager
             $this->entityManager->flush($processHistory);
 
             throw new \RuntimeException(
-                "Process {$state->getProcessConfiguration()->getCode()} as failed",
+                "Process {$state->getProcessConfiguration()->getCode()} has failed",
                 -1,
                 $state->getException()
             );
