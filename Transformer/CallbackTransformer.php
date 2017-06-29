@@ -50,7 +50,7 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         $parameters = $options['additional_parameters'];
         array_unshift($parameters, $value);
 
-        return call_user_func_array($options['callable'], $parameters);
+        return call_user_func_array($options['callback'], $parameters);
     }
 
     /**
