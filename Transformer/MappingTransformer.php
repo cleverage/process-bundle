@@ -75,23 +75,34 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                     $transformedValue = [];
                     /** @var array $sourceProperty */
                     foreach ($sourceProperty as $destKey => $srcKey) {
-                        if (!array_key_exists($srcKey, $input)) {
-                            if (!$mapping['ignore_missing'] && !$options['ignore_missing']) {
-                                throw new \RuntimeException("Missing property {$srcKey}");
+                        try {
+                            $transformedValue[$destKey] = $this->getDataFromInput(
+                                $input,
+                                $srcKey,
+                                $options['level_separator']
+                            );
+                        } catch (\RuntimeException $missingPropertyError) {
+                            if ($mapping['ignore_missing'] || $options['ignore_missing']) {
+                                continue;
+                            } else {
+                                throw $missingPropertyError;
                             }
-                            continue;
                         }
-                        $transformedValue[$destKey] = $input[$srcKey];
                     }
-
                 } else {
-                    if (!array_key_exists($sourceProperty, $input)) {
-                        if (!$mapping['ignore_missing'] && !$options['ignore_missing']) {
-                            throw new \RuntimeException("Missing property {$sourceProperty}");
+                    try {
+                        $transformedValue = $this->getDataFromInput(
+                            $input,
+                            $sourceProperty,
+                            $options['level_separator']
+                        );
+                    } catch (\RuntimeException $missingPropertyError) {
+                        if ($mapping['ignore_missing'] || $options['ignore_missing']) {
+                            continue;
+                        } else {
+                            throw $missingPropertyError;
                         }
-                        continue;
                     }
-                    $transformedValue = $input[$sourceProperty];
                 }
             }
 
@@ -132,10 +143,12 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 'ignore_missing' => false,
                 'ignore_extra' => false,
                 'initial_value' => [],
+                'level_separator' => '.',
             ]
         );
         $resolver->setAllowedTypes('ignore_missing', ['bool']);
         $resolver->setAllowedTypes('ignore_extra', ['bool']);
+        $resolver->setAllowedTypes('level_separator', ['NULL', 'string']);
 
         $resolver->setNormalizer(
             'mapping',
@@ -212,5 +225,33 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 return $transformers;
             }
         );
+    }
+
+    /**
+     * Should return the value matching the key from the input
+     * May handle multi-dimensional array through if the key contains a dot (or any other option-defined separator)
+     * Can be disabled by using "null" separator
+     *
+     * @param array  $input
+     * @param string $key
+     * @param string $separator
+     *
+     * @throws \RuntimeException if the property is missing
+     *
+     * @return mixed
+     */
+    protected function getDataFromInput(array $input, string $key, string $separator = '.')
+    {
+        if (array_key_exists($key, $input)) {
+            return $input[$key];
+        } elseif ($separator && strpos($key, $separator) !== false) {
+            $keyParts = explode($separator, $key);
+            $firstPart = array_shift($keyParts);
+            if (array_key_exists($firstPart, $input) && is_array($input[$firstPart])) {
+                return $this->getDataFromInput($input[$firstPart], implode($separator, $keyParts));
+            }
+        }
+
+        throw new \RuntimeException("Missing property {$key}");
     }
 }
