@@ -19,6 +19,7 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -106,13 +107,17 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 }
             }
 
-            /** @noinspection ForeachSourceInspection */
-            foreach ($mapping['transformers'] as $transformerCode => $transformerOptions) {
-                $transformer = $this->transformerRegistry->getTransformer($transformerCode);
-                $transformedValue = $transformer->transform(
-                    $transformedValue,
-                    $transformerOptions ?: []
-                );
+            try {
+                /** @noinspection ForeachSourceInspection */
+                foreach ($mapping['transformers'] as $transformerCode => $transformerOptions) {
+                    $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+                    $transformedValue = $transformer->transform(
+                        $transformedValue,
+                        $transformerOptions ?: []
+                    );
+                }
+            } catch (\Throwable $exception) {
+                throw new TransformerException($targetProperty, 0, $exception);
             }
 
             if (is_array($result)) {
