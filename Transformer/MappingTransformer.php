@@ -120,7 +120,9 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 throw new TransformerException($targetProperty, 0, $exception);
             }
 
-            if (is_array($result)) {
+            if (is_callable($options['merge_callback'])) {
+                $options['merge_callback']($result, $targetProperty, $transformedValue);
+            } elseif (is_array($result)) {
                 $result[$targetProperty] = $transformedValue;
             } else {
                 $this->accessor->setValue($result, $targetProperty, $transformedValue);
@@ -149,11 +151,13 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 'ignore_extra' => false,
                 'initial_value' => [],
                 'level_separator' => '.',
+                'merge_callback' => null,
             ]
         );
         $resolver->setAllowedTypes('ignore_missing', ['bool']);
         $resolver->setAllowedTypes('ignore_extra', ['bool']);
         $resolver->setAllowedTypes('level_separator', ['NULL', 'string']);
+        $resolver->setAllowedTypes('merge_callback', ['NULL', 'callable']);
 
         /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
@@ -239,17 +243,20 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
      * May handle multi-dimensional array through if the key contains a dot (or any other option-defined separator)
      * Can be disabled by using "null" separator
      *
-     * @param array  $input
-     * @param string $key
-     * @param string $separator
+     * @param array|object $input
+     * @param string       $key
+     * @param string       $separator
      *
      * @throws \RuntimeException if the property is missing
+     * @throws \InvalidArgumentException
      *
      * @return mixed
      */
-    protected function getDataFromInput(array $input, string $key, string $separator = '.')
+    protected function getDataFromInput($input, string $key, string $separator = '.')
     {
-        if (array_key_exists($key, $input)) {
+        if (!is_array($input)) {
+            return $this->accessor->getValue($input, $key);
+        } elseif (array_key_exists($key, $input)) {
             return $input[$key];
         } elseif ($separator && strpos($key, $separator) !== false) {
             $keyParts = explode($separator, $key);
