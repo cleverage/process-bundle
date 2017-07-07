@@ -80,12 +80,13 @@ class ProcessManager
     /**
      * @param string          $processCode
      * @param OutputInterface $output
+     * @param mixed           $input
      *
      * @throws \Exception
      *
      * @return int
      */
-    public function execute(string $processCode, OutputInterface $output = null)
+    public function execute(string $processCode, OutputInterface $output = null, $input = null)
     {
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
         $state = $this->initializeState($processConfiguration, $output);
@@ -99,7 +100,7 @@ class ProcessManager
         $taskConfiguration = $processConfiguration->getEntryPoint();
 
         // Then launch the process : iterate the tasks tree properly
-        $this->process($taskConfiguration, $state);
+        $this->process($taskConfiguration, $state, $input);
 
         // Finalize the process in a linear way
         foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
@@ -215,9 +216,20 @@ class ProcessManager
     protected function doInitializeTask(TaskConfiguration $taskConfiguration, ProcessState $state)
     {
         $state->setTaskConfiguration($taskConfiguration);
-        $task = $this->container->get(ltrim($taskConfiguration->getServiceReference(), '@'));
+        $serviceReference = $taskConfiguration->getServiceReference();
+        if (strpos($serviceReference, '@') === 0) {
+            $task = $this->container->get(ltrim($serviceReference, '@'));
+        } elseif (class_exists($serviceReference)) {
+            $task = new $serviceReference();
+        } else {
+            throw new \UnexpectedValueException(
+                "Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'"
+            );
+        }
         if (!$task instanceof TaskInterface) {
-            throw new \UnexpectedValueException("Task '{$taskConfiguration->getCode()}' is not a TaskInterface");
+            throw new \UnexpectedValueException(
+                "Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface"
+            );
         }
         $taskConfiguration->setTask($task);
 

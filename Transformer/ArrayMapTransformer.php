@@ -102,6 +102,7 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface, Transform
             'skip_null' => false,
         ]);
         $resolver->setAllowedTypes('skip_null', ['bool']);
+        /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'transformers',
             function (Options $options, $transformers) {

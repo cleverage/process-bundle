@@ -39,7 +39,11 @@ clever_age_process:
             entry_point: <task_code> # Code of the first task to execute
             tasks: # See the next chapter
                 <task_code>:
-                    service: '@<reference of the service>' # The service must implements the TaskInterface
+                    # You can use two syntax for service declaration
+                    service: '@<reference of the service>'
+                    # Or, alternatively, if you don't want to declare unecessary services
+                    service: MyNamespace\FooBarBundle\Task\MyTask # If no argument is needed to construct this task
+                    # In both cases the service/class must implements the TaskInterface
                     options: {} # Options to pass to the task, see each task for more information
                     outputs: [<other_task_code>, ...] # List of the tasks to pass the output to
 

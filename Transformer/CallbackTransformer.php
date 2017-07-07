@@ -76,6 +76,7 @@ class CallbackTransformer implements ConfigurableTransformerInterface
             ]
         );
         $resolver->setAllowedTypes('callback', ['string', 'array']);
+        /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'callback',
             function (Options $options, $value) {

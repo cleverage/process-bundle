@@ -70,7 +70,7 @@ class ProcessConfigurationRegistry
      */
     public function getProcessConfiguration(string $processCode): ProcessConfiguration
     {
-        if (!array_key_exists($processCode, $this->processConfigurations)) {
+        if (!$this->hasProcessConfiguration($processCode)) {
             throw new MissingProcessException($processCode);
         }
 
@@ -83,5 +83,15 @@ class ProcessConfigurationRegistry
     public function getProcessConfigurations(): array
     {
         return $this->processConfigurations;
+    }
+
+    /**
+     * @param string $processCode
+     *
+     * @return bool
+     */
+    public function hasProcessConfiguration(string $processCode): bool
+    {
+        return array_key_exists($processCode, $this->processConfigurations);
     }
 }

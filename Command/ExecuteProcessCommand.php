@@ -23,6 +23,7 @@ use CleverAge\ProcessBundle\Manager\ProcessManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -49,6 +50,8 @@ class ExecuteProcessCommand extends ContainerAwareCommand
             InputArgument::IS_ARRAY | InputArgument::REQUIRED,
             'The code(s) of the process(es) to execute, separated by a space'
         );
+        $this->addOption('input', 'i', InputOption::VALUE_REQUIRED, 'Pass input data to the first task of the process');
+        $this->addOption('input-from-stdin', null, InputOption::VALUE_NONE, 'Read input data from stdin');
     }
 
     /**
@@ -74,12 +77,20 @@ class ExecuteProcessCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $inputData = $input->getOption('input');
+        if ($input->getOption('input-from-stdin')) {
+            $inputData = '';
+            while (!feof(STDIN)) {
+                $inputData .= fread(STDIN, 8192);
+            }
+        }
+
         /** @noinspection ForeachSourceInspection */
         foreach ($input->getArgument('processCodes') as $code) {
             if (!$output->isQuiet()) {
                 $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
-            $returnValue = $this->processManager->execute($code, $output);
+            $returnValue = $this->processManager->execute($code, $output, $inputData);
             if ($returnValue !== 0) {
                 if (!$output->isQuiet()) {
                     $output->writeln("<error>Process '{$code}' returned an error code</error>");

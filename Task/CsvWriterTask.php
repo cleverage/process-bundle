@@ -33,6 +33,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 {
+    /** @var CsvFile */
+    protected $csv;
+
     /**
      * @param ProcessState $state
      *

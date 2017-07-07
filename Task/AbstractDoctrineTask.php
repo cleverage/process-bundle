@@ -19,15 +19,11 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\EntityManager;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use Doctrine\ORM\EntityRepository;
-use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Doctrine\ORM\Internal\Hydration\IterableResult;
 
 /**
  * Base logic for doctrine related tasks

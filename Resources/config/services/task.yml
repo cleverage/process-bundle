@@ -66,3 +66,18 @@ services:
         class: CleverAge\ProcessBundle\Task\TransformerTask
         arguments: ['@cleverage_process.registry.transformer', mapping]
         shared: false
+
+    cleverage_process.task.process_launcher:
+        class: CleverAge\ProcessBundle\Task\ProcessLauncherTask
+        shared: false
+        arguments:
+            - '@cleverage_process.registry.process_configuration'
+            - '@kernel'
+
+    cleverage_process.task.folder_browser:
+        class: CleverAge\ProcessBundle\Task\FolderBrowserTask
+        shared: false
+
+    cleverage_process.task.file_remover:
+        class: CleverAge\ProcessBundle\Task\FileRemoverTask
+        shared: false

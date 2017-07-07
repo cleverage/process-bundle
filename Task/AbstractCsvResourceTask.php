@@ -19,19 +19,33 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Filesystem\CsvFile;
+use CleverAge\ProcessBundle\Filesystem\CsvResource;
+use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Reads the file path from configuration and iterates over it
- * Ignores any input
+ * Generic abstract task to handle CSV resources
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-abstract class AbstractCsvTask extends AbstractCsvResourceTask
+abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implements FinalizableTaskInterface
 {
+    /** @var CsvResource */
+    protected $csv;
+
+    /**
+     * @param ProcessState $state
+     */
+    public function finalize(ProcessState $state)
+    {
+        if ($this->csv instanceof CsvResource) {
+            $this->csv->close();
+        }
+    }
+
     /**
      * @param ProcessState $state
      *
@@ -46,13 +60,12 @@ abstract class AbstractCsvTask extends AbstractCsvResourceTask
         }
         $options = $this->getOptions($state);
         $headers = $this->getHeaders($state, $options);
-        $this->csv = new CsvFile(
-            $options['file_path'],
+        $this->csv = new CsvResource(
+            $state->getInput(),
             $options['delimiter'],
             $options['enclosure'],
             $options['escape'],
-            $headers,
-            $options['mode']
+            $headers
         );
     }
 
@@ -64,18 +77,25 @@ abstract class AbstractCsvTask extends AbstractCsvResourceTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
-        $resolver->setRequired(
-            [
-                'file_path',
-            ]
-        );
-        $resolver->setAllowedTypes('file_path', ['string']);
         $resolver->setDefaults(
             [
-                'mode' => 'r',
+                'delimiter' => ';',
+                'enclosure' => '"',
+                'escape' => '\\',
+                'headers' => null,
             ]
         );
-        $resolver->setAllowedTypes('mode', ['string']);
+        $resolver->setAllowedTypes('delimiter', ['string']);
+        $resolver->setAllowedTypes('enclosure', ['string']);
+        $resolver->setAllowedTypes('escape', ['string']);
+        $resolver->setAllowedTypes('headers', ['NULL', 'array']);
     }
+
+    /**
+     * @param ProcessState $state
+     * @param array        $options
+     *
+     * @return array
+     */
+    abstract protected function getHeaders(ProcessState $state, array $options);
 }

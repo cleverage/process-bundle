@@ -155,6 +155,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
         $resolver->setAllowedTypes('ignore_extra', ['bool']);
         $resolver->setAllowedTypes('level_separator', ['NULL', 'string']);
 
+        /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'mapping',
             function (Options $options, $value) {
@@ -211,6 +212,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
         $resolver->setAllowedTypes('set_null', ['boolean']);
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
         $resolver->setAllowedTypes('transformers', ['array']);
+        /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer( // This logic is duplicated from the array_map transformer @todo fix me
             'transformers',
             function (Options $options, $transformers) {
