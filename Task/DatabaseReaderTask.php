@@ -83,18 +83,8 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
      */
     public function execute(ProcessState $state)
     {
-        $options = $this->getOptions($state);
         if (!$this->statement) {
-            $connection = $this->getConnection($state);
-            $sql = $options['sql'];
-            if (null === $sql) {
-                $qb = $connection->createQueryBuilder();
-                $qb
-                    ->select('tbl.*')
-                    ->from($options['table'], 'tbl');
-                $sql = $qb->getSQL();
-            }
-            $this->statement = $connection->executeQuery($sql);
+            $this->statement = $this->initializeStatement($state);
         }
 
         // Check if the next item has been stored by the next() call
@@ -107,7 +97,8 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
 
         // Handle empty results
         if (false === $result) {
-            $state->log('Empty resultset for query', LogLevel::WARNING, $options['class_name'], $options);
+            $options = $this->getOptions($state);
+            $state->log('Empty resultset for query', LogLevel::WARNING, $options['table'], $options);
             $state->setStopped(true);
 
             return;
@@ -137,6 +128,36 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
     }
 
     /**
+     * @param ProcessState $state
+     *
+     * @return \Doctrine\DBAL\Driver\Statement
+     */
+    protected function initializeStatement(ProcessState $state)
+    {
+        $options = $this->getOptions($state);
+        $connection = $this->getConnection($state);
+        $sql = $options['sql'];
+
+        if (null === $sql) {
+            $qb = $connection->createQueryBuilder();
+            $qb
+                ->select('tbl.*')
+                ->from($options['table'], 'tbl');
+
+            if ($options['limit']) {
+                $qb->setMaxResults($options['limit']);
+            }
+            if ($options['offset']) {
+                $qb->setFirstResult($options['offset']);
+            }
+
+            $sql = $qb->getSQL();
+        }
+
+        return $connection->executeQuery($sql);
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -151,12 +172,16 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
             [
                 'connection' => null,
                 'sql' => null,
+                'limit' => null,
+                'offset' => null,
                 'paginate' => null,
             ]
         );
         $resolver->setAllowedTypes('connection', ['NULL', 'string']);
         $resolver->setAllowedTypes('sql', ['NULL', 'string']);
         $resolver->setAllowedTypes('paginate', ['NULL', 'int']);
+        $resolver->setAllowedTypes('limit', ['NULL', 'integer']);
+        $resolver->setAllowedTypes('offset', ['NULL', 'integer']);
     }
 
     /**

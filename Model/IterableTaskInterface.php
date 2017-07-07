@@ -37,4 +37,14 @@ interface IterableTaskInterface extends TaskInterface
      * @return bool
      */
     public function next(ProcessState $state);
+
+    /**
+     * Allow to reset the cached data of the current task for next input loop
+     * May be empty if never used, but it's better
+     *
+     * @TODO should be enabled ?
+     *
+     * @param ProcessState $state
+     */
+    // public function reset(ProcessState $state);
 }
