@@ -52,6 +52,9 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
         $options = $resolver->resolve($options);
 
         if (!array_key_exists($value, $options['map'])) {
+            if ($options['keep_missing']) {
+                return $value;
+            }
             if (!$options['ignore_missing']) {
                 throw new \UnexpectedValueException("Missing value in map '{$value}'");
             }
@@ -87,7 +90,9 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('map', ['array']);
         $resolver->setDefaults([
             'ignore_missing' => false,
+            'keep_missing' => false,
         ]);
         $resolver->setAllowedTypes('ignore_missing', ['bool']);
+        $resolver->setAllowedTypes('keep_missing', ['bool']);
     }
 }

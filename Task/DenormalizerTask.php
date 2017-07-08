@@ -62,11 +62,6 @@ class DenormalizerTask extends AbstractConfigurableTask
             $state->setOutput($normalizedData);
         } catch (\Exception $e) {
             $state->setError($state->getInput());
-            if ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
-                $state->stop($e);
-
-                return;
-            }
             if ($options[AbstractConfigurableTask::LOG_ERRORS]) {
                 $state->log('Denormalizer exception: '.$e->getMessage(), LogLevel::ERROR);
             }
@@ -74,6 +69,9 @@ class DenormalizerTask extends AbstractConfigurableTask
                 $state->setSkipped(true);
 
                 return;
+            }
+            if ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
+                $state->stop($e);
             }
         }
     }
