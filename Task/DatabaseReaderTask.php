@@ -83,6 +83,7 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
      */
     public function execute(ProcessState $state)
     {
+        $options = $this->getOptions($state);
         if (!$this->statement) {
             $this->statement = $this->initializeStatement($state);
         }
@@ -97,7 +98,6 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
 
         // Handle empty results
         if (false === $result) {
-            $options = $this->getOptions($state);
             $state->log('Empty resultset for query', LogLevel::WARNING, $options['table'], $options);
             $state->setStopped(true);
 
