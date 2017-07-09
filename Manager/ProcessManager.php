@@ -254,6 +254,7 @@ class ProcessManager
     {
         $state->setInput($input);
         $state->setOutput(null);
+        $state->setSkipped(false);
         $state->setTaskConfiguration($taskConfiguration);
 
         $consoleOutput = $state->getConsoleOutput();

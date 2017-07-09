@@ -46,7 +46,9 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         try {
             if (!$this->csv instanceof CsvFile) {
                 $this->initFile($state);
-                $this->csv->writeHeaders();
+                if (0 === filesize($this->csv->getFilePath())) {
+                    $this->csv->writeHeaders();
+                }
             }
             $this->csv->writeLine($this->getInput($state));
         } catch (\Exception $e) {

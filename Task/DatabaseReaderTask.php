@@ -113,7 +113,17 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
             return;
         }
 
-        $state->setOutput($result);
+        if (null !== $options['paginate']) {
+            $results = [];
+            $i = 0;
+            while ($result !== false && $i++ < $options['paginate']) {
+                $results[] = $result;
+                $result = $this->statement->fetch();
+            }
+            $state->setOutput($results);
+        } else {
+            $state->setOutput($result);
+        }
     }
 
     /**
@@ -141,9 +151,12 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
             [
                 'connection' => null,
                 'sql' => null,
+                'paginate' => null,
             ]
         );
         $resolver->setAllowedTypes('connection', ['NULL', 'string']);
+        $resolver->setAllowedTypes('sql', ['NULL', 'string']);
+        $resolver->setAllowedTypes('paginate', ['NULL', 'int']);
     }
 
     /**
