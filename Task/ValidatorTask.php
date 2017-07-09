@@ -22,6 +22,7 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use Psr\Log\LogLevel;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -52,8 +53,8 @@ class ValidatorTask extends AbstractConfigurableTask
      */
     public function execute(ProcessState $state)
     {
-        $violations = $this->validator->validate($state->getInput());
         $options = $this->getOptions($state);
+        $violations = $this->validator->validate($state->getInput(), null, $options['groups']);
 
         if ($options[AbstractConfigurableTask::LOG_ERRORS]) {
             /** @var  $violation ConstraintViolationInterface */
@@ -84,4 +85,17 @@ class ValidatorTask extends AbstractConfigurableTask
 
         $state->setOutput($state->getInput());
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver->setDefault('groups', null);
+        $resolver->addAllowedTypes('groups', ['NULL', 'array']);
+    }
+
+
 }
