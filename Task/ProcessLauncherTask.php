@@ -24,6 +24,7 @@ use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\Options;
@@ -139,23 +140,26 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
             throw new \RuntimeException("Unable to resolve path to symfony console '{$consolePath}'");
         }
 
+        $consoleOutput = $state->getConsoleOutput();
+        $arguments = [
+            $consolePath,
+            '--env='.$this->kernel->getEnvironment(),
+            'cleverage:process:execute',
+            '--input-from-stdin',
+            $processCode,
+        ];
+        $verbosity = $this->getVerbosityParameter($consoleOutput);
+        if ($verbosity) {
+            $arguments[] = $verbosity;
+        }
+
         $processBuilder->setPrefix($pathFinder->find());
-        $processBuilder->setArguments(
-            [
-                $consolePath,
-                '-v',
-                '--env='.$this->kernel->getEnvironment(),
-                '--input-from-stdin',
-                'cleverage:process:execute',
-                $processCode,
-            ]
-        );
+        $processBuilder->setArguments($arguments);
         /** @noinspection PhpParamsInspection */
         $processBuilder->setInput($state->getInput());
         $processBuilder->enableOutput();
         $process = $processBuilder->getProcess();
 
-        $consoleOutput = $state->getConsoleOutput();
         if ($consoleOutput) {
             $consoleOutput->writeln("<info>{$process->getCommandLine()}</info>");
         }
@@ -227,7 +231,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
         $resolver->setDefaults([
             'max_processes' => 5,
             'sleep_interval' => 1,
-            'sleep_interval_after_launch' => 2,
+            'sleep_interval_after_launch' => 8,
             'sleep_on_finalize_interval' => 10,
         ]);
         $resolver->setAllowedTypes('max_processes', ['integer']);
@@ -243,5 +247,29 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
         foreach ($this->launchedProcesses as $process) {
             $process->stop(5);
         }
+    }
+
+    /**
+     * @param OutputInterface|null $output
+     *
+     * @return string
+     */
+    protected function getVerbosityParameter(OutputInterface $output = null)
+    {
+        if (!$output) {
+            return null;
+        }
+        switch($output->getVerbosity()) {
+            case OutputInterface::VERBOSITY_QUIET:
+                return '-q';
+            case OutputInterface::VERBOSITY_VERBOSE:
+                return '-v';
+            case OutputInterface::VERBOSITY_VERY_VERBOSE:
+                return '-vv';
+            case OutputInterface::VERBOSITY_DEBUG:
+                return '-vvv';
+        }
+
+        return null;
     }
 }
