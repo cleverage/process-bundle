@@ -75,6 +75,8 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
      */
     public function execute(ProcessState $state)
     {
+        $this->handleProcesses($state); // Handler processes first
+
         $options = $this->getOptions($state);
         while (count($this->launchedProcesses) >= $options['max_processes']) {
             $this->handleProcesses($state);
@@ -231,7 +233,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
         $resolver->setDefaults([
             'max_processes' => 5,
             'sleep_interval' => 1,
-            'sleep_interval_after_launch' => 8,
+            'sleep_interval_after_launch' => 3,
             'sleep_on_finalize_interval' => 10,
         ]);
         $resolver->setAllowedTypes('max_processes', ['integer']);

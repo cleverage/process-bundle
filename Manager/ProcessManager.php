@@ -192,6 +192,8 @@ class ProcessManager
      * @param OutputInterface      $output
      *
      * @throws \InvalidArgumentException
+     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
      *
      * @return ProcessState
      */
@@ -199,6 +201,8 @@ class ProcessManager
     {
         $processHistory = new ProcessHistory($processConfiguration);
         $this->entityManager->persist($processHistory);
+        $this->entityManager->flush($processHistory);
+
         $state = new ProcessState($processConfiguration, $processHistory);
         $state->setConsoleOutput($output);
 
