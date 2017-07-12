@@ -81,3 +81,7 @@ services:
     cleverage_process.task.file_remover:
         class: CleverAge\ProcessBundle\Task\FileRemoverTask
         shared: false
+
+    cleverage_process.task.file_mover:
+        class: CleverAge\ProcessBundle\Task\FileMoverTask
+        shared: false
