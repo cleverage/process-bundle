@@ -22,6 +22,7 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -52,7 +53,17 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
             }
             $this->csv->writeLine($this->getInput($state));
         } catch (\Exception $e) {
-            $state->stop($e);
+            $options = $this->getOptions($state);
+
+            $state->setError($state->getInput());
+            if ($options[self::LOG_ERRORS]) {
+                $state->log('Normalizer exception: '.$e->getMessage(), LogLevel::ERROR);
+            }
+            if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
+                $state->setSkipped(true);
+            } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {
+                $state->stop($e);
+            }
         }
     }
 

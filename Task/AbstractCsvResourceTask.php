@@ -77,6 +77,7 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
+        parent::configureOptions($resolver);
         $resolver->setDefaults(
             [
                 'delimiter' => ';',

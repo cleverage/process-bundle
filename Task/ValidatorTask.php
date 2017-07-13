@@ -56,7 +56,7 @@ class ValidatorTask extends AbstractConfigurableTask
         $options = $this->getOptions($state);
         $violations = $this->validator->validate($state->getInput(), null, $options['groups']);
 
-        if ($options[AbstractConfigurableTask::LOG_ERRORS]) {
+        if ($options[self::LOG_ERRORS]) {
             /** @var  $violation ConstraintViolationInterface */
             foreach ($violations as $violation) {
                 $invalidValue = $violation->getInvalidValue();

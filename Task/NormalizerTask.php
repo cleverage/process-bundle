@@ -61,7 +61,7 @@ class NormalizerTask extends AbstractConfigurableTask
             $state->setOutput($normalizedData);
         } catch (\Exception $e) {
             $state->setError($state->getInput());
-            if ($options[AbstractConfigurableTask::LOG_ERRORS]) {
+            if ($options[self::LOG_ERRORS]) {
                 $state->log('Normalizer exception: '.$e->getMessage(), LogLevel::ERROR);
             }
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
