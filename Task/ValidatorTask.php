@@ -74,9 +74,9 @@ class ValidatorTask extends AbstractConfigurableTask
 
         if (0 < $violations->count()) {
             $state->setError($state->getInput());
-            if ($options[AbstractConfigurableTask::SKIP_ON_ERROR]) {
+            if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
-            } elseif ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
+            } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {
                 $state->stop(
                     new \UnexpectedValueException("{$violations->count()} constraint violations detected on validation")
                 );

@@ -65,12 +65,9 @@ class DenormalizerTask extends AbstractConfigurableTask
             if ($options[AbstractConfigurableTask::LOG_ERRORS]) {
                 $state->log('Denormalizer exception: '.$e->getMessage(), LogLevel::ERROR);
             }
-            if ($options[AbstractConfigurableTask::SKIP_ON_ERROR]) {
+            if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
-
-                return;
-            }
-            if ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
+            } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {
                 $state->stop($e);
             }
         }

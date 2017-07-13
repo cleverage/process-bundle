@@ -76,9 +76,8 @@ class TransformerTask extends AbstractConfigurableTask
         $options = $this->getOptions($state);
         $transformerOptions = $options;
         unset(
-            $transformerOptions[AbstractConfigurableTask::STOP_ON_ERROR],
-            $transformerOptions[AbstractConfigurableTask::LOG_ERRORS],
-            $transformerOptions[AbstractConfigurableTask::SKIP_ON_ERROR]
+            $transformerOptions[AbstractConfigurableTask::ERROR_STRATEGY],
+            $transformerOptions[AbstractConfigurableTask::LOG_ERRORS]
         );
 
         try {
@@ -88,18 +87,13 @@ class TransformerTask extends AbstractConfigurableTask
             );
         } catch (\Exception $e) {
             $state->setError($state->getInput());
-            if ($options[AbstractConfigurableTask::STOP_ON_ERROR]) {
-                $state->stop($e);
-
-                return;
-            }
             if ($options[AbstractConfigurableTask::LOG_ERRORS]) {
                 $state->log('PropertySetter exception: '.$e->getMessage(), LogLevel::ERROR);
             }
-            if ($options[AbstractConfigurableTask::SKIP_ON_ERROR]) {
+            if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
-
-                return;
+            } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {
+                $state->stop($e);
             }
         }
         $state->setOutput($output);

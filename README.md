@@ -193,8 +193,7 @@ Accepts an array or an object as an input and sets values before returning it as
             # ...
 
         # Optional options
-        stop_on_error: true # Stops the process if an error is encountered
-        skip_on_error: true # Skip the current item of an iteration if an error is encountered
+        error_strategy: skip # Other possible values are: 'stop' and 'continue'
         log_errors: true # Logs any errors encountered
     outputs: [<task_code>] # Array of tasks accepting the same data as the input
 ```
@@ -230,8 +229,7 @@ Accepts an array as input and sets values before returning it as the output
         ignore_extra: false # Ignore extra properties
         initial_value: [] # The value from which the transformer reset to before applying any mapping
 
-        stop_on_error: true # Stops the process if an error is encountered
-        skip_on_error: true # Skip the current item of an iteration if an error is encountered
+        error_strategy: skip # Other possible values are: 'stop' and 'continue'
         log_errors: true # Logs any errors encountered
     outputs: [<task_code>] # Array of tasks accepting an array as input
 ```
@@ -243,8 +241,7 @@ Validate data from the input and pass it to the output
     service: '@cleverage_process.task.validator'
     options:
         # Optional options
-        stop_on_error: true # Stops the process if an error is encountered
-        skip_on_error: true # Skip the current item of an iteration if an error is encountered
+        error_strategy: skip # Other possible values are: 'stop' and 'continue'
         log_errors: true # Logs any errors encountered
     outputs: [<task_code>] # Array of tasks accepting the same data than the input
 ```

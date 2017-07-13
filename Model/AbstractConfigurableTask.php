@@ -29,9 +29,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractConfigurableTask implements InitializableTaskInterface
 {
-    const STOP_ON_ERROR = 'stop_on_error';
-    const SKIP_ON_ERROR = 'skip_on_error';
     const LOG_ERRORS = 'log_errors';
+    const ERROR_STRATEGY = 'error_strategy';
+
+    const STRATEGY_SKIP = 'skip';
+    const STRATEGY_STOP = 'stop';
+    const STRATEGY_CONTINUE = 'continue';
+
 
     /** @var array */
     protected $options;
@@ -95,13 +99,18 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
     {
         $resolver->setDefaults(
             [
-                self::STOP_ON_ERROR => true,
-                self::SKIP_ON_ERROR => true,
+                self::ERROR_STRATEGY => self::STRATEGY_SKIP,
                 self::LOG_ERRORS => true,
             ]
         );
-        $resolver->setAllowedTypes(self::STOP_ON_ERROR, ['bool']);
-        $resolver->setAllowedTypes(self::SKIP_ON_ERROR, ['bool']);
+        $resolver->setAllowedValues(
+            self::ERROR_STRATEGY,
+            [
+                self::STRATEGY_STOP,
+                self::STRATEGY_SKIP,
+                self::STRATEGY_CONTINUE,
+            ]
+        );
         $resolver->setAllowedTypes(self::LOG_ERRORS, ['bool']);
     }
 }
