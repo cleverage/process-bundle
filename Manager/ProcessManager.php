@@ -318,13 +318,17 @@ class ProcessManager
      */
     protected function handleState(ProcessState $state)
     {
-        // Merging the process history back into the unit of work
-        /** @var ProcessHistory $processHistory */
-        $processHistory = $this->entityManager->merge($state->getProcessHistory());
+        if ($this->entityManager->isOpen()) {
+            // Merging the process history back into the unit of work
+            /** @var ProcessHistory $processHistory */
+            $processHistory = $this->entityManager->merge($state->getProcessHistory());
+        } else {
+            $processHistory = $state->getProcessHistory(); // We will crash later
+        }
 
         $consoleOutput = $state->getConsoleOutput();
         foreach ($state->getTaskHistories() as $taskHistory) {
-            if ($consoleOutput && $consoleOutput->isVerbose()) {
+            if ($consoleOutput && ($consoleOutput->isVerbose() || !$this->entityManager->isOpen())) {
                 switch ($taskHistory->getLevel()) {
                     case LogLevel::WARNING:
                     case LogLevel::NOTICE:
@@ -343,8 +347,14 @@ class ProcessManager
                 $consoleOutput->writeln(json_encode($taskHistory->getContext()));
             }
             $taskHistory->setProcessHistory($processHistory);
-            $this->entityManager->persist($taskHistory);
-            $this->entityManager->flush($taskHistory);
+            if ($this->entityManager->isOpen()) {
+                $this->entityManager->persist($taskHistory);
+                $this->entityManager->flush($taskHistory);
+            }
+        }
+
+        if (!$this->entityManager->isOpen()) {
+            throw new \RuntimeException('Doctrine has closed the entity manager, aborting process');
         }
         $state->clearTaskHistories();
         $this->entityManager->clear(TaskHistory::class);
