@@ -23,7 +23,6 @@ use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\ORM\EntityRepository;
 use Psr\Log\LogLevel;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ORM\Internal\Hydration\IterableResult;
 
 /**
@@ -32,7 +31,7 @@ use Doctrine\ORM\Internal\Hydration\IterableResult;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class DoctrineReaderTask extends AbstractDoctrineTask implements IterableTaskInterface
+class DoctrineReaderTask extends AbstractDoctrineQueryTask implements IterableTaskInterface
 {
     /** @var IterableResult */
     protected $iterator;
@@ -85,31 +84,7 @@ class DoctrineReaderTask extends AbstractDoctrineTask implements IterableTaskInt
         $state->setOutput($result[0]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configureOptions(OptionsResolver $resolver)
-    {
-        parent::configureOptions($resolver);
-        $resolver->setRequired(
-            [
-                'class_name',
-            ]
-        );
-        $resolver->setAllowedTypes('class_name', ['string']);
-        $resolver->setDefaults(
-            [
-                'criteria' => [],
-                'order_by' => [],
-                'limit' => null,
-                'offset' => null,
-            ]
-        );
-        $resolver->setAllowedTypes('criteria', ['array']);
-        $resolver->setAllowedTypes('order_by', ['array']);
-        $resolver->setAllowedTypes('limit', ['NULL', 'integer']);
-        $resolver->setAllowedTypes('offset', ['NULL', 'integer']);
-    }
+    
 
     /**
      * @param EntityRepository $repository
@@ -119,34 +94,13 @@ class DoctrineReaderTask extends AbstractDoctrineTask implements IterableTaskInt
      */
     protected function initIterator(EntityRepository $repository, array $options)
     {
-        $qb = $repository->createQueryBuilder('e');
-        /** @noinspection ForeachSourceInspection */
-        foreach ($options['criteria'] as $field => $value) {
-            if (preg_match('/[^a-zA-Z0-9]/', $field)) {
-                throw new \UnexpectedValueException("Forbidden field name '{$field}'");
-            }
-            $parameterName = uniqid('param', false);
-            if (null === $value) {
-                $qb->andWhere("e.{$field} IS NULL");
-            } else {
-                if (is_array($value)) {
-                    $qb->andWhere("e.{$field} IN (:{$parameterName})");
-                } else {
-                    $qb->andWhere("e.{$field} = :{$parameterName}");
-                }
-                $qb->setParameter($parameterName, $value);
-            }
-        }
-        /** @noinspection ForeachSourceInspection */
-        foreach ($options['order_by'] as $field => $order) {
-            $qb->addOrderBy("e.{$field}", $order);
-        }
-        if (null !== $options['limit']) {
-            $qb->setMaxResults($options['limit']);
-        }
-        if (null !== $options['offset']) {
-            $qb->setFirstResult($options['offset']);
-        }
+        $qb = $this->getQueryBuilder(
+            $repository,
+            $options['criteria'],
+            $options['order_by'],
+            $options['limit'],
+            $options['offset']
+        );
 
         $this->iterator = $qb->getQuery()->iterate();
         $this->iterator->next(); // Move to first element

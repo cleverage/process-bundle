@@ -49,9 +49,11 @@ abstract class AbstractDoctrineTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'entity_manager' => null,
-        ]);
+        $resolver->setDefaults(
+            [
+                'entity_manager' => null,
+            ]
+        );
         $resolver->setAllowedTypes('entity_manager', ['NULL', 'string']);
     }
 
