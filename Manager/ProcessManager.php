@@ -204,7 +204,10 @@ class ProcessManager
         $this->entityManager->flush($processHistory);
 
         $state = new ProcessState($processConfiguration, $processHistory);
-        $state->setConsoleOutput($output);
+
+        if ($output) {
+            $state->setConsoleOutput($output);
+        }
 
         return $state;
     }
