@@ -55,7 +55,7 @@ class CsvResource
     protected $currentLine = 0;
 
     /** @var bool */
-    protected $isClosed;
+    protected $closed;
 
     /** @var bool */
     protected $seekCalled = false;
@@ -345,13 +345,29 @@ class CsvResource
      */
     public function close()
     {
-        if ($this->isClosed) {
+        if ($this->closed) {
             return true;
         }
 
-        $this->isClosed = fclose($this->handler);
+        $this->closed = fclose($this->handler);
 
-        return $this->isClosed;
+        return $this->closed;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isManualHeaders()
+    {
+        return $this->manualHeaders;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isClosed()
+    {
+        return $this->closed;
     }
 
     /**
@@ -367,7 +383,7 @@ class CsvResource
      */
     protected function assertOpened()
     {
-        if ($this->isClosed) {
+        if ($this->closed) {
             throw new \RuntimeException($this->getResourceName().' was closed earlier');
         }
     }
