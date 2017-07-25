@@ -52,7 +52,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
 
             $state->setError($state->getInput());
             if ($options[self::LOG_ERRORS]) {
-                $state->log('Normalizer exception: '.$e->getMessage(), LogLevel::ERROR);
+                $state->log('CSV Reader exception: '.$e->getMessage(), LogLevel::ERROR);
             }
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);

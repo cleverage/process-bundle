@@ -57,7 +57,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 
             $state->setError($state->getInput());
             if ($options[self::LOG_ERRORS]) {
-                $state->log('Normalizer exception: '.$e->getMessage(), LogLevel::ERROR);
+                $state->log('CSV Writer Exception: '.$e->getMessage(), LogLevel::ERROR);
             }
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
