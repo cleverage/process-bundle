@@ -81,7 +81,7 @@ class DoctrineReaderTask extends AbstractDoctrineQueryTask implements IterableTa
             return;
         }
 
-        $state->setOutput($result[0]);
+        $state->setOutput(reset($result));
     }
 
     
