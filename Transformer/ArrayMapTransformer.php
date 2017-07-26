@@ -63,6 +63,9 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface, Transform
         /** @noinspection ForeachSourceInspection */
         foreach ($values as $key => $item) {
             foreach ($transformers as $transformerCode => $transformerOptions) {
+                if (null === $transformerOptions) {
+                    $transformerOptions = [];
+                }
                 $transformer = $this->transformerRegistry->getTransformer($transformerCode);
                 $item = $transformer->transform($item, $transformerOptions);
             }
