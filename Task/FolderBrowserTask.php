@@ -36,7 +36,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
             if ($options['name_pattern']) {
                 $finder->name($options['name_pattern']);
             }
-            $this->files = $finder->in($options['folder_path'])->getIterator();
+            $this->files = $finder->in($options['folder_path'])->sortByName()->getIterator();
             $this->files->rewind();
         }
 
