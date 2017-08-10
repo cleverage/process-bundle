@@ -144,7 +144,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
 
         $consoleOutput = $state->getConsoleOutput();
         $arguments = [
-            'nohup', // Even if parent process is launched with nohup, all subprocesses are sensitive to SIGHUP
+            $pathFinder->find(),
             $consolePath,
             '--env='.$this->kernel->getEnvironment(),
             'cleverage:process:execute',
@@ -156,7 +156,10 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
             $arguments[] = $verbosity;
         }
 
-        $processBuilder->setPrefix($pathFinder->find());
+        // Even if parent process is launched with nohup, all subprocesses are sensitive to SIGHUP so we need to prepend
+        // this all the time. Sub-processes are still sensitive to other signal so there is no risk here.
+        $processBuilder->setPrefix('nohup');
+
         $processBuilder->setArguments($arguments);
         /** @noinspection PhpParamsInspection */
         $processBuilder->setInput($state->getInput());
