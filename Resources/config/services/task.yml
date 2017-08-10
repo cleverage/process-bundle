@@ -63,6 +63,11 @@ services:
         arguments: ['@doctrine']
         shared: false
 
+    cleverage_process.task.doctrine_remover:
+        class: CleverAge\ProcessBundle\Task\DoctrineRemoverTask
+        arguments: ['@doctrine']
+        shared: false
+
     cleverage_process.task.stat_counter:
         class: CleverAge\ProcessBundle\Task\StatCounterTask
         shared: false

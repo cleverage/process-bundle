@@ -144,6 +144,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
 
         $consoleOutput = $state->getConsoleOutput();
         $arguments = [
+            'nohup', // Even if parent process is launched with nohup, all subprocesses are sensitive to SIGHUP
             $consolePath,
             '--env='.$this->kernel->getEnvironment(),
             'cleverage:process:execute',
