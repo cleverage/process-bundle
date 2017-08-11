@@ -77,11 +77,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                     /** @var array $sourceProperty */
                     foreach ($sourceProperty as $destKey => $srcKey) {
                         try {
-                            $transformedValue[$destKey] = $this->getDataFromInput(
-                                $input,
-                                $srcKey,
-                                $options['level_separator']
-                            );
+                            $transformedValue[$destKey] = $this->accessor->getValue($input, $srcKey);
                         } catch (\RuntimeException $missingPropertyError) {
                             if ($mapping['ignore_missing'] || $options['ignore_missing']) {
                                 continue;
@@ -92,11 +88,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                     }
                 } else {
                     try {
-                        $transformedValue = $this->getDataFromInput(
-                            $input,
-                            $sourceProperty,
-                            $options['level_separator']
-                        );
+                        $transformedValue = $this->accessor->getValue($input, $sourceProperty);
                     } catch (\RuntimeException $missingPropertyError) {
                         if ($mapping['ignore_missing'] || $options['ignore_missing']) {
                             continue;
@@ -150,13 +142,11 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 'ignore_missing' => false,
                 'ignore_extra' => false,
                 'initial_value' => [],
-                'level_separator' => '.',
                 'merge_callback' => null,
             ]
         );
         $resolver->setAllowedTypes('ignore_missing', ['bool']);
         $resolver->setAllowedTypes('ignore_extra', ['bool']);
-        $resolver->setAllowedTypes('level_separator', ['NULL', 'string']);
         $resolver->setAllowedTypes('merge_callback', ['NULL', 'callable']);
 
         /** @noinspection PhpUnusedParameterInspection */
@@ -236,36 +226,5 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 return $transformers;
             }
         );
-    }
-
-    /**
-     * Should return the value matching the key from the input
-     * May handle multi-dimensional array through if the key contains a dot (or any other option-defined separator)
-     * Can be disabled by using "null" separator
-     *
-     * @param array|object $input
-     * @param string       $key
-     * @param string       $separator
-     *
-     * @throws \RuntimeException if the property is missing
-     * @throws \InvalidArgumentException
-     *
-     * @return mixed
-     */
-    protected function getDataFromInput($input, string $key, string $separator = '.')
-    {
-        if (!is_array($input)) {
-            return $this->accessor->getValue($input, $key);
-        } elseif (array_key_exists($key, $input)) {
-            return $input[$key];
-        } elseif ($separator && strpos($key, $separator) !== false) {
-            $keyParts = explode($separator, $key);
-            $firstPart = array_shift($keyParts);
-            if (array_key_exists($firstPart, $input) && is_array($input[$firstPart])) {
-                return $this->getDataFromInput($input[$firstPart], implode($separator, $keyParts));
-            }
-        }
-
-        throw new \RuntimeException("Missing property {$key}");
     }
 }
