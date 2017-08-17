@@ -139,6 +139,9 @@ class ProcessManager
             $output = $state->getOutput();
             $error = $state->getError();
             $this->handleState($state);
+            if ($state->isStopped()) {
+                return;
+            }
 
             $task = $taskConfiguration->getTask();
 
@@ -148,12 +151,20 @@ class ProcessManager
                     if (null !== $error) {
                         foreach ($state->getProcessConfiguration()->getErrorTasks($taskConfiguration) as $errorTask) {
                             $this->process($errorTask, $state, $error);
+                            /** @noinspection DisconnectedForeachInstructionInspection */
+                            if ($state->isStopped()) {
+                                return;
+                            }
                         }
                         $state->setError(null);
                     }
                 } else {
                     foreach ($state->getProcessConfiguration()->getNextTasks($taskConfiguration) as $nextTask) {
                         $this->process($nextTask, $state, $output);
+                        /** @noinspection DisconnectedForeachInstructionInspection */
+                        if ($state->isStopped()) {
+                            return;
+                        }
                     }
                 }
                 $state->setSkipped(false); // Reset skipped state
@@ -166,6 +177,9 @@ class ProcessManager
                     // If the task has no more items but there is a blocking task waiting for this one to end
                     // proceed with the blocking task
                     $this->proceed($this->blockingTaskConfiguration, $state);
+                    if ($state->isStopped()) {
+                        return;
+                    }
                 }
             }
         } while ($hasMoreItem);
@@ -362,7 +376,7 @@ class ProcessManager
         $state->clearTaskHistories();
         $this->entityManager->clear(TaskHistory::class);
 
-        if ($state->getException() || $state->isStopped()) {
+        if ($state->getException()) {
             $processHistory->setFailed();
             $this->entityManager->flush($processHistory);
 
@@ -398,11 +412,18 @@ class ProcessManager
         $state = clone $state;
         $output = $this->doProceedTask($taskConfiguration, $state);
         $this->handleState($state);
+        if ($state->isStopped()) {
+            return;
+        }
 
         // Run child items only if the state is not "skipped"
         if (!$state->isSkipped()) {
             foreach ($state->getProcessConfiguration()->getNextTasks($taskConfiguration) as $nextTask) {
                 $this->process($nextTask, $state, $output);
+                /** @noinspection DisconnectedForeachInstructionInspection */
+                if ($state->isStopped()) {
+                    return;
+                }
             }
         }
         $state->setSkipped(false); // Reset skipped state
