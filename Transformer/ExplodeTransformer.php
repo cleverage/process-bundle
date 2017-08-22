@@ -45,6 +45,10 @@ class ExplodeTransformer implements ConfigurableTransformerInterface
         $this->configureOptions($resolver);
         $options = $resolver->resolve($options);
 
+        if (null === $value || '' === $value) {
+            return [];
+        }
+
         return explode($options['delimiter'], $value);
     }
 
