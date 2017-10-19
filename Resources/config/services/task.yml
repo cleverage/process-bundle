@@ -74,7 +74,7 @@ services:
 
     cleverage_process.task.transformer:
         class: CleverAge\ProcessBundle\Task\TransformerTask
-        arguments: ['@cleverage_process.registry.transformer', mapping]
+        arguments: ['@cleverage_process.registry.transformer']
         shared: false
 
     cleverage_process.task.process_launcher:

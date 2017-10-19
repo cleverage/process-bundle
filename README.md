@@ -214,6 +214,7 @@ Accepts an array as input and sets values before returning it as the output
     service: '@cleverage_process.task.transformer'
     options:
         # Required options
+        transformer: mapping # the code of the transformer that you want to apply, 'mapping' by default
         mapping:
             <property>:
                 code: null # Source property, default to the key of the config
