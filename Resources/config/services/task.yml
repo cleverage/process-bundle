@@ -95,3 +95,7 @@ services:
     cleverage_process.task.file_mover:
         class: CleverAge\ProcessBundle\Task\FileMoverTask
         shared: false
+
+    cleverage_process.task.aggregate_iterable:
+        class: CleverAge\ProcessBundle\Task\AggregateIterableTask
+        shared: false
