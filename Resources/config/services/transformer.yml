@@ -61,3 +61,10 @@ services:
         class: CleverAge\ProcessBundle\Transformer\CallbackTransformer
         tags:
             - { name: cleverage.transformer }
+
+    cleverage_process.transformer.wrapper:
+        class: CleverAge\ProcessBundle\Transformer\WrapperTransformer
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: cleverage.transformer }
