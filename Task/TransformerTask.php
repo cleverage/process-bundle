@@ -19,8 +19,8 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
+use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Psr\Log\LogLevel;
@@ -34,24 +34,24 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TransformerTask extends AbstractConfigurableTask
 {
+    const DEFAULT_TRANSFORMER = 'mapping';
+    const ACTIVE_TRANSFORMER = 'transformer';
+
+    /** @var TransformerRegistry */
+    protected $transformerRegistry;
+
     /** @var ConfigurableTransformerInterface */
     protected $transformer;
 
     /**
      * @param TransformerRegistry $transformerRegistry
-     * @param string              $transformerCode
      *
      * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
      * @throws \UnexpectedValueException
      */
-    public function __construct(TransformerRegistry $transformerRegistry, $transformerCode)
+    public function __construct(TransformerRegistry $transformerRegistry)
     {
-        $this->transformer = $transformerRegistry->getTransformer($transformerCode);
-        if (!$this->transformer instanceof ConfigurableTransformerInterface) {
-            throw new \UnexpectedValueException(
-                "Transformer {$transformerCode} must be a ConfigurableTransformerInterface"
-            );
-        }
+        $this->transformerRegistry = $transformerRegistry;
     }
 
     /**
@@ -62,13 +62,63 @@ class TransformerTask extends AbstractConfigurableTask
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
-        $this->transformer->configureOptions($resolver);
+        $transformerCodes = array_keys($this->transformerRegistry->getTransformers());
+        $resolver->setDefault(static::ACTIVE_TRANSFORMER, static::DEFAULT_TRANSFORMER);
+        $resolver->setAllowedValues(static::ACTIVE_TRANSFORMER, $transformerCodes);
     }
 
     /**
      * @param ProcessState $state
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     *
+     * @return array
+     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
+     * @throws \UnexpectedValueException
+     */
+    protected function getOptions(ProcessState $state)
+    {
+        if (null === $this->options) {
+            $resolver = new OptionsResolver();
+            $this->configureOptions($resolver);
+
+            $options = $state->getTaskConfiguration()->getOptions();
+            if (!array_key_exists(static::ACTIVE_TRANSFORMER, $options)) {
+                $options[static::ACTIVE_TRANSFORMER] = static::DEFAULT_TRANSFORMER;
+            }
+
+            $this->transformer = $this->transformerRegistry->getTransformer($options[static::ACTIVE_TRANSFORMER]);
+            if (!$this->transformer instanceof ConfigurableTransformerInterface) {
+                throw new \UnexpectedValueException(
+                    "Transformer {$options[static::ACTIVE_TRANSFORMER]} must be a ConfigurableTransformerInterface"
+                );
+            }
+            $this->transformer->configureOptions($resolver);
+
+            $this->options = $resolver->resolve($state->getTaskConfiguration()->getOptions());
+        }
+
+        return $this->options;
+    }
+
+    /**
+     * @param ProcessState $state
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
+     * @throws \UnexpectedValueException
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */
     public function execute(ProcessState $state)
     {
@@ -77,7 +127,8 @@ class TransformerTask extends AbstractConfigurableTask
         $transformerOptions = $options;
         unset(
             $transformerOptions[self::ERROR_STRATEGY],
-            $transformerOptions[self::LOG_ERRORS]
+            $transformerOptions[self::LOG_ERRORS],
+            $transformerOptions[self::ACTIVE_TRANSFORMER]
         );
 
         try {
