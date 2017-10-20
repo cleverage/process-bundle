@@ -247,6 +247,15 @@ Validate data from the input and pass it to the output
     outputs: [<task_code>] # Array of tasks accepting the same data than the input
 ```
 
+#### EventDispatcherTask
+Call the Symfony event dispatcher
+```yml
+<task_code>:
+    service: '@cleverage_process.task.event_dispatcher'
+    options:
+        event_name: <event_name> # The name of your event
+```
+
 #### DummyTask
 Passes the input to the output, can be used as an entry point allow multiple tasks to be run at the entry point
 ```yml

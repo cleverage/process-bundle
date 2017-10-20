@@ -99,3 +99,9 @@ services:
     cleverage_process.task.aggregate_iterable:
         class: CleverAge\ProcessBundle\Task\AggregateIterableTask
         shared: false
+
+    cleverage_process.task.event_dispatcher:
+        class: CleverAge\ProcessBundle\Task\EventDispatcherTask
+        shared: false
+        arguments:
+            - '@event_dispatcher'
