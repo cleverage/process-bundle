@@ -76,6 +76,9 @@ class ProcessState
     /** @var bool */
     protected $skipped;
 
+    /** @var ProcessState|null */
+    protected $previousState;
+
     /**
      * @param ProcessConfiguration $processConfiguration
      * @param ProcessHistory       $processHistory
@@ -339,5 +342,21 @@ class ProcessState
     public function setSkipped(bool $skipped)
     {
         $this->skipped = $skipped;
+    }
+
+    /**
+     * @return ProcessState
+     */
+    public function getPreviousState()
+    {
+        return $this->previousState;
+    }
+
+    /**
+     * @param ProcessState $previousState
+     */
+    public function setPreviousState(ProcessState $previousState)
+    {
+        $this->previousState = $previousState;
     }
 }
