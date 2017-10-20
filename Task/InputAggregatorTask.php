@@ -10,6 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Wait for defined inputs before passing an aggregated output.
  * Should have been a BlockingTask, but due to limitations in the current model, it's a hack using skips and finalize.
+ * @see README.md:Known issues
  */
 class InputAggregatorTask extends AbstractConfigurableTask implements FinalizableTaskInterface
 {
