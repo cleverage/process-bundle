@@ -61,6 +61,10 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
         /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
         $options = $resolver->resolve($options);
 
+        if (null === $value && $options['ignore_null']) {
+            return null;
+        }
+
         return $this->accessor->getValue($value, $options['property_path']);
     }
 
@@ -86,6 +90,14 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
                 'property_path',
             ]
         );
+
+        $resolver->setDefaults(
+            [
+                'ignore_null' => false,
+            ]
+        );
+
         $resolver->setAllowedTypes('property_path', ['string']);
+        $resolver->setAllowedTypes('ignore_null', ['boolean']);
     }
 }
