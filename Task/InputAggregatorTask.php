@@ -20,14 +20,11 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
     /** @var bool */
     protected $isResolved;
 
-    public function finalize(ProcessState $state)
-    {
-        if (!$this->isResolved($state)) {
-            throw new \UnexpectedValueException("This task has not been resolved");
-        }
-    }
-
-
+    /**
+     * Store inputs and once everything has been received, pass to next task (only once)
+     *
+     * @param ProcessState $state
+     */
     public function execute(ProcessState $state)
     {
         $previousState = $state->getPreviousState();
@@ -50,6 +47,21 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
 
     }
 
+    /**
+     * If the task have not been executed, something went wrong
+     *
+     * @param ProcessState $state
+     */
+    public function finalize(ProcessState $state)
+    {
+        if (!$this->isResolved($state)) {
+            throw new \UnexpectedValueException("This task has not been resolved");
+        }
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -58,6 +70,13 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
         $resolver->setAllowedTypes('input_codes', 'array');
     }
 
+    /**
+     * Map the previous task code to an input code
+     *
+     * @param ProcessState $state
+     *
+     * @return string
+     */
     protected function getInputCode(ProcessState $state)
     {
         $previousState = $state->getPreviousState();
@@ -70,6 +89,13 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
         return $inputCodes[$previousTaskCode];
     }
 
+    /**
+     * Check if the received inputs match the defined mappings
+     *
+     * @param ProcessState $state
+     *
+     * @return bool
+     */
     protected function isResolved(ProcessState $state)
     {
         $inputCodes = $this->getOption($state, 'input_codes');
@@ -81,6 +107,4 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
 
         return true;
     }
-
-
 }

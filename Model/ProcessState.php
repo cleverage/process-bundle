@@ -90,6 +90,19 @@ class ProcessState
     }
 
     /**
+     * Clone the current object and keep a back reference
+     *
+     * @return ProcessState
+     */
+    public function duplicate()
+    {
+        $newState = clone $this;
+        $newState->setPreviousState($this);
+
+        return $newState;
+    }
+
+    /**
      * @return ProcessConfiguration
      */
     public function getProcessConfiguration()

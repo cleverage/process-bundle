@@ -133,11 +133,7 @@ class ProcessManager
      */
     protected function process(TaskConfiguration $taskConfiguration, ProcessState $state, $input = null)
     {
-        // Clone and replace current state with a new instance, while keeping a back link
-        $newState = clone $state;
-        $newState->setPreviousState($state);
-        $state = $newState;
-
+        $state = $state->duplicate();
         do {
             // Execute the current task, and fetch status
             $this->doProcessTask($taskConfiguration, $state, $input);
@@ -414,7 +410,7 @@ class ProcessManager
      */
     protected function proceed(TaskConfiguration $taskConfiguration, ProcessState $state)
     {
-        $state = clone $state;
+        $state = $state->duplicate();
         $output = $this->doProceedTask($taskConfiguration, $state);
         $this->handleState($state);
         if ($state->isStopped()) {
