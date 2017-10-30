@@ -17,11 +17,9 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
     /** @var array */
     protected $inputs = [];
 
-    /** @var bool */
-    protected $isResolved;
-
     /**
-     * Store inputs and once everything has been received, pass to next task (only once)
+     * Store inputs and once everything has been received, pass to next task
+     * Once an output has been generated this task is reset, and may wait for another loop
      *
      * @param ProcessState $state
      */
@@ -41,6 +39,7 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
 
         if ($this->isResolved($state)) {
             $state->setOutput($this->inputs);
+            $this->inputs = [];
         } else {
             $state->setSkipped(true);
         }
@@ -48,13 +47,13 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
     }
 
     /**
-     * If the task have not been executed, something went wrong
+     * If there is pending inputs, something went wrong
      *
      * @param ProcessState $state
      */
     public function finalize(ProcessState $state)
     {
-        if (!$this->isResolved($state)) {
+        if (!empty($this->inputs) && !$this->isResolved($state)) {
             throw new \UnexpectedValueException("This task has not been resolved");
         }
     }
