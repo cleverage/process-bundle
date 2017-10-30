@@ -26,6 +26,11 @@ services:
         tags:
             - { name: cleverage.transformer }
 
+    cleverage_process.transformer.sprintf:
+        class: CleverAge\ProcessBundle\Transformer\SprintfTransformer
+        tags:
+            - { name: cleverage.transformer }
+
     cleverage_process.transformer.array_map:
         class: CleverAge\ProcessBundle\Transformer\ArrayMapTransformer
         tags:
