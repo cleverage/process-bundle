@@ -102,6 +102,8 @@ class ProcessManager
         // Then launch the process : iterate the tasks tree properly
         $this->process($taskConfiguration, $state, $input);
 
+        // TODO resolve ?
+
         // Finalize the process in a linear way
         foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
             $this->finalize($taskConfiguration, $state);
@@ -184,6 +186,8 @@ class ProcessManager
                 }
             }
         } while ($hasMoreItem);
+
+        // TODO if parent is resolved => proceed
     }
 
     /**

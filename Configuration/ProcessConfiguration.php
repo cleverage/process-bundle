@@ -112,34 +112,26 @@ class ProcessConfiguration
     /**
      * @param TaskConfiguration $currentTaskConfiguration
      *
+     * @deprecated
      * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
      *
      * @return TaskConfiguration[]
      */
     public function getNextTasks(TaskConfiguration $currentTaskConfiguration)
     {
-        $taskConfigurations = [];
-        foreach ($currentTaskConfiguration->getOutputs() as $taskCode) {
-            $taskConfigurations[] = $this->getTaskConfiguration($taskCode);
-        }
-
-        return $taskConfigurations;
+        return $currentTaskConfiguration->getNextTasksConfigurations();
     }
 
     /**
      * @param TaskConfiguration $currentTaskConfiguration
      *
+     * @deprecated
      * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
      *
      * @return TaskConfiguration[]
      */
     public function getErrorTasks(TaskConfiguration $currentTaskConfiguration)
     {
-        $taskConfigurations = [];
-        foreach ($currentTaskConfiguration->getErrors() as $taskCode) {
-            $taskConfigurations[] = $this->getTaskConfiguration($taskCode);
-        }
-
-        return $taskConfigurations;
+        return $currentTaskConfiguration->getErrorTasksConfigurations();
     }
 }

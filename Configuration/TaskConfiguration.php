@@ -19,6 +19,7 @@
 
 namespace CleverAge\ProcessBundle\Configuration;
 
+use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 
 /**
@@ -46,6 +47,18 @@ class TaskConfiguration
 
     /** @var array */
     protected $errors = [];
+
+    /** @var ProcessState */
+    protected $state; // TODO remove ?
+
+    /** @var TaskConfiguration[] */
+    protected $nextTasksConfigurations = [];
+
+    /** @var TaskConfiguration[] */
+    protected $previousTasksConfigurations = [];
+
+    /** @var TaskConfiguration[] */
+    protected $errorTasksConfigurations = [];
 
     /**
      * @param string $code
@@ -133,4 +146,70 @@ class TaskConfiguration
     {
         return $this->errors;
     }
+
+    /**
+     * @return ProcessState
+     */
+    public function getState(): ProcessState
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param ProcessState $state
+     */
+    public function setState(ProcessState $state)
+    {
+        $this->state = $state;
+    }
+
+    /**
+     * @return TaskConfiguration[]
+     */
+    public function getNextTasksConfigurations(): array
+    {
+        return $this->nextTasksConfigurations;
+    }
+
+    /**
+     * @param TaskConfiguration $nextTaskConfiguration
+     */
+    public function addNextTaskConfiguration(TaskConfiguration $nextTaskConfiguration)
+    {
+        $this->nextTasksConfigurations[] = $nextTaskConfiguration;
+    }
+
+    /**
+     * @return TaskConfiguration[]
+     */
+    public function getPreviousTasksConfigurations(): array
+    {
+        return $this->previousTasksConfigurations;
+    }
+
+    /**
+     * @param TaskConfiguration $previousTaskConfiguration
+     */
+    public function addPreviousTaskConfiguration(TaskConfiguration $previousTaskConfiguration)
+    {
+        $this->previousTasksConfigurations[] = $previousTaskConfiguration;
+    }
+
+    /**
+     * @return TaskConfiguration[]
+     */
+    public function getErrorTasksConfigurations(): array
+    {
+        return $this->errorTasksConfigurations;
+    }
+
+    /**
+     * @param TaskConfiguration $errorTaskConfiguration
+     */
+    public function addErrorTaskConfiguration(TaskConfiguration $errorTaskConfiguration)
+    {
+        $this->errorTasksConfigurations[] = $errorTaskConfiguration;
+    }
+
+
 }

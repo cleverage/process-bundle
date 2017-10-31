@@ -52,12 +52,28 @@ class ProcessConfigurationRegistry
                 );
             }
 
-            $this->processConfigurations[$processCode] = new ProcessConfiguration(
+            $processConfig = new ProcessConfiguration(
                 $processCode,
                 $taskConfigurations,
                 $rawProcessConfiguration['options'],
                 $rawProcessConfiguration['entry_point']
             );
+
+            // Set links between tasks
+            /** @var TaskConfiguration $taskConfig */
+            foreach ($taskConfigurations as $taskCode => $taskConfig) {
+                foreach ($taskConfig->getOutputs() as $nextTaskCode) {
+                    $nextTaskConfig = $processConfig->getTaskConfiguration($nextTaskCode);
+                    $taskConfig->addNextTaskConfiguration($nextTaskConfig);
+                    $nextTaskConfig->addPreviousTaskConfiguration($taskConfig);
+                }
+                foreach ($taskConfig->getErrors() as $errorTaskCode) {
+                    $errorTaskConfig = $processConfig->getTaskConfiguration($errorTaskCode);
+                    $taskConfig->addErrorTaskConfiguration($errorTaskConfig);
+                }
+            }
+
+            $this->processConfigurations[$processCode] = $processConfig;
         }
     }
 

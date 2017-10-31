@@ -79,6 +79,8 @@ class ProcessState
     /** @var ProcessState|null */
     protected $previousState;
 
+    // TODO Status
+
     /**
      * @param ProcessConfiguration $processConfiguration
      * @param ProcessHistory       $processHistory
