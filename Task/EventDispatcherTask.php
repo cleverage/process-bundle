@@ -27,6 +27,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Call the Symfony event dispatcher
+ * If defined as passive (which is the default), it automatically set the output from the input
  *
  * @author  Valentin Clavreul <vclavreul@clever-age.com>
  * @author  Vincent Chalnot <vchalnot@clever-age.com>
@@ -57,6 +58,9 @@ class EventDispatcherTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $options = $this->getOptions($state);
+        if($options['passive']) {
+            $state->setOutput($state->getInput());
+        }
 
         $event = new EventDispatcherTaskEvent($state);
 
@@ -76,6 +80,8 @@ class EventDispatcherTask extends AbstractConfigurableTask
                 'event_name',
             ]
         );
+        $resolver->setDefault('passive', true);
         $resolver->setAllowedTypes('event_name', ['string']);
+        $resolver->setAllowedTypes('passive', ['boolean']);
     }
 }
