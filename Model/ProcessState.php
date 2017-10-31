@@ -56,9 +56,6 @@ class ProcessState
     protected $taskHistories = [];
 
     /** @var bool */
-    protected $started = false;
-
-    /** @var bool */
     protected $stopped = false;
 
     /** @var \Exception */
@@ -215,22 +212,6 @@ class ProcessState
     public function setError($error)
     {
         $this->error = $error;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isStarted(): bool
-    {
-        return $this->started;
-    }
-
-    /**
-     * @param boolean $started
-     */
-    public function setStarted(bool $started)
-    {
-        $this->started = $started;
     }
 
     /**
