@@ -46,6 +46,7 @@ class CleverAgeProcessExtension extends Extension
         $config = $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/services'));
+        $loader->load('event.yml');
         $loader->load('manager.yml');
         $loader->load('registry.yml');
         $loader->load('task.yml');

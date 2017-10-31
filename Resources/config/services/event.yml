@@ -1,0 +1,5 @@
+services:
+    cleverage_process.event_listener.data_queue:
+        class: CleverAge\ProcessBundle\EventListener\DataQueueEventListener
+        tags:
+            - { name: kernel.event_listener, event: cleverage_process.data_queue, method: pushData }

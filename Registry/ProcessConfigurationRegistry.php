@@ -32,7 +32,7 @@ use CleverAge\ProcessBundle\Exception\MissingProcessException;
 class ProcessConfigurationRegistry
 {
     /** @var ProcessConfiguration[] */
-    protected $processConfigurations;
+    protected $processConfigurations = [];
 
     /**
      * @param array $rawConfiguration
