@@ -71,13 +71,13 @@ abstract class AbstractProcessTest extends KernelTestCase
             self::assertArrayHasKey($key, $expected);
             if ($checkTask) {
                 if (array_key_exists('task', $expected[$key])) {
-                    self::assertEquals($expected[$key]['task'], $value->getPreviousState()->getTaskConfiguration()->getCode());
+                    self::assertEquals($expected[$key]['task'], $value->getPreviousState()->getTaskConfiguration()->getCode(), "Task #{$key} does not match");
                 }
                 if (array_key_exists('value', $expected[$key])) {
-                    self::assertEquals($expected[$key]['value'], $value->getInput());
+                    self::assertEquals($expected[$key]['value'], $value->getInput(), "Value #{$key} does not match");
                 }
             } else {
-                self::assertEquals($expected[$key], $value->getInput());
+                self::assertEquals($expected[$key], $value->getInput(), "Value #{$key} does not match");
 
             }
         }
