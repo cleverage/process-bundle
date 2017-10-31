@@ -84,6 +84,7 @@ class Configuration implements ConfigurationInterface
     {
         $definition
             ->scalarNode('entry_point')->defaultNull()->end()
+            ->scalarNode('end_point')->defaultNull()->end()
             ->arrayNode('options')->prototype('variable')->end()->end();
 
         /** @var ArrayNodeDefinition $tasksArrayDefinition */

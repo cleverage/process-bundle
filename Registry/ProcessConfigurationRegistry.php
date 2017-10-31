@@ -56,7 +56,8 @@ class ProcessConfigurationRegistry
                 $processCode,
                 $taskConfigurations,
                 $rawProcessConfiguration['options'],
-                $rawProcessConfiguration['entry_point']
+                $rawProcessConfiguration['entry_point'],
+                $rawProcessConfiguration['end_point']
             );
 
             // Set links between tasks

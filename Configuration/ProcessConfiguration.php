@@ -38,21 +38,26 @@ class ProcessConfiguration
     /** @var TaskConfiguration */
     protected $entryPoint;
 
+    /** @var TaskConfiguration */
+    protected $endPoint;
+
     /** @var TaskConfiguration[] */
     protected $taskConfigurations;
 
     /**
      * @param string              $code
+     * @param TaskConfiguration[] $taskConfigurations
      * @param array               $options
      * @param string              $entryPoint
-     * @param TaskConfiguration[] $taskConfigurations
+     * @param string              $endPoint
      */
-    public function __construct($code, array $taskConfigurations, array $options = [], $entryPoint = null)
+    public function __construct($code, array $taskConfigurations, array $options = [], $entryPoint = null, $endPoint = null)
     {
         $this->code = $code;
         $this->taskConfigurations = $taskConfigurations;
         $this->options = $options;
         $this->entryPoint = $entryPoint;
+        $this->endPoint = $endPoint;
     }
 
     /**
@@ -83,6 +88,20 @@ class ProcessConfiguration
         }
 
         return $this->getTaskConfiguration($this->entryPoint);
+    }
+
+    /**
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     *
+     * @return TaskConfiguration
+     */
+    public function getEndPoint(): TaskConfiguration
+    {
+        if (null === $this->endPoint) {
+            return end($this->taskConfigurations);
+        }
+
+        return $this->getTaskConfiguration($this->endPoint);
     }
 
     /**
