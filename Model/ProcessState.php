@@ -76,6 +76,9 @@ class ProcessState
     /** @var bool */
     protected $skipped;
 
+    /** @var ProcessState|null */
+    protected $previousState;
+
     /**
      * @param ProcessConfiguration $processConfiguration
      * @param ProcessHistory       $processHistory
@@ -84,6 +87,19 @@ class ProcessState
     {
         $this->processConfiguration = $processConfiguration;
         $this->processHistory = $processHistory;
+    }
+
+    /**
+     * Clone the current object and keep a back reference
+     *
+     * @return ProcessState
+     */
+    public function duplicate()
+    {
+        $newState = clone $this;
+        $newState->setPreviousState($this);
+
+        return $newState;
     }
 
     /**
@@ -339,5 +355,21 @@ class ProcessState
     public function setSkipped(bool $skipped)
     {
         $this->skipped = $skipped;
+    }
+
+    /**
+     * @return ProcessState
+     */
+    public function getPreviousState()
+    {
+        return $this->previousState;
+    }
+
+    /**
+     * @param ProcessState $previousState
+     */
+    public function setPreviousState(ProcessState $previousState)
+    {
+        $this->previousState = $previousState;
     }
 }

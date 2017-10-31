@@ -133,8 +133,9 @@ class ProcessManager
      */
     protected function process(TaskConfiguration $taskConfiguration, ProcessState $state, $input = null)
     {
-        $state = clone $state; // This is probably a bad idea but we can't just keep the reference
+        $state = $state->duplicate();
         do {
+            // Execute the current task, and fetch status
             $this->doProcessTask($taskConfiguration, $state, $input);
             $output = $state->getOutput();
             $error = $state->getError();
@@ -409,7 +410,7 @@ class ProcessManager
      */
     protected function proceed(TaskConfiguration $taskConfiguration, ProcessState $state)
     {
-        $state = clone $state;
+        $state = $state->duplicate();
         $output = $this->doProceedTask($taskConfiguration, $state);
         $this->handleState($state);
         if ($state->isStopped()) {

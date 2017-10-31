@@ -326,3 +326,15 @@ clever_age_process:
                     options:
                         file_path: '%kernel.root_dir%/../var/data/export/data.csv'
 ```
+
+## Known issues
+
+For now there are some issue with BlockingTask in multi-branch workflow
+
+* An IterableTask cannot have 2 children BlockingTask : only the last BlockingTask will be proceeded
+* A BlockingTask will not be proceeded if it has not a direct ancestor IterableTask 
+* A BlockingTask will be proceeded as much as there is direct IterableTask ancestors
+
+If you want to avoid any problem, use BlockingTask only in a one-branch workflow, with only one preceding IterableTask :
+
+* Task -> Iterable -> Task -> Task -> Blocking -> Task
