@@ -338,3 +338,14 @@ For now there are some issue with BlockingTask in multi-branch workflow
 If you want to avoid any problem, use BlockingTask only in a one-branch workflow, with only one preceding IterableTask :
 
 * Task -> Iterable -> Task -> Task -> Blocking -> Task
+
+## Release notes
+
+### v1.1
+
+* Fixed issues with blocking tasks
+* Removed deprecated methods [...]
+* added input/output in process manager (may allow a start_process_task)
+
+New issues :
+* Error workflow

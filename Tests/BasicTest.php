@@ -92,4 +92,27 @@ class BasicTest extends AbstractProcessTest
                 ],
             ], 'test.iterable_process');
     }
+
+    /**
+     * Assert that the error branch is not called
+     */
+    public function testErrorProcess()
+    {
+        $this->processManager->execute('test.error_process');
+        $this->assertDataQueue(
+            [
+                [
+                    'task'  => 'doNothing',
+                    'value' => 1,
+                ],
+                [
+                    'task'  => 'doNothing',
+                    'value' => 2,
+                ],
+                [
+                    'task'  => 'doNothing',
+                    'value' => 3,
+                ],
+            ], 'test.error_process');
+    }
 }

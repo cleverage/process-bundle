@@ -62,7 +62,7 @@ class ProcessConfigurationRegistry
 
             // Set links between tasks
             /** @var TaskConfiguration $taskConfig */
-            foreach ($taskConfigurations as $taskCode => $taskConfig) {
+            foreach ($taskConfigurations as $taskConfig) {
                 foreach ($taskConfig->getOutputs() as $nextTaskCode) {
                     $nextTaskConfig = $processConfig->getTaskConfiguration($nextTaskCode);
                     $taskConfig->addNextTaskConfiguration($nextTaskConfig);
@@ -71,6 +71,13 @@ class ProcessConfigurationRegistry
                 foreach ($taskConfig->getErrors() as $errorTaskCode) {
                     $errorTaskConfig = $processConfig->getTaskConfiguration($errorTaskCode);
                     $taskConfig->addErrorTaskConfiguration($errorTaskConfig);
+                }
+            }
+
+            // Mark error branches
+            foreach ($taskConfigurations as $taskConfig) {
+                foreach ($taskConfig->getErrorTasksConfigurations() as $errorTaskConfig) {
+                    $this->markErrorBranch($errorTaskConfig);
                 }
             }
 
@@ -110,5 +117,16 @@ class ProcessConfigurationRegistry
     public function hasProcessConfiguration(string $processCode): bool
     {
         return array_key_exists($processCode, $this->processConfigurations);
+    }
+
+    /**
+     * @param TaskConfiguration $taskConfig
+     */
+    protected function markErrorBranch(TaskConfiguration $taskConfig)
+    {
+        $taskConfig->setInErrorBranch(true);
+        foreach ($taskConfig->getNextTasksConfigurations() as $nextTasksConfig) {
+            $this->markErrorBranch($nextTasksConfig);
+        }
     }
 }

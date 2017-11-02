@@ -155,12 +155,12 @@ class ProcessManager
 
         $state->setStatus(ProcessState::STATUS_PROCESSING);
 
-        // Process only roots or BlockingTasks
-        // TODO avoid if referenced as error
-        if (empty($taskConfiguration->getPreviousTasksConfigurations())) {
+        // Start processing only roots that are not in error branch
+        if (empty($taskConfiguration->getPreviousTasksConfigurations()) && !$taskConfiguration->isInErrorBranch()) {
             $this->process($taskConfiguration);
         }
 
+        // Then we can process BlockingTask
         if ($taskConfiguration->getTask() instanceof BlockingTaskInterface) {
             $this->process($taskConfiguration, true);
         }

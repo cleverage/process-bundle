@@ -60,6 +60,9 @@ class TaskConfiguration
     /** @var TaskConfiguration[] */
     protected $errorTasksConfigurations = [];
 
+    /** @var bool */
+    protected $inErrorBranch = false;
+
     /**
      * @param string $code
      * @param string $serviceReference
@@ -211,5 +214,19 @@ class TaskConfiguration
         $this->errorTasksConfigurations[] = $errorTaskConfiguration;
     }
 
+    /**
+     * @return bool
+     */
+    public function isInErrorBranch(): bool
+    {
+        return $this->inErrorBranch;
+    }
 
+    /**
+     * @param bool $inErrorBranch
+     */
+    public function setInErrorBranch(bool $inErrorBranch)
+    {
+        $this->inErrorBranch = $inErrorBranch;
+    }
 }
