@@ -15,6 +15,10 @@ services:
         class: CleverAge\ProcessBundle\Task\DebugTask
         shared: false
 
+    cleverage_process.task.die:
+        class: CleverAge\ProcessBundle\Task\DieTask
+        shared: false
+
     cleverage_process.task.logger:
         class: CleverAge\ProcessBundle\Task\LoggerTask
         arguments: ['@property_accessor', '@serializer']
