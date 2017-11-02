@@ -36,13 +36,13 @@ class BasicTest extends AbstractProcessTest
     }
 
     /**
-     * Check that a known process can be executed and return a 0 code
+     * Check that a known process can be executed and return defined output
      */
     public function testSimpleProcess()
     {
-        $result = $this->processManager->execute('test.simple_process');
+        $result = $this->processManager->execute('test.simple_process', null, 'success');
 
-        self::assertEquals(0, $result);
+        self::assertEquals('success', $result);
     }
 
     /**

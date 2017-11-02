@@ -34,6 +34,13 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessState
 {
+
+    const STATUS = [self::STATUS_NEW, self::STATUS_PENDING, self::STATUS_PROCESSING, self::STATUS_RESOLVED];
+    const STATUS_NEW = 'new';
+    const STATUS_PENDING = 'pending';
+    const STATUS_PROCESSING = 'processing';
+    const STATUS_RESOLVED = 'resolved';
+
     /** @var ProcessConfiguration */
     protected $processConfiguration;
 
@@ -76,7 +83,8 @@ class ProcessState
     /** @var ProcessState|null */
     protected $previousState;
 
-    // TODO Status
+    /** @var string */
+    protected $status = self::STATUS_NEW;
 
     /**
      * @param ProcessConfiguration $processConfiguration
@@ -215,6 +223,15 @@ class ProcessState
     }
 
     /**
+     * @TODO use a flag in setter instead of null check
+     * @return bool
+     */
+    public function hasError()
+    {
+        return $this->error !== null;
+    }
+
+    /**
      * @param \Exception $e
      */
     public function stop(\Exception $e = null)
@@ -281,7 +298,7 @@ class ProcessState
     }
 
     /**
-     * @param string|int       $key
+     * @param string|int $key
      */
     public function removeErrorContext($key)
     {
@@ -351,8 +368,36 @@ class ProcessState
     /**
      * @param ProcessState $previousState
      */
-    public function setPreviousState(ProcessState $previousState)
+    public function setPreviousState($previousState)
     {
         $this->previousState = $previousState;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     */
+    public function setStatus(string $status)
+    {
+        if (!in_array($status, self::STATUS)) {
+            throw new \UnexpectedValueException("Unknown status {$status}");
+        }
+
+        $this->status = $status;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isResolved()
+    {
+        return $this->status === self::STATUS_RESOLVED;
     }
 }

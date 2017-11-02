@@ -79,12 +79,12 @@ class ProcessConfiguration
     /**
      * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
      *
-     * @return TaskConfiguration
+     * @return TaskConfiguration|null
      */
-    public function getEntryPoint(): TaskConfiguration
+    public function getEntryPoint()
     {
         if (null === $this->entryPoint) {
-            return reset($this->taskConfigurations);
+            return null;
         }
 
         return $this->getTaskConfiguration($this->entryPoint);
@@ -93,12 +93,12 @@ class ProcessConfiguration
     /**
      * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
      *
-     * @return TaskConfiguration
+     * @return TaskConfiguration|null
      */
-    public function getEndPoint(): TaskConfiguration
+    public function getEndPoint()
     {
         if (null === $this->endPoint) {
-            return end($this->taskConfigurations);
+            return null;
         }
 
         return $this->getTaskConfiguration($this->endPoint);

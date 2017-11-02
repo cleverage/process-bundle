@@ -63,6 +63,8 @@ abstract class AbstractProcessTest extends KernelTestCase
         $dataQueueListener = $this->container->get('cleverage_process.event_listener.data_queue');
         $actualQueue = $dataQueueListener->getQueue($processName);
 
+        self::assertEquals(count($expected), count($actualQueue), "Event count does not match");
+
         /**
          * @var int          $key
          * @var ProcessState $value
