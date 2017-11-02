@@ -24,11 +24,8 @@ class MultiWorkflowTest extends AbstractProcessTest
 {
     public function testMultiWorkflow()
     {
-        try {
-            $this->processManager->execute('test.multi_workflow_process');
-        } catch (\RuntimeException $e) {
-            // TODO remove this try/catch
-        }
+        $this->processManager->execute('test.multi_workflow_process');
+
         $this->assertDataQueue([
             [
                 'task'  => 'data',

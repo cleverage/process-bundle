@@ -49,7 +49,7 @@ class TaskConfiguration
     protected $errors = [];
 
     /** @var ProcessState */
-    protected $state; // TODO remove ?
+    protected $state;
 
     /** @var TaskConfiguration[] */
     protected $nextTasksConfigurations = [];
