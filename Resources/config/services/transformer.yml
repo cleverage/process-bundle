@@ -78,3 +78,8 @@ services:
             - '@property_accessor'
         tags:
             - { name: cleverage.transformer }
+
+    cleverage_process.transformer.evaluator:
+        class: CleverAge\ProcessBundle\Transformer\EvaluatorTransformer
+        tags:
+            - { name: cleverage.transformer }
