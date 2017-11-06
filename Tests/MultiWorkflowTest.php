@@ -19,7 +19,9 @@
 
 namespace CleverAge\ProcessBundle\Tests;
 
-
+/**
+ * Assert the behavior of multiple-branch workflow
+ */
 class MultiWorkflowTest extends AbstractProcessTest
 {
     public function testMultiWorkflow()

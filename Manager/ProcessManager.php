@@ -118,7 +118,7 @@ class ProcessManager
         // If defined, return the output of a task
         $returnValue = null;
         if ($processConfiguration->getEndPoint()) {
-            $returnValue = $processConfiguration->getEntryPoint()->getState()->getOutput();
+            $returnValue = $processConfiguration->getEndPoint()->getState()->getOutput();
         }
 
         return $returnValue;
