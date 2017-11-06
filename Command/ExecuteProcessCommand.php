@@ -91,11 +91,8 @@ class ExecuteProcessCommand extends ContainerAwareCommand
                 $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
             $returnValue = $this->processManager->execute($code, $output, $inputData);
-            if ($returnValue !== 0) {
-                if (!$output->isQuiet()) {
-                    $output->writeln("<error>Process '{$code}' returned an error code</error>");
-                }
-                return $returnValue;
+            if ($output->isVeryVerbose()) {
+                dump($returnValue);
             }
             if (!$output->isQuiet()) {
                 $output->writeln("<info>Process '{$code}' executed successfully</info>");
