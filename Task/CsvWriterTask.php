@@ -72,7 +72,9 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
      */
     public function proceed(ProcessState $state)
     {
-        $state->setOutput($this->csv->getFilePath());
+        if ($this->csv) {
+            $state->setOutput($this->csv->getFilePath());
+        }
     }
 
     /**
@@ -86,7 +88,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         parent::configureOptions($resolver);
         $resolver->setDefaults(
             [
-                'mode' => 'w',
+                'mode'            => 'w',
                 'split_character' => '|',
             ]
         );
