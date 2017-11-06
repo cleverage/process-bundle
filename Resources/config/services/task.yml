@@ -109,6 +109,10 @@ services:
         class: CleverAge\ProcessBundle\Task\AggregateIterableTask
         shared: false
 
+    cleverage_process.task.filter:
+        class: CleverAge\ProcessBundle\Task\FilterTask
+        shared: false
+
     cleverage_process.task.event_dispatcher:
         class: CleverAge\ProcessBundle\Task\EventDispatcherTask
         shared: false
