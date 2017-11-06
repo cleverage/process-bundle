@@ -23,6 +23,7 @@ use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LogLevel;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -91,6 +92,15 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
                 'mode'            => 'w',
                 'split_character' => '|',
             ]
+        );
+
+        $resolver->setNormalizer(
+            'file_path',
+            function (Options $options, $value) {
+                $value = str_replace('{date}', (new \DateTime())->format('Ymd'), $value);
+                $value = str_replace('{date_time}', (new \DateTime())->format('Ymd_His'), $value);
+                return $value;
+            }
         );
     }
 
