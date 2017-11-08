@@ -10,6 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Wait for defined inputs before passing an aggregated output.
  * Should have been a BlockingTask, but due to limitations in the current model, it's a hack using skips and finalize.
+ *
  * @see README.md:Known issues
  */
 class InputAggregatorTask extends AbstractConfigurableTask implements FinalizableTaskInterface
@@ -22,6 +23,9 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
      * Once an output has been generated this task is reset, and may wait for another loop
      *
      * @param ProcessState $state
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
@@ -30,9 +34,13 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
             throw new \UnexpectedValueException("This task cannot be used without a previous task");
         }
 
+        $allowOverride = $this->getOption($state, 'allow_input_override');
+
         $inputCode = $this->getInputCode($state);
-        if (array_key_exists($inputCode, $this->inputs)) {
-            throw new \UnexpectedValueException("The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output");
+        if (!$allowOverride && array_key_exists($inputCode, $this->inputs)) {
+            throw new \UnexpectedValueException(
+                "The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output"
+            );
         }
 
         $this->inputs[$inputCode] = $state->getInput();
@@ -50,6 +58,9 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
      * If there is pending inputs, something went wrong
      *
      * @param ProcessState $state
+     * @throws \UnexpectedValueException
+     * @throws \InvalidArgumentException
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     public function finalize(ProcessState $state)
     {
@@ -60,13 +71,17 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
 
     /**
      * @param OptionsResolver $resolver
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
 
         $resolver->setRequired('input_codes');
+        $resolver->setDefault('allow_input_override', false);
         $resolver->setAllowedTypes('input_codes', 'array');
+        $resolver->setAllowedTypes('allow_input_override', 'boolean');
     }
 
     /**
@@ -75,6 +90,9 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
      * @param ProcessState $state
      *
      * @return string
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \InvalidArgumentException
+     * @throws \UnexpectedValueException
      */
     protected function getInputCode(ProcessState $state)
     {
@@ -94,6 +112,8 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
      * @param ProcessState $state
      *
      * @return bool
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \InvalidArgumentException
      */
     protected function isResolved(ProcessState $state)
     {
