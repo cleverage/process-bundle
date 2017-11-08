@@ -48,7 +48,7 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface, Transform
      */
     public function transform($values, array $options = [])
     {
-        if (!is_array($values) && $values instanceof \Traversable) {
+        if (!is_array($values) && !$values instanceof \Traversable) {
             throw new \UnexpectedValueException('Input value must be an array or traversable');
         }
 
