@@ -304,7 +304,7 @@ class ProcessManager
         try {
             $task->execute($state);
         } catch (\Exception $e) {
-            $state->log($e->getMessage(), LogLevel::CRITICAL);
+            $state->log($e->getMessage(), LogLevel::CRITICAL, get_class($e));
             $state->stop($e);
         }
     }
