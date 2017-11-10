@@ -69,10 +69,14 @@ class LoggerTask extends AbstractConfigurableTask
         $context = [];
         foreach ($options['context'] as $contextInfo) {
             $value = $this->accessor->getValue($state, $contextInfo);
-            $context[$contextInfo] = $this->normalizer->normalize(
-                $value,
-                'json'
-            );
+            if ($value instanceof \stdClass) {
+                $context[$contextInfo] = json_decode(json_encode($value), true);
+            } else {
+                $context[$contextInfo] = $this->normalizer->normalize(
+                    $value,
+                    'json'
+                );
+            }
         }
         $state->log($options['message'], $options['level'], $options['reference'], $context);
     }
