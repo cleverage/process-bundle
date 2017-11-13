@@ -83,3 +83,8 @@ services:
         class: CleverAge\ProcessBundle\Transformer\EvaluatorTransformer
         tags:
             - { name: cleverage.transformer }
+
+    cleverage_process.transformer.preg_filter:
+        class: CleverAge\ProcessBundle\Transformer\PregFilterTransformer
+        tags:
+            - { name: cleverage.transformer }
