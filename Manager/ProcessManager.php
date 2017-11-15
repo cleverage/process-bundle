@@ -429,6 +429,7 @@ class ProcessManager
                 $consoleOutput->writeln(json_encode($taskHistory->getContext()));
             }
             $taskHistory->setProcessHistory($processHistory);
+            $processHistory->addTaskHistory($taskHistory);
             if ($this->entityManager->isOpen()) {
                 $this->entityManager->persist($taskHistory);
                 $this->entityManager->flush($taskHistory);
