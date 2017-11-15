@@ -122,3 +122,7 @@ services:
     cleverage_process.task.input_aggregator:
         class: CleverAge\ProcessBundle\Task\InputAggregatorTask
         shared: false
+
+    cleverage_process.task.error_forwarder:
+        class: CleverAge\ProcessBundle\Task\ErrorForwarderTask
+        shared: false

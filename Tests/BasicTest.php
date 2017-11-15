@@ -115,4 +115,31 @@ class BasicTest extends AbstractProcessTest
                 ],
             ], 'test.error_process');
     }
+
+    /**
+     * Assert that the error branch is called, and blocking task are correctly working
+     */
+    public function testErrorProcessBlocking()
+    {
+        $this->processManager->execute('test.error_process_with_blocking');
+        $this->assertDataQueue(
+            [
+                [
+                    'task'  => 'doNothing2',
+                    'value' => 1,
+                ],
+                [
+                    'task'  => 'doNothing2',
+                    'value' => 2,
+                ],
+                [
+                    'task'  => 'doNothing2',
+                    'value' => 3,
+                ],
+                [
+                    'task'  => 'aggregate',
+                    'value' => [1, 2, 3],
+                ],
+            ], 'test.error_process_with_blocking');
+    }
 }
