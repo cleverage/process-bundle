@@ -1,0 +1,11 @@
+clever_age_process:
+    configurations:
+        test.circular_process:
+            tasks:
+                data1:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data2]
+
+                data2:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data1]

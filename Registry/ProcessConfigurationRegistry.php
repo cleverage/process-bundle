@@ -40,6 +40,7 @@ class ProcessConfigurationRegistry
     public function __construct(array $rawConfiguration)
     {
         foreach ($rawConfiguration as $processCode => $rawProcessConfiguration) {
+            /** @var TaskConfiguration[] $taskConfigurations */
             $taskConfigurations = [];
             /** @noinspection ForeachSourceInspection */
             foreach ($rawProcessConfiguration['tasks'] as $taskCode => $rawTaskConfiguration) {
@@ -61,7 +62,6 @@ class ProcessConfigurationRegistry
             );
 
             // Set links between tasks
-            /** @var TaskConfiguration $taskConfig */
             foreach ($taskConfigurations as $taskConfig) {
                 foreach ($taskConfig->getOutputs() as $nextTaskCode) {
                     $nextTaskConfig = $processConfig->getTaskConfiguration($nextTaskCode);

@@ -22,6 +22,8 @@ namespace CleverAge\ProcessBundle\Manager;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Entity\TaskHistory;
+use CleverAge\ProcessBundle\Exception\CircularProcessException;
+use CleverAge\ProcessBundle\Exception\MultiBranchProcessException;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
@@ -90,6 +92,8 @@ class ProcessManager
     public function execute(string $processCode, OutputInterface $output = null, $input = null)
     {
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
+        $this->checkProcess($processConfiguration);
+
         $processHistory = $this->initializeStates($processConfiguration, $output);
 
         // First initialize the whole stack in a linear way, tasks are initialized in the order they are configured
@@ -460,5 +464,90 @@ class ProcessManager
         $processHistory = $this->entityManager->merge($history);
         $processHistory->setSuccess();
         $this->entityManager->flush($processHistory);
+    }
+
+    /**
+     * Validate a process
+     *
+     * @param ProcessConfiguration $processConfiguration
+     */
+    protected function checkProcess(ProcessConfiguration $processConfiguration)
+    {
+        $taskConfigurations = $processConfiguration->getTaskConfigurations();
+
+        // Check circular dependencies
+        foreach ($taskConfigurations as $taskConfiguration) {
+            if ($this->hasAncestor($taskConfiguration, $taskConfiguration->getCode())) {
+                throw CircularProcessException::create($processConfiguration->getCode(), $taskConfiguration->getCode());
+            }
+        }
+
+        // Check multi-branch processes
+        $branches = [];
+        foreach ($taskConfigurations as $taskConfiguration) {
+            $isInBranch = false;
+            foreach ($branches as $branch) {
+                if (in_array($taskConfiguration->getCode(), $branch)) {
+                    $isInBranch = true;
+                    break;
+                }
+            }
+
+            if (!$isInBranch) {
+                $dependencies = [];
+                $this->buildDependencies($taskConfiguration, $dependencies);
+                $branches[] = $dependencies;
+            }
+        }
+
+        if (count($branches) > 1) {
+            throw MultiBranchProcessException::create($processConfiguration->getCode(), $branches);
+        }
+    }
+
+    /**
+     * Check task ancestors to find if it have a given task code as parent
+     *
+     * @param TaskConfiguration $taskConfig
+     * @param string                  $taskCode
+     *
+     * @return bool
+     */
+    protected function hasAncestor(TaskConfiguration $taskConfig, $taskCode)
+    {
+        foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
+            if($previousTasksConfig->getCode() === $taskCode || $this->hasAncestor($previousTasksConfig, $taskCode)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Cross all relations of a task to find all dependencies, and append them to the given array
+     *
+     * @param TaskConfiguration $taskConfig
+     * @param array             $dependencies
+     */
+    protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies)
+    {
+        $code = $taskConfig->getCode();
+
+        if(!in_array($code, $dependencies)) {
+            $dependencies[] = $code;
+
+            foreach ($taskConfig->getNextTasksConfigurations() as $nextTasksConfig) {
+                $this->buildDependencies($nextTasksConfig, $dependencies);
+            }
+
+            foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
+                $this->buildDependencies($previousTasksConfig, $dependencies);
+            }
+
+            foreach ($taskConfig->getErrorTasksConfigurations() as $errorTasksConfig) {
+                $this->buildDependencies($errorTasksConfig, $dependencies);
+            }
+        }
     }
 }
