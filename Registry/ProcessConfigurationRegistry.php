@@ -68,9 +68,11 @@ class ProcessConfigurationRegistry
                     $taskConfig->addNextTaskConfiguration($nextTaskConfig);
                     $nextTaskConfig->addPreviousTaskConfiguration($taskConfig);
                 }
+
                 foreach ($taskConfig->getErrors() as $errorTaskCode) {
                     $errorTaskConfig = $processConfig->getTaskConfiguration($errorTaskCode);
                     $taskConfig->addErrorTaskConfiguration($errorTaskConfig);
+                    $errorTaskConfig->addPreviousTaskConfiguration($taskConfig);
                 }
             }
 
