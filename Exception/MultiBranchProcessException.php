@@ -21,6 +21,7 @@ namespace CleverAge\ProcessBundle\Exception;
 
 /**
  * Thrown when multiple independent branches are found in a process
+ * @deprecated, we won't send an error for now
  */
 class MultiBranchProcessException extends \UnexpectedValueException implements ProcessExceptionInterface
 {

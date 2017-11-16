@@ -16,6 +16,7 @@
  *    You should have received a copy of the GNU General Public License
  *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 namespace CleverAge\ProcessBundle\Tests;
 
 /**
@@ -24,10 +25,50 @@ namespace CleverAge\ProcessBundle\Tests;
 class MultiBranchProcessTest extends AbstractProcessTest
 {
     /**
-     * @expectedException \CleverAge\ProcessBundle\Exception\MultiBranchProcessException
+     * Assert only one branch is called
      */
     public function testMultiBranchProcess()
     {
-        $this->processManager->execute('test.multi_branch_process');
+        $this->processManager->execute('test.multi_branch_process_first');
+        $this->assertDataQueue([
+            [
+                'task'  => 'data1',
+                'value' => 'ok',
+            ],
+        ], 'test.multi_branch_process_first');
+
+        $this->processManager->execute('test.multi_branch_process_entry');
+        $this->assertDataQueue([
+            [
+                'task'  => 'data2',
+                'value' => 'ok',
+            ],
+        ], 'test.multi_branch_process_entry');
+
+        $this->processManager->execute('test.multi_branch_process_end');
+        $this->assertDataQueue([
+            [
+                'task'  => 'data2',
+                'value' => 'ok',
+            ],
+        ], 'test.multi_branch_process_end');
+
+        $this->processManager->execute('test.multi_branch_process_entry_end');
+        $this->assertDataQueue([
+            [
+                'task'  => 'data2',
+                'value' => 'ok',
+            ],
+        ], 'test.multi_branch_process_entry_end');
+    }
+
+    /**
+     * Assert a task cannot be started if the process is not valid
+     *
+     * @expectedException \CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException
+     */
+    public function testMultiBranchProcessError()
+    {
+        $this->processManager->execute('test.multi_branch_process_entry_end_error');
     }
 }

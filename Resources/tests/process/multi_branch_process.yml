@@ -1,9 +1,127 @@
 clever_age_process:
     configurations:
-        test.multi_branch_process:
+        test.multi_branch_process_first:
             tasks:
                 data1:
-                    service: '@cleverage_process.task.dummy'
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ok'
+                    outputs: [pushDataEvent1]
+
+                pushDataEvent1:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue
 
                 data2:
-                    service: '@cleverage_process.task.dummy'
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ko'
+                    outputs: [pushDataEvent2]
+
+                pushDataEvent2:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue
+
+        test.multi_branch_process_entry:
+            entry_point: data2
+            tasks:
+                data1:
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ko'
+                    outputs: [pushDataEvent1]
+
+                pushDataEvent1:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue
+
+                data2:
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ok'
+                    outputs: [pushDataEvent2]
+
+                pushDataEvent2:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue
+
+        test.multi_branch_process_end:
+            end_point: pushDataEvent2
+            tasks:
+                data1:
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ko'
+                    outputs: [pushDataEvent1]
+
+                pushDataEvent1:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue
+
+                data2:
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ok'
+                    outputs: [pushDataEvent2]
+
+                pushDataEvent2:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue
+
+        test.multi_branch_process_entry_end:
+            entry_point: data2
+            end_point: pushDataEvent2
+            tasks:
+                data1:
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ko'
+                    outputs: [pushDataEvent1]
+
+                pushDataEvent1:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue
+
+                data2:
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ok'
+                    outputs: [pushDataEvent2]
+
+                pushDataEvent2:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue
+
+        test.multi_branch_process_entry_end_error:
+            entry_point: data1
+            end_point: pushDataEvent2
+            tasks:
+                data1:
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ko'
+                    outputs: [pushDataEvent1]
+
+                pushDataEvent1:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue
+
+                data2:
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ok'
+                    outputs: [pushDataEvent2]
+
+                pushDataEvent2:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue

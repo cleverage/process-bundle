@@ -44,6 +44,12 @@ class ProcessConfiguration
     /** @var TaskConfiguration[] */
     protected $taskConfigurations;
 
+    /** @var array */
+    protected $dependencyGroups;
+
+    /** @var array */
+    protected $mainTaskGroup;
+
     /**
      * @param string              $code
      * @param TaskConfiguration[] $taskConfigurations
@@ -152,5 +158,90 @@ class ProcessConfiguration
     public function getErrorTasks(TaskConfiguration $currentTaskConfiguration)
     {
         return $currentTaskConfiguration->getErrorTasksConfigurations();
+    }
+
+    /**
+     * Group all task by dependencies
+     *
+     * @return array
+     */
+    public function getDependencyGroups(): array
+    {
+        if(!isset($this->dependencyGroups)) {
+            $this->dependencyGroups = [];
+            foreach ($this->getTaskConfigurations() as $taskConfiguration) {
+                $isInBranch = false;
+                foreach ($this->dependencyGroups as $branch) {
+                    if (in_array($taskConfiguration->getCode(), $branch)) {
+                        $isInBranch = true;
+                        break;
+                    }
+                }
+
+                if(!$isInBranch) {
+                    $dependencies = [];
+                    $this->buildDependencies($taskConfiguration, $dependencies);
+                    $this->dependencyGroups[] = $dependencies;
+                }
+            }
+        }
+
+        return $this->dependencyGroups;
+    }
+
+    /**
+     * Get the main task group that will be executed
+     * It may be defined by the entry_point, or the end_point or simply the first task
+     *
+     * @return array
+     */
+    public function getMainTaskGroup(): array
+    {
+        if(!isset($this->mainTaskGroup)) {
+            $entryTask = $this->getEntryPoint();
+            if(!$entryTask) {
+                $entryTask = $this->getEndPoint();
+            }
+            if(!$entryTask) {
+                $entryTask = reset($this->taskConfigurations);
+            }
+
+            $mainBranch = null;
+            foreach ($this->getDependencyGroups() as $branch) {
+                if (in_array($entryTask->getCode(), $branch)) {
+                    $this->mainTaskGroup = $branch;
+                    break;
+                }
+            }
+        }
+
+        return $this->mainTaskGroup;
+    }
+
+    /**
+     * Cross all relations of a task to find all dependencies, and append them to the given array
+     *
+     * @param TaskConfiguration $taskConfig
+     * @param array             $dependencies
+     */
+    protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies)
+    {
+        $code = $taskConfig->getCode();
+
+        if (!in_array($code, $dependencies)) {
+            $dependencies[] = $code;
+
+            foreach ($taskConfig->getNextTasksConfigurations() as $nextTasksConfig) {
+                $this->buildDependencies($nextTasksConfig, $dependencies);
+            }
+
+            foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
+                $this->buildDependencies($previousTasksConfig, $dependencies);
+            }
+
+            foreach ($taskConfig->getErrorTasksConfigurations() as $errorTasksConfig) {
+                $this->buildDependencies($errorTasksConfig, $dependencies);
+            }
+        }
     }
 }

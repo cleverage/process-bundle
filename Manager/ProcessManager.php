@@ -23,7 +23,7 @@ use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Entity\TaskHistory;
 use CleverAge\ProcessBundle\Exception\CircularProcessException;
-use CleverAge\ProcessBundle\Exception\MultiBranchProcessException;
+use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
@@ -92,9 +92,8 @@ class ProcessManager
     public function execute(string $processCode, OutputInterface $output = null, $input = null)
     {
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
-        $this->checkProcess($processConfiguration);
-
         $processHistory = $this->initializeStates($processConfiguration, $output);
+        $this->checkProcess($processConfiguration);
 
         // First initialize the whole stack in a linear way, tasks are initialized in the order they are configured
         foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
@@ -106,10 +105,14 @@ class ProcessManager
             $processConfiguration->getEntryPoint()->getState()->setInput($input);
         }
 
-        // Resolve all, starting by the end
+        // Resolve task from main branch, starting by the end
+        /** @var TaskConfiguration[] $taskList */
         $taskList = array_reverse($processConfiguration->getTaskConfigurations());
+        $allowedTasks = $processConfiguration->getMainTaskGroup();
         foreach ($taskList as $taskConfiguration) {
-            $this->resolve($taskConfiguration);
+            if (in_array($taskConfiguration->getCode(), $allowedTasks)) {
+                $this->resolve($taskConfiguration);
+            }
         }
 
         // Finalize the process in a linear way
@@ -135,7 +138,7 @@ class ProcessManager
      *
      * @return bool
      */
-    public function resolve(TaskConfiguration $taskConfiguration)
+    protected function resolve(TaskConfiguration $taskConfiguration)
     {
         $state = $taskConfiguration->getState();
         if ($state->isResolved()) {
@@ -475,6 +478,9 @@ class ProcessManager
     protected function checkProcess(ProcessConfiguration $processConfiguration)
     {
         $taskConfigurations = $processConfiguration->getTaskConfigurations();
+        $mainTaskList = $processConfiguration->getMainTaskGroup();
+        $entryPoint = $processConfiguration->getEntryPoint();
+        $endPoint = $processConfiguration->getEndPoint();
 
         // Check circular dependencies
         foreach ($taskConfigurations as $taskConfiguration) {
@@ -484,25 +490,22 @@ class ProcessManager
         }
 
         // Check multi-branch processes
-        $branches = [];
         foreach ($taskConfigurations as $taskConfiguration) {
-            $isInBranch = false;
-            foreach ($branches as $branch) {
-                if (in_array($taskConfiguration->getCode(), $branch)) {
-                    $isInBranch = true;
-                    break;
-                }
-            }
-
-            if (!$isInBranch) {
-                $dependencies = [];
-                $this->buildDependencies($taskConfiguration, $dependencies);
-                $branches[] = $dependencies;
+            if (!in_array($taskConfiguration->getCode(), $mainTaskList)) {
+                // We won't throw an error to ease development... but there must be some kind of warning
+                $state = $taskConfiguration->getState();
+                $state->log("The task won't be executed", LogLevel::WARNING, null, $mainTaskList);
+                $this->handleState($state);
             }
         }
 
-        if (count($branches) > 1) {
-            throw MultiBranchProcessException::create($processConfiguration->getCode(), $branches);
+        // Check coherence for entry/end points
+        $processConfiguration->getEndPoint();
+        if ($entryPoint && !in_array($entryPoint->getCode(), $mainTaskList)) {
+            throw InvalidProcessConfigurationException::createNotInMain($entryPoint, $mainTaskList);
+        }
+        if ($endPoint && !in_array($endPoint->getCode(), $mainTaskList)) {
+            throw InvalidProcessConfigurationException::createNotInMain($endPoint, $mainTaskList);
         }
     }
 
@@ -510,45 +513,18 @@ class ProcessManager
      * Check task ancestors to find if it have a given task code as parent
      *
      * @param TaskConfiguration $taskConfig
-     * @param string                  $taskCode
+     * @param string            $taskCode
      *
      * @return bool
      */
     protected function hasAncestor(TaskConfiguration $taskConfig, $taskCode)
     {
         foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
-            if($previousTasksConfig->getCode() === $taskCode || $this->hasAncestor($previousTasksConfig, $taskCode)) {
+            if ($previousTasksConfig->getCode() === $taskCode || $this->hasAncestor($previousTasksConfig, $taskCode)) {
                 return true;
             }
         }
 
         return false;
-    }
-
-    /**
-     * Cross all relations of a task to find all dependencies, and append them to the given array
-     *
-     * @param TaskConfiguration $taskConfig
-     * @param array             $dependencies
-     */
-    protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies)
-    {
-        $code = $taskConfig->getCode();
-
-        if(!in_array($code, $dependencies)) {
-            $dependencies[] = $code;
-
-            foreach ($taskConfig->getNextTasksConfigurations() as $nextTasksConfig) {
-                $this->buildDependencies($nextTasksConfig, $dependencies);
-            }
-
-            foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
-                $this->buildDependencies($previousTasksConfig, $dependencies);
-            }
-
-            foreach ($taskConfig->getErrorTasksConfigurations() as $errorTasksConfig) {
-                $this->buildDependencies($errorTasksConfig, $dependencies);
-            }
-        }
     }
 }
