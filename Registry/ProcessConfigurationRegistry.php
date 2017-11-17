@@ -82,6 +82,12 @@ class ProcessConfigurationRegistry
                     $this->markErrorBranch($errorTaskConfig);
                 }
             }
+            foreach ($processConfig->getMainTaskGroup() as $taskCode) {
+                $task = $taskConfigurations[$taskCode];
+                if ($task->isRoot()) {
+                    $this->markErrorBranch($task, false);
+                }
+            }
 
             $this->processConfigurations[$processCode] = $processConfig;
         }
@@ -123,12 +129,13 @@ class ProcessConfigurationRegistry
 
     /**
      * @param TaskConfiguration $taskConfig
+     * @param bool              $isErrorBranch
      */
-    protected function markErrorBranch(TaskConfiguration $taskConfig)
+    protected function markErrorBranch(TaskConfiguration $taskConfig, $isErrorBranch = true)
     {
-        $taskConfig->setInErrorBranch(true);
+        $taskConfig->setInErrorBranch($isErrorBranch);
         foreach ($taskConfig->getNextTasksConfigurations() as $nextTasksConfig) {
-            $this->markErrorBranch($nextTasksConfig);
+            $this->markErrorBranch($nextTasksConfig, $isErrorBranch);
         }
     }
 }

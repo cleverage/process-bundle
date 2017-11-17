@@ -229,4 +229,12 @@ class TaskConfiguration
     {
         $this->inErrorBranch = $inErrorBranch;
     }
+
+    /**
+     * @return bool
+     */
+    public function isRoot(): bool
+    {
+        return empty($this->getPreviousTasksConfigurations()) && !$this->isInErrorBranch();
+    }
 }

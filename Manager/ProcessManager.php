@@ -163,7 +163,7 @@ class ProcessManager
         $state->setStatus(ProcessState::STATUS_PROCESSING);
 
         // Start processing only roots that are not in error branch
-        if (empty($taskConfiguration->getPreviousTasksConfigurations()) && !$taskConfiguration->isInErrorBranch()) {
+        if ($taskConfiguration->isRoot()) {
             $this->process($taskConfiguration);
         }
 
