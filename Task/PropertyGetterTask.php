@@ -75,7 +75,7 @@ class PropertyGetterTask extends AbstractConfigurableTask
         } catch (\Exception $e) {
             $state->setError($input);
             if ($options[self::LOG_ERRORS]) {
-                $state->log('PropertySetter exception: '.$e->getMessage(), LogLevel::ERROR, $property, [
+                $state->log('PropertyGetter exception: '.$e->getMessage(), LogLevel::ERROR, $property, [
                     'property' => $property,
                 ]);
             }
