@@ -132,6 +132,10 @@ services:
         class: CleverAge\ProcessBundle\Task\ErrorForwarderTask
         shared: false
 
+    cleverage_process.task.skip_empty:
+        class: CleverAge\ProcessBundle\Task\SkipEmptyTask
+        shared: false
+
     cleverage_process.task.process_executor:
         class: CleverAge\ProcessBundle\Task\ProcessExecutorTask
         shared: false
