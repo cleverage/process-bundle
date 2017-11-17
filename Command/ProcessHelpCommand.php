@@ -22,8 +22,6 @@ namespace CleverAge\ProcessBundle\Command;
 
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
-use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
-use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
@@ -43,7 +41,9 @@ class ProcessHelpCommand extends ContainerAwareCommand
 
     const CHAR_DOWN = '│';
     const CHAR_MERGE = '┘';
+    const CHAR_MULTIMERGE = '┴─';
     const CHAR_JUMP = '┼─';
+    const CHAR_HORIZ = '──';
     const CHAR_MULTIEXPAND = '┬─';
     const CHAR_EXPAND = '┐';
     const CHAR_RECEIVE = '├─';
@@ -83,6 +83,7 @@ class ProcessHelpCommand extends ContainerAwareCommand
             $branchesToMerge = [];
             $gapBranches = [];
             $origin = null;
+            $final = null;
 
             // Check previous branches
             if (empty($task->getPreviousTasksConfigurations())) {
@@ -121,6 +122,7 @@ class ProcessHelpCommand extends ContainerAwareCommand
                 }
 
                 $origin = array_shift($branchesToMerge);
+                $final = $gapFrom;
                 $branches[$origin] = $taskCode;
             }
 
@@ -130,8 +132,23 @@ class ProcessHelpCommand extends ContainerAwareCommand
 
                 $this->writeBranches($output, $branches, '', function ($taskCode, $i) use ($branchesToMerge, $gapBranches, $origin) {
                     return in_array($i, $branchesToMerge) || in_array($i, $gapBranches) || $i === $origin;
-                }, function ($taskCode, $i) use ($gapBranches, $origin) {
-                    return $i === $origin ? self::CHAR_RECEIVE : (in_array($i, $gapBranches) ? self::CHAR_JUMP : self::CHAR_MERGE);
+                }, function ($taskCode, $i) use ($gapBranches, $origin, $final, $branches) {
+                    if ($i === $origin) {
+                        return self::CHAR_RECEIVE;
+                    }
+                    if (in_array($i, $gapBranches)) {
+                        if ($branches[$i] !== null) {
+                            return self::CHAR_JUMP;
+                        } else {
+                            return self::CHAR_HORIZ;
+                        }
+                    }
+
+                    if ($i === $final) {
+                        return self::CHAR_MERGE;
+                    }
+
+                    return self::CHAR_MULTIMERGE;
                 });
 
                 foreach ($branches as $i => $branchTask) {
