@@ -28,6 +28,7 @@ use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -67,6 +68,8 @@ class ProcessHelpCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $output->getFormatter()->setStyle('fire', new OutputFormatterStyle('red'));
+
         $this->processConfigRegistry = $this->getContainer()->get('cleverage_process.registry.process_configuration');
         $processCode = $input->getArgument('process_code');
         $process = $this->processConfigRegistry->getProcessConfiguration($processCode);
@@ -148,9 +151,14 @@ class ProcessHelpCommand extends ContainerAwareCommand
             }
 
             // Write main line
+            $nodeStr = self::CHAR_NODE;
+            if ($task->isInErrorBranch()) {
+                $nodeStr = "<fire>{$nodeStr}</fire>";
+            }
+
             $this->writeBranches($output, $branches, $this->getTaskDescription($task), function ($branchTask, $i) use ($taskCode) {
                 return $branchTask === $taskCode;
-            }, self::CHAR_NODE);
+            }, $nodeStr);
 
             // Check next tasks
             $nextTasks = array_map(function (TaskConfiguration $task) {
@@ -217,7 +225,8 @@ class ProcessHelpCommand extends ContainerAwareCommand
             }
 
             // Str_pad does not work with unicode ?
-            for ($i = mb_strlen($str); $i < self::BRANCH_SIZE; $i++) {
+            $noFormatStrLen = mb_strlen(preg_replace('/<[^>]*>/', '', $str));
+            for ($i = $noFormatStrLen; $i < self::BRANCH_SIZE; $i++) {
                 $str .= ' ';
             }
             $output->write($str);
