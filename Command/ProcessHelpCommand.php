@@ -184,16 +184,36 @@ class ProcessHelpCommand extends ContainerAwareCommand
             if (count($nextTasks) > 1) {
                 $this->writeBranches($output, $branches);
                 array_shift($nextTasks);
-                $branchesCount = count($branches);
+                $origin = array_search($taskCode, $branches, true);
                 foreach ($nextTasks as $nextTask) {
                     $branches[] = $taskCode;
                 }
                 $maxBranchCount = count($branches);
+                $gapBranches = [];
+                for ($i = $origin; $i < $maxBranchCount; $i++) {
+                    if ($branches[$i] !== $taskCode) {
+                        $gapBranches[] = $i;
+                    }
+                }
 
-                $this->writeBranches($output, $branches, '', function ($branchTask, $i) use ($branchesCount) {
-                    return $i >= $branchesCount - 1;
-                }, function ($branchTask, $i) use ($branchesCount, $maxBranchCount) {
-                    return $branchesCount - 1 === $i ? self::CHAR_RECEIVE : ($maxBranchCount - 1 === $i ? self::CHAR_EXPAND : self::CHAR_MULTIEXPAND);
+                $this->writeBranches($output, $branches, '', function ($branchTask, $i) use ($origin) {
+                    return $i >= $origin;
+                }, function ($branchTask, $i) use ($origin, $branches, $gapBranches, $maxBranchCount) {
+                    if ($i === $origin) {
+                        return self::CHAR_RECEIVE;
+                    }
+                    if (in_array($i, $gapBranches)) {
+                        if ($branches[$i] !== null) {
+                            return self::CHAR_JUMP;
+                        } else {
+                            return self::CHAR_HORIZ;
+                        }
+                    }
+                    if ($maxBranchCount - 1 === $i) {
+                        return self::CHAR_EXPAND;
+                    }
+
+                    return self::CHAR_MULTIEXPAND;
                 });
             }
 
