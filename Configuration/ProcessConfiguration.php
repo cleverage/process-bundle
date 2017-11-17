@@ -206,7 +206,6 @@ class ProcessConfiguration
                 $entryTask = reset($this->taskConfigurations);
             }
 
-            $mainBranch = null;
             foreach ($this->getDependencyGroups() as $branch) {
                 if (in_array($entryTask->getCode(), $branch)) {
                     $this->mainTaskGroup = $branch;
@@ -229,14 +228,17 @@ class ProcessConfiguration
         $code = $taskConfig->getCode();
 
         if (!in_array($code, $dependencies)) {
-            $dependencies[] = $code;
+            foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
+                $this->buildDependencies($previousTasksConfig, $dependencies);
+            }
+
+            // May have been added by previous task
+            if (!in_array($code, $dependencies)) {
+                $dependencies[] = $code;
+            }
 
             foreach ($taskConfig->getNextTasksConfigurations() as $nextTasksConfig) {
                 $this->buildDependencies($nextTasksConfig, $dependencies);
-            }
-
-            foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
-                $this->buildDependencies($previousTasksConfig, $dependencies);
             }
 
             foreach ($taskConfig->getErrorTasksConfigurations() as $errorTasksConfig) {
