@@ -126,3 +126,10 @@ services:
     cleverage_process.task.error_forwarder:
         class: CleverAge\ProcessBundle\Task\ErrorForwarderTask
         shared: false
+
+    cleverage_process.task.process_executor:
+        class: CleverAge\ProcessBundle\Task\ProcessExecutorTask
+        shared: false
+        arguments:
+            - '@cleverage_process.manager.process'
+            - '@cleverage_process.registry.process_configuration'

@@ -1,2 +1,3 @@
 imports:
     - { resource: process/* }
+    - { resource: task/* }
