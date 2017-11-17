@@ -139,7 +139,8 @@ class TransformerTask extends AbstractConfigurableTask
         } catch (\Exception $e) {
             $state->setError($state->getInput());
             if ($options[self::LOG_ERRORS]) {
-                $state->log('PropertySetter exception: '.$e->getMessage(), LogLevel::ERROR);
+                $context = $e->getPrevious() ? ['error' => $e->getPrevious()->getMessage()] : [];
+                $state->log('Transformer exception: '.$e->getMessage(), LogLevel::ERROR, null, $context);
             }
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
