@@ -44,6 +44,11 @@ services:
         arguments: ['@property_accessor']
         shared: false
 
+    cleverage_process.task.property_getter:
+        class: CleverAge\ProcessBundle\Task\PropertyGetterTask
+        arguments: ['@property_accessor']
+        shared: false
+
     cleverage_process.task.csv_reader:
         class: CleverAge\ProcessBundle\Task\CsvReaderTask
         shared: false
