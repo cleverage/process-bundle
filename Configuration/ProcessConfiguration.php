@@ -163,11 +163,13 @@ class ProcessConfiguration
     /**
      * Group all task by dependencies
      *
+     * If one task depend from another, it should come after
+     *
      * @return array
      */
     public function getDependencyGroups(): array
     {
-        if(!isset($this->dependencyGroups)) {
+        if (!isset($this->dependencyGroups)) {
             $this->dependencyGroups = [];
             foreach ($this->getTaskConfigurations() as $taskConfiguration) {
                 $isInBranch = false;
@@ -178,9 +180,23 @@ class ProcessConfiguration
                     }
                 }
 
-                if(!$isInBranch) {
-                    $dependencies = [];
-                    $this->buildDependencies($taskConfiguration, $dependencies);
+                if (!$isInBranch) {
+                    $dependencies = $this->buildDependencies($taskConfiguration);
+
+                    // Sort the tasks
+                    usort($dependencies, function ($taskCode1, $taskCode2) {
+                        $task1 = $this->getTaskConfiguration($taskCode1);
+                        $task2 = $this->getTaskConfiguration($taskCode2);
+
+                        if ($task2->hasAncestor($task1)) {
+                            return -1;
+                        } elseif ($task2->hasDescendant($task1)) {
+                            return 1;
+                        } else {
+                            return 0;
+                        }
+                    });
+
                     $this->dependencyGroups[] = $dependencies;
                 }
             }
@@ -193,21 +209,17 @@ class ProcessConfiguration
      * Get the main task group that will be executed
      * It may be defined by the entry_point, or the end_point or simply the first task
      *
+     * If one task depend from another, it should come after
+     *
      * @return array
      */
     public function getMainTaskGroup(): array
     {
-        if(!isset($this->mainTaskGroup)) {
-            $entryTask = $this->getEntryPoint();
-            if(!$entryTask) {
-                $entryTask = $this->getEndPoint();
-            }
-            if(!$entryTask) {
-                $entryTask = reset($this->taskConfigurations);
-            }
+        if (!isset($this->mainTaskGroup)) {
+            $mainTask = $this->getMainTask();
 
             foreach ($this->getDependencyGroups() as $branch) {
-                if (in_array($entryTask->getCode(), $branch)) {
+                if (in_array($mainTask->getCode(), $branch)) {
                     $this->mainTaskGroup = $branch;
                     break;
                 }
@@ -218,23 +230,42 @@ class ProcessConfiguration
     }
 
     /**
+     * Get the most important task (may be the entry or end task, or simply the first)
+     * Used to check which tree should be used
+     *
+     * @return TaskConfiguration
+     */
+    public function getMainTask()
+    {
+        $entryTask = $this->getEntryPoint();
+        if (!$entryTask) {
+            $entryTask = $this->getEndPoint();
+        }
+        if (!$entryTask) {
+            $entryTask = reset($this->taskConfigurations);
+        }
+
+        return $entryTask;
+    }
+
+    /**
      * Cross all relations of a task to find all dependencies, and append them to the given array
      *
      * @param TaskConfiguration $taskConfig
      * @param array             $dependencies
+     *
+     * @return array
      */
-    protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies)
+    protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies = [])
     {
         $code = $taskConfig->getCode();
 
+        // May have been added by previous task
         if (!in_array($code, $dependencies)) {
+            $dependencies[] = $code;
+
             foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
                 $this->buildDependencies($previousTasksConfig, $dependencies);
-            }
-
-            // May have been added by previous task
-            if (!in_array($code, $dependencies)) {
-                $dependencies[] = $code;
             }
 
             foreach ($taskConfig->getNextTasksConfigurations() as $nextTasksConfig) {
@@ -245,5 +276,7 @@ class ProcessConfiguration
                 $this->buildDependencies($errorTasksConfig, $dependencies);
             }
         }
+
+        return $dependencies;
     }
 }

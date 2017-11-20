@@ -484,7 +484,7 @@ class ProcessManager
 
         // Check circular dependencies
         foreach ($taskConfigurations as $taskConfiguration) {
-            if ($this->hasAncestor($taskConfiguration, $taskConfiguration->getCode())) {
+            if ($taskConfiguration->hasAncestor($taskConfiguration)) {
                 throw CircularProcessException::create($processConfiguration->getCode(), $taskConfiguration->getCode());
             }
         }
@@ -507,24 +507,5 @@ class ProcessManager
         if ($endPoint && !in_array($endPoint->getCode(), $mainTaskList)) {
             throw InvalidProcessConfigurationException::createNotInMain($endPoint, $mainTaskList);
         }
-    }
-
-    /**
-     * Check task ancestors to find if it have a given task code as parent
-     *
-     * @param TaskConfiguration $taskConfig
-     * @param string            $taskCode
-     *
-     * @return bool
-     */
-    protected function hasAncestor(TaskConfiguration $taskConfig, $taskCode)
-    {
-        foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
-            if ($previousTasksConfig->getCode() === $taskCode || $this->hasAncestor($previousTasksConfig, $taskCode)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

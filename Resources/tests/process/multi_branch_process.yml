@@ -49,6 +49,31 @@ clever_age_process:
                     options:
                         event_name: cleverage_process.data_queue
 
+        test.multi_branch_process_entry_reversed:
+            entry_point: data2
+            tasks:
+                pushDataEvent2:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue
+
+                data1:
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ko'
+                    outputs: [pushDataEvent1]
+
+                pushDataEvent1:
+                    service: '@cleverage_process.task.event_dispatcher'
+                    options:
+                        event_name: cleverage_process.data_queue
+
+                data2:
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: 'ok'
+                    outputs: [pushDataEvent2]
+
         test.multi_branch_process_end:
             end_point: pushDataEvent2
             tasks:

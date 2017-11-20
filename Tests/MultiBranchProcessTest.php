@@ -45,6 +45,14 @@ class MultiBranchProcessTest extends AbstractProcessTest
             ],
         ], 'test.multi_branch_process_entry');
 
+        $this->processManager->execute('test.multi_branch_process_entry_reversed');
+        $this->assertDataQueue([
+            [
+                'task'  => 'data2',
+                'value' => 'ok',
+            ],
+        ], 'test.multi_branch_process_entry');
+
         $this->processManager->execute('test.multi_branch_process_end');
         $this->assertDataQueue([
             [
@@ -60,6 +68,24 @@ class MultiBranchProcessTest extends AbstractProcessTest
                 'value' => 'ok',
             ],
         ], 'test.multi_branch_process_entry_end');
+    }
+
+    public function testMainGroupOrder()
+    {
+        $process = $this->processConfigurationRegistry->getProcessConfiguration('test.multi_branch_process_first');
+        self::assertEquals(['data1', 'pushDataEvent1'], $process->getMainTaskGroup(),'Failed testing task order with process test.multi_branch_process_first');
+
+        $process = $this->processConfigurationRegistry->getProcessConfiguration('test.multi_branch_process_entry');
+        self::assertEquals(['data2', 'pushDataEvent2'], $process->getMainTaskGroup(),'Failed testing task order with process test.multi_branch_process_entry');
+
+        $process = $this->processConfigurationRegistry->getProcessConfiguration('test.multi_branch_process_entry_reversed');
+        self::assertEquals(['data2', 'pushDataEvent2'], $process->getMainTaskGroup(),'Failed testing task order with process test.multi_branch_process_entry_reversed');
+
+        $process = $this->processConfigurationRegistry->getProcessConfiguration('test.multi_branch_process_end');
+        self::assertEquals(['data2', 'pushDataEvent2'], $process->getMainTaskGroup(),'Failed testing task order with process test.multi_branch_process_end');
+
+        $process = $this->processConfigurationRegistry->getProcessConfiguration('test.multi_branch_process_entry_end');
+        self::assertEquals(['data2', 'pushDataEvent2'], $process->getMainTaskGroup(),'Failed testing task order with process test.multi_branch_process_entry_end');
     }
 
     /**

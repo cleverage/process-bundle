@@ -82,6 +82,8 @@ class ProcessConfigurationRegistry
                     $this->markErrorBranch($errorTaskConfig);
                 }
             }
+
+            // Un-mark non-error branch (may be important for task that are in both branches
             foreach ($processConfig->getMainTaskGroup() as $taskCode) {
                 $task = $taskConfigurations[$taskCode];
                 if ($task->isRoot()) {

@@ -22,6 +22,7 @@ namespace CleverAge\ProcessBundle\Tests;
 
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -36,6 +37,9 @@ abstract class AbstractProcessTest extends KernelTestCase
     /** @var ProcessManager */
     protected $processManager;
 
+    /** @var ProcessConfigurationRegistry */
+    protected $processConfigurationRegistry;
+
     /**
      * Initialize DI
      */
@@ -48,6 +52,7 @@ abstract class AbstractProcessTest extends KernelTestCase
 
         $this->container = $kernel->getContainer();
         $this->processManager = $this->container->get('cleverage_process.manager.process');
+        $this->processConfigurationRegistry = $this->container->get('cleverage_process.registry.process_configuration');
     }
 
     /**

@@ -237,4 +237,49 @@ class TaskConfiguration
     {
         return empty($this->getPreviousTasksConfigurations()) && !$this->isInErrorBranch();
     }
+
+    /**
+     * Check task ancestors to find if it have a given task as parent
+     *
+     * @param TaskConfiguration $taskConfig
+     *
+     * @return bool
+     */
+    public function hasAncestor(TaskConfiguration $taskConfig)
+    {
+        foreach ($this->getPreviousTasksConfigurations() as $previousTasksConfig) {
+            if ($previousTasksConfig->getCode() === $taskConfig->getCode() || $previousTasksConfig->hasAncestor($taskConfig)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Check task ancestors to find if it have a given task as child
+     *
+     * @param TaskConfiguration $taskConfig
+     * @param bool              $checkErrors
+     *
+     * @return bool
+     */
+    public function hasDescendant(TaskConfiguration $taskConfig, $checkErrors = true)
+    {
+        foreach ($this->getNextTasksConfigurations() as $errorTasksConfig) {
+            if ($errorTasksConfig->getCode() === $taskConfig->getCode() || $errorTasksConfig->hasDescendant($taskConfig, $checkErrors)) {
+                return true;
+            }
+        }
+
+        if ($checkErrors) {
+            foreach ($this->getErrorTasksConfigurations() as $errorTasksConfig) {
+                if ($errorTasksConfig->getCode() === $taskConfig->getCode() || $errorTasksConfig->hasDescendant($taskConfig, $checkErrors)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }
