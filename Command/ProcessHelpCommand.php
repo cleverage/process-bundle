@@ -98,11 +98,17 @@ class ProcessHelpCommand extends ContainerAwareCommand
                 }
             } else {
                 foreach ($task->getPreviousTasksConfigurations() as $prevTask) {
+                    $foundBranch = false;
                     foreach (array_reverse($branches, true) as $i => $branchTask) {
                         if ($branchTask === $prevTask->getCode()) {
                             $branchesToMerge[] = $i;
+                            $foundBranch = true;
                             break;
                         }
+                    }
+
+                    if (!$foundBranch) {
+                        $output->writeln("<error>Could not find previous branch : {$taskCode} depends on {$prevTask->getCode()}</error>");
                     }
                 }
 
@@ -249,6 +255,12 @@ class ProcessHelpCommand extends ContainerAwareCommand
 
             $this->writeBranches($output, $branches);
         };
+
+        $branches = array_filter($branches);
+        if (!empty($branches)) {
+            $branchStr = '[' . implode(', ', $branches) . ']';
+            $output->writeln("<error>All branches are not resolved : {$branchStr}</error>");
+        }
     }
 
     /**

@@ -182,20 +182,7 @@ class ProcessConfiguration
 
                 if (!$isInBranch) {
                     $dependencies = $this->buildDependencies($taskConfiguration);
-
-                    // Sort the tasks
-                    usort($dependencies, function ($taskCode1, $taskCode2) {
-                        $task1 = $this->getTaskConfiguration($taskCode1);
-                        $task2 = $this->getTaskConfiguration($taskCode2);
-
-                        if ($task2->hasAncestor($task1)) {
-                            return -1;
-                        } elseif ($task2->hasDescendant($task1)) {
-                            return 1;
-                        } else {
-                            return 0;
-                        }
-                    });
+                    $this->sortDependencies($dependencies);
 
                     $this->dependencyGroups[] = $dependencies;
                 }
@@ -278,5 +265,26 @@ class ProcessConfiguration
         }
 
         return $dependencies;
+    }
+
+    /**
+     * @TODO does not work on complex workflow
+     *
+     * @param array $dependencies
+     */
+    protected function sortDependencies(array &$dependencies)
+    {
+        usort($dependencies, function ($taskCode1, $taskCode2) {
+            $task1 = $this->getTaskConfiguration($taskCode1);
+            $task2 = $this->getTaskConfiguration($taskCode2);
+
+            if ($task2->hasAncestor($task1)) {
+                return -1;
+            } elseif ($task2->hasDescendant($task1)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
     }
 }
