@@ -182,7 +182,7 @@ class ProcessConfiguration
 
                 if (!$isInBranch) {
                     $dependencies = $this->buildDependencies($taskConfiguration);
-                    $this->sortDependencies($dependencies);
+                    $dependencies = $this->sortDependencies($dependencies);
 
                     $this->dependencyGroups[] = $dependencies;
                 }
@@ -268,23 +268,44 @@ class ProcessConfiguration
     }
 
     /**
-     * @TODO does not work on complex workflow
+     * Sort the tasks by dependencies
      *
      * @param array $dependencies
+     *
+     * @return array
      */
-    protected function sortDependencies(array &$dependencies)
+    protected function sortDependencies(array $dependencies)
     {
-        usort($dependencies, function ($taskCode1, $taskCode2) {
-            $task1 = $this->getTaskConfiguration($taskCode1);
-            $task2 = $this->getTaskConfiguration($taskCode2);
+        if (count($dependencies) <= 1) {
+            return $dependencies;
+        }
 
-            if ($task2->hasAncestor($task1)) {
-                return -1;
-            } elseif ($task2->hasDescendant($task1)) {
-                return 1;
-            } else {
-                return 0;
+        $midOffset = (int)count($dependencies) / 2;
+        $midTaskCode = $dependencies[$midOffset];
+        $midTask = $this->getTaskConfiguration($midTaskCode);
+
+        $previousTasks = [];
+        $independentTasks = [];
+        $nextTasks = [];
+
+        foreach ($dependencies as $taskCode) {
+            if ($taskCode !== $midTaskCode) {
+                $task = $this->getTaskConfiguration($taskCode);
+
+                if ($midTask->hasAncestor($task)) {
+                    $previousTasks[] = $taskCode;
+                } elseif ($midTask->hasDescendant($task)) {
+                    $nextTasks[] = $taskCode;
+                } else {
+                    $independentTasks[] = $taskCode;
+                }
             }
-        });
+        }
+
+        $previousTasks = $this->sortDependencies($previousTasks);
+        $independentTasks = $this->sortDependencies($independentTasks);
+        $nextTasks = $this->sortDependencies($nextTasks);
+
+        return array_merge($previousTasks,[$midTaskCode], $independentTasks, $nextTasks);
     }
 }
