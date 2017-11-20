@@ -42,7 +42,7 @@ class ProcessHelpCommand extends ContainerAwareCommand
     const CHAR_DOWN = '│';
     const CHAR_MERGE = '┘';
     const CHAR_MULTIMERGE = '┴─';
-    const CHAR_JUMP = '┼─';
+    const CHAR_JUMP = '┿─';
     const CHAR_HORIZ = '──';
     const CHAR_MULTIEXPAND = '┬─';
     const CHAR_EXPAND = '┐';
@@ -185,20 +185,34 @@ class ProcessHelpCommand extends ContainerAwareCommand
                 $this->writeBranches($output, $branches);
                 array_shift($nextTasks);
                 $origin = array_search($taskCode, $branches, true);
+                $expandBranches = [];
                 foreach ($nextTasks as $nextTask) {
-                    $branches[] = $taskCode;
-                }
-                $maxBranchCount = count($branches);
-                $gapBranches = [];
-                for ($i = $origin; $i < $maxBranchCount; $i++) {
-                    if ($branches[$i] !== $taskCode) {
-                        $gapBranches[] = $i;
+                    $index = array_search(null, $branches, true);
+                    if ($index !== false) {
+                        $branches[$index] = $taskCode;
+                        $expandBranches[] = $index;
+                    } else {
+                        $expandBranches[] = count($branches);
+                        $branches[] = $taskCode;
                     }
                 }
+                $gapBranches = [];
+                sort($expandBranches);
+                $gapFrom = $origin;
+                $gapTo = null;
 
-                $this->writeBranches($output, $branches, '', function ($branchTask, $i) use ($origin) {
-                    return $i >= $origin;
-                }, function ($branchTask, $i) use ($origin, $branches, $gapBranches, $maxBranchCount) {
+                foreach ($expandBranches as $i) {
+                    $gapTo = $i;
+                    for ($j = $gapFrom + 1; $j < $gapTo; $j++) {
+                        $gapBranches[] = $j;
+                    }
+                    $gapFrom = $i;
+                }
+                $final = $gapFrom;
+
+                $this->writeBranches($output, $branches, '', function ($branchTask, $i) use ($origin, $final) {
+                    return $i >= $origin && $i <= $final;
+                }, function ($branchTask, $i) use ($origin, $branches, $gapBranches, $final) {
                     if ($i === $origin) {
                         return self::CHAR_RECEIVE;
                     }
@@ -209,7 +223,7 @@ class ProcessHelpCommand extends ContainerAwareCommand
                             return self::CHAR_HORIZ;
                         }
                     }
-                    if ($maxBranchCount - 1 === $i) {
+                    if ($final === $i) {
                         return self::CHAR_EXPAND;
                     }
 
