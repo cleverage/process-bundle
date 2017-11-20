@@ -194,7 +194,7 @@ class ProcessHelpCommand extends ContainerAwareCommand
                 $expandBranches = [];
                 foreach ($nextTasks as $nextTask) {
                     $index = array_search(null, $branches, true);
-                    if ($index !== false) {
+                    if ($index !== false && $index >= $origin) {
                         $branches[$index] = $taskCode;
                         $expandBranches[] = $index;
                     } else {
