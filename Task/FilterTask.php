@@ -50,10 +50,6 @@ class FilterTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $input = $state->getInput();
-        if (!is_array($input)) {
-            throw new \UnexpectedValueException("The given input is not an array");
-        }
-
         foreach ($this->getOption($state, 'match') as $key => $value) {
             if (!$this->checkValue($input, $key, $value)) {
                 $state->setSkipped(true);
@@ -62,7 +58,23 @@ class FilterTask extends AbstractConfigurableTask
             }
         }
 
+        foreach ($this->getOption($state, 'match_regexp') as $key => $value) {
+            if (!$this->checkValue($input, $key, $value)) {
+                $state->setSkipped(true);
+
+                return;
+            }
+        }
+
         foreach ($this->getOption($state, 'not_match') as $key => $value) {
+            if (!$this->checkValue($input, $key, $value, false)) {
+                $state->setSkipped(true);
+
+                return;
+            }
+        }
+
+        foreach ($this->getOption($state, 'not_match_regexp') as $key => $value) {
             if (!$this->checkValue($input, $key, $value, false)) {
                 $state->setSkipped(true);
 
@@ -81,8 +93,12 @@ class FilterTask extends AbstractConfigurableTask
         parent::configureOptions($resolver);
         $resolver->setDefault('not_match', []);
         $resolver->setDefault('match', []);
+        $resolver->setDefault('not_match_regexp', []);
+        $resolver->setDefault('match_regexp', []);
         $resolver->setAllowedTypes('not_match', 'array');
         $resolver->setAllowedTypes('match', 'array');
+        $resolver->setAllowedTypes('not_match_regexp', 'array');
+        $resolver->setAllowedTypes('match_regexp', 'array');
     }
 
     /**
@@ -91,11 +107,12 @@ class FilterTask extends AbstractConfigurableTask
      * @param object|array $input
      * @param string       $key
      * @param mixed        $value
-     * @param bool         $match
+     * @param bool         $shouldMatch
+     * @param bool         $regexpMode
      *
      * @return bool
      */
-    protected function checkValue($input, $key, $value, $match = true)
+    protected function checkValue($input, $key, $value, $shouldMatch = true, $regexpMode = false)
     {
         if ($this->accessor->isReadable($input, $key)) {
             $currentValue = $this->accessor->getValue($input, $key);
@@ -103,9 +120,19 @@ class FilterTask extends AbstractConfigurableTask
             $currentValue = null;
         }
 
-        if ($match && $currentValue != $value) {
+        if ($shouldMatch && !$regexpMode && $currentValue != $value) {
             return false;
-        } elseif (!$match && $currentValue == $value) {
+        }
+
+        if (!$shouldMatch && !$regexpMode && $currentValue == $value) {
+            return false;
+        }
+
+        if ($shouldMatch && $regexpMode && preg_match($value, $currentValue) !== false) {
+            return false;
+        }
+
+        if (!$shouldMatch && $regexpMode && preg_match($value, $currentValue) !== false) {
             return false;
         }
 
