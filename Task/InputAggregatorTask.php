@@ -64,9 +64,6 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
      */
     public function finalize(ProcessState $state)
     {
-        if (!empty($this->inputs) && !$this->isResolved($state)) {
-            throw new \UnexpectedValueException("This task has not been resolved");
-        }
     }
 
     /**
