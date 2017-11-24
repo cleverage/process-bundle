@@ -168,6 +168,10 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
 
         if ($consoleOutput) {
             $consoleOutput->writeln("<info>{$process->getCommandLine()}</info>");
+            if ($consoleOutput->isVeryVerbose() && function_exists('dump')) {
+                $consoleOutput->writeln("<info>Input:</info>");
+                dump($state->getInput());
+            }
         }
 
         $process->start(

@@ -57,6 +57,14 @@ services:
         class: CleverAge\ProcessBundle\Task\CsvWriterTask
         shared: false
 
+    cleverage_process.task.csv_input_reader:
+        class: CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask
+        shared: false
+
+    cleverage_process.task.csv_splitter:
+        class: CleverAge\ProcessBundle\Task\File\Csv\CsvSplitterTask
+        shared: false
+
     cleverage_process.task.database_reader:
         class: CleverAge\ProcessBundle\Task\DatabaseReaderTask
         arguments: ['@doctrine']
@@ -84,6 +92,10 @@ services:
 
     cleverage_process.task.stat_counter:
         class: CleverAge\ProcessBundle\Task\StatCounterTask
+        shared: false
+
+    cleverage_process.task.advanced_stat_counter:
+        class: CleverAge\ProcessBundle\Task\Reporting\AdvancedStatCounterTask
         shared: false
 
     cleverage_process.task.transformer:
