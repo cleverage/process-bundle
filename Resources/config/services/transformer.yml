@@ -88,3 +88,13 @@ services:
         class: CleverAge\ProcessBundle\Transformer\PregFilterTransformer
         tags:
             - { name: cleverage.transformer }
+
+    cleverage_process.transformer.date_format:
+        class: CleverAge\ProcessBundle\Transformer\DateFormatTransformer
+        tags:
+            - { name: cleverage.transformer }
+
+    cleverage_process.transformer.default:
+        class: CleverAge\ProcessBundle\Transformer\DefaultTransformer
+        tags:
+            - { name: cleverage.transformer }
