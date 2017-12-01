@@ -23,6 +23,7 @@ use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LogLevel;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Reads the file path from configuration and iterates over it
@@ -64,11 +65,13 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         }
 
         if (null === $output) {
-            $state->log(
-                "Empty line detected at line: {$this->csv->getCurrentLine()}",
-                LogLevel::WARNING,
-                $this->csv->getFilePath()
-            );
+            if ($this->getOption($state, 'log_empty_lines')) {
+                $state->log(
+                    "Empty line detected at line: {$this->csv->getCurrentLine()}",
+                    LogLevel::WARNING,
+                    $this->csv->getFilePath()
+                );
+            }
             $state->setSkipped(true);
         }
 
@@ -112,4 +115,14 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     {
         return $options['headers'];
     }
+
+    protected function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+        $resolver->setDefaults([
+            'log_empty_lines' => false,
+        ]);
+    }
+
+
 }
