@@ -133,6 +133,7 @@ class ProcessManager
 
     /**
      * Resolve a task, by checking if parents are resolved and processing roots and BlockingTasks
+     * @TODO handle properly resolution of stopped task
      *
      * @param TaskConfiguration $taskConfiguration
      *
@@ -465,8 +466,14 @@ class ProcessManager
      */
     protected function endProcess(ProcessHistory $history)
     {
+        /** @var ProcessHistory $processHistory */
         $processHistory = $this->entityManager->merge($history);
-        $processHistory->setSuccess();
+
+        // Do not change state if already set
+        if ($processHistory->isStarted()) {
+            $processHistory->setSuccess();
+        }
+
         $this->entityManager->flush($processHistory);
     }
 

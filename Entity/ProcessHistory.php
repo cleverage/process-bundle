@@ -173,6 +173,15 @@ class ProcessHistory
     }
 
     /**
+     * Is true when the process is running
+     * @return bool
+     */
+    public function isStarted()
+    {
+        return $this->state === self::STATE_STARTED;
+    }
+
+    /**
      * @return string
      */
     public function __toString()

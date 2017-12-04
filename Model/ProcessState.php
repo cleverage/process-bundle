@@ -236,7 +236,9 @@ class ProcessState
      */
     public function stop(\Exception $e = null)
     {
-        $this->setException($e);
+        if ($e) {
+            $this->setException($e);
+        }
         $this->setStopped(true);
     }
 

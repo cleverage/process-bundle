@@ -148,6 +148,10 @@ services:
         class: CleverAge\ProcessBundle\Task\SkipEmptyTask
         shared: false
 
+    cleverage_process.task.stop:
+        class: CleverAge\ProcessBundle\Task\StopTask
+        shared: false
+
     cleverage_process.task.process_executor:
         class: CleverAge\ProcessBundle\Task\ProcessExecutorTask
         shared: false
