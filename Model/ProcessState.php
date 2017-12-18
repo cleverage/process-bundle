@@ -65,7 +65,7 @@ class ProcessState
     /** @var bool */
     protected $stopped = false;
 
-    /** @var \Exception */
+    /** @var \Throwable */
     protected $exception;
 
     /** @var array */
@@ -232,9 +232,9 @@ class ProcessState
     }
 
     /**
-     * @param \Exception $e
+     * @param \Throwable $e
      */
-    public function stop(\Exception $e = null)
+    public function stop(\Throwable $e = null)
     {
         if ($e) {
             $this->setException($e);
@@ -259,7 +259,7 @@ class ProcessState
     }
 
     /**
-     * @return \Exception
+     * @return \Throwable
      */
     public function getException()
     {
@@ -267,9 +267,9 @@ class ProcessState
     }
 
     /**
-     * @param \Exception $exception
+     * @param \Throwable $exception
      */
-    public function setException(\Exception $exception)
+    public function setException(\Throwable $exception)
     {
         $this->exception = $exception;
     }

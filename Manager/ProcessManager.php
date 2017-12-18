@@ -208,7 +208,7 @@ class ProcessManager
             $state = $taskConfiguration->getState();
             try {
                 $task->initialize($state);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $state->log($e->getMessage(), LogLevel::CRITICAL);
                 $state->stop($e);
             }
@@ -284,7 +284,7 @@ class ProcessManager
         if ($task instanceof FinalizableTaskInterface) {
             try {
                 $task->finalize($taskConfiguration->getState());
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $state->log($e->getMessage(), LogLevel::CRITICAL);
                 $state->stop($e);
             }
@@ -357,7 +357,7 @@ class ProcessManager
         $task = $taskConfiguration->getTask();
         try {
             $task->execute($state);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $state->log($e->getMessage(), LogLevel::CRITICAL);
             $state->stop($e);
         }
@@ -389,7 +389,7 @@ class ProcessManager
 
         try {
             $task->proceed($state);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $state->log($e->getMessage(), LogLevel::CRITICAL);
             $state->stop($e);
         }
