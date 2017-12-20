@@ -152,6 +152,10 @@ services:
         class: CleverAge\ProcessBundle\Task\StopTask
         shared: false
 
+    cleverage_process.task.array_merge:
+        class: CleverAge\ProcessBundle\Task\ArrayMergeTask
+        shared: false
+
     cleverage_process.task.process_executor:
         class: CleverAge\ProcessBundle\Task\ProcessExecutorTask
         shared: false
