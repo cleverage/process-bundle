@@ -23,6 +23,7 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
+use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -40,7 +41,7 @@ class TransformerTask extends AbstractConfigurableTask
     /** @var TransformerRegistry */
     protected $transformerRegistry;
 
-    /** @var ConfigurableTransformerInterface */
+    /** @var TransformerInterface */
     protected $transformer;
 
     /**
@@ -94,12 +95,9 @@ class TransformerTask extends AbstractConfigurableTask
             }
 
             $this->transformer = $this->transformerRegistry->getTransformer($options[static::ACTIVE_TRANSFORMER]);
-            if (!$this->transformer instanceof ConfigurableTransformerInterface) {
-                throw new \UnexpectedValueException(
-                    "Transformer {$options[static::ACTIVE_TRANSFORMER]} must be a ConfigurableTransformerInterface"
-                );
+            if ($this->transformer instanceof ConfigurableTransformerInterface) {
+                $this->transformer->configureOptions($resolver);
             }
-            $this->transformer->configureOptions($resolver);
 
             $this->options = $resolver->resolve($state->getTaskConfiguration()->getOptions());
         }
