@@ -50,6 +50,11 @@ class CsvFile extends CsvResource
     ) {
         $this->filePath = $filePath;
 
+        $dirname = dirname($this->filePath);
+        if (!is_dir($dirname)) {
+            mkdir($dirname, 0755, true);
+        }
+
         $resource = fopen($filePath, $mode);
         if (false === $resource) {
             throw new \UnexpectedValueException("Unable to open file: '{$filePath}' in {$mode} mode");
