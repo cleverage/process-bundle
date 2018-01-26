@@ -34,13 +34,17 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
             throw new \UnexpectedValueException("This task cannot be used without a previous task");
         }
 
-        $allowOverride = $this->getOption($state, 'allow_input_override');
+        $cleanInputOnOverride = $this->getOption($state, 'clean_input_on_override');
 
         $inputCode = $this->getInputCode($state);
-        if (!$allowOverride && array_key_exists($inputCode, $this->inputs)) {
-            throw new \UnexpectedValueException(
-                "The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output"
-            );
+        if (array_key_exists($inputCode, $this->inputs)) {
+            if ($cleanInputOnOverride) {
+                $this->inputs = [];
+            } else {
+                throw new \UnexpectedValueException(
+                    "The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output"
+                );
+            }
         }
 
         $this->inputs[$inputCode] = $state->getInput();
@@ -76,9 +80,9 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
         parent::configureOptions($resolver);
 
         $resolver->setRequired('input_codes');
-        $resolver->setDefault('allow_input_override', false);
+        $resolver->setDefault('clean_input_on_override', true);
         $resolver->setAllowedTypes('input_codes', 'array');
-        $resolver->setAllowedTypes('allow_input_override', 'boolean');
+        $resolver->setAllowedTypes('clean_input_on_override', 'boolean');
     }
 
     /**
