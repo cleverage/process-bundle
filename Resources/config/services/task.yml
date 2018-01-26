@@ -136,6 +136,10 @@ services:
         arguments:
             - '@event_dispatcher'
 
+    cleverage_process.task.input_iterator:
+        class: CleverAge\ProcessBundle\Task\InputIteratorTask
+        shared: false
+
     cleverage_process.task.input_aggregator:
         class: CleverAge\ProcessBundle\Task\InputAggregatorTask
         shared: false
