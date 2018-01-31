@@ -65,6 +65,10 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
             return null;
         }
 
+        if ($options['ignore_missing'] && !$this->accessor->isReadable($value, $options['property_path'])) {
+            return null;
+        }
+
         return $this->accessor->getValue($value, $options['property_path']);
     }
 
@@ -94,6 +98,7 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
         $resolver->setDefaults(
             [
                 'ignore_null' => false,
+                'ignore_missing' => false,
             ]
         );
 
