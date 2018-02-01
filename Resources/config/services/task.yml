@@ -166,3 +166,9 @@ services:
         arguments:
             - '@cleverage_process.manager.process'
             - '@cleverage_process.registry.process_configuration'
+
+    cleverage_process.task.file_fetch:
+        class: CleverAge\ProcessBundle\Task\File\FileFetchTask
+        shared: false
+        arguments:
+            - '@oneup_flysystem.mount_manager'
