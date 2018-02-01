@@ -172,3 +172,7 @@ services:
         shared: false
         arguments:
             - '@oneup_flysystem.mount_manager'
+
+    cleverage_process.task.row_aggregator:
+        class: CleverAge\ProcessBundle\Task\RowAggregatorTask
+        shared: false
