@@ -59,7 +59,7 @@ class FilterTask extends AbstractConfigurableTask
         }
 
         foreach ($this->getOption($state, 'match_regexp') as $key => $value) {
-            if (!$this->checkValue($input, $key, $value)) {
+            if (!$this->checkValue($input, $key, $value, true, true)) {
                 $state->setSkipped(true);
 
                 return;
@@ -75,7 +75,7 @@ class FilterTask extends AbstractConfigurableTask
         }
 
         foreach ($this->getOption($state, 'not_match_regexp') as $key => $value) {
-            if (!$this->checkValue($input, $key, $value, false)) {
+            if (!$this->checkValue($input, $key, $value, false, true)) {
                 $state->setSkipped(true);
 
                 return;
@@ -128,11 +128,12 @@ class FilterTask extends AbstractConfigurableTask
             return false;
         }
 
-        if ($shouldMatch && $regexpMode && preg_match($value, $currentValue) !== false) {
+        $pregMatch = preg_match($value, $currentValue);
+        if ($shouldMatch && $regexpMode && ($pregMatch === false || $pregMatch === 0)) {
             return false;
         }
 
-        if (!$shouldMatch && $regexpMode && preg_match($value, $currentValue) !== false) {
+        if (!$shouldMatch && $regexpMode && ($pregMatch === false || $pregMatch > 0)) {
             return false;
         }
 
