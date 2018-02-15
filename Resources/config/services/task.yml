@@ -122,6 +122,10 @@ services:
         class: CleverAge\ProcessBundle\Task\FileMoverTask
         shared: false
 
+    cleverage_process.task.file_writer:
+        class: CleverAge\ProcessBundle\Task\FileWriterTask
+        shared: false
+
     cleverage_process.task.aggregate_iterable:
         class: CleverAge\ProcessBundle\Task\AggregateIterableTask
         shared: false
