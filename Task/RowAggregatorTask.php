@@ -2,6 +2,7 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -40,14 +41,14 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
 
         if (!array_key_exists($aggregateBy, $input)) {
             $state->setError($state->getInput());
+            $message = sprintf('Array aggregator exception: missing column %s', $aggregateBy);
             if ($this->getOption($state, self::LOG_ERRORS)) {
-                $message = sprintf('Array aggregator exception: missing column %s', $aggregateBy);
                 $state->log($message, LogLevel::ERROR);
             }
             if ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
             } elseif ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_STOP) {
-                $state->stop($e);
+                $state->stop(new InvalidProcessConfigurationException($message));
             }
 
             return;
@@ -67,15 +68,15 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         $inputAggregateColumns = [];
         foreach ($aggregateColumns as $aggregateColumn) {
             if (!array_key_exists($aggregateColumn, $input)) {
+                $message = sprintf('Array aggregator exception: missing column %s', $aggregateColumn);
                 $state->setError($state->getInput());
                 if ($this->getOption($state, self::LOG_ERRORS)) {
-                    $message = sprintf('Array aggregator exception: missing column %s', $aggregateColumn);
                     $state->log($message, LogLevel::ERROR);
                 }
                 if ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_SKIP) {
                     $state->setSkipped(true);
                 } elseif ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_STOP) {
-                    $state->stop($e);
+                    $state->stop(new InvalidProcessConfigurationException($message));
                 }
 
                 return;
