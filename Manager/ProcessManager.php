@@ -209,7 +209,7 @@ class ProcessManager
             try {
                 $task->initialize($state);
             } catch (\Throwable $e) {
-                $state->log($e->getMessage(), LogLevel::CRITICAL);
+                $state->log($e->getMessage(), LogLevel::CRITICAL, \get_class($e));
                 $state->stop($e);
             }
         }
@@ -285,7 +285,7 @@ class ProcessManager
             try {
                 $task->finalize($taskConfiguration->getState());
             } catch (\Throwable $e) {
-                $state->log($e->getMessage(), LogLevel::CRITICAL);
+                $state->log($e->getMessage(), LogLevel::CRITICAL, \get_class($e));
                 $state->stop($e);
             }
         }
@@ -358,7 +358,7 @@ class ProcessManager
         try {
             $task->execute($state);
         } catch (\Throwable $e) {
-            $state->log($e->getMessage(), LogLevel::CRITICAL);
+            $state->log($e->getMessage(), LogLevel::CRITICAL, \get_class($e));
             $state->stop($e);
         }
     }
@@ -390,7 +390,7 @@ class ProcessManager
         try {
             $task->proceed($state);
         } catch (\Throwable $e) {
-            $state->log($e->getMessage(), LogLevel::CRITICAL);
+            $state->log($e->getMessage(), LogLevel::CRITICAL, \get_class($e));
             $state->stop($e);
         }
     }
