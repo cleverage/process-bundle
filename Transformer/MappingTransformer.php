@@ -21,6 +21,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -53,6 +54,18 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
      * @param mixed $input
      * @param array $options
      *
+     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \RuntimeException
+     * @throws \CleverAge\ProcessBundle\Exception\TransformerException
+     * @throws \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
+     * @throws \Symfony\Component\PropertyAccess\Exception\AccessException
      * @throws \Exception
      *
      * @return mixed $value
@@ -63,7 +76,21 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
         $this->configureOptions($resolver);
         $options = $resolver->resolve($options);
 
+        if ($options['ignore_extra']) {
+            throw new InvalidOptionsException('"ignore_extra" option is deprecated, please use "keep_input" instead.');
+        }
+
+        if (!empty($options['initial_value']) && $options['keep_input']) {
+            throw new InvalidOptionsException(
+                'The options "initial_value" and "keep_input" can\'t be both enabled.'
+            );
+        }
+
         $result = $options['initial_value'];
+        if ($options['keep_input']) {
+            $result = $input;
+        }
+
         /** @noinspection ForeachSourceInspection */
         foreach ($options['mapping'] as $targetProperty => $mapping) {
             if (null !== $mapping['constant']) {
@@ -71,7 +98,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
             } elseif ($mapping['set_null']) {
                 $transformedValue = null;
             } else {
-                $sourceProperty = $mapping['code'] === null ? $targetProperty : $mapping['code'];
+                $sourceProperty = $mapping['code'] ?? $targetProperty;
                 if (is_array($sourceProperty)) {
                     $transformedValue = [];
                     /** @var array $sourceProperty */
@@ -81,9 +108,8 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                         } catch (\RuntimeException $missingPropertyError) {
                             if ($mapping['ignore_missing'] || $options['ignore_missing']) {
                                 continue;
-                            } else {
-                                throw $missingPropertyError;
                             }
+                            throw $missingPropertyError;
                         }
                     }
                 } else {
@@ -92,9 +118,8 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                     } catch (\RuntimeException $missingPropertyError) {
                         if ($mapping['ignore_missing'] || $options['ignore_missing']) {
                             continue;
-                        } else {
-                            throw $missingPropertyError;
                         }
+                        throw $missingPropertyError;
                     }
                 }
             }
@@ -140,6 +165,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
         $resolver->setDefaults(
             [
                 'ignore_missing' => false,
+                'keep_input' => false,
                 'ignore_extra' => false,
                 'initial_value' => [],
                 'merge_callback' => null,
@@ -147,6 +173,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
         );
         $resolver->setAllowedTypes('ignore_missing', ['bool']);
         $resolver->setAllowedTypes('ignore_extra', ['bool']);
+        $resolver->setAllowedTypes('keep_input', ['bool']);
         $resolver->setAllowedTypes('merge_callback', ['NULL', 'callable']);
 
         /** @noinspection PhpUnusedParameterInspection */
@@ -159,7 +186,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 /** @var array $value */
                 foreach ($value as $property => $mappingConfig) {
                     $resolvedMapping[$property] = $mappingResolver->resolve(
-                        null === $mappingConfig ? [] : $mappingConfig
+                        $mappingConfig ?? []
                     );
                 }
 
@@ -218,7 +245,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                     if ($transformer instanceof ConfigurableTransformerInterface) {
                         $transformer->configureOptions($transformerOptionsResolver);
                         $transformerOptions = $transformerOptionsResolver->resolve(
-                            null === $transformerOptions ? [] : $transformerOptions
+                            $transformerOptions ?? []
                         );
                     }
                 }
