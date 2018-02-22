@@ -60,6 +60,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
      * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \RuntimeException
      * @throws \CleverAge\ProcessBundle\Exception\TransformerException
      * @throws \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
@@ -68,7 +69,6 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
      * @throws \Exception
      *
      * @return mixed $value
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     public function transform($input, array $options = [])
     {
@@ -76,9 +76,16 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
         $this->configureOptions($resolver);
         $options = $resolver->resolve($options);
 
-        if (!empty($options['initial_value']) && $options['ignore_extra']) {
-            throw new InvalidOptionsException('The options "initial_value" and "ignore_extra" can\'t be both enabled.');
+        if ($options['ignore_extra']) {
+            throw new InvalidOptionsException('"ignore_extra" option is deprecated, please use "keep_input" instead.');
         }
+
+        if (!empty($options['initial_value']) && $options['keep_input']) {
+            throw new InvalidOptionsException(
+                'The options "initial_value" and "keep_input" can\'t be both enabled.'
+            );
+        }
+
         $result = $options['initial_value'];
         if ($options['keep_input']) {
             $result = $input;
@@ -159,11 +166,13 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
             [
                 'ignore_missing' => false,
                 'keep_input' => false,
+                'ignore_extra' => false,
                 'initial_value' => [],
                 'merge_callback' => null,
             ]
         );
         $resolver->setAllowedTypes('ignore_missing', ['bool']);
+        $resolver->setAllowedTypes('ignore_extra', ['bool']);
         $resolver->setAllowedTypes('keep_input', ['bool']);
         $resolver->setAllowedTypes('merge_callback', ['NULL', 'callable']);
 
