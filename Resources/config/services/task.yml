@@ -29,6 +29,11 @@ services:
         arguments: ['@validator']
         shared: false
 
+    cleverage_process.task.serializer:
+        class: CleverAge\ProcessBundle\Task\SerializerTask
+        arguments: ['@serializer']
+        shared: false
+
     cleverage_process.task.normalizer:
         class: CleverAge\ProcessBundle\Task\NormalizerTask
         arguments: ['@serializer']
