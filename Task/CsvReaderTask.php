@@ -44,6 +44,11 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     {
         $output = null;
         try {
+            if ($this->csv instanceof CsvFile
+                && $this->csv->getFilePath() !== $this->getOption($state, 'file_path')) {
+                $this->csv = null;
+            }
+
             if (!$this->csv instanceof CsvFile) {
                 $this->initFile($state);
             }
@@ -119,10 +124,11 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
-        $resolver->setDefaults([
-            'log_empty_lines' => false,
-        ]);
+        $resolver->setDefaults(
+            [
+                'log_empty_lines' => false,
+            ]
+        );
     }
-
 
 }
