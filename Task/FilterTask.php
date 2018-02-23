@@ -128,13 +128,16 @@ class FilterTask extends AbstractConfigurableTask
             return false;
         }
 
-        $pregMatch = preg_match($value, $currentValue);
-        if ($shouldMatch && $regexpMode && ($pregMatch === false || $pregMatch === 0)) {
-            return false;
-        }
+        if ($regexpMode) {
+            $pregMatch = preg_match($value, $currentValue);
 
-        if (!$shouldMatch && $regexpMode && ($pregMatch === false || $pregMatch > 0)) {
-            return false;
+            if ($shouldMatch && ($pregMatch === false || $pregMatch === 0)) {
+                return false;
+            }
+
+            if (!$shouldMatch && ($pregMatch === false || $pregMatch > 0)) {
+                return false;
+            }
         }
 
         return true;
