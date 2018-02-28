@@ -114,7 +114,9 @@ class FilterTask extends AbstractConfigurableTask
      */
     protected function checkValue($input, $key, $value, $shouldMatch = true, $regexpMode = false)
     {
-        if ($this->accessor->isReadable($input, $key)) {
+        if ('' === $key) {
+            $currentValue = $input;
+        } elseif ($this->accessor->isReadable($input, $key)) {
             $currentValue = $this->accessor->getValue($input, $key);
         } else {
             $currentValue = null;
