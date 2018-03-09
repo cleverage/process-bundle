@@ -11,6 +11,10 @@ services:
         class: CleverAge\ProcessBundle\Task\ConstantIterableOutputTask
         shared: false
 
+    cleverage_process.task.yaml_reader:
+        class: CleverAge\ProcessBundle\Task\YamlReaderTask
+        shared: false
+
     cleverage_process.task.debug:
         class: CleverAge\ProcessBundle\Task\DebugTask
         shared: false

@@ -20,40 +20,63 @@
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Yaml\Yaml;
 
 /**
- * Always send the same output regardless of the input, only accepts array for values and iterate over it
+ * Reads a YAML file and iterate over its root elements
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class ConstantIterableOutputTask extends AbstractIterableOutputTask
+class YamlReaderTask extends AbstractIterableOutputTask
 {
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws \UnexpectedValueException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
+        parent::configureOptions($resolver);
         $resolver->setRequired(
             [
-                'output',
+                'file_path',
             ]
         );
-        $resolver->setAllowedTypes('output', ['array']);
+        $resolver->setAllowedTypes('file_path', ['string']);
+        $resolver->setNormalizer(
+            'file_path',
+            function (Options $options, $value) {
+                if (!file_exists($value)) {
+                    throw new \UnexpectedValueException('File not found: '.$value);
+                }
+
+                return $value;
+            }
+        );
     }
 
     /**
-     * {@inheritdoc}
+     * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \InvalidArgumentException
+     * @throws \Symfony\Component\Yaml\Exception\ParseException
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     *
+     * @return \Iterator
      */
     protected function initializeIterator(ProcessState $state): \Iterator
     {
-        return new \ArrayIterator($this->getOption($state, 'output'));
+        $filePath = $this->getOption($state, 'file_path');
+        $content = Yaml::parseFile($filePath);
+        if (!\is_array($content)) {
+            throw new \InvalidArgumentException('File content is not an array: '.$filePath);
+        }
+
+        return new \ArrayIterator($content);
     }
 }
