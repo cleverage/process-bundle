@@ -11,7 +11,7 @@
     ],
     "homepage": "https://github.com/cleverage/process-bundle",
     "type": "library",
-    "license": "GPL-3.0",
+    "license": "MIT",
     "authors": [
         {
             "name": "Vincent Chalnot",
