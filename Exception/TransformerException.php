@@ -18,14 +18,16 @@ namespace CleverAge\ProcessBundle\Exception;
  */
 class TransformerException extends \RuntimeException implements ProcessExceptionInterface
 {
-
     /**
      * {@inheritDoc}
      */
     public function __construct($targetProperty, $code = 0, \Throwable $previous = null)
     {
-        parent::__construct("Transformation have failed for target property '{$targetProperty}'", $code, $previous);
+        $m = "Transformation have failed for target property '{$targetProperty}'";
+        if ($previous) {
+            $m .= ": {$previous->getMessage()}";
+        }
+
+        parent::__construct($m, $code,$previous);
     }
-
-
 }
