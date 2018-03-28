@@ -1,43 +1,43 @@
 {
-  "name": "cleverage/process-bundle",
-  "description": "Process, import/export, transform and validate data with a simple API with Symfony3",
-  "keywords": [
-    "process",
-    "task",
-    "etl",
-    "transformation",
-    "import",
-    "export"
-  ],
-  "homepage": "https://github.com/cleverage/process-bundle",
-  "type": "library",
-  "license": "GPL-3.0-or-later",
-  "authors": [
-    {
-      "name": "Vincent Chalnot",
-      "email": "vchalnot@clever-age.com",
-      "homepage": "http://chalnot.fr",
-      "role": "Lead Developer"
+    "name": "cleverage/process-bundle",
+    "description": "Process, import/export, transform and validate data with a simple API with Symfony3",
+    "keywords": [
+        "process",
+        "task",
+        "etl",
+        "transformation",
+        "import",
+        "export"
+    ],
+    "homepage": "https://github.com/cleverage/process-bundle",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vincent Chalnot",
+            "email": "vchalnot@clever-age.com",
+            "homepage": "http://chalnot.fr",
+            "role": "Lead Developer"
+        },
+        {
+            "name": "Valentin Clavreul",
+            "email": "vclavreul@clever-age.com",
+            "role": "Developer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "CleverAge\\ProcessBundle\\": ""
+        }
     },
-    {
-      "name": "Valentin Clavreul",
-      "email": "vclavreul@clever-age.com",
-      "role": "Developer"
+    "require": {
+        "php": ">=7.0",
+        "symfony/symfony": "^3.0",
+        "doctrine/orm": "^2.5",
+        "doctrine/doctrine-bundle": "^1.6",
+      "symfony/expression-language": "^3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.4"
     }
-  ],
-  "autoload": {
-    "psr-4": {
-      "CleverAge\\ProcessBundle\\": ""
-    }
-  },
-  "require": {
-    "php": ">=7.0",
-    "symfony/symfony": "^3.0",
-    "doctrine/orm": "^2.5",
-    "doctrine/doctrine-bundle": "^1.6",
-    "symfony/expression-language": "^3.0"
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^6.4"
-  }
 }
