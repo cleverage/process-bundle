@@ -55,7 +55,7 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
         if (null === $this->options) {
             $resolver = new OptionsResolver();
             $this->configureOptions($resolver);
-            $this->options = $resolver->resolve($state->getTaskConfiguration()->getOptions());
+            $this->options = $resolver->resolve($state->getContextualizedOptions());
         }
 
         return $this->options;
