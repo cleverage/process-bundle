@@ -63,7 +63,7 @@ class ProcessExecutorTask extends AbstractConfigurableTask
         $input = $state->getInput();
         $consoleOutput = $state->getConsoleOutput();
 
-        $output = $this->processManager->execute($this->getOption($state, 'process'), $consoleOutput, $input);
+        $output = $this->processManager->execute($this->getOption($state, 'process'), $consoleOutput, $input, $this->getOption($state, 'context'));
 
         $state->setOutput($output);
     }
@@ -85,7 +85,13 @@ class ProcessExecutorTask extends AbstractConfigurableTask
         parent::configureOptions($resolver);
 
         $resolver->setRequired('process');
+        $resolver->setDefaults(
+            [
+                'context' => [],
+            ]
+        );
         $resolver->addAllowedTypes('process', 'string');
+        $resolver->setAllowedTypes('context', ['array']);
         $resolver->setNormalizer('process',
             function (Options $options, $processCode) {
                 if (!$this->processRegistry->hasProcessConfiguration($processCode)) {
