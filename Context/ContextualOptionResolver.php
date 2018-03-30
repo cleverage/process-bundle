@@ -39,11 +39,16 @@ class ContextualOptionResolver
      */
     public function contextualizeOption($value, array $context)
     {
-        $keys = [];
-        if (is_string($value) && preg_match('/^{{ *([a-z0-9_\-]+) *}}$/', $value, $keys) && isset($keys[1])) {
-            if (array_key_exists($keys[1], $context)) {
-                return $context[$keys[1]];
-            }
+        if (is_string($value)) {
+            $pattern = sprintf('/{{[ ]*(%s){1}[ ]*}}/', implode('|', array_keys($context)));
+
+            return preg_replace_callback(
+                $pattern,
+                function ($matches) use ($context) {
+                    return $context[$matches[1]];
+                },
+                $value
+            );
         }
 
         return $value;
