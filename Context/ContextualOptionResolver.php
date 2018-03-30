@@ -32,13 +32,17 @@ class ContextualOptionResolver
      * Basic value inference
      * Replaces "{{ key }}" by context[key]
      *
-     * @param string $value
-     * @param array  $context
+     * @param string|array $value
+     * @param array        $context
      *
      * @return mixed
      */
     public function contextualizeOption($value, array $context)
     {
+        if (is_array($value)) {
+            return $this->contextualizeOptions($value, $context);
+        }
+
         if (is_string($value)) {
             $pattern = sprintf('/{{[ ]*(%s){1}[ ]*}}/', implode('|', array_keys($context)));
 
