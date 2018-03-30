@@ -83,7 +83,7 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
             'ignore_missing' => false,
             'keep_missing' => false,
         ]);
-        $resolver->setAllowedTypes('ignore_missing', ['bool']);
-        $resolver->setAllowedTypes('keep_missing', ['bool']);
+        $resolver->setAllowedTypes('ignore_missing', ['boolean']);
+        $resolver->setAllowedTypes('keep_missing', ['boolean']);
     }
 }

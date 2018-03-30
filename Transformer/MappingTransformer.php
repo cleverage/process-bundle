@@ -162,9 +162,9 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 'merge_callback' => null,
             ]
         );
-        $resolver->setAllowedTypes('ignore_missing', ['bool']);
-        $resolver->setAllowedTypes('ignore_extra', ['bool']);
-        $resolver->setAllowedTypes('keep_input', ['bool']);
+        $resolver->setAllowedTypes('ignore_missing', ['boolean']);
+        $resolver->setAllowedTypes('ignore_extra', ['boolean']);
+        $resolver->setAllowedTypes('keep_input', ['boolean']);
         $resolver->setAllowedTypes('merge_callback', ['NULL', 'callable']);
 
         /** @noinspection PhpUnusedParameterInspection */

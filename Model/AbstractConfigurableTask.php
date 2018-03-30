@@ -102,6 +102,6 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
                 self::STRATEGY_CONTINUE,
             ]
         );
-        $resolver->setAllowedTypes(self::LOG_ERRORS, ['bool']);
+        $resolver->setAllowedTypes(self::LOG_ERRORS, ['boolean']);
     }
 }
