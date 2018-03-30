@@ -1,12 +1,12 @@
 <?php
- /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+/*
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Transformer;
 
@@ -30,6 +30,9 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
 
     /** @var PropertyAccessorInterface */
     protected $accessor;
+
+    /** @var array */
+    protected $transformerCodes;
 
     /**
      * @param PropertyAccessorInterface $accessor
@@ -118,6 +121,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
             try {
                 /** @noinspection ForeachSourceInspection */
                 foreach ($mapping['transformers'] as $transformerCode => $transformerOptions) {
+                    $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
                     $transformer = $this->transformerRegistry->getTransformer($transformerCode);
                     $transformedValue = $transformer->transform(
                         $transformedValue,
@@ -231,6 +235,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 /** @var array $transformers */
                 foreach ($transformers as $transformerCode => &$transformerOptions) {
                     $transformerOptionsResolver = new OptionsResolver();
+                    $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
                     /** @noinspection ExceptionsAnnotatingAndHandlingInspection */// @todo remove me sometimes
                     $transformer = $this->transformerRegistry->getTransformer($transformerCode);
                     if ($transformer instanceof ConfigurableTransformerInterface) {
@@ -244,5 +249,31 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 return $transformers;
             }
         );
+    }
+
+    /**
+     * @param $transformerCode
+     * @return string
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
+     */
+    protected function getCleanedTransfomerCode($transformerCode)
+    {
+        if (!$this->transformerCodes) {
+            $this->transformerCodes = array_keys($this->transformerRegistry->getTransformers());
+        }
+        $pattern = sprintf(
+            '/(%s)(#[\d]+)?/',
+            implode('|', $this->transformerCodes)
+        );
+        $match = preg_match($pattern, $transformerCode, $parts);
+
+        if (1 === $match) {
+            if ($this->transformerRegistry->hasTransformer($parts[1])) {
+                return $parts[1];
+            }
+
+        }
+
+        return $transformerCode;
     }
 }
