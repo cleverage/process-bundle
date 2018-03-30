@@ -134,7 +134,7 @@ class TransformerTask extends AbstractConfigurableTask
                 $this->transformer->configureOptions($resolver);
             }
 
-            $this->options = $resolver->resolve($state->getTaskConfiguration()->getOptions());
+            $this->options = $resolver->resolve($state->getContextualizedOptions());
         }
 
         return $this->options;
