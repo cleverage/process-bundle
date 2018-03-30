@@ -70,7 +70,9 @@ class ContextualOptionResolver
     {
         $contextualizedOptions = [];
         foreach ($options as $key => $value) {
-            $contextualizedOptions[$key] = $this->contextualizeOption($value, $context);
+            $contextualizedKey = $this->contextualizeOption($key, $context);
+            $contextualizedValue = $this->contextualizeOption($value, $context);
+            $contextualizedOptions[$contextualizedKey] = $contextualizedValue;
         }
 
         return $contextualizedOptions;
