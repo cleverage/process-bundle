@@ -43,7 +43,7 @@ class ExecuteProcessCommand extends ContainerAwareCommand
         );
         $this->addOption('input', 'i', InputOption::VALUE_REQUIRED, 'Pass input data to the first task of the process');
         $this->addOption('input-from-stdin', null, InputOption::VALUE_NONE, 'Read input data from stdin');
-        $this->addOption('context', 'c', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Contextual value', []);
+        $this->addOption('context', 'c', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Contextual value', []);
     }
 
     /**
