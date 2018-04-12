@@ -32,7 +32,12 @@ class InputIteratorTask extends AbstractConfigurableTask implements IterableTask
 
         $state->addErrorContextValue('iterate_on_array_key', $this->iterator->key());
 
-        $state->setOutput($this->iterator->current());
+        // If the initial value is already null, skip right now the next steps
+        if ($this->iterator->valid()) {
+            $state->setOutput($this->iterator->current());
+        } else {
+            $state->setSkipped(true);
+        }
     }
 
     /**
