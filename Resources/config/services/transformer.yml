@@ -48,6 +48,13 @@ services:
         tags:
             - { name: cleverage.transformer }
 
+    cleverage_process.transformer.recursive_property_setter:
+        class: CleverAge\ProcessBundle\Transformer\RecursivePropertySetterTransformer
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: cleverage.transformer }
+
     cleverage_process.transformer.denormalize:
         class: CleverAge\ProcessBundle\Transformer\DenormalizeTransformer
         arguments:

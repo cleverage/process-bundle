@@ -95,5 +95,6 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
 
         $resolver->setAllowedTypes('property_path', ['string']);
         $resolver->setAllowedTypes('ignore_null', ['boolean']);
+        $resolver->setAllowedTypes('ignore_missing', ['boolean']);
     }
 }

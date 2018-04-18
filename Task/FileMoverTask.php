@@ -69,8 +69,8 @@ class FileMoverTask extends AbstractConfigurableTask
                 'autoincrement' => false,
             ]
         );
-        $resolver->setAllowedTypes('overwrite', ['bool']);
-        $resolver->setAllowedTypes('autoincrement', ['bool']);
+        $resolver->setAllowedTypes('overwrite', ['boolean']);
+        $resolver->setAllowedTypes('autoincrement', ['boolean']);
     }
 
     /**

@@ -1,12 +1,12 @@
 <?php
- /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+/*
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Command;
 
@@ -43,6 +43,7 @@ class ExecuteProcessCommand extends ContainerAwareCommand
         );
         $this->addOption('input', 'i', InputOption::VALUE_REQUIRED, 'Pass input data to the first task of the process');
         $this->addOption('input-from-stdin', null, InputOption::VALUE_NONE, 'Read input data from stdin');
+        $this->addOption('context', 'c', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Contextual value', []);
     }
 
     /**
@@ -76,12 +77,14 @@ class ExecuteProcessCommand extends ContainerAwareCommand
             }
         }
 
+        $context = $this->parseContextValues($input);
+
         /** @noinspection ForeachSourceInspection */
         foreach ($input->getArgument('processCodes') as $code) {
             if (!$output->isQuiet()) {
                 $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
-            $returnValue = $this->processManager->execute($code, $output, $inputData);
+            $returnValue = $this->processManager->execute($code, $output, $inputData, $context);
             if ($output->isVeryVerbose() && function_exists('dump')) {
                 dump($returnValue);
             }
@@ -91,5 +94,17 @@ class ExecuteProcessCommand extends ContainerAwareCommand
         }
 
         return 0;
+    }
+
+    protected function parseContextValues(InputInterface $input)
+    {
+        $contextValues = $input->getOption('context');
+        $context = [];
+        foreach ($contextValues as $contextValue) {
+            list($key, $val) = explode(':', $contextValue);
+            $context[$key] = $val;
+        }
+
+        return $context;
     }
 }

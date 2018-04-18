@@ -1,12 +1,12 @@
 <?php
- /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+/*
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Task;
 
@@ -126,6 +126,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
         $consolePath = $this->kernel->getRootDir().'/../bin/console';
         $logDir = $this->kernel->getLogDir().'/process';
         $processCode = $this->getOption($state, 'process');
+        $processOptions = $this->getOption($state, 'process_options');
 
         $fs = new Filesystem();
         $fs->mkdir($logDir);
@@ -140,12 +141,14 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
             '--env='.$this->kernel->getEnvironment(),
             'cleverage:process:execute',
             '--input-from-stdin',
-            $processCode,
         ];
+        $arguments = array_merge($arguments, $processOptions);
+
         $verbosity = $this->getVerbosityParameter($consoleOutput);
         if ($verbosity) {
             $arguments[] = $verbosity;
         }
+        $arguments[] = $processCode;
 
         // Even if parent process is launched with nohup, all subprocesses are sensitive to SIGHUP so we need to prepend
         // this all the time. Sub-processes are still sensitive to other signal so there is no risk here.
@@ -229,15 +232,19 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
                 return $value;
             }
         );
-        $resolver->setDefaults([
-            'max_processes' => 5,
-            'sleep_interval' => 1,
-            'sleep_interval_after_launch' => 3,
-            'sleep_on_finalize_interval' => 10,
-        ]);
+        $resolver->setDefaults(
+            [
+                'max_processes' => 5,
+                'sleep_interval' => 1,
+                'sleep_interval_after_launch' => 3,
+                'sleep_on_finalize_interval' => 10,
+                'process_options' => [],
+            ]
+        );
         $resolver->setAllowedTypes('max_processes', ['integer']);
         $resolver->setAllowedTypes('sleep_interval', ['integer']);
         $resolver->setAllowedTypes('sleep_interval_after_launch', ['integer']);
+        $resolver->setAllowedTypes('process_options', ['array']);
     }
 
     /**
@@ -260,7 +267,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
         if (!$output) {
             return null;
         }
-        switch($output->getVerbosity()) {
+        switch ($output->getVerbosity()) {
             case OutputInterface::VERBOSITY_QUIET:
                 return '-q';
             case OutputInterface::VERBOSITY_VERBOSE:

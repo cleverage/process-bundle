@@ -1,0 +1,10 @@
+clever_age_process:
+    configurations:
+        test.context:
+            entry_point: data
+            end_point: data
+            tasks:
+                data:
+                    service: '@cleverage_process.task.constant_output'
+                    options:
+                        output: '{{ value }}'

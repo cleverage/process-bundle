@@ -1,17 +1,18 @@
 <?php
- /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+/*
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Model;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Entity\ProcessHistory;
 use CleverAge\ProcessBundle\Entity\TaskHistory;
 use Psr\Log\LogLevel;
@@ -71,6 +72,15 @@ class ProcessState
     /** @var bool */
     protected $skipped;
 
+    /** @var array */
+    protected $context;
+
+    /** @var ContextualOptionResolver */
+    protected $contextualOptionResolver;
+
+    /** @var array */
+    protected $contextualizedOptions;
+
     /** @var ProcessState|null */
     protected $previousState;
 
@@ -85,6 +95,14 @@ class ProcessState
     {
         $this->processConfiguration = $processConfiguration;
         $this->processHistory = $processHistory;
+    }
+
+    /**
+     * @param ContextualOptionResolver $contextualOptionResolver
+     */
+    public function setContextualOptionResolver(ContextualOptionResolver $contextualOptionResolver): void
+    {
+        $this->contextualOptionResolver = $contextualOptionResolver;
     }
 
     /**
@@ -392,5 +410,54 @@ class ProcessState
     public function isResolved()
     {
         return $this->status === self::STATUS_RESOLVED;
+    }
+
+    /**
+     * @return array
+     */
+    public function getContext(): array
+    {
+        return $this->context;
+    }
+
+    /**
+     * @param array $context
+     */
+    public function setContext(array $context): void
+    {
+        if ($this->context) {
+            throw new \RuntimeException('Once defined, context is immutable');
+        }
+
+        $this->context = $context;
+    }
+
+    /**
+     * @return array
+     */
+    public function getContextualizedOptions()
+    {
+        if (!$this->contextualizedOptions) {
+            $options = $this->getTaskConfiguration()->getOptions();
+            $this->contextualizedOptions = $this->contextualOptionResolver->contextualizeOptions($options, $this->context);
+        }
+
+        return $this->contextualizedOptions;
+    }
+
+    /**
+     * @param string $code
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function getContextualizedOption($code, $default = null)
+    {
+        $contextualizedOptions = $this->getContextualizedOptions();
+        if (array_key_exists($code, $contextualizedOptions)) {
+            return $contextualizedOptions[$code];
+        }
+
+        return $default;
     }
 }

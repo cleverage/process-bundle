@@ -1,17 +1,18 @@
 <?php
- /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+/*
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Manager;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Entity\TaskHistory;
 use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
@@ -52,38 +53,47 @@ class ProcessManager
     /** @var TaskConfiguration */
     protected $blockingTaskConfiguration;
 
+    /** @var ContextualOptionResolver */
+    protected $contextualOptionResolver;
+
     /**
+     * ProcessManager constructor.
+     *
      * @param ContainerInterface           $container
      * @param LoggerInterface              $logger
      * @param EntityManager                $entityManager
      * @param ProcessConfigurationRegistry $processConfigurationRegistry
+     * @param ContextualOptionResolver     $contextualOptionResolver
      */
     public function __construct(
         ContainerInterface $container,
         LoggerInterface $logger,
         EntityManager $entityManager,
-        ProcessConfigurationRegistry $processConfigurationRegistry
+        ProcessConfigurationRegistry $processConfigurationRegistry,
+        ContextualOptionResolver $contextualOptionResolver
     )
     {
         $this->container = $container;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
         $this->processConfigurationRegistry = $processConfigurationRegistry;
+        $this->contextualOptionResolver = $contextualOptionResolver;
     }
 
     /**
      * @param string          $processCode
      * @param OutputInterface $output
      * @param mixed           $input
+     * @param array           $context
      *
      * @throws \Exception
      *
      * @return int
      */
-    public function execute(string $processCode, OutputInterface $output = null, $input = null)
+    public function execute(string $processCode, OutputInterface $output = null, $input = null, $context = [])
     {
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
-        $processHistory = $this->initializeStates($processConfiguration, $output);
+        $processHistory = $this->initializeStates($processConfiguration, $output, $context);
         $this->checkProcess($processConfiguration);
 
         // First initialize the whole stack in a linear way, tasks are initialized in the order they are configured
@@ -287,6 +297,7 @@ class ProcessManager
     /**
      * @param ProcessConfiguration $processConfiguration
      * @param OutputInterface      $output
+     * @param array                $context
      *
      * @throws \InvalidArgumentException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -294,7 +305,7 @@ class ProcessManager
      *
      * @return ProcessHistory
      */
-    protected function initializeStates(ProcessConfiguration $processConfiguration, OutputInterface $output = null)
+    protected function initializeStates(ProcessConfiguration $processConfiguration, OutputInterface $output = null, $context = [])
     {
         $processHistory = new ProcessHistory($processConfiguration);
         $this->entityManager->persist($processHistory);
@@ -302,6 +313,8 @@ class ProcessManager
 
         foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
             $state = new ProcessState($processConfiguration, $processHistory);
+            $state->setContext($context);
+            $state->setContextualOptionResolver($this->contextualOptionResolver);
             if ($output) {
                 $state->setConsoleOutput($output);
             }

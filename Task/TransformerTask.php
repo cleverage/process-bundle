@@ -1,12 +1,12 @@
 <?php
- /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+/*
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Task;
 
@@ -44,6 +44,50 @@ class TransformerTask extends AbstractConfigurableTask
     public function __construct(TransformerRegistry $transformerRegistry)
     {
         $this->transformerRegistry = $transformerRegistry;
+    }
+
+    /**
+     * @param ProcessState $state
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
+     * @throws \UnexpectedValueException
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     */
+    public function execute(ProcessState $state)
+    {
+        $output = null;
+        $options = $this->getOptions($state);
+        $transformerOptions = $options;
+        unset(
+            $transformerOptions[self::ERROR_STRATEGY],
+            $transformerOptions[self::LOG_ERRORS],
+            $transformerOptions[self::ACTIVE_TRANSFORMER]
+        );
+
+        try {
+            $output = $this->transformer->transform(
+                $state->getInput(),
+                $transformerOptions
+            );
+        } catch (\Exception $e) {
+            $state->setError($state->getInput());
+            if ($options[self::LOG_ERRORS]) {
+                $context = $e->getPrevious() ? ['error' => $e->getPrevious()->getMessage()] : [];
+                $state->log('Transformer exception: '.$e->getMessage(), LogLevel::ERROR, null, $context);
+            }
+            if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
+                $state->setSkipped(true);
+            } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {
+                $state->stop($e);
+            }
+        }
+        $state->setOutput($output);
     }
 
     /**
@@ -90,53 +134,9 @@ class TransformerTask extends AbstractConfigurableTask
                 $this->transformer->configureOptions($resolver);
             }
 
-            $this->options = $resolver->resolve($state->getTaskConfiguration()->getOptions());
+            $this->options = $resolver->resolve($state->getContextualizedOptions());
         }
 
         return $this->options;
-    }
-
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
-     * @throws \UnexpectedValueException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     */
-    public function execute(ProcessState $state)
-    {
-        $output = null;
-        $options = $this->getOptions($state);
-        $transformerOptions = $options;
-        unset(
-            $transformerOptions[self::ERROR_STRATEGY],
-            $transformerOptions[self::LOG_ERRORS],
-            $transformerOptions[self::ACTIVE_TRANSFORMER]
-        );
-
-        try {
-            $output = $this->transformer->transform(
-                $state->getInput(),
-                $transformerOptions
-            );
-        } catch (\Exception $e) {
-            $state->setError($state->getInput());
-            if ($options[self::LOG_ERRORS]) {
-                $context = $e->getPrevious() ? ['error' => $e->getPrevious()->getMessage()] : [];
-                $state->log('Transformer exception: '.$e->getMessage(), LogLevel::ERROR, null, $context);
-            }
-            if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
-                $state->setSkipped(true);
-            } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {
-                $state->stop($e);
-            }
-        }
-        $state->setOutput($output);
     }
 }

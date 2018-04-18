@@ -6,3 +6,7 @@ services:
             - '@logger'
             - '@doctrine.orm.default_entity_manager'
             - '@cleverage_process.registry.process_configuration'
+            - '@cleverage_process.context.contextual_option_resolver'
+
+    cleverage_process.context.contextual_option_resolver:
+        class: CleverAge\ProcessBundle\Context\ContextualOptionResolver
