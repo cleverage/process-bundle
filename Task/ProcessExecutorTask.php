@@ -24,6 +24,7 @@ use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use Psr\Log\LogLevel;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -63,9 +64,21 @@ class ProcessExecutorTask extends AbstractConfigurableTask
         $input = $state->getInput();
         $consoleOutput = $state->getConsoleOutput();
 
-        $output = $this->processManager->execute($this->getOption($state, 'process'), $consoleOutput, $input, $this->getOption($state, 'context'));
-
-        $state->setOutput($output);
+        $processCode = $this->getOption($state, 'process');
+        try {
+            $output = $this->processManager->execute($this->getOption($state, 'process'), $consoleOutput, $input, $this->getOption($state, 'context'));
+            $state->setOutput($output);
+        } catch (\Throwable $e) {
+            if ($this->getOption($state, self::LOG_ERRORS)) {
+                $state->log("Process '{$processCode}' have failed: {$e->getMessage()}", LogLevel::ERROR, null, ['input' => $input]);
+            }
+            if ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_SKIP) {
+                $state->setSkipped(true);
+                $state->setError($input);
+            } elseif ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_STOP) {
+                $state->stop($e);
+            }
+        }
     }
 
     /**
