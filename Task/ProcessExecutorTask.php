@@ -70,7 +70,8 @@ class ProcessExecutorTask extends AbstractConfigurableTask
             $state->setOutput($output);
         } catch (\Throwable $e) {
             if ($this->getOption($state, self::LOG_ERRORS)) {
-                $state->log("Process '{$processCode}' have failed: {$e->getMessage()}", LogLevel::ERROR, null, ['input' => $input]);
+                $message = $e->getPrevious() ? $e->getPrevious()->getMessage() : $e->getMessage();
+                $state->log("Process '{$processCode}' has failed: {$message}", LogLevel::ERROR, null, ['input' => $input, 'error' => $e]);
             }
             if ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
