@@ -13,6 +13,7 @@ namespace CleverAge\ProcessBundle\Manager;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Entity\ProcessHistory;
 use CleverAge\ProcessBundle\Entity\TaskHistory;
 use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
@@ -20,10 +21,9 @@ use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
+use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
-use CleverAge\ProcessBundle\Entity\ProcessHistory;
-use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -139,6 +139,7 @@ class ProcessManager
      * @throws \Exception
      *
      * @return bool
+     * @throws \Exception
      */
     protected function resolve(TaskConfiguration $taskConfiguration): bool
     {
@@ -305,6 +306,7 @@ class ProcessManager
      * @throws \InvalidArgumentException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\ORMException
      *
      * @return ProcessHistory
      */
