@@ -35,7 +35,7 @@ class ProcessExecutorTask extends AbstractConfigurableTask
     protected $process;
 
     /**
-     * @param ProcessManager               $processManager
+     * @param ProcessManager $processManager
      * @param ProcessConfigurationRegistry $processRegistry
      */
     public function __construct(ProcessManager $processManager, ProcessConfigurationRegistry $processRegistry)

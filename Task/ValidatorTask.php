@@ -10,10 +10,10 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use Sidus\BaseBundle\Validator\Mapping\Loader\BaseLoader;
+use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LogLevel;
+use Sidus\BaseBundle\Validator\Mapping\Loader\BaseLoader;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -47,7 +47,11 @@ class ValidatorTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $options = $this->getOptions($state);
-        $violations = $this->validator->validate($state->getInput(), $this->getOption($state, 'constraints'), $options['groups']);
+        $violations = $this->validator->validate(
+            $state->getInput(),
+            $this->getOption($state, 'constraints'),
+            $options['groups']
+        );
 
         if ($options[self::LOG_ERRORS]) {
             /** @var  $violation ConstraintViolationInterface */
@@ -58,7 +62,7 @@ class ValidatorTask extends AbstractConfigurableTask
                     LogLevel::ERROR,
                     $violation->getPropertyPath(),
                     [
-                        'code'          => $violation->getCode(),
+                        'code' => $violation->getCode(),
                         'invalid_value' => \is_object($invalidValue) ? \get_class($invalidValue) : $invalidValue,
                     ]
                 );
@@ -91,12 +95,15 @@ class ValidatorTask extends AbstractConfigurableTask
 
         $resolver->setDefault('constraints', null);
         $resolver->addAllowedTypes('constraints', ['NULL', 'array']);
-        $resolver->setNormalizer('constraints', function (Options $options, $constraints) {
-            if (is_null($constraints)) {
-                return null;
-            }
+        $resolver->setNormalizer(
+            'constraints',
+            function (Options $options, $constraints) {
+                if (is_null($constraints)) {
+                    return null;
+                }
 
-            return (new BaseLoader())->loadCustomConstraints($constraints);
-        });
+                return (new BaseLoader())->loadCustomConstraints($constraints);
+            }
+        );
     }
 }

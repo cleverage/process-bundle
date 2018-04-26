@@ -79,11 +79,13 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'num_items' => 1,
-            'skip_first' => 0,
-            'show_every' => 1,
-        ]);
+        $resolver->setDefaults(
+            [
+                'num_items' => 1,
+                'skip_first' => 0,
+                'show_every' => 1,
+            ]
+        );
         $resolver->setAllowedTypes('num_items', ['int']);
         $resolver->setAllowedTypes('skip_first', ['int']);
         $resolver->setAllowedTypes('show_every', ['int']);

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -7,7 +8,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
@@ -40,7 +40,6 @@ class SerializerTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $options = $this->getOptions($state);
-
 
         try {
             $serializeData = $this->serializer->serialize(
