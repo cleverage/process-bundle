@@ -14,7 +14,7 @@ use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -25,10 +25,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @var array
      */
     protected $result = [];
+
+    /**
+     * RowAggregatorTask constructor.
+     *
+     * @param LoggerInterface $logger
+     */
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * Store inputs and once everything has been received, pass to next task
@@ -51,9 +64,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         if (!array_key_exists($aggregateBy, $input)) {
             $state->setError($state->getInput());
             $message = sprintf('Array aggregator exception: missing column %s', $aggregateBy);
-            if ($this->getOption($state, self::LOG_ERRORS)) {
-                $state->log($message, LogLevel::ERROR);
-            }
+            $this->logger->error($message, $state->getLogContext());
             if ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
             } elseif ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_STOP) {
@@ -79,9 +90,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
             if (!array_key_exists($aggregateColumn, $input)) {
                 $message = sprintf('Array aggregator exception: missing column %s', $aggregateColumn);
                 $state->setError($state->getInput());
-                if ($this->getOption($state, self::LOG_ERRORS)) {
-                    $state->log($message, LogLevel::ERROR);
-                }
+                $this->logger->error($message, $state->getLogContext());
                 if ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_SKIP) {
                     $state->setSkipped(true);
                 } elseif ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_STOP) {

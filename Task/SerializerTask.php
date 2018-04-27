@@ -8,11 +8,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -21,14 +22,21 @@ use Symfony\Component\Serializer\SerializerInterface;
  */
 class SerializerTask extends AbstractConfigurableTask
 {
+    /** @var LoggerInterface */
+    protected $logger;
+
     /** @var SerializerInterface */
     protected $serializer;
 
     /**
+     * SerializerTask constructor.
+     *
+     * @param LoggerInterface     $logger
      * @param SerializerInterface $serializer
      */
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(LoggerInterface $logger, SerializerInterface $serializer)
     {
+        $this->logger = $logger;
         $this->serializer = $serializer;
     }
 
@@ -50,9 +58,7 @@ class SerializerTask extends AbstractConfigurableTask
             $state->setOutput($serializeData);
         } catch (\Exception $e) {
             $state->setError($state->getInput());
-            if ($options[self::LOG_ERRORS]) {
-                $state->log('Encoder exception: '.$e->getMessage(), LogLevel::ERROR);
-            }
+            $this->logger->error($e->getMessage(), $state->getLogContext());
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
             } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {

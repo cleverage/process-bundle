@@ -15,7 +15,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -29,6 +29,9 @@ class TransformerTask extends AbstractConfigurableTask
     public const DEFAULT_TRANSFORMER = 'mapping';
     public const ACTIVE_TRANSFORMER = 'transformer';
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /** @var TransformerRegistry */
     protected $transformerRegistry;
 
@@ -36,13 +39,13 @@ class TransformerTask extends AbstractConfigurableTask
     protected $transformer;
 
     /**
+     * @param LoggerInterface     $logger
      * @param TransformerRegistry $transformerRegistry
      *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
-     * @throws \UnexpectedValueException
      */
-    public function __construct(TransformerRegistry $transformerRegistry)
+    public function __construct(LoggerInterface $logger, TransformerRegistry $transformerRegistry)
     {
+        $this->logger = $logger;
         $this->transformerRegistry = $transformerRegistry;
     }
 
@@ -77,10 +80,11 @@ class TransformerTask extends AbstractConfigurableTask
             );
         } catch (\Exception $e) {
             $state->setError($state->getInput());
-            if ($options[self::LOG_ERRORS]) {
-                $context = $e->getPrevious() ? ['error' => $e->getPrevious()->getMessage()] : [];
-                $state->log('Transformer exception: '.$e->getMessage(), LogLevel::ERROR, null, $context);
+            $logContext = $state->getLogContext();
+            if ($e->getPrevious()) {
+                $logContext['error'] = $e->getPrevious()->getMessage();
             }
+            $this->logger->error($e->getMessage(), $logContext);
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
             } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {

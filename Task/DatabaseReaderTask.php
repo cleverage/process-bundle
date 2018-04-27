@@ -15,8 +15,8 @@ use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Psr\Log\LogLevel;
 use Doctrine\DBAL\Driver\PDOStatement;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -27,6 +27,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTaskInterface, FinalizableTaskInterface
 {
+    /** @var LoggerInterface */
+    protected $logger;
+
     /** @var ManagerRegistry */
     protected $doctrine;
 
@@ -37,10 +40,12 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
     protected $nextItem;
 
     /**
+     * @param LoggerInterface $logger
      * @param ManagerRegistry $doctrine
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(LoggerInterface $logger, ManagerRegistry $doctrine)
     {
+        $this->logger = $logger;
         $this->doctrine = $doctrine;
     }
 
@@ -90,7 +95,9 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
 
         // Handle empty results
         if (false === $result) {
-            $state->log('Empty resultset for query', LogLevel::WARNING, $options['table'], $options);
+            $logContext = $state->getLogContext();
+            $logContext['options'] = $options;
+            $this->logger->error('Empty resultset for query', $logContext);
             $state->setStopped(true);
 
             return;

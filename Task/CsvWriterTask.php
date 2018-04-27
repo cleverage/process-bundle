@@ -13,7 +13,7 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -28,6 +28,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 {
+    /** @var \Psr\Log\LoggerInterface */
+    protected $logger;
+
+    /**
+     * CsvWriterTask constructor.
+     *
+     * @param \Psr\Log\LoggerInterface $logger
+     */
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     /**
      * @param ProcessState $state
      *
@@ -47,9 +60,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
             $options = $this->getOptions($state);
 
             $state->setError($state->getInput());
-            if ($options[self::LOG_ERRORS]) {
-                $state->log('CSV Writer Exception: '.$e->getMessage(), LogLevel::ERROR);
-            }
+            $this->logger->error($e->getMessage(), $state->getLogContext());
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
             } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {

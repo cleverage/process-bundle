@@ -3,13 +3,22 @@ services:
         shared: false
 
     CleverAge\ProcessBundle\Task\ConstantOutputTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\ConstantIterableOutputTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\YamlReaderTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\DebugTask:
         shared: false
@@ -20,108 +29,176 @@ services:
     CleverAge\ProcessBundle\Task\LoggerTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\ValidatorTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\SerializerTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\NormalizerTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\DenormalizerTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\PropertySetterTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\PropertyGetterTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\CsvReaderTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\CsvWriterTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\File\Csv\CsvSplitterTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\DatabaseReaderTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\DatabaseUpdaterTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\DoctrineReaderTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\DoctrineWriterTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\DoctrineDetacherTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\DoctrineRemoverTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\StatCounterTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\Reporting\AdvancedStatCounterTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\TransformerTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\ProcessLauncherTask:
-        shared: false
         autowire: true
+        shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\FolderBrowserTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\FileRemoverTask:
         shared: false
 
     CleverAge\ProcessBundle\Task\FileMoverTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\FileWriterTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\AggregateIterableTask:
         shared: false
 
     CleverAge\ProcessBundle\Task\FilterTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\EventDispatcherTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\InputIteratorTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\InputAggregatorTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\ErrorForwarderTask:
         shared: false
@@ -138,10 +215,17 @@ services:
     CleverAge\ProcessBundle\Task\ProcessExecutorTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\File\FileFetchTask:
         autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Task\RowAggregatorTask:
+        autowire: true
         shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }

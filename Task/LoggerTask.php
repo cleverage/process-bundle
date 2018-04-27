@@ -12,6 +12,7 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
@@ -25,6 +26,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class LoggerTask extends AbstractConfigurableTask
 {
+    /** @var LoggerInterface */
+    protected $logger;
+
     /** @var PropertyAccessorInterface */
     protected $accessor;
 
@@ -32,13 +36,18 @@ class LoggerTask extends AbstractConfigurableTask
     protected $normalizer;
 
     /**
+     * @param LoggerInterface           $logger
      * @param PropertyAccessorInterface $accessor
      * @param NormalizerInterface       $normalizer
      *
      * @internal param LoggerInterface $logger
      */
-    public function __construct(PropertyAccessorInterface $accessor, NormalizerInterface $normalizer)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        PropertyAccessorInterface $accessor,
+        NormalizerInterface $normalizer
+    ) {
+        $this->logger = $logger;
         $this->accessor = $accessor;
         $this->normalizer = $normalizer;
     }
@@ -69,7 +78,10 @@ class LoggerTask extends AbstractConfigurableTask
                 );
             }
         }
-        $state->log($options['message'], $options['level'], $options['reference'], $context);
+        if ($options['reference']) {
+            $context['reference'] = $options['reference'];
+        }
+        $this->logger->log($options['level'], $options['message'], $context);
     }
 
     /**

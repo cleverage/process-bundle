@@ -12,7 +12,7 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -24,14 +24,19 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  */
 class NormalizerTask extends AbstractConfigurableTask
 {
+    /** @var LoggerInterface */
+    protected $logger;
+
     /** @var NormalizerInterface */
     protected $normalizer;
 
     /**
+     * @param LoggerInterface     $logger
      * @param NormalizerInterface $normalizer
      */
-    public function __construct(NormalizerInterface $normalizer)
+    public function __construct(LoggerInterface $logger, NormalizerInterface $normalizer)
     {
+        $this->logger = $logger;
         $this->normalizer = $normalizer;
     }
 
@@ -52,9 +57,7 @@ class NormalizerTask extends AbstractConfigurableTask
             $state->setOutput($normalizedData);
         } catch (\Exception $e) {
             $state->setError($state->getInput());
-            if ($options[self::LOG_ERRORS]) {
-                $state->log('Normalizer exception: '.$e->getMessage(), LogLevel::ERROR);
-            }
+            $this->logger->error($e->getMessage(), $state->getLogContext());
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
             } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {

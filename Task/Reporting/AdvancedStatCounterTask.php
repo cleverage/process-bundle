@@ -12,7 +12,7 @@ namespace CleverAge\ProcessBundle\Task\Reporting;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -20,6 +20,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AdvancedStatCounterTask extends AbstractConfigurableTask
 {
+    /** @var \Psr\Log\LoggerInterface */
+    protected $logger;
+
     /** @var \DateTime */
     protected $startedAt;
 
@@ -31,6 +34,16 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
 
     /** @var int */
     protected $preInitCounter = 0;
+
+    /**
+     * AdvancedStatCounterTask constructor.
+     *
+     * @param LoggerInterface $logger
+     */
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * @param ProcessState $state
@@ -61,7 +74,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
             $fullText .= " - {$rate} items/s - {$items} items processed";
             $fullText .= " in {$now->diff($this->startedAt)->format('%H:%I:%S')}";
 
-            $state->log($fullText, LogLevel::INFO);
+            $this->logger->info($fullText, $state->getLogContext());
             $consoleOutput = $state->getConsoleOutput();
             if ($consoleOutput) {
                 $consoleOutput->writeln("<info>### {$fullText}</info>");

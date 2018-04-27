@@ -12,7 +12,7 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 
 /**
  * Count the number of times the task was executed
@@ -22,15 +22,29 @@ use Psr\Log\LogLevel;
  */
 class StatCounterTask implements FinalizableTaskInterface
 {
+    /** @var LoggerInterface */
+    protected $logger;
+
     /** @var int */
     protected $counter = 0;
+
+    /**
+     * StatCounterTask constructor.
+     *
+     * @param LoggerInterface $logger
+     */
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * @param ProcessState $state
      */
     public function finalize(ProcessState $state)
     {
-        $state->log("Processed item count: {$this->counter}", LogLevel::INFO);
+        $logContext = $state->getLogContext();
+        $this->logger->info("Processed item count: {$this->counter}", $logContext);
     }
 
     /**
