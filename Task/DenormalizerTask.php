@@ -12,7 +12,7 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
@@ -28,10 +28,12 @@ class DenormalizerTask extends AbstractConfigurableTask
     protected $denormalizer;
 
     /**
+     * @param LoggerInterface       $logger
      * @param DenormalizerInterface $denormalizer
      */
-    public function __construct(DenormalizerInterface $denormalizer)
+    public function __construct(LoggerInterface $logger, DenormalizerInterface $denormalizer)
     {
+        parent::__construct($logger);
         $this->denormalizer = $denormalizer;
     }
 
@@ -53,9 +55,8 @@ class DenormalizerTask extends AbstractConfigurableTask
             $state->setOutput($normalizedData);
         } catch (\Exception $e) {
             $state->setError($state->getInput());
-            if ($options[self::LOG_ERRORS]) {
-                $state->log('Denormalizer exception: '.$e->getMessage(), LogLevel::ERROR);
-            }
+
+            $this->logger->error($e->getMessage(), $state->getLogContext());
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
             } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {

@@ -11,8 +11,8 @@
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use Psr\Log\LogLevel;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -29,10 +29,12 @@ class ValidatorTask extends AbstractConfigurableTask
     protected $validator;
 
     /**
+     * @param LoggerInterface    $logger
      * @param ValidatorInterface $validator
      */
-    public function __construct(ValidatorInterface $validator)
+    public function __construct(LoggerInterface $logger, ValidatorInterface $validator)
     {
+        parent::__construct($logger);
         $this->validator = $validator;
     }
 
@@ -47,24 +49,24 @@ class ValidatorTask extends AbstractConfigurableTask
         $options = $this->getOptions($state);
         $violations = $this->validator->validate($state->getInput(), null, $options['groups']);
 
-        if ($options[self::LOG_ERRORS]) {
+        if (0 < $violations->count()) {
+            $defaultLogContext = $state->getLogContext();
+
             /** @var  $violation ConstraintViolationInterface */
             foreach ($violations as $violation) {
                 $invalidValue = $violation->getInvalidValue();
-                $state->log(
-                    $violation->getMessage(),
-                    LogLevel::ERROR,
-                    $violation->getPropertyPath(),
-                    [
-                        'code' => $violation->getCode(),
-                        'invalid_value' => \is_object($invalidValue) ? \get_class($invalidValue) : $invalidValue,
-                    ]
-                );
-            }
-        }
 
-        if (0 < $violations->count()) {
+                $logContext = $defaultLogContext;
+                $logContext['property'] = $violation->getPropertyPath();
+                $logContext['violation_code'] = $violation->getCode();
+                $logContext['invalid_value'] = is_object($invalidValue) ? get_class($invalidValue) : $invalidValue;
+                $this->logger->warning($violation->getMessage(), $logContext);
+            }
+
             $state->setError($state->getInput());
+            $logContext = $defaultLogContext;
+            $this->logger->warning("{$violations->count()} constraint violations detected on validation", $logContext);
+
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
             } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {

@@ -12,7 +12,7 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -27,10 +27,12 @@ class PropertyGetterTask extends AbstractConfigurableTask
     protected $accessor;
 
     /**
+     * @param LoggerInterface           $logger
      * @param PropertyAccessorInterface $accessor
      */
-    public function __construct(PropertyAccessorInterface $accessor)
+    public function __construct(LoggerInterface $logger, PropertyAccessorInterface $accessor)
     {
+        parent::__construct($logger);
         $this->accessor = $accessor;
     }
 
@@ -50,16 +52,9 @@ class PropertyGetterTask extends AbstractConfigurableTask
             $output = $this->accessor->getValue($input, $property);
         } catch (\Exception $e) {
             $state->setError($input);
-            if ($options[self::LOG_ERRORS]) {
-                $state->log(
-                    'PropertyGetter exception: '.$e->getMessage(),
-                    LogLevel::ERROR,
-                    $property,
-                    [
-                        'property' => $property,
-                    ]
-                );
-            }
+            $logContext = $state->getLogContext();
+            $logContext['property'] = $property;
+            $this->logger->error($e->getMessage(), $logContext);
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
             } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {

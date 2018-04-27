@@ -213,7 +213,9 @@ class ProcessManager
             try {
                 $task->initialize($state);
             } catch (\Throwable $e) {
-                $state->log($e->getMessage(), LogLevel::CRITICAL, \get_class($e));
+                $logContext = $state->getLogContext();
+                $logContext['exception'] = $e;
+                $this->logger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
             }
         }
@@ -289,7 +291,9 @@ class ProcessManager
             try {
                 $task->finalize($taskConfiguration->getState());
             } catch (\Throwable $e) {
-                $state->log($e->getMessage(), LogLevel::CRITICAL, \get_class($e));
+                $logContext = $state->getLogContext();
+                $logContext['exception'] = $e;
+                $this->logger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
             }
         }
@@ -373,7 +377,9 @@ class ProcessManager
         try {
             $task->execute($state);
         } catch (\Throwable $e) {
-            $state->log($e->getMessage(), LogLevel::CRITICAL, \get_class($e));
+            $logContext = $state->getLogContext();
+            $logContext['exception'] = $e;
+            $this->logger->critical($e->getMessage(), $logContext);
             $state->stop($e);
         }
     }
@@ -405,7 +411,9 @@ class ProcessManager
         try {
             $task->proceed($state);
         } catch (\Throwable $e) {
-            $state->log($e->getMessage(), LogLevel::CRITICAL, \get_class($e));
+            $logContext = $state->getLogContext();
+            $logContext['exception'] = $e;
+            $this->logger->critical($e->getMessage(), $logContext);
             $state->stop($e);
         }
     }
@@ -524,7 +532,9 @@ class ProcessManager
             if (!\in_array($taskConfiguration->getCode(), $mainTaskList, true)) {
                 // We won't throw an error to ease development... but there must be some kind of warning
                 $state = $taskConfiguration->getState();
-                $state->log("The task won't be executed", LogLevel::WARNING, null, $mainTaskList);
+                $logContext = $state->getLogContext();
+                $logContext ['main_task_list'] = $mainTaskList;
+                $this->logger->warning("The task won't be executed", $logContext);
                 $this->handleState($state);
             }
         }

@@ -14,7 +14,6 @@ use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use Psr\Log\LogLevel;
 use Doctrine\ORM\Internal\Hydration\IterableResult;
 
 /**
@@ -76,7 +75,9 @@ class DoctrineReaderTask extends AbstractDoctrineQueryTask implements IterableTa
 
         // Handle empty results
         if (false === $result) {
-            $state->log('Empty resultset for query', LogLevel::WARNING, $options['class_name'], $options);
+            $logContext = $state->getLogContext();
+            $logContext['options'] = $options;
+            $this->logger->error('Empty resultset for query', $logContext);
             $state->setStopped(true);
 
             return;

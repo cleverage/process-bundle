@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Model;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -27,8 +28,21 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
     public const STRATEGY_STOP = 'stop';
     public const STRATEGY_CONTINUE = 'continue';
 
+    /** @var \Psr\Log\LoggerInterface */
+    protected $logger;
+
     /** @var array */
     protected $options;
+
+    /**
+     * AbstractConfigurableTask constructor.
+     *
+     * @param \Psr\Log\LoggerInterface $logger
+     */
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * Only validate the options at initialization, ensuring that the task will not fail at runtime
