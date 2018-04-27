@@ -59,7 +59,7 @@ class ValidatorTask extends AbstractConfigurableTask
                 $logContext = $defaultLogContext;
                 $logContext['property'] = $violation->getPropertyPath();
                 $logContext['violation_code'] = $violation->getCode();
-                $logContext['invalid_value'] = is_object($invalidValue) ? get_class($invalidValue) : $invalidValue;
+                $logContext['invalid_value'] = \is_object($invalidValue) ? \get_class($invalidValue) : $invalidValue;
                 $this->logger->warning($violation->getMessage(), $logContext);
             }
 
