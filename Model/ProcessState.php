@@ -496,4 +496,29 @@ class ProcessState
 
         return $default;
     }
+
+    /**
+     * @return array
+     */
+    public function getLogContext()
+    {
+        $context = [
+            'process_code' => $this->processConfiguration->getCode(),
+            'process_context' => $this->context,
+            'task_code' => $this->taskConfiguration->getCode(),
+            'task_service' => $this->taskConfiguration->getServiceReference(),
+
+        ];
+
+        if ($this->hasError()) {
+            $context['error'] = $this->getError();
+            $context['error_context'] = $this->getErrorContext();
+        }
+
+        if ($this->exception) {
+            $context['exception'] = $this->getException()->getMessage();
+        }
+
+        return $context;
+    }
 }
