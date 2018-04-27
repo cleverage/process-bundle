@@ -85,6 +85,12 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
      */
     protected function getOption(ProcessState $state, $code)
     {
+        if (self::LOG_ERRORS === $code) {
+            trigger_error(
+                'The logs_errors option is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger configuration instead.',
+                E_USER_DEPRECATED
+            );
+        }
         $options = $this->getOptions($state);
         if (!array_key_exists($code, $options)) {
             throw new \InvalidArgumentException("Missing option {$code}");
