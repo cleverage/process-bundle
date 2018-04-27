@@ -50,7 +50,12 @@ class ProcessState
     /** @var mixed */
     protected $error;
 
-    /** @var TaskHistory[] */
+    /**
+     * @var TaskHistory[]
+     *
+     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::taskHistories attribute is deprecated since
+     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
+     */
     protected $taskHistories = [];
 
     /** @var bool */
@@ -154,9 +159,17 @@ class ProcessState
      * @param string $level
      * @param string $reference
      * @param array  $context
+     *
+     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::log() function is deprecated since version 1.2 and
+     *             will be removed in 2.0. Use default Symfony logger service instead.
      */
     public function log(string $message, string $level = LogLevel::ERROR, string $reference = null, array $context = [])
     {
+        trigger_error(
+            "The CleverAge\ProcessBundle\Model\ProcessState::log() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
+            E_DEPRECATED
+        );
+
         $taskHistory = new TaskHistory($this->getTaskConfiguration());
         $taskHistory->setMessage($message);
         $taskHistory->setLevel($level);
@@ -168,17 +181,33 @@ class ProcessState
 
     /**
      * @return TaskHistory[]
+     *
+     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::getTaskHistories() function is deprecated since
+     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
      */
     public function getTaskHistories(): array
     {
+        trigger_error(
+            "The CleverAge\ProcessBundle\Model\ProcessState::getTaskHistories() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
+            E_DEPRECATED
+        );
+
         return $this->taskHistories;
     }
 
     /**
      * Cleanup log
+     *
+     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::clearTaskHistories() function is deprecated since
+     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
      */
     public function clearTaskHistories()
     {
+        trigger_error(
+            "The CleverAge\ProcessBundle\Model\ProcessState::clearTaskHistories() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
+            E_DEPRECATED
+        );
+
         $this->taskHistories = [];
     }
 

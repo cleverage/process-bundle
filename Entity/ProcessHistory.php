@@ -20,6 +20,9 @@ use Doctrine\ORM\Mapping as ORM;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  *
+ * @deprecated The CleverAge\ProcessBundle\Entity\TaskHistory class is deprecated since
+ *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
+ *
  * @ORM\Table(name="clever_process_history", indexes={
  *     @ORM\Index(name="process_code", columns={"process_code"}),
  *     @ORM\Index(name="start_date", columns={"start_date"}),

@@ -17,8 +17,11 @@ use Psr\Log\LogLevel;
 /**
  * History element for a task
  *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
+ * @author     Valentin Clavreul <vclavreul@clever-age.com>
+ * @author     Vincent Chalnot <vchalnot@clever-age.com>
+ *
+ * @deprecated The CleverAge\ProcessBundle\Entity\TaskHistory class is deprecated since
+ *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
  *
  * @ORM\Table(name="clever_task_history", indexes={
  *     @ORM\Index(name="task_code", columns={"task_code"}),
