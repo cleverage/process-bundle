@@ -1,18 +1,20 @@
 <?php
 /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
+use CleverAge\ProcessBundle\Validator\Mapping\Loader\BaseLoader;
 use Psr\Log\LogLevel;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -45,7 +47,7 @@ class ValidatorTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $options = $this->getOptions($state);
-        $violations = $this->validator->validate($state->getInput(), null, $options['groups']);
+        $violations = $this->validator->validate($state->getInput(), $this->getOption($state, 'constraints'), $options['groups']);
 
         if ($options[self::LOG_ERRORS]) {
             /** @var  $violation ConstraintViolationInterface */
@@ -56,7 +58,7 @@ class ValidatorTask extends AbstractConfigurableTask
                     LogLevel::ERROR,
                     $violation->getPropertyPath(),
                     [
-                        'code' => $violation->getCode(),
+                        'code'          => $violation->getCode(),
                         'invalid_value' => \is_object($invalidValue) ? \get_class($invalidValue) : $invalidValue,
                     ]
                 );
@@ -86,5 +88,15 @@ class ValidatorTask extends AbstractConfigurableTask
 
         $resolver->setDefault('groups', null);
         $resolver->addAllowedTypes('groups', ['NULL', 'array']);
+
+        $resolver->setDefault('constraints', null);
+        $resolver->addAllowedTypes('constraints', ['NULL', 'array']);
+        $resolver->setNormalizer('constraints', function (Options $options, $constraints) {
+            if (is_null($constraints)) {
+                return null;
+            }
+
+            return (new BaseLoader())->loadCustomConstraints($constraints);
+        });
     }
 }
