@@ -73,7 +73,7 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
         $resolver->setDefaults([
             'batch_count' => 1,
             'global_flush' => true,
-            'clear_em' => true,
+            'clear_em' => false,
             'global_clear' => true,
         ]);
         $resolver->setAllowedTypes('batch_count', ['integer']);
