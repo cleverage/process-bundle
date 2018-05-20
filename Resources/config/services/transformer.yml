@@ -1,80 +1,75 @@
 services:
-    cleverage_process.transformer.mapping:
-        class: CleverAge\ProcessBundle\Transformer\MappingTransformer
-        arguments:
-            - '@property_accessor'
+    CleverAge\ProcessBundle\Transformer\MappingTransformer:
+        public: false
+        autowire: true
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.slugify:
-        class: CleverAge\ProcessBundle\Transformer\SlugifyTransformer
+    CleverAge\ProcessBundle\Transformer\SlugifyTransformer:
+        public: false
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.explode:
-        class: CleverAge\ProcessBundle\Transformer\ExplodeTransformer
+    CleverAge\ProcessBundle\Transformer\ExplodeTransformer:
+        public: false
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.implode:
-        class: CleverAge\ProcessBundle\Transformer\ImplodeTransformer
+    CleverAge\ProcessBundle\Transformer\ImplodeTransformer:
+        public: false
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.trim:
-        class: CleverAge\ProcessBundle\Transformer\TrimTransformer
+    CleverAge\ProcessBundle\Transformer\TrimTransformer:
+        public: false
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.sprintf:
-        class: CleverAge\ProcessBundle\Transformer\SprintfTransformer
+    CleverAge\ProcessBundle\Transformer\SprintfTransformer:
+        public: false
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.array_map:
-        class: CleverAge\ProcessBundle\Transformer\ArrayMapTransformer
+    CleverAge\ProcessBundle\Transformer\ArrayMapTransformer:
+        public: false
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.array_first:
-        class: CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer
+    CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer:
+        public: false
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.property_accessor:
-        class: CleverAge\ProcessBundle\Transformer\PropertyAccessorTransformer
-        arguments:
-            - '@property_accessor'
+    CleverAge\ProcessBundle\Transformer\PropertyAccessorTransformer:
+        public: false
+        autowire: true
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.denormalize:
-        class: CleverAge\ProcessBundle\Transformer\DenormalizeTransformer
-        arguments:
-            - '@serializer'
+    CleverAge\ProcessBundle\Transformer\DenormalizeTransformer:
+        public: false
+        autowire: true
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.normalize:
-        class: CleverAge\ProcessBundle\Transformer\NormalizeTransformer
-        arguments:
-            - '@serializer'
+    CleverAge\ProcessBundle\Transformer\NormalizeTransformer:
+        public: false
+        autowire: true
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.convert_value:
-        class: CleverAge\ProcessBundle\Transformer\ConvertValueTransformer
+    CleverAge\ProcessBundle\Transformer\ConvertValueTransformer:
+        public: false
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.callback:
-        class: CleverAge\ProcessBundle\Transformer\CallbackTransformer
+    CleverAge\ProcessBundle\Transformer\CallbackTransformer:
+        public: false
         tags:
             - { name: cleverage.transformer }
 
-    cleverage_process.transformer.wrapper:
-        class: CleverAge\ProcessBundle\Transformer\WrapperTransformer
-        arguments:
-            - '@property_accessor'
+    CleverAge\ProcessBundle\Transformer\WrapperTransformer:
+        public: false
+        autowire: true
         tags:
             - { name: cleverage.transformer }

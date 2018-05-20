@@ -10,7 +10,6 @@
 
 namespace CleverAge\ProcessBundle\Tests;
 
-
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;

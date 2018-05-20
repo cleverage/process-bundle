@@ -1,0 +1,8 @@
+services:
+    CleverAge\ProcessBundle\Command\ExecuteProcessCommand:
+        autowire: true
+        autoconfigure: true
+
+    CleverAge\ProcessBundle\Command\ListProcessCommand:
+        autowire: true
+        autoconfigure: true

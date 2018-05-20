@@ -13,7 +13,7 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -27,7 +27,7 @@ use Doctrine\DBAL\Driver\PDOStatement;
  */
 class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTaskInterface, FinalizableTaskInterface
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
     /** @var PDOStatement */
@@ -37,9 +37,9 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
     protected $nextItem;
 
     /**
-     * @param Registry $doctrine
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(Registry $doctrine)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
     }
@@ -51,8 +51,9 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
      *
      * @param ProcessState $state
      *
-     * @return bool
      * @throws \LogicException
+     *
+     * @return bool
      */
     public function next(ProcessState $state)
     {
@@ -70,7 +71,6 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
      *
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \Doctrine\DBAL\DBALException
      */
     public function execute(ProcessState $state)
     {

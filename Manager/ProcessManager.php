@@ -1,12 +1,12 @@
 <?php
- /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+/*
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Manager;
 
@@ -19,9 +19,9 @@ use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
-use Doctrine\ORM\EntityManager;
 use CleverAge\ProcessBundle\Entity\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -41,7 +41,7 @@ class ProcessManager
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     protected $entityManager;
 
     /** @var ProcessConfigurationRegistry */
@@ -53,13 +53,13 @@ class ProcessManager
     /**
      * @param ContainerInterface           $container
      * @param LoggerInterface              $logger
-     * @param EntityManager                $entityManager
+     * @param EntityManagerInterface       $entityManager
      * @param ProcessConfigurationRegistry $processConfigurationRegistry
      */
     public function __construct(
         ContainerInterface $container,
         LoggerInterface $logger,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         ProcessConfigurationRegistry $processConfigurationRegistry
     ) {
         $this->container = $container;
@@ -198,7 +198,6 @@ class ProcessManager
      * @param OutputInterface      $output
      *
      * @throws \InvalidArgumentException
-     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      *
      * @return ProcessState
@@ -230,7 +229,7 @@ class ProcessManager
     {
         $state->setTaskConfiguration($taskConfiguration);
         $serviceReference = $taskConfiguration->getServiceReference();
-        if (strpos($serviceReference, '@') === 0) {
+        if (0 === strpos($serviceReference, '@')) {
             $task = $this->container->get(ltrim($serviceReference, '@'));
         } elseif (class_exists($serviceReference)) {
             $task = new $serviceReference();
@@ -301,8 +300,8 @@ class ProcessManager
     }
 
     /**
-     * @param $taskConfiguration
-     * @param $state
+     * @param TaskConfiguration $taskConfiguration
+     * @param ProcessState      $state
      */
     protected function doFinalizeTask(TaskConfiguration $taskConfiguration, ProcessState $state)
     {
@@ -383,7 +382,6 @@ class ProcessManager
     /**
      * @param ProcessState $state
      *
-     * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      */
     protected function endProcess(ProcessState $state)

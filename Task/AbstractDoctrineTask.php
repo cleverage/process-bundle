@@ -11,7 +11,7 @@
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -24,13 +24,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractDoctrineTask extends AbstractConfigurableTask
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
     /**
-     * @param Registry $doctrine
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(Registry $doctrine)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
     }
