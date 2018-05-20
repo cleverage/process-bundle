@@ -35,6 +35,7 @@ class ExecuteProcessCommand extends Command
     public function __construct(ProcessManager $processManager)
     {
         $this->processManager = $processManager;
+        parent::__construct();
     }
 
     /**

@@ -32,6 +32,7 @@ class ListProcessCommand extends Command
     public function __construct(ProcessConfigurationRegistry $processConfigRegistry)
     {
         $this->processConfigRegistry = $processConfigRegistry;
+        parent::__construct();
     }
 
     /**
