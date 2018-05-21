@@ -28,7 +28,14 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
         if (!$value) {
             return $value;
         }
-        $date = new \DateTime($value);
+
+        if ($value instanceof \DateTime) {
+            $date = $value;
+        } elseif (is_string($value)) {
+            $date = new \DateTime($value);
+        } else {
+            throw new \UnexpectedValueException("Given value cannot be parsed into a date");
+        }
 
         return $date->format($options['format']);
     }
