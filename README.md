@@ -1,8 +1,40 @@
 CleverAge/ProcessBundle
 =======================
 
+## Introduction
+
 This bundle allows to configure series of tasks to be performed on a certain order.
 Basically, it will greatly ease the configuration of import and exports but can do much more.
+
+## Index
+
+- [Quick start](Documentation/01-quick_start.md)
+- [Task types](Documentation/02-task_types.md)
+- [Custom tasks and development]
+- [Advanced worklow]
+- [Good practices]
+- [Testing]
+- Cookbooks
+    - [Transformations]
+    - [Flow manipulation]
+    - [Dummy tasks]
+    - [Debugging]
+    - [Logging]
+    - [Subprocess]
+    - [File manipulation]
+- Reference
+    - [Process definition]
+    - Tasks
+    - Transformers
+- Examples
+    - [Simple ETL]
+- [Roadmap and versions]
+
+
+-------
+
+_obsolete documentation_
+
 
 ## Base concepts
 - Process: A sets of tasks linked together that you can run in a terminal
