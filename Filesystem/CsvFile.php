@@ -43,7 +43,7 @@ class CsvFile extends CsvResource
         $this->filePath = $filePath;
 
         $dirname = \dirname($this->filePath);
-        if (!mkdir($dirname, 0755, true) && !is_dir($dirname)) {
+        if (!@mkdir($dirname, 0755, true) && !is_dir($dirname)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $dirname));
         }
 

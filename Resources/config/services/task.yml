@@ -82,7 +82,7 @@ services:
 
     CleverAge\ProcessBundle\Task\Reporting\AdvancedStatCounterTask:
         shared: false
-]
+
     CleverAge\ProcessBundle\Task\TransformerTask:
         autowire: true
         shared: false

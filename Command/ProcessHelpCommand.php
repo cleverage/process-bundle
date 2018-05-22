@@ -50,11 +50,14 @@ class ProcessHelpCommand extends Command
     /**
      * @param ProcessConfigurationRegistry $processConfigRegistry
      * @param ContainerInterface           $container
+     *
+     * @throws \Symfony\Component\Console\Exception\LogicException
      */
     public function __construct(ProcessConfigurationRegistry $processConfigRegistry, ContainerInterface $container)
     {
         $this->processConfigRegistry = $processConfigRegistry;
         $this->container = $container;
+        parent::__construct();
     }
 
     /**
