@@ -1,18 +1,17 @@
 <?php
- /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+/*
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -29,6 +28,8 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
     /**
      * @param ProcessState $state
      *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
@@ -42,6 +43,8 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
     /**
      * @param ProcessState $state
      *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
@@ -52,7 +55,7 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
         $entity = $state->getInput();
 
         $this->batch[] = $entity;
-        if (count($this->batch) >= $this->getOption($state, 'batch_count')) {
+        if (\count($this->batch) >= $this->getOption($state, 'batch_count')) {
             $this->writeBatch($state);
         }
 
@@ -62,33 +65,24 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \UnexpectedValueException
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
-        $resolver->setDefaults([
-            'batch_count' => 1,
-            'global_flush' => true,
-            'clear_em' => true,
-            'global_clear' => true,
-        ]);
+        $resolver->setDefaults(
+            [
+                'batch_count' => 1,
+                'global_flush' => true,
+                'clear_em' => false,
+                'global_clear' => true,
+            ]
+        );
         $resolver->setAllowedTypes('batch_count', ['integer']);
         $resolver->setAllowedTypes('global_flush', ['boolean']);
         $resolver->setAllowedTypes('clear_em', ['boolean']);
         $resolver->setAllowedTypes('global_clear', ['boolean']);
-        $resolver->setNormalizer('global_flush', function (Options $options, $value) {
-            if ($options['batch_count'] > 1 && !$value) {
-                throw new \UnexpectedValueException(
-                    'Options batch_count and global_flush cannot be used simultaneously'
-                );
-            }
-
-            return $value;
-        });
     }
 
     /**
@@ -98,10 +92,12 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
      */
     protected function writeBatch(ProcessState $state)
     {
-        if (count($this->batch) === 0) {
+        if (0 === \count($this->batch)) {
             return;
         }
         $options = $this->getOptions($state);
@@ -119,14 +115,14 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
             $manager->flush();
         }
 
-        if (!$options['global_clear']) {
-            foreach ($this->batch as $entity) {
-                $manager->detach($entity);
+        if ($options['clear_em']) {
+            if ($options['global_clear']) {
+                $manager->clear();
+            } else {
+                foreach ($this->batch as $entity) {
+                    $manager->detach($entity);
+                }
             }
-        }
-
-        if ($options['clear_em'] && $options['global_clear']) {
-            $manager->clear();
         }
         $this->batch = [];
     }
