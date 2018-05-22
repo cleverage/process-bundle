@@ -1,31 +1,22 @@
 <?php
 /*
- *    CleverAge/ProcessBundle
- *    Copyright (C) 2017 Clever-Age
+ * This file is part of the CleverAge/ProcessBundle package.
  *
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
+ * Copyright (C) 2017-2018 Clever-Age
  *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace CleverAge\ProcessBundle\Command;
-
 
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -36,26 +27,40 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  */
-class ProcessHelpCommand extends ContainerAwareCommand
+class ProcessHelpCommand extends Command
 {
+    protected const CHAR_DOWN = '│';
+    protected const CHAR_MERGE = '┘';
+    protected const CHAR_MULTIMERGE = '┴─';
+    protected const CHAR_JUMP = '┿─';
+    protected const CHAR_HORIZ = '──';
+    protected const CHAR_MULTIEXPAND = '┬─';
+    protected const CHAR_EXPAND = '┐';
+    protected const CHAR_RECEIVE = '├─';
+    protected const CHAR_NODE = '■';
 
-    const CHAR_DOWN = '│';
-    const CHAR_MERGE = '┘';
-    const CHAR_MULTIMERGE = '┴─';
-    const CHAR_JUMP = '┿─';
-    const CHAR_HORIZ = '──';
-    const CHAR_MULTIEXPAND = '┬─';
-    const CHAR_EXPAND = '┐';
-    const CHAR_RECEIVE = '├─';
-    const CHAR_NODE = '■';
-
-    const BRANCH_SIZE = 2;
+    protected const BRANCH_SIZE = 2;
 
     /** @var ProcessConfigurationRegistry */
     protected $processConfigRegistry;
 
+    /** @var ContainerInterface */
+    protected $container;
+
+    /**
+     * @param ProcessConfigurationRegistry $processConfigRegistry
+     * @param ContainerInterface           $container
+     */
+    public function __construct(ProcessConfigurationRegistry $processConfigRegistry, ContainerInterface $container)
+    {
+        $this->processConfigRegistry = $processConfigRegistry;
+        $this->container = $container;
+    }
+
     /**
      * {@inheritdoc}
+     *
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      */
     protected function configure()
     {
@@ -65,12 +70,19 @@ class ProcessHelpCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \UnexpectedValueException
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws \CleverAge\ProcessBundle\Exception\MissingProcessException
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws \InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $output->getFormatter()->setStyle('fire', new OutputFormatterStyle('red'));
 
-        $this->processConfigRegistry = $this->getContainer()->get('cleverage_process.registry.process_configuration');
         $processCode = $input->getArgument('process_code');
         $process = $this->processConfigRegistry->getProcessConfiguration($processCode);
 
@@ -88,7 +100,7 @@ class ProcessHelpCommand extends ContainerAwareCommand
             // Check previous branches
             if (empty($task->getPreviousTasksConfigurations())) {
                 $branches[] = $task->getCode();
-            } elseif (count($task->getPreviousTasksConfigurations()) === 1) {
+            } elseif (1 === \count($task->getPreviousTasksConfigurations())) {
                 $prevTask = $task->getPreviousTasksConfigurations()[0]->getCode();
                 foreach (array_reverse($branches, true) as $i => $branchTask) {
                     if ($branchTask === $prevTask) {
@@ -108,7 +120,9 @@ class ProcessHelpCommand extends ContainerAwareCommand
                     }
 
                     if (!$foundBranch) {
-                        $output->writeln("<error>Could not find previous branch : {$taskCode} depends on {$prevTask->getCode()}</error>");
+                        $output->writeln(
+                            "<error>Could not find previous branch : {$taskCode} depends on {$prevTask->getCode()}</error>"
+                        );
                     }
                 }
 
@@ -119,8 +133,8 @@ class ProcessHelpCommand extends ContainerAwareCommand
                 $gapTo = null;
                 foreach ($branchesToMerge as $i) {
                     $gapTo = $i;
-                    if ($gapFrom !== null) {
-                        for ($j = $gapFrom + 1; $j < $gapTo; $j++) {
+                    if (null !== $gapFrom) {
+                        for ($j = $gapFrom + 1; $j < $gapTo; ++$j) {
                             $gapBranches[] = $j;
                         }
                     }
@@ -136,29 +150,37 @@ class ProcessHelpCommand extends ContainerAwareCommand
             if (!empty($branchesToMerge)) {
                 $this->writeBranches($output, $branches);
 
-                $this->writeBranches($output, $branches, '', function ($taskCode, $i) use ($branchesToMerge, $gapBranches, $origin) {
-                    return in_array($i, $branchesToMerge) || in_array($i, $gapBranches) || $i === $origin;
-                }, function ($taskCode, $i) use ($gapBranches, $origin, $final, $branches) {
-                    if ($i === $origin) {
-                        return self::CHAR_RECEIVE;
-                    }
-                    if (in_array($i, $gapBranches)) {
-                        if ($branches[$i] !== null) {
-                            return self::CHAR_JUMP;
-                        } else {
+                $this->writeBranches(
+                    $output,
+                    $branches,
+                    '',
+                    function ($taskCode, $i) use ($branchesToMerge, $gapBranches, $origin) {
+                        return \in_array($i, $branchesToMerge, true)
+                            || \in_array($i, $gapBranches, true)
+                            || $i === $origin;
+                    },
+                    function ($taskCode, $i) use ($gapBranches, $origin, $final, $branches) {
+                        if ($i === $origin) {
+                            return self::CHAR_RECEIVE;
+                        }
+                        if (\in_array($i, $gapBranches, true)) {
+                            if (null !== $branches[$i]) {
+                                return self::CHAR_JUMP;
+                            }
+
                             return self::CHAR_HORIZ;
                         }
-                    }
 
-                    if ($i === $final) {
-                        return self::CHAR_MERGE;
-                    }
+                        if ($i === $final) {
+                            return self::CHAR_MERGE;
+                        }
 
-                    return self::CHAR_MULTIMERGE;
-                });
+                        return self::CHAR_MULTIMERGE;
+                    }
+                );
 
                 foreach ($branches as $i => $branchTask) {
-                    if (in_array($i, $branchesToMerge)) {
+                    if (\in_array($i, $branchesToMerge, true)) {
                         $branches[$i] = null;
                     }
                 }
@@ -167,8 +189,8 @@ class ProcessHelpCommand extends ContainerAwareCommand
 
             // Cleanup empty trailing branches
             foreach (array_reverse($branches, true) as $i => $branchTask) {
-                if ($branchTask !== null) {
-                    $branches = array_slice($branches, 0, $i + 1);
+                if (null !== $branchTask) {
+                    $branches = \array_slice($branches, 0, $i + 1);
                     break;
                 }
             }
@@ -179,26 +201,36 @@ class ProcessHelpCommand extends ContainerAwareCommand
                 $nodeStr = "<fire>{$nodeStr}</fire>";
             }
 
-            $this->writeBranches($output, $branches, $this->getTaskDescription($task), function ($branchTask, $i) use ($taskCode) {
-                return $branchTask === $taskCode;
-            }, $nodeStr);
+            $this->writeBranches(
+                $output,
+                $branches,
+                $this->getTaskDescription($task),
+                function ($branchTask, $i) use ($taskCode) {
+                    return $branchTask === $taskCode;
+                },
+                $nodeStr
+            );
 
             // Check next tasks
-            $nextTasks = array_map(function (TaskConfiguration $task) {
-                return $task->getCode();
-            }, array_merge($task->getNextTasksConfigurations(), $task->getErrorTasksConfigurations()));
-            if (count($nextTasks) > 1) {
+            $nextTasks = array_map(
+                function (TaskConfiguration $task) {
+                    return $task->getCode();
+                },
+                array_merge($task->getNextTasksConfigurations(), $task->getErrorTasksConfigurations())
+            );
+            if (\count($nextTasks) > 1) {
                 $this->writeBranches($output, $branches);
                 array_shift($nextTasks);
                 $origin = array_search($taskCode, $branches, true);
                 $expandBranches = [];
                 foreach ($nextTasks as $nextTask) {
                     $index = array_search(null, $branches, true);
-                    if ($index !== false && $index >= $origin) {
+                    if (false !== $index && $index >= $origin) {
+                        /** @var $index int */
                         $branches[$index] = $taskCode;
                         $expandBranches[] = $index;
                     } else {
-                        $expandBranches[] = count($branches);
+                        $expandBranches[] = \count($branches);
                         $branches[] = $taskCode;
                     }
                 }
@@ -209,32 +241,38 @@ class ProcessHelpCommand extends ContainerAwareCommand
 
                 foreach ($expandBranches as $i) {
                     $gapTo = $i;
-                    for ($j = $gapFrom + 1; $j < $gapTo; $j++) {
+                    for ($j = $gapFrom + 1; $j < $gapTo; ++$j) {
                         $gapBranches[] = $j;
                     }
                     $gapFrom = $i;
                 }
                 $final = $gapFrom;
 
-                $this->writeBranches($output, $branches, '', function ($branchTask, $i) use ($origin, $final) {
-                    return $i >= $origin && $i <= $final;
-                }, function ($branchTask, $i) use ($origin, $branches, $gapBranches, $final) {
-                    if ($i === $origin) {
-                        return self::CHAR_RECEIVE;
-                    }
-                    if (in_array($i, $gapBranches)) {
-                        if ($branches[$i] !== null) {
-                            return self::CHAR_JUMP;
-                        } else {
+                $this->writeBranches(
+                    $output,
+                    $branches,
+                    '',
+                    function ($branchTask, $i) use ($origin, $final) {
+                        return $i >= $origin && $i <= $final;
+                    },
+                    function ($branchTask, $i) use ($origin, $branches, $gapBranches, $final) {
+                        if ($i === $origin) {
+                            return self::CHAR_RECEIVE;
+                        }
+                        if (\in_array($i, $gapBranches, true)) {
+                            if (null !== $branches[$i]) {
+                                return self::CHAR_JUMP;
+                            }
+
                             return self::CHAR_HORIZ;
                         }
-                    }
-                    if ($final === $i) {
-                        return self::CHAR_EXPAND;
-                    }
+                        if ($final === $i) {
+                            return self::CHAR_EXPAND;
+                        }
 
-                    return self::CHAR_MULTIEXPAND;
-                });
+                        return self::CHAR_MULTIEXPAND;
+                    }
+                );
             }
 
             if (empty($nextTasks)) {
@@ -247,18 +285,18 @@ class ProcessHelpCommand extends ContainerAwareCommand
 
             // Cleanup empty trailing branches
             foreach (array_reverse($branches, true) as $i => $branchTask) {
-                if ($branchTask !== null) {
-                    $branches = array_slice($branches, 0, $i + 1);
+                if (null !== $branchTask) {
+                    $branches = \array_slice($branches, 0, $i + 1);
                     break;
                 }
             }
 
             $this->writeBranches($output, $branches);
-        };
+        }
 
         $branches = array_filter($branches);
         if (!empty($branches)) {
-            $branchStr = '[' . implode(', ', $branches) . ']';
+            $branchStr = '['.implode(', ', $branches).']';
             $output->writeln("<error>All branches are not resolved : {$branchStr}</error>");
         }
     }
@@ -269,35 +307,45 @@ class ProcessHelpCommand extends ContainerAwareCommand
      * @param string          $comment
      * @param callable        $match
      * @param string|callable $char
+     *
+     * @throws \InvalidArgumentException
      */
     protected function writeBranches(OutputInterface $output, $branches, $comment = '', $match = null, $char = null)
     {
         // Merge lines
         foreach ($branches as $i => $branchTask) {
             $str = '';
-            if ($match !== null && $match($branchTask, $i)) {
-                if (is_string($char)) {
+            if (null !== $match && $match($branchTask, $i)) {
+                if (\is_string($char)) {
                     $str = $char;
-                } elseif (is_callable($char)) {
+                } elseif (\is_callable($char)) {
                     $str = $char($branchTask, $i);
                 } else {
-                    throw new \InvalidArgumentException("Char must be string|callable");
+                    throw new \InvalidArgumentException('Char must be string|callable');
                 }
-            } elseif ($branchTask !== null) {
+            } elseif (null !== $branchTask) {
                 $str = self::CHAR_DOWN;
             }
 
             // Str_pad does not work with unicode ?
             $noFormatStrLen = mb_strlen(preg_replace('/<[^>]*>/', '', $str));
-            for ($i = $noFormatStrLen; $i < self::BRANCH_SIZE; $i++) {
+            for ($j = $noFormatStrLen; $j < self::BRANCH_SIZE; ++$j) {
                 $str .= ' ';
             }
             $output->write($str);
         }
         $output->writeln($comment);
-
     }
 
+    /**
+     * @param TaskConfiguration $task
+     *
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \UnexpectedValueException
+     *
+     * @return string
+     */
     protected function getTaskDescription(TaskConfiguration $task)
     {
         $description = $task->getCode();
@@ -312,18 +360,27 @@ class ProcessHelpCommand extends ContainerAwareCommand
             $interfaces[] = 'Blocking';
         }
 
-        if (count($interfaces)) {
-            $description .= ' <info>(' . implode(', ', $interfaces) . ')</info>';
+        if (\count($interfaces)) {
+            $description .= ' <info>('.implode(', ', $interfaces).')</info>';
         }
 
         return $description;
     }
 
+    /**
+     * @param TaskConfiguration $taskConfiguration
+     *
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \UnexpectedValueException
+     *
+     * @return mixed
+     */
     protected function getTaskService(TaskConfiguration $taskConfiguration)
     {
         $serviceReference = $taskConfiguration->getServiceReference();
-        if (strpos($serviceReference, '@') === 0) {
-            $task = $this->getContainer()->get(ltrim($serviceReference, '@'));
+        if (0 === strpos($serviceReference, '@')) {
+            $task = $this->container->get(ltrim($serviceReference, '@'));
         } elseif (class_exists($serviceReference)) {
             $task = new $serviceReference();
         } else {
@@ -339,5 +396,4 @@ class ProcessHelpCommand extends ContainerAwareCommand
 
         return $task;
     }
-
 }

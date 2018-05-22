@@ -1,20 +1,11 @@
 <?php
 /*
- *    CleverAge/ProcessBundle
- *    Copyright (C) 2017 Clever-Age
+ * This file is part of the CleverAge/ProcessBundle package.
  *
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
+ * Copyright (C) 2017-2018 Clever-Age
  *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace CleverAge\ProcessBundle\Command;
@@ -22,9 +13,10 @@ namespace CleverAge\ProcessBundle\Command;
 use CleverAge\ProcessBundle\Entity\ProcessHistory;
 use CleverAge\ProcessBundle\Entity\TaskHistory;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -42,29 +34,37 @@ use Symfony\Component\Console\Output\OutputInterface;
  * - `--process-filters="processCode:like:internal%" --task-filters="level:=:debug"` : remove debug task histories of
  * process with code starts with "internal"
  *
- * @package CleverAge\ProcessBundle\Command
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
-class CleanLogCommand extends ContainerAwareCommand
+class CleanLogCommand extends Command
 {
-    const VALID_COMPARISON = ['=', '!=', '>', '<', '>=', '<=', 'in', 'not in', 'like', 'is null', 'is not null'];
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var array */
+    protected const VALID_COMPARISON = [
+        '=',
+        '!=',
+        '>',
+        '<',
+        '>=',
+        '<=',
+        'in',
+        'not in',
+        'like',
+        'is null',
+        'is not null',
+    ];
+
+    /** @var EntityManagerInterface|EntityManager */
     protected $entityManager;
 
     /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
+     * @param EntityManager|EntityManagerInterface $entityManager
      *
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
-     * @throws \LogicException
+     * @throws \Symfony\Component\Console\Exception\LogicException
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->entityManager = $this->getContainer()->get('doctrine')->getManager();
+        $this->entityManager = $entityManager;
+        parent::__construct();
     }
 
     /**
@@ -96,6 +96,9 @@ class CleanLogCommand extends ContainerAwareCommand
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @throws \InvalidArgumentException
      * @throws \LogicException
@@ -112,7 +115,7 @@ class CleanLogCommand extends ContainerAwareCommand
                 ProcessHistory::class
             );
         } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException('Failed to parse process filters : '.$e->getMessage());
+            throw new \InvalidArgumentException("Failed to parse process filters: {$e->getMessage()}");
         }
         try {
             $taskFilters = $this->extractFilterOptions(
@@ -120,7 +123,7 @@ class CleanLogCommand extends ContainerAwareCommand
                 TaskHistory::class
             );
         } catch (\InvalidArgumentException $e) {
-            throw new \InvalidArgumentException('Failed to parse task filters : '.$e->getMessage());
+            throw new \InvalidArgumentException("Failed to parse task filters: {$e->getMessage()}");
         }
 
         if ($processFilters && $taskFilters) {
@@ -130,7 +133,6 @@ class CleanLogCommand extends ContainerAwareCommand
                     $taskFilters
                 );
             $output->writeln(sprintf('Task history : %d filtred item(s) removed', $result));
-
         } else {
             try {
                 $result = $this
@@ -163,14 +165,16 @@ class CleanLogCommand extends ContainerAwareCommand
     /**
      * @param array  $input
      * @param string $className
-     * @return array
+     *
      * @throws \LogicException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \InvalidArgumentException
+     *
+     * @return array
      */
-    protected function extractFilterOptions(array $input, string $className)
-    : array {
+    protected function extractFilterOptions(array $input, string $className): array
+    {
         $classMetadata = $this
             ->entityManager
             ->getClassMetadata($className);
@@ -189,11 +193,13 @@ class CleanLogCommand extends ContainerAwareCommand
     /**
      * @param string        $input
      * @param ClassMetadata $classMetadata
-     * @return array
+     *
      * @throws \InvalidArgumentException
+     *
+     * @return array
      */
-    protected function parseFilter(string $input, ClassMetadata $classMetadata)
-    : array {
+    protected function parseFilter(string $input, ClassMetadata $classMetadata): array
+    {
         $classProperties = $classMetadata->getFieldNames();
         $pattern = sprintf(
             '/(%s):(%s):(.+)/',
@@ -202,7 +208,7 @@ class CleanLogCommand extends ContainerAwareCommand
         );
         preg_match($pattern, $input, $parts);
 
-        if (4 !== count($parts)) {
+        if (4 !== \count($parts)) {
             throw new \InvalidArgumentException(sprintf('Invalid filter %s', $input));
         }
 
@@ -216,14 +222,14 @@ class CleanLogCommand extends ContainerAwareCommand
      * @param ClassMetadata $classMetadata
      * @param array         $filter
      */
-    protected function fixFilterValue(ClassMetadata $classMetadata, array &$filter)
-    : void {
-        if (in_array($filter['comparison'], ['in', 'not in'], true)) {
+    protected function fixFilterValue(ClassMetadata $classMetadata, array &$filter): void
+    {
+        if (\in_array($filter['comparison'], ['in', 'not in'], true)) {
             $filter['value'] = explode(',', $filter['value']);
         }
 
         $propertyType = $classMetadata->getTypeOfField($filter['property']);
-        if (in_array($propertyType, ['date', 'datetime'], true)) {
+        if (\in_array($propertyType, ['date', 'datetime'], true)) {
             $filter['value'] = new \DateTime($filter['value']);
         }
     }
@@ -232,14 +238,16 @@ class CleanLogCommand extends ContainerAwareCommand
      * Remove task history items based en filters
      *
      * @param array[] $filters
-     * @return int
+     *
      * @throws \LogicException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \InvalidArgumentException
+     *
+     * @return int
      */
-    protected function cleanTaskHistory($filters)
-    : int {
+    protected function cleanTaskHistory($filters): int
+    {
         $repository = $this
             ->entityManager
             ->getRepository(TaskHistory::class);
@@ -252,14 +260,19 @@ class CleanLogCommand extends ContainerAwareCommand
      *
      * @param array[] $processFilters
      * @param array[] $taskFilters
-     * @return int
+     *
      * @throws \LogicException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \InvalidArgumentException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \Doctrine\ORM\ORMException
+     *
+     * @return int
      */
-    protected function cleanTaskHistoryWithProcessFilters($processFilters, $taskFilters)
-    : int {
+    protected function cleanTaskHistoryWithProcessFilters($processFilters, $taskFilters): int
+    {
         if (!$processFilters && !$taskFilters) {
             throw new \InvalidArgumentException('No filter found');
         }
@@ -273,7 +286,7 @@ class CleanLogCommand extends ContainerAwareCommand
 
         foreach ($processFilters as $index => $item) {
             $parameterName = sprintf('%s_%d', $item['property'], $index);
-            if (in_array($item['comparison'], ['is null', 'is not null', true])) {
+            if (\in_array($item['comparison'], ['is null', 'is not null'], true)) {
                 $pattern = 'process.%s %s';
                 $queryBuiler
                     ->andWhere(
@@ -285,7 +298,7 @@ class CleanLogCommand extends ContainerAwareCommand
                     )
                     ->setParameter($parameterName, $item['value']);
             } else {
-                $pattern = is_array($item['value']) ? 'process.%s %s (:%s)' : 'process.%s %s :%s';
+                $pattern = \is_array($item['value']) ? 'process.%s %s (:%s)' : 'process.%s %s :%s';
                 /** @noinspection PrintfScanfArgumentsInspection */
                 $queryBuiler
                     ->andWhere(
@@ -302,7 +315,7 @@ class CleanLogCommand extends ContainerAwareCommand
 
         foreach ($taskFilters as $index => $item) {
             $parameterName = sprintf('%s_%d', $item['property'], $index);
-            if (in_array($item['comparison'], ['is null', 'is not null'], true)) {
+            if (\in_array($item['comparison'], ['is null', 'is not null'], true)) {
                 $pattern = 'task.%s %s';
                 $queryBuiler
                     ->andWhere(
@@ -314,7 +327,7 @@ class CleanLogCommand extends ContainerAwareCommand
                     )
                     ->setParameter($parameterName, $item['value']);
             } else {
-                $pattern = is_array($item['value']) ? 'task.%s %s (:%s)' : 'task.%s %s :%s';
+                $pattern = \is_array($item['value']) ? 'task.%s %s (:%s)' : 'task.%s %s :%s';
                 $queryBuiler
                     ->andWhere(
                         sprintf(
@@ -335,7 +348,7 @@ class CleanLogCommand extends ContainerAwareCommand
             $this
                 ->entityManager
                 ->remove($row[0]);
-            if (($i % 100) === 0) {
+            if (0 === ($i % 100)) {
                 $this
                     ->entityManager
                     ->flush();
@@ -359,13 +372,15 @@ class CleanLogCommand extends ContainerAwareCommand
      * Remove process history items orphan and those based en filters
      *
      * @param array[] $filters
-     * @return int
+     *
      * @throws \LogicException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \InvalidArgumentException
+     *
+     * @return int
      */
-    protected function cleanProcessHistory($filters)
-    : int {
+    protected function cleanProcessHistory($filters): int
+    {
         $repository = $this
             ->entityManager
             ->getRepository(ProcessHistory::class);
@@ -376,13 +391,13 @@ class CleanLogCommand extends ContainerAwareCommand
     /**
      * Remove process history items without task history
      *
-     * @return int
      * @throws \LogicException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \InvalidArgumentException
+     *
+     * @return int
      */
-    protected function cleanOrphanProcessHistory()
-    : int
+    protected function cleanOrphanProcessHistory(): int
     {
         $taskSubQueryBuilder = $this
             ->entityManager
@@ -396,10 +411,9 @@ class CleanLogCommand extends ContainerAwareCommand
             ->createQueryBuilder('process');
         $processQueryBuilder
             ->delete()
-            ->where($processQueryBuilder->expr()->notIn('process', $taskSubQueryBuilder->getDQL()));;
+            ->where($processQueryBuilder->expr()->notIn('process', $taskSubQueryBuilder->getDQL()));
 
         return $processQueryBuilder->getQuery()->execute();
-
     }
 
     /**
@@ -407,11 +421,13 @@ class CleanLogCommand extends ContainerAwareCommand
      *
      * @param EntityRepository $repository
      * @param array[]          $filters
-     * @return int
+     *
      * @throws \InvalidArgumentException
+     *
+     * @return int
      */
-    protected function cleanHistory($repository, $filters)
-    : int {
+    protected function cleanHistory($repository, $filters): int
+    {
         if (!$filters) {
             throw new \InvalidArgumentException('No filter found');
         }
@@ -422,7 +438,7 @@ class CleanLogCommand extends ContainerAwareCommand
 
         foreach ($filters as $index => $item) {
             $parameterName = sprintf('%s_%d', $item['property'], $index);
-            $pattern = is_array($item['value']) ? 'object.%s %s (:%s)' : 'object.%s %s :%s';
+            $pattern = \is_array($item['value']) ? 'object.%s %s (:%s)' : 'object.%s %s :%s';
             $queryBuiler
                 ->andWhere(
                     sprintf(

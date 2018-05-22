@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -18,7 +18,6 @@ use CleverAge\ProcessBundle\Model\ProcessState;
  *
  * Aggregate the result of iterable tasks in an array
  *
- * @package CleverAge\ProcessBundle\Task
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class AggregateIterableTask implements BlockingTaskInterface

@@ -1,12 +1,12 @@
 <?php
 /*
-* This file is part of the CleverAge/ProcessBundle package.
-*
-* Copyright (C) 2017-2018 Clever-Age
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2018 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Manager;
 
@@ -22,9 +22,10 @@ use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
-use Doctrine\ORM\EntityManager;
 use CleverAge\ProcessBundle\Entity\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -44,7 +45,7 @@ class ProcessManager
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var EntityManager */
+    /** @var EntityManagerInterface|EntityManager */
     protected $entityManager;
 
     /** @var ProcessConfigurationRegistry */
@@ -57,22 +58,19 @@ class ProcessManager
     protected $contextualOptionResolver;
 
     /**
-     * ProcessManager constructor.
-     *
      * @param ContainerInterface           $container
      * @param LoggerInterface              $logger
-     * @param EntityManager                $entityManager
+     * @param EntityManagerInterface       $entityManager
      * @param ProcessConfigurationRegistry $processConfigurationRegistry
      * @param ContextualOptionResolver     $contextualOptionResolver
      */
     public function __construct(
         ContainerInterface $container,
         LoggerInterface $logger,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         ProcessConfigurationRegistry $processConfigurationRegistry,
         ContextualOptionResolver $contextualOptionResolver
-    )
-    {
+    ) {
         $this->container = $container;
         $this->logger = $logger;
         $this->entityManager = $entityManager;
@@ -88,9 +86,9 @@ class ProcessManager
      *
      * @throws \Exception
      *
-     * @return int
+     * @return mixed
      */
-    public function execute(string $processCode, OutputInterface $output = null, $input = null, $context = [])
+    public function execute(string $processCode, OutputInterface $output = null, $input = null, array $context = [])
     {
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
         $processHistory = $this->initializeStates($processConfiguration, $output, $context);
@@ -111,7 +109,7 @@ class ProcessManager
         $taskList = array_reverse($processConfiguration->getTaskConfigurations());
         $allowedTasks = $processConfiguration->getMainTaskGroup();
         foreach ($taskList as $taskConfiguration) {
-            if (in_array($taskConfiguration->getCode(), $allowedTasks)) {
+            if (\in_array($taskConfiguration->getCode(), $allowedTasks, true)) {
                 $this->resolve($taskConfiguration);
             }
         }
@@ -134,13 +132,16 @@ class ProcessManager
 
     /**
      * Resolve a task, by checking if parents are resolved and processing roots and BlockingTasks
+     *
      * @TODO handle properly resolution of stopped task
      *
      * @param TaskConfiguration $taskConfiguration
      *
+     * @throws \Exception
+     *
      * @return bool
      */
-    protected function resolve(TaskConfiguration $taskConfiguration)
+    protected function resolve(TaskConfiguration $taskConfiguration): bool
     {
         $state = $taskConfiguration->getState();
         if ($state->isResolved()) {
@@ -159,7 +160,7 @@ class ProcessManager
         }
 
         if (!$allParentsResolved) {
-            throw new \UnexpectedValueException("Cannot resolve all parents");
+            throw new \UnexpectedValueException('Cannot resolve all parents');
         }
 
         $state->setStatus(ProcessState::STATUS_PROCESSING);
@@ -186,10 +187,10 @@ class ProcessManager
      *
      * @throws \Exception
      */
-    protected function initialize(TaskConfiguration $taskConfiguration)
+    protected function initialize(TaskConfiguration $taskConfiguration): void
     {
         $serviceReference = $taskConfiguration->getServiceReference();
-        if (strpos($serviceReference, '@') === 0) {
+        if (0 === strpos($serviceReference, '@')) {
             $task = $this->container->get(ltrim($serviceReference, '@'));
         } elseif (class_exists($serviceReference)) {
             $task = new $serviceReference();
@@ -223,15 +224,15 @@ class ProcessManager
      *
      * @throws \Exception
      */
-    protected function process(TaskConfiguration $taskConfiguration, $doProceed = false)
+    protected function process(TaskConfiguration $taskConfiguration, $doProceed = false): void
     {
         $state = $taskConfiguration->getState();
         do {
             // Execute the current task, and fetch status
-            if (!$doProceed) {
-                $this->doProcessTask($taskConfiguration);
-            } else {
+            if ($doProceed) {
                 $this->doProceedTask($taskConfiguration);
+            } else {
+                $this->doProcessTask($taskConfiguration);
             }
             $this->handleState($state);
             if ($state->isStopped()) {
@@ -278,7 +279,7 @@ class ProcessManager
      *
      * @throws \Exception
      */
-    protected function finalize(TaskConfiguration $taskConfiguration)
+    protected function finalize(TaskConfiguration $taskConfiguration): void
     {
         $state = $taskConfiguration->getState();
         $task = $taskConfiguration->getTask();
@@ -299,14 +300,18 @@ class ProcessManager
      * @param OutputInterface      $output
      * @param array                $context
      *
+     * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      *
      * @return ProcessHistory
      */
-    protected function initializeStates(ProcessConfiguration $processConfiguration, OutputInterface $output = null, $context = [])
-    {
+    protected function initializeStates(
+        ProcessConfiguration $processConfiguration,
+        OutputInterface $output = null,
+        array $context = []
+    ): ProcessHistory {
         $processHistory = new ProcessHistory($processConfiguration);
         $this->entityManager->persist($processHistory);
         $this->entityManager->flush($processHistory);
@@ -331,12 +336,15 @@ class ProcessManager
      * @param TaskConfiguration $nextTaskConfiguration
      * @param bool              $isError
      */
-    protected function prepareNextProcess(TaskConfiguration $previousTaskConfiguration, TaskConfiguration $nextTaskConfiguration, $isError = false)
-    {
-        if (!$isError) {
-            $input = $previousTaskConfiguration->getState()->getOutput();
-        } else {
+    protected function prepareNextProcess(
+        TaskConfiguration $previousTaskConfiguration,
+        TaskConfiguration $nextTaskConfiguration,
+        $isError = false
+    ): void {
+        if ($isError) {
             $input = $previousTaskConfiguration->getState()->getError();
+        } else {
+            $input = $previousTaskConfiguration->getState()->getOutput();
         }
 
         $nextState = $nextTaskConfiguration->getState();
@@ -347,7 +355,7 @@ class ProcessManager
     /**
      * @param TaskConfiguration $taskConfiguration
      */
-    protected function doProcessTask(TaskConfiguration $taskConfiguration)
+    protected function doProcessTask(TaskConfiguration $taskConfiguration): void
     {
         $state = $taskConfiguration->getState();
         $state->setOutput(null);
@@ -372,7 +380,7 @@ class ProcessManager
      *
      * @throws \UnexpectedValueException
      */
-    protected function doProceedTask(TaskConfiguration $taskConfiguration)
+    protected function doProceedTask(TaskConfiguration $taskConfiguration): void
     {
         $state = $taskConfiguration->getState();
         $state->setInput(null);
@@ -404,9 +412,11 @@ class ProcessManager
      *
      * @param ProcessState $state
      *
-     * @throws \Exception
+     * @throws \RuntimeException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      */
-    protected function handleState(ProcessState $state)
+    protected function handleState(ProcessState $state): void
     {
         if ($this->entityManager->isOpen()) {
             // Merging the process history back into the unit of work
@@ -465,10 +475,9 @@ class ProcessManager
     /**
      * @param ProcessHistory $history
      *
-     * @throws \Doctrine\ORM\OptimisticLockException
-     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\ORMException
      */
-    protected function endProcess(ProcessHistory $history)
+    protected function endProcess(ProcessHistory $history): void
     {
         /** @var ProcessHistory $processHistory */
         $processHistory = $this->entityManager->merge($history);
@@ -485,8 +494,15 @@ class ProcessManager
      * Validate a process
      *
      * @param ProcessConfiguration $processConfiguration
+     *
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
+     * @throws \RuntimeException
+     * @throws \CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException
+     * @throws \CleverAge\ProcessBundle\Exception\CircularProcessException
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws \Doctrine\ORM\ORMException
      */
-    protected function checkProcess(ProcessConfiguration $processConfiguration)
+    protected function checkProcess(ProcessConfiguration $processConfiguration): void
     {
         $taskConfigurations = $processConfiguration->getTaskConfigurations();
         $mainTaskList = $processConfiguration->getMainTaskGroup();
@@ -502,7 +518,7 @@ class ProcessManager
 
         // Check multi-branch processes
         foreach ($taskConfigurations as $taskConfiguration) {
-            if (!in_array($taskConfiguration->getCode(), $mainTaskList)) {
+            if (!\in_array($taskConfiguration->getCode(), $mainTaskList, true)) {
                 // We won't throw an error to ease development... but there must be some kind of warning
                 $state = $taskConfiguration->getState();
                 $state->log("The task won't be executed", LogLevel::WARNING, null, $mainTaskList);
@@ -512,10 +528,10 @@ class ProcessManager
 
         // Check coherence for entry/end points
         $processConfiguration->getEndPoint();
-        if ($entryPoint && !in_array($entryPoint->getCode(), $mainTaskList)) {
+        if ($entryPoint && !\in_array($entryPoint->getCode(), $mainTaskList, true)) {
             throw InvalidProcessConfigurationException::createNotInMain($entryPoint, $mainTaskList);
         }
-        if ($endPoint && !in_array($endPoint->getCode(), $mainTaskList)) {
+        if ($endPoint && !\in_array($endPoint->getCode(), $mainTaskList, true)) {
             throw InvalidProcessConfigurationException::createNotInMain($endPoint, $mainTaskList);
         }
     }

@@ -26,12 +26,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ProcessState
 {
-
-    const STATUS = [self::STATUS_NEW, self::STATUS_PENDING, self::STATUS_PROCESSING, self::STATUS_RESOLVED];
-    const STATUS_NEW = 'new';
-    const STATUS_PENDING = 'pending';
-    const STATUS_PROCESSING = 'processing';
-    const STATUS_RESOLVED = 'resolved';
+    public const STATUS = [self::STATUS_NEW, self::STATUS_PENDING, self::STATUS_PROCESSING, self::STATUS_RESOLVED];
+    public const STATUS_NEW = 'new';
+    public const STATUS_PENDING = 'pending';
+    public const STATUS_PROCESSING = 'processing';
+    public const STATUS_RESOLVED = 'resolved';
 
     /** @var ProcessConfiguration */
     protected $processConfiguration;
@@ -233,11 +232,12 @@ class ProcessState
 
     /**
      * @TODO use a flag in setter instead of null check
+     *
      * @return bool
      */
     public function hasError()
     {
-        return $this->error !== null;
+        return null !== $this->error;
     }
 
     /**
@@ -394,10 +394,12 @@ class ProcessState
 
     /**
      * @param string $status
+     *
+     * @throws \UnexpectedValueException
      */
     public function setStatus(string $status)
     {
-        if (!in_array($status, self::STATUS)) {
+        if (!\in_array($status, self::STATUS, true)) {
             throw new \UnexpectedValueException("Unknown status {$status}");
         }
 
@@ -422,6 +424,8 @@ class ProcessState
 
     /**
      * @param array $context
+     *
+     * @throws \RuntimeException
      */
     public function setContext(array $context): void
     {
@@ -439,7 +443,10 @@ class ProcessState
     {
         if (!$this->contextualizedOptions) {
             $options = $this->getTaskConfiguration()->getOptions();
-            $this->contextualizedOptions = $this->contextualOptionResolver->contextualizeOptions($options, $this->context);
+            $this->contextualizedOptions = $this->contextualOptionResolver->contextualizeOptions(
+                $options,
+                $this->context
+            );
         }
 
         return $this->contextualizedOptions;

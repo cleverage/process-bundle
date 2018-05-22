@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -10,7 +10,6 @@
 
 namespace CleverAge\ProcessBundle\EventListener;
 
-
 use CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent;
 
 /**
@@ -18,12 +17,10 @@ use CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent;
  * This is a basic queue, mainly aiming to catch data coming out of a process
  * Used mostly for testing purpose
  *
- * @package CleverAge\ProcessBundle\EventListener
  * @author  Valentin Clavreul <vclavreul@¢levere-age.com>
  */
 class DataQueueEventListener
 {
-
     /** @var \SplQueue[] */
     protected $queues = [];
 

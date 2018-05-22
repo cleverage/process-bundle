@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -57,7 +57,7 @@ class ValidatorTask extends AbstractConfigurableTask
                     $violation->getPropertyPath(),
                     [
                         'code' => $violation->getCode(),
-                        'invalid_value' => is_object($invalidValue) ? get_class($invalidValue) : $invalidValue,
+                        'invalid_value' => \is_object($invalidValue) ? \get_class($invalidValue) : $invalidValue,
                     ]
                 );
             }
@@ -87,6 +87,4 @@ class ValidatorTask extends AbstractConfigurableTask
         $resolver->setDefault('groups', null);
         $resolver->addAllowedTypes('groups', ['NULL', 'array']);
     }
-
-
 }

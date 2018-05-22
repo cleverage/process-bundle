@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -28,6 +28,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     /**
      * @param ProcessState $state
      *
+     * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \LogicException
      */
@@ -112,6 +113,12 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         return $options['headers'];
     }
 
+    /**
+     * @param OptionsResolver $resolver
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -121,5 +128,4 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
             ]
         );
     }
-
 }

@@ -26,8 +26,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TransformerTask extends AbstractConfigurableTask
 {
-    const DEFAULT_TRANSFORMER = 'mapping';
-    const ACTIVE_TRANSFORMER = 'transformer';
+    public const DEFAULT_TRANSFORMER = 'mapping';
+    public const ACTIVE_TRANSFORMER = 'transformer';
 
     /** @var TransformerRegistry */
     protected $transformerRegistry;
@@ -108,7 +108,6 @@ class TransformerTask extends AbstractConfigurableTask
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      *
-     * @return array
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
@@ -117,6 +116,8 @@ class TransformerTask extends AbstractConfigurableTask
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
      * @throws \UnexpectedValueException
+     *
+     * @return array
      */
     protected function getOptions(ProcessState $state)
     {

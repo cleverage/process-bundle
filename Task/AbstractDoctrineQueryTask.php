@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -74,7 +74,7 @@ abstract class AbstractDoctrineQueryTask extends AbstractDoctrineTask
             if (null === $value) {
                 $qb->andWhere("e.{$field} IS NULL");
             } else {
-                if (is_array($value)) {
+                if (\is_array($value)) {
                     $qb->andWhere("e.{$field} IN (:{$parameterName})");
                 } else {
                     $qb->andWhere("e.{$field} = :{$parameterName}");

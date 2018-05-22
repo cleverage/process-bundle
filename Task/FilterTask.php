@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -37,6 +37,12 @@ class FilterTask extends AbstractConfigurableTask
 
     /**
      * {@inheritDoc}
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
+     * @throws \Symfony\Component\PropertyAccess\Exception\AccessException
+     * @throws \InvalidArgumentException
      */
     public function execute(ProcessState $state)
     {
@@ -101,6 +107,10 @@ class FilterTask extends AbstractConfigurableTask
      * @param bool         $shouldMatch
      * @param bool         $regexpMode
      *
+     * @throws \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @throws \Symfony\Component\PropertyAccess\Exception\AccessException
+     * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
+     *
      * @return bool
      */
     protected function checkValue($input, $key, $value, $shouldMatch = true, $regexpMode = false)
@@ -113,10 +123,12 @@ class FilterTask extends AbstractConfigurableTask
             $currentValue = null;
         }
 
+        /** @noinspection TypeUnsafeComparisonInspection */
         if ($shouldMatch && !$regexpMode && $currentValue != $value) {
             return false;
         }
 
+        /** @noinspection TypeUnsafeComparisonInspection */
         if (!$shouldMatch && !$regexpMode && $currentValue == $value) {
             return false;
         }
@@ -124,11 +136,11 @@ class FilterTask extends AbstractConfigurableTask
         if ($regexpMode) {
             $pregMatch = preg_match($value, $currentValue);
 
-            if ($shouldMatch && ($pregMatch === false || $pregMatch === 0)) {
+            if ($shouldMatch && (false === $pregMatch || 0 === $pregMatch)) {
                 return false;
             }
 
-            if (!$shouldMatch && ($pregMatch === false || $pregMatch > 0)) {
+            if (!$shouldMatch && (false === $pregMatch || $pregMatch > 0)) {
                 return false;
             }
         }

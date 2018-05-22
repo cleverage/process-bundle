@@ -1,24 +1,14 @@
 <?php
 /*
- *    CleverAge/ProcessBundle
- *    Copyright (C) 2017 Clever-Age
+ * This file is part of the CleverAge/ProcessBundle package.
  *
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
+ * Copyright (C) 2017-2018 Clever-Age
  *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace CleverAge\ProcessBundle\Task;
-
 
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
@@ -45,8 +35,6 @@ class ProcessExecutorTask extends AbstractConfigurableTask
     protected $process;
 
     /**
-     * ProcessExecutorTask constructor.
-     *
      * @param ProcessManager               $processManager
      * @param ProcessConfigurationRegistry $processRegistry
      */
@@ -58,6 +46,9 @@ class ProcessExecutorTask extends AbstractConfigurableTask
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \InvalidArgumentException
      */
     public function execute(ProcessState $state)
     {
@@ -66,12 +57,22 @@ class ProcessExecutorTask extends AbstractConfigurableTask
 
         $processCode = $this->getOption($state, 'process');
         try {
-            $output = $this->processManager->execute($this->getOption($state, 'process'), $consoleOutput, $input, $this->getOption($state, 'context'));
+            $output = $this->processManager->execute(
+                $this->getOption($state, 'process'),
+                $consoleOutput,
+                $input,
+                $this->getOption($state, 'context')
+            );
             $state->setOutput($output);
         } catch (\Throwable $e) {
             if ($this->getOption($state, self::LOG_ERRORS)) {
                 $message = $e->getPrevious() ? $e->getPrevious()->getMessage() : $e->getMessage();
-                $state->log("Process '{$processCode}' has failed: {$message}", LogLevel::ERROR, null, ['input' => $input, 'error' => $e]);
+                $state->log(
+                    "Process '{$processCode}' has failed: {$message}",
+                    LogLevel::ERROR,
+                    null,
+                    ['input' => $input, 'error' => $e]
+                );
             }
             if ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
@@ -84,6 +85,7 @@ class ProcessExecutorTask extends AbstractConfigurableTask
 
     /**
      * {@inheritdoc}
+     * @throws \InvalidArgumentException
      */
     public function initialize(ProcessState $state)
     {
@@ -93,6 +95,8 @@ class ProcessExecutorTask extends AbstractConfigurableTask
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \Symfony\Component\Form\Exception\InvalidConfigurationException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
@@ -106,7 +110,8 @@ class ProcessExecutorTask extends AbstractConfigurableTask
         );
         $resolver->addAllowedTypes('process', 'string');
         $resolver->setAllowedTypes('context', ['array']);
-        $resolver->setNormalizer('process',
+        $resolver->setNormalizer(
+            'process',
             function (Options $options, $processCode) {
                 if (!$this->processRegistry->hasProcessConfiguration($processCode)) {
                     throw new InvalidConfigurationException("Unknown process {$processCode}");

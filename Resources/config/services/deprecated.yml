@@ -1,0 +1,194 @@
+services:
+    cleverage_process.event_listener.data_queue:
+        alias: CleverAge\ProcessBundle\EventListener\DataQueueEventListener
+        public: true
+
+    cleverage_process.manager.process:
+        alias: CleverAge\ProcessBundle\Manager\ProcessManager
+        public: true
+
+    cleverage_process.registry.transformer:
+        alias: CleverAge\ProcessBundle\Registry\TransformerRegistry
+
+    cleverage_process.task.dummy:
+        alias: CleverAge\ProcessBundle\Task\DummyTask
+
+    cleverage_process.task.constant_output:
+        alias: CleverAge\ProcessBundle\Task\ConstantOutputTask
+        
+    cleverage_process.task.constant_iterable_output:
+        alias: CleverAge\ProcessBundle\Task\ConstantIterableOutputTask
+
+    cleverage_process.task.yaml_reader:
+        alias: CleverAge\ProcessBundle\Task\YamlReaderTask
+        
+    cleverage_process.task.debug:
+        alias: CleverAge\ProcessBundle\Task\DebugTask
+
+    cleverage_process.task.die:
+        alias: CleverAge\ProcessBundle\Task\DieTask
+
+    cleverage_process.task.logger:
+        alias: CleverAge\ProcessBundle\Task\LoggerTask
+        
+    cleverage_process.task.validator:
+        alias: CleverAge\ProcessBundle\Task\ValidatorTask
+
+    cleverage_process.task.serializer:
+        alias: CleverAge\ProcessBundle\Task\SerializerTask
+
+    cleverage_process.task.normalizer:
+        alias: CleverAge\ProcessBundle\Task\NormalizerTask
+        
+    cleverage_process.task.denormalizer:
+        alias: CleverAge\ProcessBundle\Task\DenormalizerTask
+        
+    cleverage_process.task.property_setter:
+        alias: CleverAge\ProcessBundle\Task\PropertySetterTask
+
+    cleverage_process.task.property_getter:
+        alias: CleverAge\ProcessBundle\Task\PropertyGetterTask
+        
+    cleverage_process.task.csv_reader:
+        alias: CleverAge\ProcessBundle\Task\CsvReaderTask
+        
+    cleverage_process.task.csv_writer:
+        alias: CleverAge\ProcessBundle\Task\CsvWriterTask
+
+    cleverage_process.task.csv_input_reader:
+        alias: CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask
+
+    cleverage_process.task.csv_splitter:
+        alias: CleverAge\ProcessBundle\Task\File\Csv\CsvSplitterTask
+
+    cleverage_process.task.database_reader:
+        alias: CleverAge\ProcessBundle\Task\DatabaseReaderTask
+
+    cleverage_process.task.doctrine_reader:
+        alias: CleverAge\ProcessBundle\Task\DoctrineReaderTask
+        
+    cleverage_process.task.doctrine_writer:
+        alias: CleverAge\ProcessBundle\Task\DoctrineWriterTask
+        
+    cleverage_process.task.doctrine_detacher:
+        alias: CleverAge\ProcessBundle\Task\DoctrineDetacherTask
+        
+    cleverage_process.task.doctrine_remover:
+        alias: CleverAge\ProcessBundle\Task\DoctrineRemoverTask
+        
+    cleverage_process.task.stat_counter:
+        alias: CleverAge\ProcessBundle\Task\StatCounterTask
+
+    cleverage_process.task.advanced_stat_counter:
+        alias: CleverAge\ProcessBundle\Task\Reporting\AdvancedStatCounterTask
+
+    cleverage_process.task.transformer:
+        alias: CleverAge\ProcessBundle\Task\TransformerTask
+        
+    cleverage_process.task.process_launcher:
+        alias: CleverAge\ProcessBundle\Task\ProcessLauncherTask
+
+    cleverage_process.task.folder_browser:
+        alias: CleverAge\ProcessBundle\Task\FolderBrowserTask
+        
+    cleverage_process.task.file_remover:
+        alias: CleverAge\ProcessBundle\Task\FileRemoverTask
+        
+    cleverage_process.task.file_mover:
+        alias: CleverAge\ProcessBundle\Task\FileMoverTask
+
+    cleverage_process.task.file_writer:
+        alias: CleverAge\ProcessBundle\Task\FileWriterTask
+        
+    cleverage_process.task.aggregate_iterable:
+        alias: CleverAge\ProcessBundle\Task\AggregateIterableTask
+        
+    cleverage_process.task.filter:
+        alias: CleverAge\ProcessBundle\Task\FilterTask
+        
+    cleverage_process.task.event_dispatcher:
+        alias: CleverAge\ProcessBundle\Task\EventDispatcherTask
+
+    cleverage_process.task.input_iterator:
+        alias: CleverAge\ProcessBundle\Task\InputIteratorTask
+
+    cleverage_process.task.input_aggregator:
+        alias: CleverAge\ProcessBundle\Task\InputAggregatorTask
+        
+    cleverage_process.task.error_forwarder:
+        alias: CleverAge\ProcessBundle\Task\ErrorForwarderTask
+
+    cleverage_process.task.skip_empty:
+        alias: CleverAge\ProcessBundle\Task\SkipEmptyTask
+
+    cleverage_process.task.stop:
+        alias: CleverAge\ProcessBundle\Task\StopTask
+
+    cleverage_process.task.array_merge:
+        alias: CleverAge\ProcessBundle\Task\ArrayMergeTask
+
+    cleverage_process.task.process_executor:
+        alias: CleverAge\ProcessBundle\Task\ProcessExecutorTask
+
+    cleverage_process.task.file_fetch:
+        alias: CleverAge\ProcessBundle\Task\File\FileFetchTask
+
+    cleverage_process.task.row_aggregator:
+        alias: CleverAge\ProcessBundle\Task\RowAggregatorTask
+
+    cleverage_process.transformer.mapping:
+        alias: CleverAge\ProcessBundle\Transformer\MappingTransformer
+
+    cleverage_process.transformer.slugify:
+        alias: CleverAge\ProcessBundle\Transformer\SlugifyTransformer
+
+    cleverage_process.transformer.explode:
+        alias: CleverAge\ProcessBundle\Transformer\ExplodeTransformer
+
+    cleverage_process.transformer.implode:
+        alias: CleverAge\ProcessBundle\Transformer\ImplodeTransformer
+
+    cleverage_process.transformer.trim:
+        alias: CleverAge\ProcessBundle\Transformer\TrimTransformer
+
+    cleverage_process.transformer.sprintf:
+        alias: CleverAge\ProcessBundle\Transformer\SprintfTransformer
+
+    cleverage_process.transformer.array_map:
+        alias: CleverAge\ProcessBundle\Transformer\ArrayMapTransformer
+
+    cleverage_process.transformer.array_first:
+        alias: CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer
+
+    cleverage_process.transformer.property_accessor:
+        alias: CleverAge\ProcessBundle\Transformer\PropertyAccessorTransformer
+
+    cleverage_process.transformer.recursive_property_setter:
+        alias: CleverAge\ProcessBundle\Transformer\RecursivePropertySetterTransformer
+
+    cleverage_process.transformer.denormalize:
+        alias: CleverAge\ProcessBundle\Transformer\DenormalizeTransformer
+
+    cleverage_process.transformer.normalize:
+        alias: CleverAge\ProcessBundle\Transformer\NormalizeTransformer
+
+    cleverage_process.transformer.convert_value:
+        alias: CleverAge\ProcessBundle\Transformer\ConvertValueTransformer
+
+    cleverage_process.transformer.callback:
+        alias: CleverAge\ProcessBundle\Transformer\CallbackTransformer
+
+    cleverage_process.transformer.wrapper:
+        alias: CleverAge\ProcessBundle\Transformer\WrapperTransformer
+
+    cleverage_process.transformer.evaluator:
+        alias: CleverAge\ProcessBundle\Transformer\EvaluatorTransformer
+
+    cleverage_process.transformer.preg_filter:
+        alias: CleverAge\ProcessBundle\Transformer\PregFilterTransformer
+
+    cleverage_process.transformer.date_format:
+        alias: CleverAge\ProcessBundle\Transformer\DateFormatTransformer
+
+    cleverage_process.transformer.default:
+        alias: CleverAge\ProcessBundle\Transformer\DefaultTransformer

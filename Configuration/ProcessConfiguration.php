@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -48,8 +48,13 @@ class ProcessConfiguration
      * @param string              $entryPoint
      * @param string              $endPoint
      */
-    public function __construct($code, array $taskConfigurations, array $options = [], $entryPoint = null, $endPoint = null)
-    {
+    public function __construct(
+        $code,
+        array $taskConfigurations,
+        array $options = [],
+        $entryPoint = null,
+        $endPoint = null
+    ) {
         $this->code = $code;
         $this->taskConfigurations = $taskConfigurations;
         $this->options = $options;
@@ -126,9 +131,10 @@ class ProcessConfiguration
     }
 
     /**
+     * @deprecated
+     *
      * @param TaskConfiguration $currentTaskConfiguration
      *
-     * @deprecated
      * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
      *
      * @return TaskConfiguration[]
@@ -139,9 +145,10 @@ class ProcessConfiguration
     }
 
     /**
+     * @deprecated
+     *
      * @param TaskConfiguration $currentTaskConfiguration
      *
-     * @deprecated
      * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
      *
      * @return TaskConfiguration[]
@@ -156,16 +163,18 @@ class ProcessConfiguration
      *
      * If one task depend from another, it should come after
      *
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     *
      * @return array
      */
     public function getDependencyGroups(): array
     {
-        if (!isset($this->dependencyGroups)) {
+        if (null === $this->dependencyGroups) {
             $this->dependencyGroups = [];
             foreach ($this->getTaskConfigurations() as $taskConfiguration) {
                 $isInBranch = false;
                 foreach ($this->dependencyGroups as $branch) {
-                    if (in_array($taskConfiguration->getCode(), $branch)) {
+                    if (\in_array($taskConfiguration->getCode(), $branch, true)) {
                         $isInBranch = true;
                         break;
                     }
@@ -189,15 +198,17 @@ class ProcessConfiguration
      *
      * If one task depend from another, it should come after
      *
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     *
      * @return array
      */
     public function getMainTaskGroup(): array
     {
-        if (!isset($this->mainTaskGroup)) {
+        if (null === $this->mainTaskGroup) {
             $mainTask = $this->getMainTask();
 
             foreach ($this->getDependencyGroups() as $branch) {
-                if (in_array($mainTask->getCode(), $branch)) {
+                if (\in_array($mainTask->getCode(), $branch, true)) {
                     $this->mainTaskGroup = $branch;
                     break;
                 }
@@ -210,6 +221,8 @@ class ProcessConfiguration
     /**
      * Get the most important task (may be the entry or end task, or simply the first)
      * Used to check which tree should be used
+     *
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
      *
      * @return TaskConfiguration
      */
@@ -239,7 +252,7 @@ class ProcessConfiguration
         $code = $taskConfig->getCode();
 
         // May have been added by previous task
-        if (!in_array($code, $dependencies)) {
+        if (!\in_array($code, $dependencies, true)) {
             $dependencies[] = $code;
 
             foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
@@ -263,15 +276,18 @@ class ProcessConfiguration
      *
      * @param array $dependencies
      *
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     *
      * @return array
      */
     protected function sortDependencies(array $dependencies)
     {
-        if (count($dependencies) <= 1) {
+        if (\count($dependencies) <= 1) {
             return $dependencies;
         }
 
-        $midOffset = (int)count($dependencies) / 2;
+        /** @var int $midOffset */
+        $midOffset = \count($dependencies) / 2;
         $midTaskCode = $dependencies[$midOffset];
         $midTask = $this->getTaskConfiguration($midTaskCode);
 
@@ -297,6 +313,6 @@ class ProcessConfiguration
         $independentTasks = $this->sortDependencies($independentTasks);
         $nextTasks = $this->sortDependencies($nextTasks);
 
-        return array_merge($previousTasks,[$midTaskCode], $independentTasks, $nextTasks);
+        return array_merge($previousTasks, [$midTaskCode], $independentTasks, $nextTasks);
     }
 }

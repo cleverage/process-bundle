@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -23,12 +23,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
+ *
+ * @property CsvFile $csv
  */
 class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 {
-    /** @var CsvFile */
-    protected $csv;
-
     /**
      * @param ProcessState $state
      *
@@ -80,7 +79,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         parent::configureOptions($resolver);
         $resolver->setDefaults(
             [
-                'mode'            => 'w',
+                'mode' => 'w',
                 'split_character' => '|',
             ]
         );
@@ -88,8 +87,12 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         $resolver->setNormalizer(
             'file_path',
             function (Options $options, $value) {
-                $value = str_replace('{date}', (new \DateTime())->format('Ymd'), $value);
-                $value = str_replace('{date_time}', (new \DateTime())->format('Ymd_His'), $value);
+                $value = str_replace(
+                    ['{date}', '{date_time}'],
+                    [(new \DateTime())->format('Ymd'), (new \DateTime())->format('Ymd_His')],
+                    $value
+                );
+
                 return $value;
             }
         );
@@ -107,14 +110,14 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     protected function getInput(ProcessState $state)
     {
         $input = $state->getInput();
-        if (!is_array($input)) {
+        if (!\is_array($input)) {
             throw new \UnexpectedValueException('Input value is not an array');
         }
         $splitCharacter = $this->getOption($state, 'split_character');
 
         /** @var array $input */
         foreach ($input as $key => &$item) {
-            if (is_array($item)) {
+            if (\is_array($item)) {
                 $item = implode($splitCharacter, $item);
             }
         }

@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -30,9 +30,9 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class ProcessHistory
 {
-    const STATE_STARTED = 'started';
-    const STATE_SUCCESS = 'success';
-    const STATE_FAILED = 'failed';
+    public const STATE_STARTED = 'started';
+    public const STATE_SUCCESS = 'success';
+    public const STATE_FAILED = 'failed';
 
     /**
      * @var int
@@ -178,7 +178,7 @@ class ProcessHistory
     public function __toString()
     {
         $reference = $this->getProcessCode().'['.$this->getState().']';
-        $time = $this->getStartDate()->format(\DateTime::ISO8601);
+        $time = $this->getStartDate()->format(\DateTime::ATOM);
 
         return $reference.': '.$time;
     }

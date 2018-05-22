@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2018 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
@@ -36,7 +44,7 @@ class CsvSplitterTask extends InputCsvReaderTask
             );
 
             $output = $state->getConsoleOutput();
-            if ($csv->getLineCount() > $options['max_lines'] && $output) {
+            if ($output && $csv->getLineCount() > $options['max_lines']) {
                 $output->writeln("<info>Found big CSV file ({$csv->getLineCount()} lines), splitting...</info>");
             }
             $this->csv = $csv;
@@ -100,7 +108,7 @@ class CsvSplitterTask extends InputCsvReaderTask
     protected function splitCsv(CsvFile $csv, $maxLines)
     {
         $tmpFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_'.uniqid('process', false).'.csv';
-        $tmpFile = fopen($tmpFilePath, 'w+');
+        $tmpFile = fopen($tmpFilePath, 'wb+');
         if (false === $tmpFile) {
             throw new \RuntimeException("Unable to open temporary file {$tmpFilePath}");
         }

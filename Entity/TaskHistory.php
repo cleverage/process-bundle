@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -207,7 +207,7 @@ class TaskHistory
     public function __toString()
     {
         $reference = $this->getProcessHistory()->getProcessCode().'/'.$this->getTaskCode();
-        $time = $this->getLoggedAt()->format(\DateTime::ISO8601);
+        $time = $this->getLoggedAt()->format(\DateTime::ATOM);
 
         return $reference.': '.$time;
     }

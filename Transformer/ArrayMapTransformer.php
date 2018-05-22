@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -39,7 +39,7 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface, Transform
      */
     public function transform($values, array $options = [])
     {
-        if (!is_array($values) && !$values instanceof \Traversable) {
+        if (!\is_array($values) && !$values instanceof \Traversable) {
             throw new \UnexpectedValueException('Input value must be an array or traversable');
         }
 
@@ -108,7 +108,7 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface, Transform
                     if ($transformer instanceof ConfigurableTransformerInterface) {
                         $transformer->configureOptions($transformerOptionsResolver);
                         $transformerOptions = $transformerOptionsResolver->resolve(
-                            null === $transformerOptions ? [] : $transformerOptions
+                            $transformerOptions ?? []
                         );
                     }
                 }

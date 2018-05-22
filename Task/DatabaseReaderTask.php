@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -13,7 +13,7 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -27,7 +27,7 @@ use Doctrine\DBAL\Driver\PDOStatement;
  */
 class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTaskInterface, FinalizableTaskInterface
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
     /** @var PDOStatement */
@@ -37,9 +37,9 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
     protected $nextItem;
 
     /**
-     * @param Registry $doctrine
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(Registry $doctrine)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
     }
@@ -51,8 +51,9 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
      *
      * @param ProcessState $state
      *
-     * @return bool
      * @throws \LogicException
+     *
+     * @return bool
      */
     public function next(ProcessState $state)
     {
@@ -98,7 +99,7 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
         if (null !== $options['paginate']) {
             $results = [];
             $i = 0;
-            while ($result !== false && $i++ < $options['paginate']) {
+            while (false !== $result && $i++ < $options['paginate']) {
                 $results[] = $result;
                 $result = $this->statement->fetch();
             }
@@ -120,6 +121,10 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
 
     /**
      * @param ProcessState $state
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \InvalidArgumentException
+     * @throws \Doctrine\DBAL\DBALException
      *
      * @return \Doctrine\DBAL\Driver\Statement
      */
@@ -185,6 +190,8 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
      */
     protected function getConnection(ProcessState $state)
     {
+        /** @noinspection PhpIncompatibleReturnTypeInspection */
+
         return $this->doctrine->getConnection($this->getOption($state, 'connection'));
     }
 }

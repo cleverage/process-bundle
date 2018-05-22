@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2018 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Task;
 
@@ -10,7 +18,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class FileWriterTask
  *
- * @package CleverAge\ProcessBundle\Task
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class FileWriterTask extends AbstractConfigurableTask
@@ -18,6 +25,7 @@ class FileWriterTask extends AbstractConfigurableTask
     /**
      * @param ProcessState $state
      *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Symfony\Component\Filesystem\Exception\IOException
      */
     public function execute(ProcessState $state)

@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2018 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Task;
 
@@ -27,6 +35,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
      * Once an output has been generated this task is reset, and may wait for another loop
      *
      * @param ProcessState $state
+     *
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
@@ -96,6 +105,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
 
     /**
      * @param OptionsResolver $resolver
+     *
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */

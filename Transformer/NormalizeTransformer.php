@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -54,6 +54,15 @@ class NormalizeTransformer implements ConfigurableTransformerInterface
      * @param mixed $value
      * @param array $options
      *
+     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws \Symfony\Component\Serializer\Exception\LogicException
+     * @throws \Symfony\Component\Serializer\Exception\InvalidArgumentException
+     * @throws \Symfony\Component\Serializer\Exception\CircularReferenceException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      *
      * @return mixed

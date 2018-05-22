@@ -48,6 +48,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
      * @param mixed $input
      * @param array $options
      *
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
@@ -93,7 +94,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 $transformedValue = null;
             } else {
                 $sourceProperty = $mapping['code'] ?? $targetProperty;
-                if (is_array($sourceProperty)) {
+                if (\is_array($sourceProperty)) {
                     $transformedValue = [];
                     /** @var array $sourceProperty */
                     foreach ($sourceProperty as $destKey => $srcKey) {
@@ -132,9 +133,9 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                 throw new TransformerException($targetProperty, 0, $exception);
             }
 
-            if (is_callable($options['merge_callback'])) {
+            if (\is_callable($options['merge_callback'])) {
                 $options['merge_callback']($result, $targetProperty, $transformedValue);
-            } elseif (is_array($result)) {
+            } elseif (\is_array($result)) {
                 $result[$targetProperty] = $transformedValue;
             } else {
                 $this->accessor->setValue($result, $targetProperty, $transformedValue);
@@ -147,6 +148,13 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
     /**
      * @param OptionsResolver $resolver
      *
+     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     public function configureOptions(OptionsResolver $resolver)
@@ -211,6 +219,13 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
     /**
      * @param OptionsResolver $resolver
      *
+     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
+     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     protected function configureMappingOptions(OptionsResolver $resolver)
@@ -252,11 +267,13 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
     }
 
     /**
-     * @param $transformerCode
-     * @return string
+     * @param string $transformerCode
+     *
      * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
+     *
+     * @return string
      */
-    protected function getCleanedTransfomerCode($transformerCode)
+    protected function getCleanedTransfomerCode(string $transformerCode)
     {
         if (!$this->transformerCodes) {
             $this->transformerCodes = array_keys($this->transformerRegistry->getTransformers());
@@ -267,11 +284,8 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
         );
         $match = preg_match($pattern, $transformerCode, $parts);
 
-        if (1 === $match) {
-            if ($this->transformerRegistry->hasTransformer($parts[1])) {
-                return $parts[1];
-            }
-
+        if (1 === $match && $this->transformerRegistry->hasTransformer($parts[1])) {
+            return $parts[1];
         }
 
         return $transformerCode;

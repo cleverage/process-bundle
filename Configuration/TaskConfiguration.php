@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -239,7 +239,7 @@ class TaskConfiguration
     public function hasAncestor(TaskConfiguration $taskConfig)
     {
         foreach ($this->getPreviousTasksConfigurations() as $previousTasksConfig) {
-            if ($previousTasksConfig->getCode() === $taskConfig->getCode() || $previousTasksConfig->hasAncestor($taskConfig)) {
+            if ($previousTasksConfig->hasAncestor($taskConfig) || $previousTasksConfig->getCode() === $taskConfig->getCode()) {
                 return true;
             }
         }
@@ -258,14 +258,14 @@ class TaskConfiguration
     public function hasDescendant(TaskConfiguration $taskConfig, $checkErrors = true)
     {
         foreach ($this->getNextTasksConfigurations() as $errorTasksConfig) {
-            if ($errorTasksConfig->getCode() === $taskConfig->getCode() || $errorTasksConfig->hasDescendant($taskConfig, $checkErrors)) {
+            if ($errorTasksConfig->hasDescendant($taskConfig, $checkErrors) || $errorTasksConfig->getCode() === $taskConfig->getCode()) {
                 return true;
             }
         }
 
         if ($checkErrors) {
             foreach ($this->getErrorTasksConfigurations() as $errorTasksConfig) {
-                if ($errorTasksConfig->getCode() === $taskConfig->getCode() || $errorTasksConfig->hasDescendant($taskConfig, $checkErrors)) {
+                if ($errorTasksConfig->hasDescendant($taskConfig, $checkErrors) || $errorTasksConfig->getCode() === $taskConfig->getCode()) {
                     return true;
                 }
             }
