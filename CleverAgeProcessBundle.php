@@ -1,24 +1,23 @@
 <?php
- /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+/*
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle;
 
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
+use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 
 /**
- * @package CleverAge\ProcessBundle
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
+ * @author  Valentin Clavreul <vclavreul@clever-age.com>
+ * @author  Vincent Chalnot <vchalnot@clever-age.com>
  */
 class CleverAgeProcessBundle extends Bundle
 {
@@ -31,7 +30,7 @@ class CleverAgeProcessBundle extends Bundle
     {
         $container->addCompilerPass(
             new RegistryCompilerPass(
-                'cleverage_process.registry.transformer',
+                TransformerRegistry::class,
                 'cleverage.transformer',
                 'addTransformer'
             )

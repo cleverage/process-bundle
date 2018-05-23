@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -11,7 +11,8 @@
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -24,13 +25,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractDoctrineTask extends AbstractConfigurableTask
 {
-    /** @var Registry */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
     /**
-     * @param Registry $doctrine
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(Registry $doctrine)
+    public function __construct(ManagerRegistry $doctrine)
     {
         $this->doctrine = $doctrine;
     }
@@ -54,7 +55,7 @@ abstract class AbstractDoctrineTask extends AbstractConfigurableTask
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      *
-     * @return EntityManager
+     * @return EntityManager|ObjectManager
      */
     protected function getManager(ProcessState $state)
     {

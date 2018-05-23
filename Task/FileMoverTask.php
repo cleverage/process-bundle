@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -85,7 +85,7 @@ class FileMoverTask extends AbstractConfigurableTask
         while ($fs->exists($dest)) {
             if (preg_match('/^(.*?)(-\d+)?(\.[^\.]*)$/', $dest, $matches)) {
                 $dest = $matches[1].'-'.$i.$matches[3];
-                $i++;
+                ++$i;
             } else {
                 $dest .= '-'.$i; // Fallback brutal mode
             }

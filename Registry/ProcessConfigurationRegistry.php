@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -27,6 +27,8 @@ class ProcessConfigurationRegistry
 
     /**
      * @param array $rawConfiguration
+     *
+     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
      */
     public function __construct(array $rawConfiguration)
     {
@@ -124,7 +126,7 @@ class ProcessConfigurationRegistry
      * @param TaskConfiguration $taskConfig
      * @param bool              $isErrorBranch
      */
-    protected function markErrorBranch(TaskConfiguration $taskConfig, $isErrorBranch = true)
+    protected function markErrorBranch(TaskConfiguration $taskConfig, $isErrorBranch = true): void
     {
         $taskConfig->setInErrorBranch($isErrorBranch);
         foreach ($taskConfig->getNextTasksConfigurations() as $nextTasksConfig) {

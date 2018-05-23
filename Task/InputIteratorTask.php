@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2018 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Task;
 
@@ -9,7 +17,6 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 /**
  * Class InputIteratorTask
  *
- * @package CleverAge\ProcessBundle\Task
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class InputIteratorTask extends AbstractConfigurableTask implements IterableTaskInterface
@@ -26,7 +33,7 @@ class InputIteratorTask extends AbstractConfigurableTask implements IterableTask
     public function execute(ProcessState $state)
     {
         // Recreate an iterator with input if the current iterator is finish
-        if (null === $this->iterator || (!$this->iterator->valid() && is_array($state->getInput()))) {
+        if (null === $this->iterator || (!$this->iterator->valid() && \is_array($state->getInput()))) {
             $this->iterator = new \ArrayIterator($state->getInput());
         }
 

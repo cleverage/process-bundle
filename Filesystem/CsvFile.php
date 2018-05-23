@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -22,13 +22,14 @@ class CsvFile extends CsvResource
     protected $filePath;
 
     /**
-     * @param string $filePath Also accept a resource
-     * @param string $delimiter
+     * @param string $filePath  Also accept a resource
+     * @param string $delimiter CSV delimiter
      * @param string $enclosure
      * @param string $escape
-     * @param array  $headers  Leave null to read the headers from the file
-     * @param string $mode     Same parameter as the mode in the fopen function (r, w, a, etc.)
+     * @param array  $headers   Leave null to read the headers from the file
+     * @param string $mode      Same parameter as the mode in the fopen function (r, w, a, etc.)
      *
+     * @throws \RuntimeException
      * @throws \UnexpectedValueException
      */
     public function __construct(
@@ -41,9 +42,9 @@ class CsvFile extends CsvResource
     ) {
         $this->filePath = $filePath;
 
-        $dirname = dirname($this->filePath);
-        if (!is_dir($dirname)) {
-            mkdir($dirname, 0755, true);
+        $dirname = \dirname($this->filePath);
+        if (!@mkdir($dirname, 0755, true) && !is_dir($dirname)) {
+            throw new \RuntimeException(sprintf('Directory "%s" was not created', $dirname));
         }
 
         $resource = fopen($filePath, $mode);
@@ -51,7 +52,7 @@ class CsvFile extends CsvResource
             throw new \UnexpectedValueException("Unable to open file: '{$filePath}' in {$mode} mode");
         }
         // Cannot read headers if the file was just created
-        if (null === $headers && !in_array($mode, ['r', 'r+', 'w+', 'a+', 'x+', 'c+'], true)) {
+        if (null === $headers && !\in_array($mode, ['r', 'r+', 'w+', 'a+', 'x+', 'c+'], true)) {
             throw new \UnexpectedValueException(
                 "Invalid headers for {$this->getResourceName()}, you need to pass the headers manually"
             );

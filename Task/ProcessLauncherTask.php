@@ -69,7 +69,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
         $this->handleProcesses($state); // Handler processes first
 
         $options = $this->getOptions($state);
-        while (count($this->launchedProcesses) >= $options['max_processes']) {
+        while (\count($this->launchedProcesses) >= $options['max_processes']) {
             $this->handleProcesses($state);
             sleep($options['sleep_interval']);
         }
@@ -87,14 +87,14 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
      */
     public function finalize(ProcessState $state)
     {
-        $processCount = count($this->launchedProcesses);
+        $processCount = \count($this->launchedProcesses);
         if (0 === $processCount) {
             return;
         }
 
         $output = $state->getConsoleOutput();
-        while (count($this->launchedProcesses) > 0) {
-            $processCount = count($this->launchedProcesses);
+        while (\count($this->launchedProcesses) > 0) {
+            $processCount = \count($this->launchedProcesses);
             if ($output) {
                 $output->writeln("<info>Waiting for {$processCount} processes to end...</info>");
             }
@@ -162,8 +162,8 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
 
         if ($consoleOutput) {
             $consoleOutput->writeln("<info>{$process->getCommandLine()}</info>");
-            if ($consoleOutput->isVeryVerbose() && function_exists('dump')) {
-                $consoleOutput->writeln("<info>Input:</info>");
+            if ($consoleOutput->isVeryVerbose() && \function_exists('dump')) {
+                $consoleOutput->writeln('<info>Input:</info>');
                 dump($state->getInput());
             }
         }
@@ -171,7 +171,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
         $process->start(
             function ($type, $output) use ($consoleOutput) {
                 if ($consoleOutput) {
-                    if ($type === 'err') {
+                    if ('err' === $type) {
                         $consoleOutput->write('<error>'.$output.'</error>');
                     } else {
                         $consoleOutput->write($output);

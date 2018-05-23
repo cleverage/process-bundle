@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -15,7 +15,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class WrapperTransformer
  *
- * @package Transformer
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class WrapperTransformer implements ConfigurableTransformerInterface
@@ -27,6 +26,7 @@ class WrapperTransformer implements ConfigurableTransformerInterface
      * @param mixed $input
      * @param array $options
      *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Exception
      *
      * @return mixed $value

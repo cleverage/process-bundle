@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2018 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Task\File;
 
@@ -15,7 +23,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Copy (or move) file from one filesystem to another, using Flysystem
  * Either get files using a file regexp, or take files from input
  *
- * @package CleverAge\ProcessBundle\Task\File
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInterface
@@ -34,8 +41,6 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
     protected $matchingFiles = [];
 
     /**
-     * FileFetchTask constructor.
-     *
      * @param MountManager $mountManager
      */
     public function __construct(MountManager $mountManager)
@@ -45,6 +50,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
 
     /**
      * @param ProcessState $state
+     *
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \League\Flysystem\FilesystemNotFoundException
@@ -60,6 +66,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
 
     /**
      * @param ProcessState $state
+     *
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \UnexpectedValueException
@@ -81,6 +88,15 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
         $state->setOutput($file);
     }
 
+    /**
+     * @param ProcessState $state
+     *
+     * @throws \UnexpectedValueException
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \InvalidArgumentException
+     *
+     * @return bool|mixed
+     */
     public function next(ProcessState $state)
     {
         $this->findMatchingFiles($state);
@@ -90,6 +106,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
 
     /**
      * @param ProcessState $state
+     *
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
@@ -101,7 +118,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
             foreach ($this->sourceFS->listContents('/') as $file) {
                 if ('file' === $file['type']
                     && preg_match($filePattern, $file['path'])
-                    && !in_array($file['path'], $this->matchingFiles, true)) {
+                    && !\in_array($file['path'], $this->matchingFiles, true)) {
                     $this->matchingFiles[] = $file['path'];
                 }
             }
@@ -110,14 +127,14 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
             if (!$input) {
                 throw new \UnexpectedValueException('No pattern neither input provided for the Task');
             }
-            if (is_array($input)) {
+            if (\is_array($input)) {
                 foreach ($input as $file) {
-                    if (!in_array($file, $this->matchingFiles, true)) {
+                    if (!\in_array($file, $this->matchingFiles, true)) {
                         $this->matchingFiles[] = $file;
                     }
                 }
             } else {
-                if (!in_array($input, $this->matchingFiles, true)) {
+                if (!\in_array($input, $this->matchingFiles, true)) {
                     $this->matchingFiles[] = $input;
                 }
             }
@@ -128,11 +145,13 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
      * @param ProcessState $state
      * @param string       $filename
      * @param bool         $removeSource
-     * @return mixed
+     *
      * @throws \League\Flysystem\FileNotFoundException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \League\Flysystem\FilesystemNotFoundException
      * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
     protected function doFileCopy(ProcessState $state, $filename, $removeSource)
     {
@@ -141,13 +160,13 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
 
         $buffer = $this->mountManager->getFilesystem($prefixFrom)->readStream($filename);
 
-        if ($buffer === false) {
+        if (false === $buffer) {
             return false;
         }
 
         $result = $this->mountManager->getFilesystem($prefixTo)->putStream($filename, $buffer);
 
-        if (is_resource($buffer)) {
+        if (\is_resource($buffer)) {
             fclose($buffer);
         }
 

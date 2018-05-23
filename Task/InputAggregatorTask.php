@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -31,6 +31,7 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
      * Once an output has been generated this task is reset, and may wait for another loop
      *
      * @param ProcessState $state
+     *
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
@@ -39,7 +40,7 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
     {
         $previousState = $state->getPreviousState();
         if (!$previousState || !$previousState->getTaskConfiguration()) {
-            throw new \UnexpectedValueException("This task cannot be used without a previous task");
+            throw new \UnexpectedValueException('This task cannot be used without a previous task');
         }
 
         $cleanInputOnOverride = $this->getOption($state, 'clean_input_on_override');
@@ -63,13 +64,13 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
         } else {
             $state->setSkipped(true);
         }
-
     }
 
     /**
      * If there is pending inputs, something went wrong
      *
      * @param ProcessState $state
+     *
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
@@ -80,6 +81,7 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
 
     /**
      * @param OptionsResolver $resolver
+     *
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */
@@ -98,10 +100,11 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
      *
      * @param ProcessState $state
      *
-     * @return string
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
+     *
+     * @return string
      */
     protected function getInputCode(ProcessState $state)
     {
@@ -120,9 +123,10 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
      *
      * @param ProcessState $state
      *
-     * @return bool
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \InvalidArgumentException
+     *
+     * @return bool
      */
     protected function isResolved(ProcessState $state)
     {

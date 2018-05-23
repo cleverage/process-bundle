@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -9,7 +9,6 @@
  */
 
 namespace CleverAge\ProcessBundle\Tests;
-
 
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -36,14 +35,16 @@ abstract class AbstractProcessTest extends KernelTestCase
      */
     protected function setUp()
     {
-        $kernel = static::bootKernel([
-            'environment' => 'test',
-            'debug'       => true,
-        ]);
+        $kernel = static::bootKernel(
+            [
+                'environment' => 'test',
+                'debug' => true,
+            ]
+        );
 
         $this->container = $kernel->getContainer();
-        $this->processManager = $this->container->get('cleverage_process.manager.process');
-        $this->processConfigurationRegistry = $this->container->get('cleverage_process.registry.process_configuration');
+        $this->processManager = $this->container->get(ProcessManager::class);
+        $this->processConfigurationRegistry = $this->container->get(ProcessConfigurationRegistry::class);
     }
 
     /**
@@ -59,7 +60,7 @@ abstract class AbstractProcessTest extends KernelTestCase
         $dataQueueListener = $this->container->get('cleverage_process.event_listener.data_queue');
         $actualQueue = $dataQueueListener->getQueue($processName);
 
-        self::assertEquals(count($expected), count($actualQueue), "Event count does not match");
+        self::assertEquals(\count($expected), \count($actualQueue), 'Event count does not match');
 
         /**
          * @var int          $key
@@ -69,14 +70,17 @@ abstract class AbstractProcessTest extends KernelTestCase
             self::assertArrayHasKey($key, $expected);
             if ($checkTask) {
                 if (array_key_exists('task', $expected[$key])) {
-                    self::assertEquals($expected[$key]['task'], $value->getPreviousState()->getTaskConfiguration()->getCode(), "Task #{$key} does not match");
+                    self::assertEquals(
+                        $expected[$key]['task'],
+                        $value->getPreviousState()->getTaskConfiguration()->getCode(),
+                        "Task #{$key} does not match"
+                    );
                 }
                 if (array_key_exists('value', $expected[$key])) {
                     self::assertEquals($expected[$key]['value'], $value->getInput(), "Value #{$key} does not match");
                 }
             } else {
                 self::assertEquals($expected[$key], $value->getInput(), "Value #{$key} does not match");
-
             }
         }
     }

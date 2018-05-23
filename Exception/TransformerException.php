@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -28,6 +28,6 @@ class TransformerException extends \RuntimeException implements ProcessException
             $m .= ": {$previous->getMessage()}";
         }
 
-        parent::__construct($m, $code,$previous);
+        parent::__construct($m, $code, $previous);
     }
 }

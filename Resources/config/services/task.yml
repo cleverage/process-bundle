@@ -1,191 +1,143 @@
 services:
-    cleverage_process.task.dummy:
-        class: CleverAge\ProcessBundle\Task\DummyTask
+    CleverAge\ProcessBundle\Task\DummyTask:
         shared: false
 
-    cleverage_process.task.constant_output:
-        class: CleverAge\ProcessBundle\Task\ConstantOutputTask
+    CleverAge\ProcessBundle\Task\ConstantOutputTask:
         shared: false
 
-    cleverage_process.task.constant_iterable_output:
-        class: CleverAge\ProcessBundle\Task\ConstantIterableOutputTask
+    CleverAge\ProcessBundle\Task\ConstantIterableOutputTask:
         shared: false
 
-    cleverage_process.task.yaml_reader:
-        class: CleverAge\ProcessBundle\Task\YamlReaderTask
+    CleverAge\ProcessBundle\Task\YamlReaderTask:
         shared: false
 
-    cleverage_process.task.debug:
-        class: CleverAge\ProcessBundle\Task\DebugTask
+    CleverAge\ProcessBundle\Task\DebugTask:
         shared: false
 
-    cleverage_process.task.die:
-        class: CleverAge\ProcessBundle\Task\DieTask
+    CleverAge\ProcessBundle\Task\DieTask:
         shared: false
 
-    cleverage_process.task.logger:
-        class: CleverAge\ProcessBundle\Task\LoggerTask
-        arguments: ['@property_accessor', '@serializer']
+    CleverAge\ProcessBundle\Task\LoggerTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.validator:
-        class: CleverAge\ProcessBundle\Task\ValidatorTask
-        arguments: ['@validator']
+    CleverAge\ProcessBundle\Task\ValidatorTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.serializer:
-        class: CleverAge\ProcessBundle\Task\SerializerTask
-        arguments: ['@serializer']
+    CleverAge\ProcessBundle\Task\SerializerTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.normalizer:
-        class: CleverAge\ProcessBundle\Task\NormalizerTask
-        arguments: ['@serializer']
+    CleverAge\ProcessBundle\Task\NormalizerTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.denormalizer:
-        class: CleverAge\ProcessBundle\Task\DenormalizerTask
-        arguments: ['@serializer']
+    CleverAge\ProcessBundle\Task\DenormalizerTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.property_setter:
-        class: CleverAge\ProcessBundle\Task\PropertySetterTask
-        arguments: ['@property_accessor']
+    CleverAge\ProcessBundle\Task\PropertySetterTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.property_getter:
-        class: CleverAge\ProcessBundle\Task\PropertyGetterTask
-        arguments: ['@property_accessor']
+    CleverAge\ProcessBundle\Task\PropertyGetterTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.csv_reader:
-        class: CleverAge\ProcessBundle\Task\CsvReaderTask
+    CleverAge\ProcessBundle\Task\CsvReaderTask:
         shared: false
 
-    cleverage_process.task.csv_writer:
-        class: CleverAge\ProcessBundle\Task\CsvWriterTask
+    CleverAge\ProcessBundle\Task\CsvWriterTask:
         shared: false
 
-    cleverage_process.task.csv_input_reader:
-        class: CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask
+    CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask:
         shared: false
 
-    cleverage_process.task.csv_splitter:
-        class: CleverAge\ProcessBundle\Task\File\Csv\CsvSplitterTask
+    CleverAge\ProcessBundle\Task\File\Csv\CsvSplitterTask:
         shared: false
 
-    cleverage_process.task.database_reader:
-        class: CleverAge\ProcessBundle\Task\DatabaseReaderTask
-        arguments: ['@doctrine']
+    CleverAge\ProcessBundle\Task\DatabaseReaderTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.doctrine_reader:
-        class: CleverAge\ProcessBundle\Task\DoctrineReaderTask
-        arguments: ['@doctrine']
+    CleverAge\ProcessBundle\Task\DoctrineReaderTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.doctrine_writer:
-        class: CleverAge\ProcessBundle\Task\DoctrineWriterTask
-        arguments: ['@doctrine']
+    CleverAge\ProcessBundle\Task\DoctrineWriterTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.doctrine_detacher:
-        class: CleverAge\ProcessBundle\Task\DoctrineDetacherTask
-        arguments: ['@doctrine']
+    CleverAge\ProcessBundle\Task\DoctrineDetacherTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.doctrine_remover:
-        class: CleverAge\ProcessBundle\Task\DoctrineRemoverTask
-        arguments: ['@doctrine']
+    CleverAge\ProcessBundle\Task\DoctrineRemoverTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.stat_counter:
-        class: CleverAge\ProcessBundle\Task\StatCounterTask
+    CleverAge\ProcessBundle\Task\StatCounterTask:
         shared: false
 
-    cleverage_process.task.advanced_stat_counter:
-        class: CleverAge\ProcessBundle\Task\Reporting\AdvancedStatCounterTask
+    CleverAge\ProcessBundle\Task\Reporting\AdvancedStatCounterTask:
         shared: false
 
-    cleverage_process.task.transformer:
-        class: CleverAge\ProcessBundle\Task\TransformerTask
-        arguments: ['@cleverage_process.registry.transformer']
+    CleverAge\ProcessBundle\Task\TransformerTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.process_launcher:
-        class: CleverAge\ProcessBundle\Task\ProcessLauncherTask
+    CleverAge\ProcessBundle\Task\ProcessLauncherTask:
         shared: false
-        arguments:
-            - '@cleverage_process.registry.process_configuration'
-            - '@kernel'
+        autowire: true
 
-    cleverage_process.task.folder_browser:
-        class: CleverAge\ProcessBundle\Task\FolderBrowserTask
+    CleverAge\ProcessBundle\Task\FolderBrowserTask:
         shared: false
 
-    cleverage_process.task.file_remover:
-        class: CleverAge\ProcessBundle\Task\FileRemoverTask
+    CleverAge\ProcessBundle\Task\FileRemoverTask:
         shared: false
 
-    cleverage_process.task.file_mover:
-        class: CleverAge\ProcessBundle\Task\FileMoverTask
+    CleverAge\ProcessBundle\Task\FileMoverTask:
         shared: false
 
-    cleverage_process.task.file_writer:
-        class: CleverAge\ProcessBundle\Task\FileWriterTask
+    CleverAge\ProcessBundle\Task\FileWriterTask:
         shared: false
 
-    cleverage_process.task.aggregate_iterable:
-        class: CleverAge\ProcessBundle\Task\AggregateIterableTask
+    CleverAge\ProcessBundle\Task\AggregateIterableTask:
         shared: false
 
-    cleverage_process.task.filter:
-        class: CleverAge\ProcessBundle\Task\FilterTask
+    CleverAge\ProcessBundle\Task\FilterTask:
         shared: false
 
-    cleverage_process.task.event_dispatcher:
-        class: CleverAge\ProcessBundle\Task\EventDispatcherTask
-        shared: false
-        arguments:
-            - '@event_dispatcher'
-
-    cleverage_process.task.input_iterator:
-        class: CleverAge\ProcessBundle\Task\InputIteratorTask
+    CleverAge\ProcessBundle\Task\EventDispatcherTask:
+        autowire: true
         shared: false
 
-    cleverage_process.task.input_aggregator:
-        class: CleverAge\ProcessBundle\Task\InputAggregatorTask
+    CleverAge\ProcessBundle\Task\InputIteratorTask:
         shared: false
 
-    cleverage_process.task.error_forwarder:
-        class: CleverAge\ProcessBundle\Task\ErrorForwarderTask
+    CleverAge\ProcessBundle\Task\InputAggregatorTask:
         shared: false
 
-    cleverage_process.task.skip_empty:
-        class: CleverAge\ProcessBundle\Task\SkipEmptyTask
+    CleverAge\ProcessBundle\Task\ErrorForwarderTask:
         shared: false
 
-    cleverage_process.task.stop:
-        class: CleverAge\ProcessBundle\Task\StopTask
+    CleverAge\ProcessBundle\Task\SkipEmptyTask:
         shared: false
 
-    cleverage_process.task.array_merge:
-        class: CleverAge\ProcessBundle\Task\ArrayMergeTask
+    CleverAge\ProcessBundle\Task\StopTask:
         shared: false
 
-    cleverage_process.task.process_executor:
-        class: CleverAge\ProcessBundle\Task\ProcessExecutorTask
+    CleverAge\ProcessBundle\Task\ArrayMergeTask:
         shared: false
-        arguments:
-            - '@cleverage_process.manager.process'
-            - '@cleverage_process.registry.process_configuration'
 
-    cleverage_process.task.file_fetch:
-        class: CleverAge\ProcessBundle\Task\File\FileFetchTask
+    CleverAge\ProcessBundle\Task\ProcessExecutorTask:
+        autowire: true
         shared: false
-        arguments:
-            - '@oneup_flysystem.mount_manager'
 
-    cleverage_process.task.row_aggregator:
-        class: CleverAge\ProcessBundle\Task\RowAggregatorTask
+    CleverAge\ProcessBundle\Task\File\FileFetchTask:
+        autowire: true
+        shared: false
+
+    CleverAge\ProcessBundle\Task\RowAggregatorTask:
         shared: false

@@ -1,21 +1,22 @@
 <?php
 /*
-* This file is part of the CleverAge/ProcessBundle package.
-*
-* Copyright (C) 2017-2018 Clever-Age
-*
-* For the full copyright and license information, please view the LICENSE
-* file that was distributed with this source code.
-*/
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2018 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Command;
 
 use CleverAge\ProcessBundle\Manager\ProcessManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Run a process from the command line interface
@@ -23,10 +24,21 @@ use Symfony\Component\Console\Output\OutputInterface;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class ExecuteProcessCommand extends ContainerAwareCommand
+class ExecuteProcessCommand extends Command
 {
     /** @var ProcessManager */
     protected $processManager;
+
+    /**
+     * @param ProcessManager $processManager
+     *
+     * @throws \Symfony\Component\Console\Exception\LogicException
+     */
+    public function __construct(ProcessManager $processManager)
+    {
+        $this->processManager = $processManager;
+        parent::__construct();
+    }
 
     /**
      * {@inheritdoc}
@@ -44,19 +56,6 @@ class ExecuteProcessCommand extends ContainerAwareCommand
         $this->addOption('input', 'i', InputOption::VALUE_REQUIRED, 'Pass input data to the first task of the process');
         $this->addOption('input-from-stdin', null, InputOption::VALUE_NONE, 'Read input data from stdin');
         $this->addOption('context', 'c', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Contextual value', []);
-    }
-
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @throws \LogicException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     */
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
-        $this->processManager = $this->getContainer()->get('cleverage_process.manager.process');
     }
 
     /**
@@ -85,8 +84,8 @@ class ExecuteProcessCommand extends ContainerAwareCommand
                 $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
             $returnValue = $this->processManager->execute($code, $output, $inputData, $context);
-            if ($output->isVeryVerbose() && function_exists('dump')) {
-                dump($returnValue);
+            if ($output->isVeryVerbose() && class_exists(VarDumper::class)) {
+                VarDumper::dump($returnValue);
             }
             if (!$output->isQuiet()) {
                 $output->writeln("<info>Process '{$code}' executed successfully</info>");
@@ -96,12 +95,19 @@ class ExecuteProcessCommand extends ContainerAwareCommand
         return 0;
     }
 
+    /**
+     * @param InputInterface $input
+     *
+     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     *
+     * @return array
+     */
     protected function parseContextValues(InputInterface $input)
     {
         $contextValues = $input->getOption('context');
         $context = [];
         foreach ($contextValues as $contextValue) {
-            list($key, $val) = explode(':', $contextValue);
+            [$key, $val] = explode(':', $contextValue);
             $context[$key] = $val;
         }
 

@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -20,13 +20,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractConfigurableTask implements InitializableTaskInterface
 {
-    const LOG_ERRORS = 'log_errors';
-    const ERROR_STRATEGY = 'error_strategy';
+    public const LOG_ERRORS = 'log_errors';
+    public const ERROR_STRATEGY = 'error_strategy';
 
-    const STRATEGY_SKIP = 'skip';
-    const STRATEGY_STOP = 'stop';
-    const STRATEGY_CONTINUE = 'continue';
-
+    public const STRATEGY_SKIP = 'skip';
+    public const STRATEGY_STOP = 'stop';
+    public const STRATEGY_CONTINUE = 'continue';
 
     /** @var array */
     protected $options;

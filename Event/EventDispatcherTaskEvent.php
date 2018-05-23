@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -16,7 +16,6 @@ use Symfony\Component\EventDispatcher\Event;
 /**
  * Class EventDispatcherTaskEvent
  *
- * @package CleverAge\ProcessBundle\Event
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class EventDispatcherTaskEvent extends Event
@@ -27,8 +26,6 @@ class EventDispatcherTaskEvent extends Event
     protected $state;
 
     /**
-     * EventDispatcherTaskEvent constructor.
-     *
      * @param ProcessState $state
      */
     public function __construct(ProcessState $state)

@@ -1,20 +1,11 @@
 <?php
 /*
- *    CleverAge/ProcessBundle
- *    Copyright (C) 2017 Clever-Age
+ * This file is part of the CleverAge/ProcessBundle package.
  *
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU General Public License as published by
- *    the Free Software Foundation, either version 3 of the License, or
- *    (at your option) any later version.
+ * Copyright (C) 2017-2018 Clever-Age
  *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU General Public License for more details.
- *
- *    You should have received a copy of the GNU General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace CleverAge\ProcessBundle\Task;
@@ -30,7 +21,6 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
  *
  * Add custom log in state
  *
- * @package Task
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class LoggerTask extends AbstractConfigurableTask
@@ -44,6 +34,7 @@ class LoggerTask extends AbstractConfigurableTask
     /**
      * @param PropertyAccessorInterface $accessor
      * @param NormalizerInterface       $normalizer
+     *
      * @internal param LoggerInterface $logger
      */
     public function __construct(PropertyAccessorInterface $accessor, NormalizerInterface $normalizer)
@@ -83,6 +74,7 @@ class LoggerTask extends AbstractConfigurableTask
 
     /**
      * @param OptionsResolver $resolver
+     *
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */
@@ -102,5 +94,4 @@ class LoggerTask extends AbstractConfigurableTask
         $resolver->setAllowedTypes('context', ['array']);
         $resolver->setAllowedTypes('reference', ['string', 'NULL']);
     }
-
 }

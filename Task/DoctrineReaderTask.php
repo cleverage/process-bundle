@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -34,8 +34,9 @@ class DoctrineReaderTask extends AbstractDoctrineQueryTask implements IterableTa
      *
      * @param ProcessState $state
      *
-     * @return bool
      * @throws \LogicException
+     *
+     * @return bool
      */
     public function next(ProcessState $state)
     {
@@ -74,8 +75,6 @@ class DoctrineReaderTask extends AbstractDoctrineQueryTask implements IterableTa
 
         $state->setOutput(reset($result));
     }
-
-    
 
     /**
      * @param EntityRepository $repository

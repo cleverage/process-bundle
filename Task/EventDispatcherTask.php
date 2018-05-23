@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -26,15 +26,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EventDispatcherTask extends AbstractConfigurableTask
 {
-
-    /**
-     * @var EventDispatcherInterface
-     */
+    /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
     /**
-     * EventDispatcherTask constructor.
-     *
      * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(EventDispatcherInterface $eventDispatcher)
@@ -44,12 +39,13 @@ class EventDispatcherTask extends AbstractConfigurableTask
 
     /**
      * @param ProcessState $state
+     *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
         $options = $this->getOptions($state);
-        if($options['passive']) {
+        if ($options['passive']) {
             $state->setOutput($state->getInput());
         }
 

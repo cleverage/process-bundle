@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -37,7 +37,7 @@ class SprintfTransformer implements ConfigurableTransformerInterface
      */
     public function transform($value, array $options = [])
     {
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             $value = [$value];
         }
 

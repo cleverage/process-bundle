@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -13,6 +13,7 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Dump the content of the input
@@ -29,18 +30,22 @@ class DebugTask implements TaskInterface
     {
         $input = $state->getInput();
         $console = $state->getConsoleOutput();
-        if($console) {
-            $processCode= $state->getProcessConfiguration()->getCode();
-            $taskCode= $state->getTaskConfiguration()->getCode();
+        if ($console) {
+            $processCode = $state->getProcessConfiguration()->getCode();
+            $taskCode = $state->getTaskConfiguration()->getCode();
             $console->writeln("<info>DEBUG from {$processCode}::{$taskCode}</info>");
         }
         $this->printData($input, $console);
     }
 
+    /**
+     * @param mixed                $data
+     * @param OutputInterface|null $output
+     */
     protected function printData($data, OutputInterface $output = null)
     {
-        if (function_exists('dump')) {
-            dump($data);
+        if (class_exists(VarDumper::class)) {
+            VarDumper::dump($data);
         } elseif ($output) {
             $output->writeln(print_r($data, true));
         }

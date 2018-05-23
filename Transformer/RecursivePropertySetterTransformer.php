@@ -38,6 +38,7 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
      * @param mixed $value
      * @param array $options
      *
+     * @throws \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @throws \CleverAge\ProcessBundle\Exception\TransformerException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
@@ -86,7 +87,7 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
                     $this->accessor->setValue($item, $protertyName, $propertyValue);
                 } catch (\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException $e) {
                     if ($item instanceof \stdClass) {
-                        $item = (object)array_merge((array)$item, [$protertyName => $propertyValue]);
+                        $item = (object) array_merge((array) $item, [$protertyName => $propertyValue]);
                     } else {
                         throw $e;
                     }

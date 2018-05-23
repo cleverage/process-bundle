@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -36,21 +36,6 @@ class PropertySetterTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     */
-    protected function configureOptions(OptionsResolver $resolver)
-    {
-        parent::configureOptions($resolver);
-        $resolver->setRequired([
-            'values',
-        ]);
-        $resolver->setAllowedTypes('values', ['array']);
-    }
-
-    /**
      * @param ProcessState $state
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
@@ -66,9 +51,14 @@ class PropertySetterTask extends AbstractConfigurableTask
             } catch (\Exception $e) {
                 $state->setError($input);
                 if ($options[self::LOG_ERRORS]) {
-                    $state->log('PropertySetter exception: '.$e->getMessage(), LogLevel::ERROR, $key, [
-                        'value' => $value,
-                    ]);
+                    $state->log(
+                        'PropertySetter exception: '.$e->getMessage(),
+                        LogLevel::ERROR,
+                        $key,
+                        [
+                            'value' => $value,
+                        ]
+                    );
                 }
                 if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                     $state->setSkipped(true);
@@ -79,5 +69,22 @@ class PropertySetterTask extends AbstractConfigurableTask
         }
 
         $state->setOutput($input);
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     */
+    protected function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+        $resolver->setRequired(
+            [
+                'values',
+            ]
+        );
+        $resolver->setAllowedTypes('values', ['array']);
     }
 }

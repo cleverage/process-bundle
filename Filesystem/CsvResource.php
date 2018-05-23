@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -53,10 +53,10 @@ class CsvResource
 
     /**
      * @param resource $resource
-     * @param string   $delimiter
+     * @param string   $delimiter CSV delimiter
      * @param string   $enclosure
      * @param string   $escape
-     * @param array    $headers Leave null to read the headers from the file
+     * @param array    $headers   Leave null to read the headers from the file
      *
      * @throws \UnexpectedValueException
      */
@@ -67,8 +67,8 @@ class CsvResource
         $escape = '\\',
         array $headers = null
     ) {
-        if (!is_resource($resource)) {
-            $type = gettype($resource);
+        if (!\is_resource($resource)) {
+            $type = \gettype($resource);
             throw new \UnexpectedValueException("Resource argument must be a resource, '{$type}' given");
         }
         $this->delimiter = $delimiter;
@@ -77,7 +77,7 @@ class CsvResource
 
         $this->handler = $resource;
         $this->headers = $this->parseHeaders($headers);
-        $this->headerCount = count($this->headers);
+        $this->headerCount = \count($this->headers);
     }
 
     /**
@@ -225,7 +225,7 @@ class CsvResource
             throw new \UnexpectedValueException($message);
         }
 
-        $count = count($values);
+        $count = \count($values);
         if ($count !== $this->headerCount) {
             $message = "Number of columns not matching on line {$this->currentLine} for {$this->getResourceName()}: ";
             $message .= "{$count} columns for {$this->headerCount} headers";
@@ -261,7 +261,7 @@ class CsvResource
      */
     public function writeLine(array $fields)
     {
-        $count = count($fields);
+        $count = \count($fields);
         if ($count !== $this->headerCount) {
             $message = "Trying to write an invalid number of columns for {$this->getResourceName()}: ";
             $message .= "{$count} columns for {$this->headerCount} headers";
@@ -279,7 +279,7 @@ class CsvResource
 
         $length = $this->writeRaw($parsedFields);
         if (false === $length) {
-            throw new \RuntimeException('Unable to write data to '.$this->getResourceName());
+            throw new \RuntimeException("Unable to write data to {$this->getResourceName()}");
         }
 
         return $length;
@@ -289,14 +289,12 @@ class CsvResource
      * This methods rewinds the file to the first line of data, skipping the headers.
      *
      * @throws \RuntimeException
-     *
-     * @return bool
      */
     public function rewind()
     {
         $this->assertOpened();
         if (!rewind($this->handler)) {
-            throw new \RuntimeException('Unable to rewind '.$this->getResourceName());
+            throw new \RuntimeException("Unable to rewind '{$this->getResourceName()}'");
         }
         $this->currentLine = 0;
         if (!$this->manualHeaders) {
@@ -375,12 +373,12 @@ class CsvResource
     protected function assertOpened()
     {
         if ($this->closed) {
-            throw new \RuntimeException($this->getResourceName().' was closed earlier');
+            throw new \RuntimeException("{$this->getResourceName()} was closed earlier");
         }
     }
 
     /**
-     * @param array  $headers
+     * @param array $headers
      *
      * @throws \UnexpectedValueException
      *
@@ -390,9 +388,9 @@ class CsvResource
     {
         // If headers are not passed in the constructor but file is readable, try to read headers from file
         if (null === $headers) {
-            $headers = fgetcsv($this->handler, null, $this->delimiter, $this->enclosure, $this->escape);
-            if (false === $headers || 0 === count($headers)) {
-                throw new \UnexpectedValueException('Unable to read headers for '.$this->getResourceName());
+            $headers = fgetcsv($this->handler, 0, $this->delimiter, $this->enclosure, $this->escape);
+            if (false === $headers || 0 === \count($headers)) {
+                throw new \UnexpectedValueException("Unable to read headers for {$this->getResourceName()}");
             }
             // Remove BOM if any
             $bom = pack('H*', 'EFBBBF');
@@ -402,12 +400,12 @@ class CsvResource
         }
 
         $this->manualHeaders = true;
-        if (null === $headers || !is_array($headers)) {
+        if (null === $headers || !\is_array($headers)) {
             throw new \UnexpectedValueException(
                 "Invalid headers for {$this->getResourceName()}, you need to pass the headers manually"
             );
         }
-        if (0 === count($headers)) {
+        if (0 === \count($headers)) {
             throw new \UnexpectedValueException(
                 "Empty headers for {$this->getResourceName()}, you need to pass the headers manually"
             );

@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -23,18 +23,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ConstantOutputTask extends AbstractConfigurableTask
 {
     /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
-    protected function configureOptions(OptionsResolver $resolver)
-    {
-        $resolver->setRequired([
-            'output',
-        ]);
-    }
-
-    /**
      * @param ProcessState $state
      *
      * @throws \InvalidArgumentException
@@ -43,5 +31,19 @@ class ConstantOutputTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $state->setOutput($this->getOption($state, 'output'));
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     */
+    protected function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setRequired(
+            [
+                'output',
+            ]
+        );
     }
 }

@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -41,7 +41,7 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         $parameters = $options['additional_parameters'];
         array_unshift($parameters, $value);
 
-        return call_user_func_array($options['callback'], $parameters);
+        return \call_user_func_array($options['callback'], $parameters);
     }
 
     /**
@@ -71,7 +71,7 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         $resolver->setNormalizer(
             'callback',
             function (Options $options, $value) {
-                if (!is_callable($value)) {
+                if (!\is_callable($value)) {
                     throw new InvalidOptionsException(
                         'Callback option must be callable'
                     );

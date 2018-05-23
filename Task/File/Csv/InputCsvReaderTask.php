@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2018 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
@@ -45,18 +53,18 @@ class InputCsvReaderTask extends CsvReaderTask
     /**
      * If there is no base_path, then the given path from input should be absolute
      *
-     * @param $options
-     * @param $input
+     * @param array  $options
+     * @param string $input
      *
      * @return string
      */
-    protected function getFilePath($options, $input)
+    protected function getFilePath(array $options, string $input)
     {
         $basePath = $options['base_path'];
-        if (strlen($basePath) > 0) {
-            $basePath = rtrim($options['base_path'], '/') . '/';
+        if (\strlen($basePath) > 0) {
+            $basePath = rtrim($options['base_path'], '/').'/';
         }
 
-        return $basePath . $input;
+        return $basePath.$input;
     }
 }

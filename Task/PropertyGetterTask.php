@@ -1,5 +1,5 @@
 <?php
- /*
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2018 Clever-Age
@@ -35,21 +35,6 @@ class PropertyGetterTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     */
-    protected function configureOptions(OptionsResolver $resolver)
-    {
-        parent::configureOptions($resolver);
-        $resolver->setRequired([
-            'property',
-        ]);
-        $resolver->setAllowedTypes('property', ['string']);
-    }
-
-    /**
      * @param ProcessState $state
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
@@ -66,9 +51,14 @@ class PropertyGetterTask extends AbstractConfigurableTask
         } catch (\Exception $e) {
             $state->setError($input);
             if ($options[self::LOG_ERRORS]) {
-                $state->log('PropertyGetter exception: '.$e->getMessage(), LogLevel::ERROR, $property, [
-                    'property' => $property,
-                ]);
+                $state->log(
+                    'PropertyGetter exception: '.$e->getMessage(),
+                    LogLevel::ERROR,
+                    $property,
+                    [
+                        'property' => $property,
+                    ]
+                );
             }
             if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
@@ -78,5 +68,22 @@ class PropertyGetterTask extends AbstractConfigurableTask
         }
 
         $state->setOutput($output);
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     */
+    protected function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+        $resolver->setRequired(
+            [
+                'property',
+            ]
+        );
+        $resolver->setAllowedTypes('property', ['string']);
     }
 }
