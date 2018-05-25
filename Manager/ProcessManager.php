@@ -24,7 +24,6 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Entity\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -45,7 +44,7 @@ class ProcessManager
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var EntityManagerInterface|EntityManager */
+    /** @var EntityManagerInterface */
     protected $entityManager;
 
     /** @var ProcessConfigurationRegistry */

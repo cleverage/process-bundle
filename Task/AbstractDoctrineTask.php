@@ -13,8 +13,8 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManager;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -55,7 +55,7 @@ abstract class AbstractDoctrineTask extends AbstractConfigurableTask
      * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      *
-     * @return EntityManager|ObjectManager
+     * @return EntityManagerInterface|ObjectManager
      */
     protected function getManager(ProcessState $state)
     {

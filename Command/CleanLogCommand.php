@@ -13,7 +13,6 @@ namespace CleverAge\ProcessBundle\Command;
 use CleverAge\ProcessBundle\Entity\ProcessHistory;
 use CleverAge\ProcessBundle\Entity\TaskHistory;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Console\Command\Command;
@@ -53,11 +52,11 @@ class CleanLogCommand extends Command
         'is not null',
     ];
 
-    /** @var EntityManagerInterface|EntityManager */
+    /** @var EntityManagerInterface */
     protected $entityManager;
 
     /**
-     * @param EntityManager|EntityManagerInterface $entityManager
+     * @param EntityManagerInterface $entityManager
      *
      * @throws \Symfony\Component\Console\Exception\LogicException
      */
@@ -97,8 +96,6 @@ class CleanLogCommand extends Command
     /**
      * {@inheritdoc}
      *
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
      * @throws \InvalidArgumentException
      * @throws \LogicException
@@ -265,9 +262,6 @@ class CleanLogCommand extends Command
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
      * @throws \InvalidArgumentException
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
-     * @throws \Doctrine\ORM\ORMException
      *
      * @return int
      */
