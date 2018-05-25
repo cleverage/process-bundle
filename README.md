@@ -22,6 +22,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
     - [Logging]
     - [Subprocess]
     - [File manipulation]
+    - [Direct call (in controller)]
 - Reference
     - [Process definition]
     - Tasks
