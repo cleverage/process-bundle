@@ -44,7 +44,7 @@ amount of data (either with a hard limit or by storing the minimum amount of dat
 before finally doing a onetime upload of the result as a JSON.
 - Once you retrieved some collection of data, you want to check for a global condition such as "there is exactly `XX` 
 data that fulfill `YY` condition on one field". In this case, instead of storing the full data, you could only store the
-filed values.
+field values.
 
 Other blocking tasks might be accumulators: with each input they change some internal data (value, file, ...) without 
 storing a huge collection. Once there is no input, only the final data is outputted. 
@@ -69,10 +69,22 @@ Most tasks aims to have a generic behavior. This can provide reusablility but ev
 behavior. Options are a way to configure a task.
 
 Configurable tasks extends `CleverAge\ProcessBundle\Model\AbstractConfigurableTask`. As you might notice it's an 
-initializable task that rely on [Symfony's OptionsResolver Component](https://symfony.com/doc/current/components/options_resolver.html).
-This allows to check the definition of the options before actually executing the process.
+initializable task that rely on
+[Symfony's OptionsResolver Component](https://symfony.com/doc/current/components/options_resolver.html). This allows to 
+check the definition of the options before actually executing the process.
 
 _TODO_ more about definition in XXX section
+
+## Transformers
+
+Transformers are a special subset of this bundle. They're not tasks strictly speaking, but used by them. The main entry 
+point for Transformers is the `CleverAge\ProcessBundle\Task\TransformerTask`, whose only purpose is to take some input, 
+pass it to a transformer and transfer the output to next task.
+
+The idea is to allow a great flexibility (especially using the [MappingTransformer]()), without using too much code.
+
+They implement `CleverAge\ProcessBundle\Transformer\TransformerInterface` or 
+`CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface`.
 
 ## Finalizable tasks
 

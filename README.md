@@ -10,7 +10,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
 
 - [Quick start](Documentation/01-quick_start.md)
 - [Task types](Documentation/02-task_types.md)
-- [Custom tasks and development]
+- [Custom tasks and development](Documentation/03-custom_tasks.md)
 - [Advanced worklow]
 - [Good practices]
 - [Testing]
@@ -35,31 +35,6 @@ Basically, it will greatly ease the configuration of import and exports but can 
 -------
 
 _obsolete documentation_
-
-
-## Base concepts
-- Process: A sets of tasks linked together that you can run in a terminal
-- Task: A simple action, that can accepts an input and should return an output
-
-A task is basically a service that implements the ```TaskInterface``` interface.
-It can also implements other interfaces to trigger specific behaviors:
-
-- InitializableTaskInterface: The initialize() method will be called at the very beginning of the process, before
-executing anything.
-- IterableTaskInterface: The task can return multiple items, (one at a time)
-- BlockingTaskInterface: Specific task that must be executed after an iterable task, will wait for the iteration to end
-before continuing to execute children tasks
-
-The AbstractConfigurableTask class is a good way to go if you need to configure your task with options, you should then
-override the ```AbstractConfigurableTask::configureOptions()``` method.
-
-This bundle already implements a lot of basic tasks that can be used out of the box, see dedicated chapter.
-
-## Running a process
-You can execute one or multiple process in a chain:
-```bash
-$ bin/console cleverage:process:execute process_code1 process_code2
-```
 
 ## Configuration reference
 
