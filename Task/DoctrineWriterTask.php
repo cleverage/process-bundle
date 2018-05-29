@@ -12,6 +12,9 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -28,8 +31,9 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
     /**
      * @param ProcessState $state
      *
+     * @throws \UnexpectedValueException
+     * @throws \Doctrine\ORM\ORMException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \InvalidArgumentException
      */
     public function finalize(ProcessState $state)
@@ -40,7 +44,8 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \UnexpectedValueException
+     * @throws \Doctrine\ORM\ORMException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \InvalidArgumentException
      */
@@ -82,9 +87,9 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
     /**
      * @param ProcessState $state
      *
-     * @throws \InvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \UnexpectedValueException
+     * @throws \Doctrine\ORM\ORMException
      */
     protected function writeBatch(ProcessState $state)
     {
@@ -93,25 +98,38 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
         }
         $options = $this->getOptions($state);
 
-        $manager = $this->getManager($state);
+        $entityManagers = new \SplObjectStorage();
         foreach ($this->batch as $entity) {
-            $manager->persist($entity);
+            $class = ClassUtils::getClass($entity);
+            $entityManager = $this->doctrine->getManagerForClass($class);
+            if (!$entityManager instanceof EntityManagerInterface) {
+                throw new \UnexpectedValueException("No manager found for class {$class}");
+            }
+            $entityManager->persist($entity);
 
             if (!$options['global_flush']) {
-                $manager->flush($entity);
+                if (!$entityManager instanceof EntityManager) {
+                    throw new \UnexpectedValueException("Manager for class {$class} does not support unitary flush");
+                }
+                $entityManager->flush($entity);
             }
+            $entityManagers->attach($entityManager);
         }
 
         if ($options['global_flush']) {
-            $manager->flush();
+            foreach ($entityManagers as $entityManager) {
+                $entityManager->flush();
+            }
         }
 
         if ($options['clear_em']) {
-            if ($options['global_clear']) {
-                $manager->clear();
-            } else {
-                foreach ($this->batch as $entity) {
-                    $manager->detach($entity);
+            foreach ($entityManagers as $entityManager) {
+                if ($options['global_clear']) {
+                    $entityManager->clear();
+                } else {
+                    foreach ($this->batch as $entity) {
+                        $entityManager->detach($entity);
+                    }
                 }
             }
         }

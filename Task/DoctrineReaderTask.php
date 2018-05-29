@@ -12,6 +12,7 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Psr\Log\LogLevel;
 use Doctrine\ORM\Internal\Hydration\IterableResult;
@@ -59,7 +60,15 @@ class DoctrineReaderTask extends AbstractDoctrineQueryTask implements IterableTa
     {
         $options = $this->getOptions($state);
         if (!$this->iterator) {
-            $repository = $this->getManager($state)->getRepository($options['class_name']);
+            $class = $options['class_name'];
+            $entityManager = $this->doctrine->getManagerForClass($class);
+            if (!$entityManager instanceof EntityManagerInterface) {
+                throw new \UnexpectedValueException("No manager found for class {$class}");
+            }
+            $repository = $entityManager->getRepository($class);
+            if (!$repository instanceof EntityRepository) {
+                throw new \UnexpectedValueException("No repository found for class {$class}");
+            }
             $this->initIterator($repository, $options);
         }
 

@@ -11,6 +11,8 @@
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -24,6 +26,7 @@ class DoctrineDetacherTask extends AbstractDoctrineTask
     /**
      * @param ProcessState $state
      *
+     * @throws \UnexpectedValueException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \InvalidArgumentException
@@ -31,10 +34,14 @@ class DoctrineDetacherTask extends AbstractDoctrineTask
     public function execute(ProcessState $state)
     {
         $entity = $state->getInput();
-        $manager = $this->getManager($state);
-        $manager->detach($entity);
+        $class = ClassUtils::getClass($entity);
+        $entityManager = $this->doctrine->getManagerForClass($class);
+        if (!$entityManager instanceof EntityManagerInterface) {
+            throw new \UnexpectedValueException("No manager found for class {$class}");
+        }
+        $entityManager->detach($entity);
         if ($this->getOption($state, 'global_clear')) {
-            $manager->clear();
+            $entityManager->clear();
         }
     }
 
