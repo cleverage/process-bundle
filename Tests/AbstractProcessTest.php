@@ -43,8 +43,8 @@ abstract class AbstractProcessTest extends KernelTestCase
         );
 
         $this->container = $kernel->getContainer();
-        $this->processManager = $this->container->get(ProcessManager::class);
-        $this->processConfigurationRegistry = $this->container->get(ProcessConfigurationRegistry::class);
+        $this->processManager = $this->container->get('cleverage_process.manager.process');
+        $this->processConfigurationRegistry = $this->container->get('cleverage_process.registry.process_configuration');
     }
 
     /**

@@ -239,7 +239,11 @@ class TaskConfiguration
     public function hasAncestor(TaskConfiguration $taskConfig)
     {
         foreach ($this->getPreviousTasksConfigurations() as $previousTasksConfig) {
-            if ($previousTasksConfig->hasAncestor($taskConfig) || $previousTasksConfig->getCode() === $taskConfig->getCode()) {
+            if ($previousTasksConfig->getCode() === $taskConfig->getCode()) {
+                return true;
+            }
+
+            if ($previousTasksConfig->hasAncestor($taskConfig)) {
                 return true;
             }
         }
@@ -258,14 +262,22 @@ class TaskConfiguration
     public function hasDescendant(TaskConfiguration $taskConfig, $checkErrors = true)
     {
         foreach ($this->getNextTasksConfigurations() as $errorTasksConfig) {
-            if ($errorTasksConfig->hasDescendant($taskConfig, $checkErrors) || $errorTasksConfig->getCode() === $taskConfig->getCode()) {
+            if ($errorTasksConfig->getCode() === $taskConfig->getCode()) {
+                return true;
+            }
+
+            if ($errorTasksConfig->hasDescendant($taskConfig, $checkErrors)) {
                 return true;
             }
         }
 
         if ($checkErrors) {
             foreach ($this->getErrorTasksConfigurations() as $errorTasksConfig) {
-                if ($errorTasksConfig->hasDescendant($taskConfig, $checkErrors) || $errorTasksConfig->getCode() === $taskConfig->getCode()) {
+                if ($errorTasksConfig->getCode() === $taskConfig->getCode()) {
+                    return true;
+                }
+
+                if ($errorTasksConfig->hasDescendant($taskConfig, $checkErrors)) {
                     return true;
                 }
             }

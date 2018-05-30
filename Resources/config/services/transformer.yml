@@ -95,6 +95,11 @@ services:
         tags:
             - { name: cleverage.transformer }
 
+    CleverAge\ProcessBundle\Transformer\DateParserTransformer:
+        public: false
+        tags:
+            - { name: cleverage.transformer }
+
     CleverAge\ProcessBundle\Transformer\DefaultTransformer:
         public: false
         tags:
