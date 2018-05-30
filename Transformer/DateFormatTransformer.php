@@ -13,7 +13,11 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @todo vclavreul comment this class
+ * Transformer aiming to take a date as an input (object or string) and format it according to options
+ *
+ * @example in YML config
+ * options:
+ *     format: Y-m-d
  */
 class DateFormatTransformer implements ConfigurableTransformerInterface
 {
