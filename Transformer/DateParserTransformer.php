@@ -13,19 +13,16 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Transformer aiming to take a date as an input (object or string) and format it according to options.
- * In input it takes any value understood by \DateTime.
+ * Transformer aiming to take a date as an input (object or a format defined string) to strictly output aa \DateTime
  *
  * @example in YML config
  * transformers:
- *     date_format:
+ *     date_parser:
  *         format: Y-m-d
- *
- * @deprecated the input string value will be removed in next version, use date_parser just before
- * @TODO v1.2 : remove string input
  */
-class DateFormatTransformer implements ConfigurableTransformerInterface
+class DateParserTransformer implements ConfigurableTransformerInterface
 {
+
     /**
      * @param mixed $value
      * @param array $options
@@ -34,19 +31,17 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
      */
     public function transform($value, array $options = [])
     {
-        if (!$value) {
+        if (!$value || $value instanceof \DateTime) {
             return $value;
         }
 
-        if ($value instanceof \DateTime) {
-            $date = $value;
-        } elseif (is_string($value)) {
-            $date = new \DateTime($value);
-        } else {
+        $date = \DateTime::createFromFormat($options['format'], $value);
+
+        if (!$date) {
             throw new \UnexpectedValueException("Given value cannot be parsed into a date");
         }
 
-        return $date->format($options['format']);
+        return $date;
     }
 
     /**
@@ -54,7 +49,7 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
      */
     public function getCode()
     {
-        return 'date_format';
+        return 'date_parser';
     }
 
     /**
