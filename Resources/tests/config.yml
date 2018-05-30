@@ -1,3 +1,4 @@
 imports:
     - { resource: process/* }
     - { resource: task/* }
+    - { resource: transfomer/* }

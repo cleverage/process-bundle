@@ -1,0 +1,42 @@
+clever_age_process:
+    configurations:
+        test.date_transformers.date_format:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@cleverage_process.task.transformer'
+                    options:
+                        error_strategy: stop
+                        transformer: date_format
+                        format: 'Y-m-d'
+
+        test.date_transformers.date_parser:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@cleverage_process.task.transformer'
+                    options:
+                        error_strategy: stop
+                        transformer: date_parser
+                        format: 'Y-m-d'
+
+        test.date_transformers.date_parse_format:
+            entry_point: parse
+            end_point: format
+            tasks:
+                parse:
+                    service: '@cleverage_process.task.transformer'
+                    options:
+                        error_strategy: stop
+                        transformer: date_parser
+                        format: 'Y-m-d\TH:i:sP'
+                    outputs: [format]
+
+                format:
+                    service: '@cleverage_process.task.transformer'
+                    options:
+                        error_strategy: stop
+                        transformer: date_format
+                        format: 'Y-m-d'

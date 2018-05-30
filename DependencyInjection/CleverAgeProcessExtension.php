@@ -10,10 +10,8 @@
 
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
+use Sidus\BaseBundle\DependencyInjection\SidusBaseExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\HttpKernel\DependencyInjection\Extension;
-use Symfony\Component\DependencyInjection\Loader;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 
 /**
@@ -24,7 +22,7 @@ use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class CleverAgeProcessExtension extends Extension
+class CleverAgeProcessExtension extends SidusBaseExtension
 {
     /**
      * @param array            $configs
@@ -34,17 +32,10 @@ class CleverAgeProcessExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $container)
     {
+        parent::load($configs, $container);
+
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config/services'));
-        $loader->load('command.yml');
-        $loader->load('deprecated.yml');
-        $loader->load('event.yml');
-        $loader->load('manager.yml');
-        $loader->load('registry.yml');
-        $loader->load('task.yml');
-        $loader->load('transformer.yml');
 
         $processConfigurationRegistry = $container->getDefinition(ProcessConfigurationRegistry::class);
         $processConfigurationRegistry->replaceArgument(0, $config['configurations']);
