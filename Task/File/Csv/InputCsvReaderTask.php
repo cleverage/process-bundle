@@ -29,7 +29,9 @@ class InputCsvReaderTask extends CsvReaderTask
     protected function getOptions(ProcessState $state)
     {
         $options = parent::getOptions($state);
-        $options['file_path'] = $this->getFilePath($options, $state->getInput());
+        if ($state->getInput() !== null) {
+            $options['file_path'] = $this->getFilePath($options, $state->getInput());
+        }
 
         return $options;
     }
