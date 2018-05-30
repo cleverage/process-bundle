@@ -22,6 +22,8 @@ class InputCsvReaderTask extends CsvReaderTask
     /**
      * @param ProcessState $state
      *
+     * @TODO refactor to get file path outside of options
+     *
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      *
      * @return array
