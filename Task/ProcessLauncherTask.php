@@ -234,10 +234,10 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
         );
         $resolver->setDefaults(
             [
-                'max_processes' => 5,
+                'max_processes' => 3,
                 'sleep_interval' => 1,
-                'sleep_interval_after_launch' => 3,
-                'sleep_on_finalize_interval' => 10,
+                'sleep_interval_after_launch' => 1,
+                'sleep_on_finalize_interval' => 5,
                 'process_options' => [],
             ]
         );
