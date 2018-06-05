@@ -64,7 +64,7 @@ abstract class AbstractCsvTask extends AbstractCsvResourceTask
         $resolver->setAllowedTypes('file_path', ['string']);
         $resolver->setDefaults(
             [
-                'mode' => 'r',
+                'mode' => 'rb',
             ]
         );
         $resolver->setAllowedTypes('mode', ['string']);

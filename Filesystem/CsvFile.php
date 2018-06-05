@@ -38,7 +38,7 @@ class CsvFile extends CsvResource
         $enclosure = '"',
         $escape = '\\',
         array $headers = null,
-        $mode = 'r'
+        $mode = 'rb'
     ) {
         $this->filePath = $filePath;
 
@@ -51,8 +51,10 @@ class CsvFile extends CsvResource
         if (false === $resource) {
             throw new \UnexpectedValueException("Unable to open file: '{$filePath}' in {$mode} mode");
         }
-        // Cannot read headers if the file was just created
-        if (null === $headers && !\in_array($mode, ['r', 'r+', 'w+', 'a+', 'x+', 'c+'], true)) {
+        // All modes allowing file reading, binary safe modes are handled by stripping out the b during test
+        $readAllowedModes = ['r', 'r+', 'w+', 'a+', 'x+', 'c+'];
+        if (null === $headers && !\in_array(str_replace('b', '', $mode), $readAllowedModes, true)) {
+            // Cannot read headers if the file was just created
             throw new \UnexpectedValueException(
                 "Invalid headers for {$this->getResourceName()}, you need to pass the headers manually"
             );

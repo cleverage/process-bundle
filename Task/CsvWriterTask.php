@@ -79,7 +79,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         parent::configureOptions($resolver);
         $resolver->setDefaults(
             [
-                'mode' => 'w',
+                'mode' => 'wb',
                 'split_character' => '|',
             ]
         );
