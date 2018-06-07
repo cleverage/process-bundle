@@ -98,6 +98,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                         try {
                             $transformedValue[$destKey] = $this->accessor->getValue($input, $srcKey);
                         } catch (\RuntimeException $missingPropertyError) {
+                            // @TODO no error if framework.property_access.throw_exception_on_invalid_index = false (default)
                             if ($mapping['ignore_missing'] || $options['ignore_missing']) {
                                 continue;
                             }
@@ -108,6 +109,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                     try {
                         $transformedValue = $this->accessor->getValue($input, $sourceProperty);
                     } catch (\RuntimeException $missingPropertyError) {
+                        // @TODO no error if framework.property_access.throw_exception_on_invalid_index = false (default)
                         if ($mapping['ignore_missing'] || $options['ignore_missing']) {
                             continue;
                         }
