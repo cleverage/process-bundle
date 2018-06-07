@@ -49,9 +49,7 @@ class DateTransformersTest extends AbstractProcessTest
      */
     public function testDateParserError()
     {
-        $result = $this->processManager->execute('test.date_transformers.date_parser', null, '2001-01-01T00:00:00+00:00');
-
-        dump($result);
+        $this->processManager->execute('test.date_transformers.date_parser', null, '2001-01-01T00:00:00+00:00');
     }
 
     /**
