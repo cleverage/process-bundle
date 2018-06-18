@@ -31,9 +31,6 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
     /** @var PropertyAccessorInterface */
     protected $accessor;
 
-    /** @var array */
-    protected $transformerCodes;
-
     /**
      * @param PropertyAccessorInterface $accessor
      */
@@ -101,6 +98,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                         try {
                             $transformedValue[$destKey] = $this->accessor->getValue($input, $srcKey);
                         } catch (\RuntimeException $missingPropertyError) {
+                            // @TODO no error if framework.property_access.throw_exception_on_invalid_index = false (default)
                             if ($mapping['ignore_missing'] || $options['ignore_missing']) {
                                 continue;
                             }
@@ -111,6 +109,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                     try {
                         $transformedValue = $this->accessor->getValue($input, $sourceProperty);
                     } catch (\RuntimeException $missingPropertyError) {
+                        // @TODO no error if framework.property_access.throw_exception_on_invalid_index = false (default)
                         if ($mapping['ignore_missing'] || $options['ignore_missing']) {
                             continue;
                         }
@@ -267,6 +266,17 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
     }
 
     /**
+     * This allows to use transformer codes suffixes to avoid limitations to the "transformers" option using codes as keys
+     * This way you can chain multiple times the same transformer. Without this, it would silently call only the 1st one.
+     *
+     * @example
+     * transformers:
+     *     callback#1:
+     *         callback: array_filter
+     *     callback#2:
+     *         callback: array_reverse
+     *
+     *
      * @param string $transformerCode
      *
      * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
@@ -275,14 +285,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
      */
     protected function getCleanedTransfomerCode(string $transformerCode)
     {
-        if (!$this->transformerCodes) {
-            $this->transformerCodes = array_keys($this->transformerRegistry->getTransformers());
-        }
-        $pattern = sprintf(
-            '/(%s)(#[\d]+)?/',
-            implode('|', $this->transformerCodes)
-        );
-        $match = preg_match($pattern, $transformerCode, $parts);
+        $match = preg_match('/([^#]+)(#[\d]+)?/', $transformerCode, $parts);
 
         if (1 === $match && $this->transformerRegistry->hasTransformer($parts[1])) {
             return $parts[1];

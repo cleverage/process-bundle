@@ -1,0 +1,42 @@
+clever_age_process:
+    configurations:
+        test.mapping_transformer.simple:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@cleverage_process.task.transformer'
+                    options:
+                        error_strategy: stop
+                        mapping:
+                            field2:
+                                code: '[field]'
+
+        test.mapping_transformer.error:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@cleverage_process.task.transformer'
+                    options:
+                        error_strategy: stop
+                        mapping:
+                            field2:
+                                code: 'probably_not_a_field'
+
+        test.mapping_transformer.multi_subtransformers:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@cleverage_process.task.transformer'
+                    options:
+                        error_strategy: stop
+                        mapping:
+                            field2:
+                                code: '[field]'
+                                transformers:
+                                    callback#1:
+                                        callback: array_filter
+                                    callback#2:
+                                        callback: array_reverse
