@@ -38,7 +38,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         try {
             if (!$this->csv instanceof CsvFile) {
                 $this->initFile($state);
-                if (0 === filesize($this->csv->getFilePath())) {
+                if ($this->getOption($state, 'write_headers') && 0 === filesize($this->csv->getFilePath())) {
                     $this->csv->writeHeaders();
                 }
             }
@@ -79,8 +79,9 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         parent::configureOptions($resolver);
         $resolver->setDefaults(
             [
-                'mode' => 'wb',
+                'mode'            => 'wb',
                 'split_character' => '|',
+                'write_headers'   => true,
             ]
         );
 
