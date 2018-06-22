@@ -68,6 +68,9 @@ services:
     cleverage_process.task.database_reader:
         alias: CleverAge\ProcessBundle\Task\DatabaseReaderTask
 
+    cleverage_process.task.database_updater:
+        alias: CleverAge\ProcessBundle\Task\DatabaseUpdaterTask
+
     cleverage_process.task.doctrine_reader:
         alias: CleverAge\ProcessBundle\Task\DoctrineReaderTask
         

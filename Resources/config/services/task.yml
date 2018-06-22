@@ -61,6 +61,10 @@ services:
         autowire: true
         shared: false
 
+    CleverAge\ProcessBundle\Task\DatabaseUpdaterTask:
+        autowire: true
+        shared: false
+
     CleverAge\ProcessBundle\Task\DoctrineReaderTask:
         autowire: true
         shared: false

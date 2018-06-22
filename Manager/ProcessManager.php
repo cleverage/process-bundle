@@ -191,6 +191,8 @@ class ProcessManager
         $serviceReference = $taskConfiguration->getServiceReference();
         if (0 === strpos($serviceReference, '@')) {
             $task = $this->container->get(ltrim($serviceReference, '@'));
+        } elseif ($this->container->has($serviceReference)) {
+            $task = $this->container->get($serviceReference);
         } elseif (class_exists($serviceReference)) {
             $task = new $serviceReference();
         } else {
