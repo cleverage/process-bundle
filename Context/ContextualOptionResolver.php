@@ -29,6 +29,7 @@ class ContextualOptionResolver
      */
     public function contextualizeOption($value, array $context)
     {
+        // Recursively parse options
         if (\is_array($value)) {
             return $this->contextualizeOptions($value, $context);
         }
@@ -36,6 +37,15 @@ class ContextualOptionResolver
         if (\is_string($value)) {
             $pattern = sprintf('/{{[ ]*(%s){1}[ ]*}}/', implode('|', array_keys($context)));
 
+            $matches = [];
+            $result = preg_match($pattern, $value, $matches);
+
+            // If it's an exact match, directly returns the value (allowing complex values such as an array)
+            if ($result && $matches[0] === $value) {
+                return $context[$matches[1]];
+            }
+
+            // Else use a replace to insert a string value into another
             return preg_replace_callback(
                 $pattern,
                 function ($matches) use ($context) {
