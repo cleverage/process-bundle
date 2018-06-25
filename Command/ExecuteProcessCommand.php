@@ -104,11 +104,16 @@ class ExecuteProcessCommand extends Command
      */
     protected function parseContextValues(InputInterface $input)
     {
+        $pattern = '/([\w]+):(.*)/';
         $contextValues = $input->getOption('context');
         $context = [];
         foreach ($contextValues as $contextValue) {
-            [$key, $val] = explode(':', $contextValue);
-            $context[$key] = $val;
+            preg_match($pattern, $contextValue, $parts);
+            if (3 !== \count($parts)
+                || $parts[0] !== $contextValue) {
+                throw new \InvalidArgumentException(sprintf('Invalid context %s', $contextValue));
+            }
+            $context[$parts[1]] = $parts[2];
         }
 
         return $context;
