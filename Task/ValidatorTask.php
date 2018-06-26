@@ -12,7 +12,7 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use CleverAge\ProcessBundle\Validator\Mapping\Loader\BaseLoader;
+use Sidus\BaseBundle\Validator\Mapping\Loader\BaseLoader;
 use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
