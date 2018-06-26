@@ -14,7 +14,7 @@ use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -35,11 +35,16 @@ class ProcessExecutorTask extends AbstractConfigurableTask
     protected $process;
 
     /**
+     * @param LoggerInterface              $logger
      * @param ProcessManager               $processManager
      * @param ProcessConfigurationRegistry $processRegistry
      */
-    public function __construct(ProcessManager $processManager, ProcessConfigurationRegistry $processRegistry)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        ProcessManager $processManager,
+        ProcessConfigurationRegistry $processRegistry
+    ) {
+        parent::__construct($logger);
         $this->processManager = $processManager;
         $this->processRegistry = $processRegistry;
     }
@@ -65,18 +70,13 @@ class ProcessExecutorTask extends AbstractConfigurableTask
             );
             $state->setOutput($output);
         } catch (\Throwable $e) {
-            if ($this->getOption($state, self::LOG_ERRORS)) {
-                $message = $e->getPrevious() ? $e->getPrevious()->getMessage() : $e->getMessage();
-                $state->log(
-                    "Process '{$processCode}' has failed: {$message}",
-                    LogLevel::ERROR,
-                    null,
-                    ['input' => $input, 'error' => $e]
-                );
-            }
+            $state->setError($input);
+            $message = $e->getPrevious() ? $e->getPrevious()->getMessage() : $e->getMessage();
+            $logContext = $state->getLogContext();
+            $logContext['exception'] = $e;
+            $this->logger->error("Process '{$processCode}' has failed: {$message}", $logContext);
             if ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_SKIP) {
                 $state->setSkipped(true);
-                $state->setError($input);
             } elseif ($this->getOption($state, self::ERROR_STRATEGY) === self::STRATEGY_STOP) {
                 $state->stop($e);
             }

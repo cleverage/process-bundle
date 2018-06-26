@@ -1,12 +1,12 @@
 <?php
 /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Task;
 
@@ -32,7 +32,7 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
      * @param ProcessState $state
      *
      * @throws \UnexpectedValueException
-     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \InvalidArgumentException
      */
@@ -44,6 +44,9 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
     /**
      * @param ProcessState $state
      *
+     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws \Doctrine\ORM\ORMException
+     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \UnexpectedValueException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
@@ -64,6 +67,7 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
     /**
      * @param OptionsResolver $resolver
      *
+     * @throws \UnexpectedValueException
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      */
@@ -87,6 +91,7 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
     /**
      * @param ProcessState $state
      *
+     * @throws \UnexpectedValueException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \UnexpectedValueException
      * @throws \Doctrine\ORM\ORMException

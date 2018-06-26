@@ -12,7 +12,6 @@ namespace CleverAge\ProcessBundle\Task\Reporting;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -61,7 +60,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
             $fullText .= " - {$rate} items/s - {$items} items processed";
             $fullText .= " in {$now->diff($this->startedAt)->format('%H:%I:%S')}";
 
-            $state->log($fullText, LogLevel::INFO);
+            $this->logger->info($fullText, $state->getLogContext());
             $consoleOutput = $state->getConsoleOutput();
             if ($consoleOutput) {
                 $consoleOutput->writeln("<info>### {$fullText}</info>");
@@ -79,11 +78,13 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults([
-            'num_items' => 1,
-            'skip_first' => 0,
-            'show_every' => 1,
-        ]);
+        $resolver->setDefaults(
+            [
+                'num_items' => 1,
+                'skip_first' => 0,
+                'show_every' => 1,
+            ]
+        );
         $resolver->setAllowedTypes('num_items', ['int']);
         $resolver->setAllowedTypes('skip_first', ['int']);
         $resolver->setAllowedTypes('show_every', ['int']);

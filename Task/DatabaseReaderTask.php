@@ -1,23 +1,23 @@
 <?php
 /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use Psr\Log\LogLevel;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\DBAL\Driver\PDOStatement;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Fetch entities from doctrine
@@ -37,10 +37,12 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
     protected $nextItem;
 
     /**
+     * @param LoggerInterface $logger
      * @param ManagerRegistry $doctrine
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(LoggerInterface $logger, ManagerRegistry $doctrine)
     {
+        parent::__construct($logger);
         $this->doctrine = $doctrine;
     }
 
@@ -63,7 +65,7 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
 
         $this->nextItem = $this->statement->fetch();
 
-        return (bool) $this->nextItem;
+        return (bool)$this->nextItem;
     }
 
     /**
@@ -90,7 +92,9 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
 
         // Handle empty results
         if (false === $result) {
-            $state->log('Empty resultset for query', LogLevel::WARNING, $options['table'], $options);
+            $logContext = $state->getLogContext();
+            $logContext['options'] = $options;
+            $this->logger->error('Empty resultset for query', $logContext);
             $state->setStopped(true);
 
             return;

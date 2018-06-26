@@ -1,19 +1,18 @@
 <?php
 /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -49,7 +48,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
         }
 
         if (!$this->files->valid()) {
-            $state->log("No item found in path {$options['folder_path']}", LogLevel::WARNING);
+            $this->logger->warning("No item found in path {$options['folder_path']}", $state->getLogContext());
             $state->setSkipped(true);
             $state->setError($options['folder_path']);
 
@@ -93,24 +92,33 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired([
-            'folder_path',
-        ]);
+        $resolver->setRequired(
+            [
+                'folder_path',
+            ]
+        );
         $resolver->setAllowedTypes('folder_path', ['string']);
         /** @noinspection PhpUnusedParameterInspection */
-        $resolver->setNormalizer('folder_path', function (Options $options, $value) {
-            if (!is_dir($value)) {
-                throw new InvalidConfigurationException("Folder path does not exists or is not a folder: '{$value}'");
-            }
-            if (!is_readable($value)) {
-                throw new InvalidConfigurationException("Folder path is not readable: '{$value}'");
-            }
+        $resolver->setNormalizer(
+            'folder_path',
+            function (Options $options, $value) {
+                if (!is_dir($value)) {
+                    throw new InvalidConfigurationException(
+                        "Folder path does not exists or is not a folder: '{$value}'"
+                    );
+                }
+                if (!is_readable($value)) {
+                    throw new InvalidConfigurationException("Folder path is not readable: '{$value}'");
+                }
 
-            return $value;
-        });
-        $resolver->setDefaults([
-            'name_pattern' => null,
-        ]);
+                return $value;
+            }
+        );
+        $resolver->setDefaults(
+            [
+                'name_pattern' => null,
+            ]
+        );
         $resolver->setAllowedTypes('name_pattern', ['NULL', 'string']);
     }
 }

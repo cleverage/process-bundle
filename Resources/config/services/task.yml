@@ -3,12 +3,15 @@ services:
         shared: false
 
     CleverAge\ProcessBundle\Task\ConstantOutputTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\ConstantIterableOutputTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\YamlReaderTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\DebugTask:
@@ -46,15 +49,19 @@ services:
         shared: false
 
     CleverAge\ProcessBundle\Task\CsvReaderTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\CsvWriterTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\File\Csv\CsvSplitterTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\DatabaseReaderTask:
@@ -85,6 +92,7 @@ services:
         shared: false
 
     CleverAge\ProcessBundle\Task\Reporting\AdvancedStatCounterTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\TransformerTask:
@@ -92,25 +100,29 @@ services:
         shared: false
 
     CleverAge\ProcessBundle\Task\ProcessLauncherTask:
-        shared: false
         autowire: true
+        shared: false
 
     CleverAge\ProcessBundle\Task\FolderBrowserTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\FileRemoverTask:
         shared: false
 
     CleverAge\ProcessBundle\Task\FileMoverTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\FileWriterTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\AggregateIterableTask:
         shared: false
 
     CleverAge\ProcessBundle\Task\FilterTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\EventDispatcherTask:
@@ -118,9 +130,11 @@ services:
         shared: false
 
     CleverAge\ProcessBundle\Task\InputIteratorTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\InputAggregatorTask:
+        autowire: true
         shared: false
 
     CleverAge\ProcessBundle\Task\ErrorForwarderTask:
@@ -144,4 +158,5 @@ services:
         shared: false
 
     CleverAge\ProcessBundle\Task\RowAggregatorTask:
+        autowire: true
         shared: false

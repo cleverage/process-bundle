@@ -1,15 +1,16 @@
 <?php
 /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Model;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -27,8 +28,21 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
     public const STRATEGY_STOP = 'stop';
     public const STRATEGY_CONTINUE = 'continue';
 
+    /** @var \Psr\Log\LoggerInterface */
+    protected $logger;
+
     /** @var array */
     protected $options;
+
+    /**
+     * AbstractConfigurableTask constructor.
+     *
+     * @param \Psr\Log\LoggerInterface $logger
+     */
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
 
     /**
      * Only validate the options at initialization, ensuring that the task will not fail at runtime
@@ -71,6 +85,12 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
      */
     protected function getOption(ProcessState $state, $code)
     {
+        if (self::LOG_ERRORS === $code) {
+            trigger_error(
+                'The logs_errors option is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger configuration instead.',
+                E_USER_DEPRECATED
+            );
+        }
         $options = $this->getOptions($state);
         if (!array_key_exists($code, $options)) {
             throw new \InvalidArgumentException("Missing option {$code}");

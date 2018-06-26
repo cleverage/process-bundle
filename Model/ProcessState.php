@@ -50,7 +50,12 @@ class ProcessState
     /** @var mixed */
     protected $error;
 
-    /** @var TaskHistory[] */
+    /**
+     * @var TaskHistory[]
+     *
+     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::taskHistories attribute is deprecated since
+     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
+     */
     protected $taskHistories = [];
 
     /** @var bool */
@@ -154,6 +159,9 @@ class ProcessState
      * @param string $level
      * @param string $reference
      * @param array  $context
+     *
+     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::log() function is deprecated since version 1.2 and
+     *             will be removed in 2.0. Use default Symfony logger service instead.
      */
     public function log(string $message, string $level = LogLevel::ERROR, string $reference = null, array $context = [])
     {
@@ -168,6 +176,9 @@ class ProcessState
 
     /**
      * @return TaskHistory[]
+     *
+     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::getTaskHistories() function is deprecated since
+     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
      */
     public function getTaskHistories(): array
     {
@@ -176,6 +187,9 @@ class ProcessState
 
     /**
      * Cleanup log
+     *
+     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::clearTaskHistories() function is deprecated since
+     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
      */
     public function clearTaskHistories()
     {
@@ -466,5 +480,26 @@ class ProcessState
         }
 
         return $default;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLogContext()
+    {
+        $context = [
+            'process_code' => $this->processConfiguration->getCode(),
+            'process_context' => $this->context,
+            'task_code' => $this->taskConfiguration->getCode(),
+            'task_service' => $this->taskConfiguration->getServiceReference(),
+
+        ];
+
+        if ($this->hasError()) {
+            $context['error'] = $this->getError();
+            $context['error_context'] = $this->getErrorContext();
+        }
+
+        return $context;
     }
 }

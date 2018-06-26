@@ -1,20 +1,21 @@
 <?php
 /*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (C) 2017-2018 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+* This file is part of the CleverAge/ProcessBundle package.
+*
+* Copyright (C) 2017-2018 Clever-Age
+*
+* For the full copyright and license information, please view the LICENSE
+* file that was distributed with this source code.
+*/
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\ObjectManager;
-use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -29,10 +30,12 @@ abstract class AbstractDoctrineTask extends AbstractConfigurableTask
     protected $doctrine;
 
     /**
+     * @param LoggerInterface $logger
      * @param ManagerRegistry $doctrine
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(LoggerInterface $logger, ManagerRegistry $doctrine)
     {
+        parent::__construct($logger);
         $this->doctrine = $doctrine;
     }
 
