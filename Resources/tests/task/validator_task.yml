@@ -1,0 +1,25 @@
+clever_age_process:
+    configurations:
+        test.validator_task:
+            entry_point: validate_item
+            end_point: validate_item
+            tasks:
+                validate_item:
+                    service: '@cleverage_process.task.validator'
+                    options:
+                        error_strategy: stop
+                        constraints:
+                            - Collection:
+                                int_field:
+                                    - NotNull: ~
+                                    - Type: integer
+                                any_field:
+                                    - NotNull: ~
+                                choice_field:
+                                    - NotNull: ~
+                                    - Choice:
+                                        strict: true
+                                        choices:
+                                            - Some random value 1
+                                            - Some random value 2
+                                            - Some random value 3
