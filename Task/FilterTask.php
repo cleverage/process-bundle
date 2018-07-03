@@ -55,6 +55,14 @@ class FilterTask extends AbstractConfigurableTask
             }
         }
 
+        foreach ($this->getOption($state, 'empty') as $key => $value) {
+            if (!$this->checkEmpty($input, $key)) {
+                $state->setSkipped(true);
+
+                return;
+            }
+        }
+
         foreach ($this->getOption($state, 'match_regexp') as $key => $value) {
             if (!$this->checkValue($input, $key, $value, true, true)) {
                 $state->setSkipped(true);
@@ -65,6 +73,14 @@ class FilterTask extends AbstractConfigurableTask
 
         foreach ($this->getOption($state, 'not_match') as $key => $value) {
             if (!$this->checkValue($input, $key, $value, false)) {
+                $state->setSkipped(true);
+
+                return;
+            }
+        }
+
+        foreach ($this->getOption($state, 'not_empty') as $key => $value) {
+            if ($this->checkEmpty($input, $key)) {
                 $state->setSkipped(true);
 
                 return;
@@ -90,6 +106,8 @@ class FilterTask extends AbstractConfigurableTask
         parent::configureOptions($resolver);
         $resolver->setDefault('not_match', []);
         $resolver->setDefault('match', []);
+        $resolver->setDefault('not_empty', []);
+        $resolver->setDefault('empty', []);
         $resolver->setDefault('not_match_regexp', []);
         $resolver->setDefault('match_regexp', []);
         $resolver->setAllowedTypes('not_match', 'array');
@@ -115,13 +133,7 @@ class FilterTask extends AbstractConfigurableTask
      */
     protected function checkValue($input, $key, $value, $shouldMatch = true, $regexpMode = false)
     {
-        if ('' === $key) {
-            $currentValue = $input;
-        } elseif ($this->accessor->isReadable($input, $key)) {
-            $currentValue = $this->accessor->getValue($input, $key);
-        } else {
-            $currentValue = null;
-        }
+        $currentValue = $this->getValue($input, $key);
 
         /** @noinspection TypeUnsafeComparisonInspection */
         if ($shouldMatch && !$regexpMode && $currentValue != $value) {
@@ -146,5 +158,41 @@ class FilterTask extends AbstractConfigurableTask
         }
 
         return true;
+    }
+
+    /**
+     * Check if the input property is empty or not
+     *
+     * @param array|object $input
+     * @param string       $key
+     *
+     * @return bool
+     */
+    protected function checkEmpty($input, $key)
+    {
+        $currentValue = $this->getValue($input, $key);
+
+        return empty($currentValue);
+    }
+
+    /**
+     * Soft value getter (return the value or null)
+     *
+     * @param array|object $input
+     * @param string       $key
+     *
+     * @return mixed|null
+     */
+    protected function getValue($input, $key)
+    {
+        if ('' === $key) {
+            $currentValue = $input;
+        } elseif ($this->accessor->isReadable($input, $key)) {
+            $currentValue = $this->accessor->getValue($input, $key);
+        } else {
+            $currentValue = null;
+        }
+
+        return $currentValue;
     }
 }
