@@ -1,0 +1,73 @@
+clever_age_process:
+    configurations:
+        test.filter_task.match:
+            entry_point: iterate
+            end_point: aggregate
+            tasks:
+                iterate:
+                    service: CleverAge\ProcessBundle\Task\InputIteratorTask
+                    outputs: [filter]
+
+                filter:
+                    service: CleverAge\ProcessBundle\Task\FilterTask
+                    options:
+                        match:
+                            "[key1]": value1
+                    outputs: [aggregate]
+
+                aggregate:
+                    service: CleverAge\ProcessBundle\Task\AggregateIterableTask
+
+        test.filter_task.not_match:
+            entry_point: iterate
+            end_point: aggregate
+            tasks:
+                iterate:
+                    service: CleverAge\ProcessBundle\Task\InputIteratorTask
+                    outputs: [filter]
+
+                filter:
+                    service: CleverAge\ProcessBundle\Task\FilterTask
+                    options:
+                        not_match:
+                            "[key1]": value1
+                    outputs: [aggregate]
+
+                aggregate:
+                    service: CleverAge\ProcessBundle\Task\AggregateIterableTask
+
+        test.filter_task.empty:
+            entry_point: iterate
+            end_point: aggregate
+            tasks:
+                iterate:
+                    service: CleverAge\ProcessBundle\Task\InputIteratorTask
+                    outputs: [filter]
+
+                filter:
+                    service: CleverAge\ProcessBundle\Task\FilterTask
+                    options:
+                        empty:
+                            "[key3]": ~
+                    outputs: [aggregate]
+
+                aggregate:
+                    service: CleverAge\ProcessBundle\Task\AggregateIterableTask
+
+        test.filter_task.not_empty:
+            entry_point: iterate
+            end_point: aggregate
+            tasks:
+                iterate:
+                    service: CleverAge\ProcessBundle\Task\InputIteratorTask
+                    outputs: [filter]
+
+                filter:
+                    service: CleverAge\ProcessBundle\Task\FilterTask
+                    options:
+                        not_empty:
+                            "[key3]": ~
+                    outputs: [aggregate]
+
+                aggregate:
+                    service: CleverAge\ProcessBundle\Task\AggregateIterableTask
