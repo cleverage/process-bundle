@@ -39,4 +39,14 @@ class MappingTransformerTest extends AbstractProcessTest
 
         self::assertEquals(['field2' => [2, 4, 3]], $result);
     }
+
+    /**
+     * Assert we can use a deep property path as a key to generate a multi-depth array
+     */
+    public function testDeepMapping()
+    {
+        $result = $this->processManager->execute('test.mapping_transformer.deep_mapping', null, ['value' => "ok"]);
+
+        self::assertEquals(['field1' => ["field2" => ["field3" => "ok"]]], $result);
+    }
 }
