@@ -40,3 +40,15 @@ clever_age_process:
                                         callback: array_filter
                                     callback#2:
                                         callback: array_reverse
+
+        test.mapping_transformer.deep_mapping:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@cleverage_process.task.transformer'
+                    options:
+                        error_strategy: stop
+                        mapping:
+                            "[field1][field2][field3]":
+                                code: '[value]'
