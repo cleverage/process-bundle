@@ -134,10 +134,12 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
 
             if (\is_callable($options['merge_callback'])) {
                 $options['merge_callback']($result, $targetProperty, $transformedValue);
+            } elseif ($this->accessor->isWritable($result, $targetProperty)) {
+                $this->accessor->setValue($result, $targetProperty, $transformedValue);
             } elseif (\is_array($result)) {
                 $result[$targetProperty] = $transformedValue;
             } else {
-                $this->accessor->setValue($result, $targetProperty, $transformedValue);
+                throw new \UnexpectedValueException("Property '{$targetProperty}' is not writable");
             }
         }
 
