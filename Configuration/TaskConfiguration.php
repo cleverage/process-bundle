@@ -238,12 +238,17 @@ class TaskConfiguration
      */
     public function hasAncestor(TaskConfiguration $taskConfig)
     {
-        foreach ($this->getPreviousTasksConfigurations() as $previousTasksConfig) {
-            if ($previousTasksConfig->getCode() === $taskConfig->getCode()) {
+        foreach ($this->getPreviousTasksConfigurations() as $previousTaskConfig) {
+            // Avoid errors for direct ancestors
+            if ($this->getCode() === $previousTaskConfig->getCode()) {
+                continue;
+            }
+
+            if ($previousTaskConfig->getCode() === $taskConfig->getCode()) {
                 return true;
             }
 
-            if ($previousTasksConfig->hasAncestor($taskConfig)) {
+            if ($previousTaskConfig->hasAncestor($taskConfig)) {
                 return true;
             }
         }
@@ -261,18 +266,28 @@ class TaskConfiguration
      */
     public function hasDescendant(TaskConfiguration $taskConfig, $checkErrors = true)
     {
-        foreach ($this->getNextTasksConfigurations() as $errorTasksConfig) {
-            if ($errorTasksConfig->getCode() === $taskConfig->getCode()) {
+        foreach ($this->getNextTasksConfigurations() as $nextTaskConfig) {
+            // Avoid errors for direct descendant
+            if ($this->getCode() === $nextTaskConfig->getCode()) {
+                continue;
+            }
+
+            if ($nextTaskConfig->getCode() === $taskConfig->getCode()) {
                 return true;
             }
 
-            if ($errorTasksConfig->hasDescendant($taskConfig, $checkErrors)) {
+            if ($nextTaskConfig->hasDescendant($taskConfig, $checkErrors)) {
                 return true;
             }
         }
 
         if ($checkErrors) {
             foreach ($this->getErrorTasksConfigurations() as $errorTasksConfig) {
+                // Avoid errors for direct error descendant
+                if ($this->getCode() === $errorTasksConfig->getCode()) {
+                    continue;
+                }
+
                 if ($errorTasksConfig->getCode() === $taskConfig->getCode()) {
                     return true;
                 }

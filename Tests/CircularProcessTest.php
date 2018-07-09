@@ -22,4 +22,28 @@ class CircularProcessTest extends AbstractProcessTest
     {
         $this->processManager->execute('test.circular_process');
     }
+
+    /**
+     * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
+     */
+    public function testReversedCircularProcess()
+    {
+        $this->processManager->execute('test.circular_process.reversed');
+    }
+
+    /**
+     * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
+     */
+    public function testSelfCircularProcess()
+    {
+        $this->processManager->execute('test.circular_process.self');
+    }
+
+    /**
+     * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
+     */
+    public function testLongCircularProcess()
+    {
+        $this->processManager->execute('test.circular_process.long');
+    }
 }
