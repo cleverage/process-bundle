@@ -40,6 +40,8 @@ class CircularProcessTest extends AbstractProcessTest
     }
 
     /**
+     * A loop in an independent branch was sometime not properly detected
+     *
      * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
      */
     public function testLongCircularProcess()

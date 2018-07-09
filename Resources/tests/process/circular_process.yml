@@ -34,13 +34,28 @@ clever_age_process:
             tasks:
                 data1:
                     service: '@cleverage_process.task.dummy'
-                    outputs: [data3]
+                    outputs: [data3, data4]
 
                 data2:
                     service: '@cleverage_process.task.dummy'
                     outputs: [data3]
 
                 data3:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data2, data3b]
+
+                data3b:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data3c]
+
+                data3c:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data3d]
+
+                data3d:
+                    service: '@cleverage_process.task.dummy'
+
+                data3b:
                     service: '@cleverage_process.task.dummy'
                     outputs: [data2]
 

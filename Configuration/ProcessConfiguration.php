@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Configuration;
 
+use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
 
 /**
@@ -240,6 +241,27 @@ class ProcessConfiguration
     }
 
     /**
+     * Assert the process does not contain circular dependencies
+     *
+     * @throws CircularProcessException
+     */
+    public function checkCircularDependencies()
+    {
+        $taskConfigurations = $this->getTaskConfigurations();
+
+        foreach ($taskConfigurations as $taskConfiguration) {
+            foreach ($taskConfiguration->getPreviousTasksConfigurations() as $previousTaskConfig) {
+                if ($taskConfiguration->getCode() === $previousTaskConfig->getCode()) {
+                    throw CircularProcessException::create($this->getCode(), $taskConfiguration->getCode());
+                }
+            }
+            if ($taskConfiguration->hasAncestor($taskConfiguration)) {
+                throw CircularProcessException::create($this->getCode(), $taskConfiguration->getCode());
+            }
+        }
+    }
+
+    /**
      * Cross all relations of a task to find all dependencies, and append them to the given array
      *
      * @param TaskConfiguration $taskConfig
@@ -283,6 +305,13 @@ class ProcessConfiguration
     protected function sortDependencies(array $dependencies)
     {
         if (\count($dependencies) <= 1) {
+            return $dependencies;
+        }
+
+        try {
+            $this->checkCircularDependencies();
+        } catch (CircularProcessException $e) {
+            // Skipping the sort phase, it will throw later, on runtime
             return $dependencies;
         }
 
