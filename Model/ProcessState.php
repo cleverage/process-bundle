@@ -67,7 +67,11 @@ class ProcessState
     /** @var array */
     protected $errorContext = [];
 
-    /** @var OutputInterface */
+    /** @var OutputInterface
+     *
+     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::consoleOutput attribute is deprecated since
+     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
+     */
     protected $consoleOutput;
 
     /** @var int */
@@ -347,17 +351,33 @@ class ProcessState
 
     /**
      * @return OutputInterface
+     *
+     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::getConsoleOutput() function is deprecated since
+     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
      */
     public function getConsoleOutput()
     {
+        trigger_error(
+            "The CleverAge\ProcessBundle\Model\ProcessState::getConsoleOutput() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
+            E_DEPRECATED
+        );
+
         return $this->consoleOutput;
     }
 
     /**
      * @param OutputInterface $consoleOutput
+     *
+     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::getConsoleOutput() function is deprecated since
+     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
      */
     public function setConsoleOutput(OutputInterface $consoleOutput)
     {
+        trigger_error(
+            "The CleverAge\ProcessBundle\Model\ProcessState::setConsoleOutput() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
+            E_DEPRECATED
+        );
+
         $this->consoleOutput = $consoleOutput;
     }
 
