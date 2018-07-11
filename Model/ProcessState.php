@@ -13,8 +13,6 @@ namespace CleverAge\ProcessBundle\Model;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
-use CleverAge\ProcessBundle\Entity\ProcessHistory;
-use CleverAge\ProcessBundle\Entity\TaskHistory;
 use Psr\Log\LogLevel;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -171,7 +169,7 @@ class ProcessState
     {
         trigger_error(
             "The CleverAge\ProcessBundle\Model\ProcessState::log() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
-            E_DEPRECATED
+            E_USER_DEPRECATED
         );
 
         $taskHistory = new TaskHistory($this->getTaskConfiguration());
@@ -193,7 +191,7 @@ class ProcessState
     {
         trigger_error(
             "The CleverAge\ProcessBundle\Model\ProcessState::getTaskHistories() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
-            E_DEPRECATED
+            E_USER_DEPRECATED
         );
 
         return $this->taskHistories;
@@ -209,7 +207,7 @@ class ProcessState
     {
         trigger_error(
             "The CleverAge\ProcessBundle\Model\ProcessState::clearTaskHistories() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
-            E_DEPRECATED
+            E_USER_DEPRECATED
         );
 
         $this->taskHistories = [];
@@ -359,7 +357,7 @@ class ProcessState
     {
         trigger_error(
             "The CleverAge\ProcessBundle\Model\ProcessState::getConsoleOutput() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
-            E_DEPRECATED
+            E_USER_DEPRECATED
         );
 
         return $this->consoleOutput;
@@ -375,7 +373,7 @@ class ProcessState
     {
         trigger_error(
             "The CleverAge\ProcessBundle\Model\ProcessState::setConsoleOutput() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
-            E_DEPRECATED
+            E_USER_DEPRECATED
         );
 
         $this->consoleOutput = $consoleOutput;
@@ -523,6 +521,7 @@ class ProcessState
     public function getLogContext()
     {
         $context = [
+            'process_id' => $this->processHistory->getId(),
             'process_code' => $this->processConfiguration->getCode(),
             'process_context' => $this->context,
             'task_code' => $this->taskConfiguration->getCode(),

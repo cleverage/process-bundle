@@ -13,7 +13,6 @@ namespace CleverAge\ProcessBundle\Manager;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
-use CleverAge\ProcessBundle\Entity\ProcessHistory;
 use CleverAge\ProcessBundle\Entity\TaskHistory;
 use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
@@ -21,6 +20,7 @@ use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
+use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
@@ -308,9 +308,7 @@ class ProcessManager
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
-     * @throws \Doctrine\ORM\ORMException
      *
      * @return ProcessHistory
      */
@@ -320,8 +318,6 @@ class ProcessManager
         array $context = []
     ): ProcessHistory {
         $processHistory = new ProcessHistory($processConfiguration);
-        $this->entityManager->persist($processHistory);
-        $this->entityManager->flush($processHistory);
 
         foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
             $state = new ProcessState($processConfiguration, $processHistory);
@@ -424,18 +420,10 @@ class ProcessManager
      * @param ProcessState $state
      *
      * @throws \RuntimeException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      */
     protected function handleState(ProcessState $state): void
     {
-        if ($this->entityManager->isOpen()) {
-            // Merging the process history back into the unit of work
-            /** @var ProcessHistory $processHistory */
-            $processHistory = $this->entityManager->merge($state->getProcessHistory());
-        } else {
-            $processHistory = $state->getProcessHistory(); // We will crash later
-        }
+        $processHistory = $state->getProcessHistory();
 
         $consoleOutput = $state->getConsoleOutput();
         foreach ($state->getTaskHistories() as $taskHistory) {
@@ -457,12 +445,9 @@ class ProcessManager
                 $consoleOutput->writeln($msg);
                 $consoleOutput->writeln(json_encode($taskHistory->getContext()));
             }
+            $this->logger->${$taskHistory->getLevel()}($taskHistory->getMessage(), $taskHistory->getContext());
             $taskHistory->setProcessHistory($processHistory);
             $processHistory->addTaskHistory($taskHistory);
-            if ($this->entityManager->isOpen()) {
-                $this->entityManager->persist($taskHistory);
-                $this->entityManager->flush($taskHistory);
-            }
         }
 
         if (!$this->entityManager->isOpen()) {
@@ -473,7 +458,14 @@ class ProcessManager
 
         if ($state->getException()) {
             $processHistory->setFailed();
-            $this->entityManager->flush($processHistory);
+
+            $this->logger->critical(
+                "Process {$state->getProcessConfiguration()->getCode()} has failed",
+                [
+                    'duration' => $processHistory->getDuration(),
+                    'state' => $state->getLogContext(),
+                ]
+            );
 
             throw new \RuntimeException(
                 "Process {$state->getProcessConfiguration()->getCode()} has failed",
@@ -486,19 +478,21 @@ class ProcessManager
     /**
      * @param ProcessHistory $history
      *
-     * @throws \Doctrine\ORM\ORMException
      */
     protected function endProcess(ProcessHistory $history): void
     {
-        /** @var ProcessHistory $processHistory */
-        $processHistory = $this->entityManager->merge($history);
-
         // Do not change state if already set
-        if ($processHistory->isStarted()) {
-            $processHistory->setSuccess();
-        }
+        if ($history->isStarted()) {
+            $history->setSuccess();
 
-        $this->entityManager->flush($processHistory);
+            $this->logger->info(
+                "Process {$history->getProcessCode()} succeed",
+                [
+                    'process_id' => $history->getId(),
+                    'duration' => $history->getDuration(),
+                ]
+            );
+        }
     }
 
     /**
@@ -506,12 +500,10 @@ class ProcessManager
      *
      * @param ProcessConfiguration $processConfiguration
      *
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \RuntimeException
      * @throws \CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException
      * @throws \CleverAge\ProcessBundle\Exception\CircularProcessException
      * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
-     * @throws \Doctrine\ORM\ORMException
      */
     protected function checkProcess(ProcessConfiguration $processConfiguration): void
     {
