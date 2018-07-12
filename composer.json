@@ -36,7 +36,7 @@
         "doctrine/orm": "^2.5",
         "doctrine/doctrine-bundle": "^1.6",
         "symfony/expression-language": "^3.0",
-        "symfony/monolog-bundle": "^3.3",
+        "symfony/monolog-bundle": "~3.3",
         "sidus/base-bundle": "^1.0"
     },
     "require-dev": {
