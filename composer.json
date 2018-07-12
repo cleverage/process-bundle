@@ -32,14 +32,14 @@
     },
     "require": {
         "php": ">=7.1",
-        "symfony/symfony": "^3.0",
-        "doctrine/orm": "^2.5",
-        "doctrine/doctrine-bundle": "^1.6",
-        "symfony/expression-language": "^3.0",
+        "symfony/symfony": "~3.0|~4.0",
+        "doctrine/orm": "~2.5",
+        "doctrine/doctrine-bundle": "~1.6",
+        "symfony/expression-language": "~3.0|~4.0",
         "symfony/monolog-bundle": "~3.3",
-        "sidus/base-bundle": "^1.0"
+        "sidus/base-bundle": "~1.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^6.4"
+        "phpunit/phpunit": "~6.4"
     }
 }
