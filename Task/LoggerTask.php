@@ -66,7 +66,10 @@ class LoggerTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $options = $this->getOptions($state);
-        $context = [];
+        $context = [
+            'process_id' => $state->getProcessHistory()->getId(),
+            'process_code' => $state->getProcessConfiguration()->getCode(),
+        ];
         foreach ($options['context'] as $contextInfo) {
             $value = $this->accessor->getValue($state, $contextInfo);
             if ($value instanceof \stdClass) {
