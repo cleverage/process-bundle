@@ -12,6 +12,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -28,14 +29,19 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
     /** @var TransformerRegistry */
     protected $transformerRegistry;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /** @var PropertyAccessorInterface */
     protected $accessor;
 
     /**
+     * @param LoggerInterface           $logger
      * @param PropertyAccessorInterface $accessor
      */
-    public function __construct(PropertyAccessorInterface $accessor)
+    public function __construct(LoggerInterface $logger, PropertyAccessorInterface $accessor)
     {
+        $this->logger = $logger;
         $this->accessor = $accessor;
     }
 
@@ -102,6 +108,12 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                             if ($mapping['ignore_missing'] || $options['ignore_missing']) {
                                 continue;
                             }
+                            $this->logger->debug(
+                                'Mapping exception',
+                                [
+                                    'message' => $missingPropertyError->getMessage(),
+                                ]
+                            );
                             throw $missingPropertyError;
                         }
                     }
@@ -113,6 +125,12 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                         if ($mapping['ignore_missing'] || $options['ignore_missing']) {
                             continue;
                         }
+                        $this->logger->debug(
+                            'Mapping exception',
+                            [
+                                'message' => $missingPropertyError->getMessage(),
+                            ]
+                        );
                         throw $missingPropertyError;
                     }
                 }
@@ -129,6 +147,16 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
                     );
                 }
             } catch (\Throwable $exception) {
+                $this->logger->debug(
+                    'Transformation exception',
+                    [
+                        'message' => $exception->getMessage(),
+                        'file' => $exception->getFile(),
+                        'line' => $exception->getLine(),
+                        'trace' => $exception->getTraceAsString(),
+                    ]
+                );
+
                 throw new TransformerException($targetProperty, 0, $exception);
             }
 
@@ -268,8 +296,9 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
     }
 
     /**
-     * This allows to use transformer codes suffixes to avoid limitations to the "transformers" option using codes as keys
-     * This way you can chain multiple times the same transformer. Without this, it would silently call only the 1st one.
+     * This allows to use transformer codes suffixes to avoid limitations to the "transformers" option using codes as
+     * keys This way you can chain multiple times the same transformer. Without this, it would silently call only the
+     * 1st one.
      *
      * @example
      * transformers:

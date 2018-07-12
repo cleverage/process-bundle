@@ -4,6 +4,7 @@ services:
         autowire: true
         tags:
             - { name: cleverage.transformer }
+            - { name: monolog.logger, channel: cleverage_process_transformer }
 
     CleverAge\ProcessBundle\Transformer\SlugifyTransformer:
         public: false
