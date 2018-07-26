@@ -4,51 +4,51 @@ clever_age_process:
             entry_point: data
             tasks:
                 data:
-                    service: '@cleverage_process.task.constant_iterable_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
                     options:
                         output: [1, 2, 3]
                     outputs: [doNothing]
                     errors: [doNothing2]
 
                 doNothing:
-                    service: '@cleverage_process.task.dummy'
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
                     outputs: [pushDataEvent]
 
                 doNothing2:
-                    service: '@cleverage_process.task.dummy'
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
                     outputs: [pushDataEvent]
 
                 pushDataEvent:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
         test.error_process_with_blocking:
             tasks:
                 data:
-                    service: '@cleverage_process.task.constant_iterable_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
                     options:
                         output: [1, 2, 3]
                     outputs: [errorForwarder]
 
                 errorForwarder:
-                    service: '@cleverage_process.task.error_forwarder'
+                    service: '@CleverAge\ProcessBundle\Task\ErrorForwarderTask'
                     outputs: [doNothing]
                     errors: [doNothing2]
 
                 doNothing:
-                    service: '@cleverage_process.task.dummy'
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
                     outputs: [pushDataEvent]
 
                 doNothing2:
-                    service: '@cleverage_process.task.dummy'
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
                     outputs: [aggregate, pushDataEvent]
 
                 aggregate:
-                    service: '@cleverage_process.task.aggregate_iterable'
+                    service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
                     outputs: [pushDataEvent]
 
                 pushDataEvent:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue

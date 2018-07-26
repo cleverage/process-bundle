@@ -4,29 +4,29 @@ clever_age_process:
             entry_point: data
             tasks:
                 data:
-                    service: '@cleverage_process.task.constant_iterable_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
                     options:
                         output: [1, 2, 3]
                     outputs: [pushDataEvent, doNothing, doNothing2]
 
                 doNothing:
-                    service: '@cleverage_process.task.dummy'
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
                     outputs: [aggregate]
 
                 aggregate:
-                    service: '@cleverage_process.task.aggregate_iterable'
+                    service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
                     outputs: [pushDataEvent, inputAggregate]
 
                 doNothing2:
-                    service: '@cleverage_process.task.dummy'
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
                     outputs: [aggregate2]
 
                 aggregate2:
-                    service: '@cleverage_process.task.aggregate_iterable'
+                    service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
                     outputs: [pushDataEvent, inputAggregate]
 
                 inputAggregate:
-                    service: '@cleverage_process.task.input_aggregator'
+                    service: '@CleverAge\ProcessBundle\Task\InputAggregatorTask'
                     options:
                         input_codes:
                             aggregate: aggregate
@@ -34,6 +34,6 @@ clever_age_process:
                     outputs: [pushDataEvent]
 
                 pushDataEvent:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue

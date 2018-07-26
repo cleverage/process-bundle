@@ -3,9 +3,9 @@ clever_age_process:
         test.circular_process:
             tasks:
                 data1:
-                    service: '@cleverage_process.task.dummy'
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
                     outputs: [data2]
 
                 data2:
-                    service: '@cleverage_process.task.dummy'
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
                     outputs: [data1]

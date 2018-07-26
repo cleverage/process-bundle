@@ -5,4 +5,4 @@ clever_age_process:
             end_point: data
             tasks:
                 data:
-                    service: '@cleverage_process.task.dummy'
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'

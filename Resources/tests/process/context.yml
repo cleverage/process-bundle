@@ -5,6 +5,6 @@ clever_age_process:
             end_point: data
             tasks:
                 data:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: '{{ value }}'

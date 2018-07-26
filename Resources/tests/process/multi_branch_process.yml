@@ -3,24 +3,24 @@ clever_age_process:
         test.multi_branch_process_first:
             tasks:
                 data1:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ok'
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
                 data2:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ko'
                     outputs: [pushDataEvent2]
 
                 pushDataEvent2:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -28,24 +28,24 @@ clever_age_process:
             entry_point: data2
             tasks:
                 data1:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ko'
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
                 data2:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ok'
                     outputs: [pushDataEvent2]
 
                 pushDataEvent2:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -53,23 +53,23 @@ clever_age_process:
             entry_point: data2
             tasks:
                 pushDataEvent2:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
                 data1:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ko'
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
                 data2:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ok'
                     outputs: [pushDataEvent2]
@@ -78,24 +78,24 @@ clever_age_process:
             end_point: pushDataEvent2
             tasks:
                 data1:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ko'
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
                 data2:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ok'
                     outputs: [pushDataEvent2]
 
                 pushDataEvent2:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -104,24 +104,24 @@ clever_age_process:
             end_point: pushDataEvent2
             tasks:
                 data1:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ko'
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
                 data2:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ok'
                     outputs: [pushDataEvent2]
 
                 pushDataEvent2:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -130,23 +130,23 @@ clever_age_process:
             end_point: pushDataEvent2
             tasks:
                 data1:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ko'
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
                 data2:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output: 'ok'
                     outputs: [pushDataEvent2]
 
                 pushDataEvent2:
-                    service: '@cleverage_process.task.event_dispatcher'
+                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue

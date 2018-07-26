@@ -5,7 +5,7 @@ clever_age_process:
             end_point: transform
             tasks:
                 transform:
-                    service: '@cleverage_process.task.transformer'
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
                     options:
                         error_strategy: stop
                         mapping:
@@ -17,7 +17,7 @@ clever_age_process:
             end_point: transform
             tasks:
                 transform:
-                    service: '@cleverage_process.task.transformer'
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
                     options:
                         error_strategy: stop
                         mapping:
@@ -29,7 +29,7 @@ clever_age_process:
             end_point: transform
             tasks:
                 transform:
-                    service: '@cleverage_process.task.transformer'
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
                     options:
                         error_strategy: stop
                         mapping:
@@ -46,7 +46,7 @@ clever_age_process:
             end_point: transform
             tasks:
                 transform:
-                    service: '@cleverage_process.task.transformer'
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
                     options:
                         error_strategy: stop
                         mapping:

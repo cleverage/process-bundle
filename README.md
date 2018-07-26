@@ -57,7 +57,7 @@ Note that orphan tasks will be reported as errors before the process starts
 Simply outputs the same configured value all the time, ignores any input
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.constant_output'
+    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
     options:
         # Required options
         output: <mixed> # Will always output the value configured here
@@ -68,7 +68,7 @@ Simply outputs the same configured value all the time, ignores any input
 Same as ConstantOutputTask but only accepts an array of values and iterates over each element.
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.constant_iterable_output'
+    service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
     options:
         # Required options
         output: <array> # Will iterate over the elements
@@ -79,7 +79,7 @@ Same as ConstantOutputTask but only accepts an array of values and iterates over
 Reads a CSV file and iterate on each line, returning an array of key -> values
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.csv_reader'
+    service: '@CleverAge\ProcessBundle\Task\CsvReaderTask'
     options:
         # Required options
         file_path: <string> # Required, the path of the file to read from
@@ -98,7 +98,7 @@ Write to a CSV file, will wait until the end of the previous iteration (this is 
 path.
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.csv_writer'
+    service: '@CleverAge\ProcessBundle\Task\CsvWriterTask'
     options:
         # Required options
         file_path: <string> # Required, the path of the file to write to
@@ -118,7 +118,7 @@ If the tasks read anything else than an array as input the process will stops.
 Dumps the input value to the console, obviously for debug purposes
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.debug'
+    service: '@CleverAge\ProcessBundle\Task\DebugTask'
 ```
 No supported options, no output.
 
@@ -126,7 +126,7 @@ No supported options, no output.
 Reads data from a Doctrine Repository, iterating over the results. Ignores any input.
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.doctrine_reader'
+    service: '@CleverAge\ProcessBundle\Task\DoctrineReaderTask'
     options:
         # Required options
         class_name: <string> # Required, the class name of the entity
@@ -145,7 +145,7 @@ All the criteria, order_by, limit and offset options behave like the ```EntityRe
 Write a Doctrine entity to the database.
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.doctrine_writer'
+    service: '@CleverAge\ProcessBundle\Task\DoctrineWriterTask'
     options:
         # Optional options
         entity_manager: null # If the entity manager is not the default one, use this option
@@ -156,7 +156,7 @@ Write a Doctrine entity to the database.
 Normalize data from the input and pass it to the output
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.normalizer'
+    service: '@CleverAge\ProcessBundle\Task\NormalizerTask'
     options:
         # Required options
         format: <string> # Required, format for normalization
@@ -170,7 +170,7 @@ Normalize data from the input and pass it to the output
 Denormalize data from the input and pass it to the output
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.denormalizer'
+    service: '@CleverAge\ProcessBundle\Task\DenormalizerTask'
     options:
         # Required options
         class: <string>
@@ -185,7 +185,7 @@ Denormalize data from the input and pass it to the output
 Accepts an array or an object as an input and sets values before returning it as the output
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.property_setter'
+    service: '@CleverAge\ProcessBundle\Task\PropertySetterTask'
     options:
         # Required options
         values:
@@ -203,7 +203,7 @@ Accepts an array or an object as an input and sets values before returning it as
 At the end of the process, during the finalize(), it will log the number of item processed.
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.stat_counter'
+    service: '@CleverAge\ProcessBundle\Task\StatCounterTask'
 ```
 No supported options, no output.
 
@@ -211,7 +211,7 @@ No supported options, no output.
 Accepts an array as input and sets values before returning it as the output
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.transformer'
+    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
     options:
         # Required options
         transformer: mapping # the code of the transformer that you want to apply, 'mapping' by default
@@ -239,7 +239,7 @@ Accepts an array as input and sets values before returning it as the output
 Validate data from the input and pass it to the output
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.validator'
+    service: '@CleverAge\ProcessBundle\Task\ValidatorTask'
     options:
         # Optional options
         error_strategy: skip # Other possible values are: 'stop' and 'continue'
@@ -251,7 +251,7 @@ Validate data from the input and pass it to the output
 Call the Symfony event dispatcher
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.event_dispatcher'
+    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
     options:
         event_name: <event_name> # The name of your event
 ```
@@ -260,7 +260,7 @@ Call the Symfony event dispatcher
 Passes the input to the output, can be used as an entry point allow multiple tasks to be run at the entry point
 ```yml
 <task_code>:
-    service: '@cleverage_process.task.dummy'
+    service: '@CleverAge\ProcessBundle\Task\DummyTask'
     outputs: [<task_code>] # Array of tasks to be called, does not pass any input
 ```
 
@@ -310,19 +310,19 @@ clever_age_process:
             entry_point: read
             tasks:
                 read:
-                    service: '@cleverage_process.task.doctrine_reader'
+                    service: '@CleverAge\ProcessBundle\Task\DoctrineReaderTask'
                     options:
                         class_name: MyNamespace\FooBarBundle\Entity\Data
                     outputs: [normalize]
 
                 normalize:
-                    service: '@cleverage_process.task.normalizer'
+                    service: '@CleverAge\ProcessBundle\Task\NormalizerTask'
                     options:
                         format: csv
                     outputs: [write]
 
                 write:
-                    service: '@cleverage_process.task.csv_writer'
+                    service: '@CleverAge\ProcessBundle\Task\CsvWriterTask'
                     options:
                         file_path: '%kernel.root_dir%/../var/data/export/data.csv'
 ```
