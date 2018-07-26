@@ -420,7 +420,6 @@ class ProcessState
             'process_context' => $this->context,
             'task_code' => $this->taskConfiguration->getCode(),
             'task_service' => $this->taskConfiguration->getServiceReference(),
-
         ];
 
         if ($this->hasError()) {
