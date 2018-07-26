@@ -15,7 +15,7 @@ class MappingTransformerTest extends AbstractProcessTest
      */
     public function testSimpleMapping()
     {
-        $result = $this->processManager->execute('test.mapping_transformer.simple', null, ['field' => 'value']);
+        $result = $this->processManager->execute('test.mapping_transformer.simple', ['field' => 'value']);
 
         self::assertEquals(['field2' => 'value'], $result);
     }
@@ -27,7 +27,7 @@ class MappingTransformerTest extends AbstractProcessTest
      */
     public function testMissingMapping()
     {
-        $this->processManager->execute('test.mapping_transformer.error', null, ['field' => 'value']);
+        $this->processManager->execute('test.mapping_transformer.error', ['field' => 'value']);
     }
 
     /**
@@ -35,7 +35,7 @@ class MappingTransformerTest extends AbstractProcessTest
      */
     public function testMultiSubtransformers()
     {
-        $result = $this->processManager->execute('test.mapping_transformer.multi_subtransformers', null, ['field' => [3, null, 4, 2]]);
+        $result = $this->processManager->execute('test.mapping_transformer.multi_subtransformers', ['field' => [3, null, 4, 2]]);
 
         self::assertEquals(['field2' => [2, 4, 3]], $result);
     }
@@ -45,7 +45,7 @@ class MappingTransformerTest extends AbstractProcessTest
      */
     public function testDeepMapping()
     {
-        $result = $this->processManager->execute('test.mapping_transformer.deep_mapping', null, ['value' => "ok"]);
+        $result = $this->processManager->execute('test.mapping_transformer.deep_mapping', ['value' => "ok"]);
 
         self::assertEquals(['field1' => ["field2" => ["field3" => "ok"]]], $result);
     }

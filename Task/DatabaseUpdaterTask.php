@@ -10,14 +10,11 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
-use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use Psr\Log\LogLevel;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Doctrine\DBAL\Driver\PDOStatement;
 
 /**
  * Fetch entities from doctrine
@@ -30,12 +27,17 @@ class DatabaseUpdaterTask extends AbstractConfigurableTask
     /** @var ManagerRegistry */
     protected $doctrine;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param ManagerRegistry $doctrine
+     * @param LoggerInterface $logger
      */
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, LoggerInterface $logger)
     {
         $this->doctrine = $doctrine;
+        $this->logger = $logger;
     }
 
     /**
@@ -51,11 +53,9 @@ class DatabaseUpdaterTask extends AbstractConfigurableTask
 
         // Handle empty results
         if (false === $statement->execute()) {
-            $state->log(
-                'Error while executing query: ',
-                LogLevel::ERROR,
-                $state->getProcessConfiguration()->getCode(),
-                $this->getOptions($state)
+            $this->logger->critical(
+                'Error while executing query: '.$statement->errorInfo(),
+                $state->getLogContext()
             );
             $state->setStopped(true);
 

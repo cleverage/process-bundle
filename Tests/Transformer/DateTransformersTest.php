@@ -16,7 +16,7 @@ class DateTransformersTest extends AbstractProcessTest
      */
     public function testDateFormatString()
     {
-        $result = $this->processManager->execute('test.date_transformers.date_format', null, '2001-01-01T00:00:00+00:00');
+        $result = $this->processManager->execute('test.date_transformers.date_format', '2001-01-01T00:00:00+00:00');
         self::assertEquals('2001-01-01', $result);
     }
 
@@ -26,7 +26,7 @@ class DateTransformersTest extends AbstractProcessTest
     public function testDateFormatObject()
     {
         $date = \DateTime::createFromFormat(DATE_ATOM, '2001-01-02T00:00:00+00:00');
-        $result = $this->processManager->execute('test.date_transformers.date_format', null, $date);
+        $result = $this->processManager->execute('test.date_transformers.date_format', $date);
         self::assertEquals('2001-01-02', $result);
     }
 
@@ -36,7 +36,7 @@ class DateTransformersTest extends AbstractProcessTest
     public function testDateParser()
     {
         $date = \DateTime::createFromFormat('d/m/Y', '01/01/2001');
-        $result = $this->processManager->execute('test.date_transformers.date_parser', null, '2001-01-01');
+        $result = $this->processManager->execute('test.date_transformers.date_parser', '2001-01-01');
         self::assertInstanceOf(\DateTime::class, $result);
         if ($result instanceof \DateTime) {
             self::assertEquals($date->getTimestamp(), $result->getTimestamp());
@@ -49,7 +49,7 @@ class DateTransformersTest extends AbstractProcessTest
      */
     public function testDateParserError()
     {
-        $this->processManager->execute('test.date_transformers.date_parser', null, '2001-01-01T00:00:00+00:00');
+        $this->processManager->execute('test.date_transformers.date_parser', '2001-01-01T00:00:00+00:00');
     }
 
     /**
@@ -57,7 +57,7 @@ class DateTransformersTest extends AbstractProcessTest
      */
     public function testDateParseFormat()
     {
-        $result = $this->processManager->execute('test.date_transformers.date_parse_format', null, '2001-01-01T00:00:00+00:00');
+        $result = $this->processManager->execute('test.date_transformers.date_parse_format', '2001-01-01T00:00:00+00:00');
         self::assertEquals('2001-01-01', $result);
     }
 }

@@ -131,34 +131,6 @@ class ProcessConfiguration
     }
 
     /**
-     * @deprecated
-     *
-     * @param TaskConfiguration $currentTaskConfiguration
-     *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
-     *
-     * @return TaskConfiguration[]
-     */
-    public function getNextTasks(TaskConfiguration $currentTaskConfiguration)
-    {
-        return $currentTaskConfiguration->getNextTasksConfigurations();
-    }
-
-    /**
-     * @deprecated
-     *
-     * @param TaskConfiguration $currentTaskConfiguration
-     *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
-     *
-     * @return TaskConfiguration[]
-     */
-    public function getErrorTasks(TaskConfiguration $currentTaskConfiguration)
-    {
-        return $currentTaskConfiguration->getErrorTasksConfigurations();
-    }
-
-    /**
      * Group all task by dependencies
      *
      * If one task depend from another, it should come after

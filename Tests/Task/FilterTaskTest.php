@@ -41,16 +41,16 @@ class FilterTaskTest extends AbstractProcessTest
                 'key3' => [],
             ],
         ];
-        $result = $this->processManager->execute('test.filter_task.match', null, $input);
+        $result = $this->processManager->execute('test.filter_task.match', $input);
         self::assertEquals([$input[0]], $result);
 
-        $result = $this->processManager->execute('test.filter_task.not_match', null, $input);
+        $result = $this->processManager->execute('test.filter_task.not_match', $input);
         self::assertEquals([$input[1], $input[2]], $result);
 
-        $result = $this->processManager->execute('test.filter_task.empty', null, $input);
+        $result = $this->processManager->execute('test.filter_task.empty', $input);
         self::assertEquals([$input[2]], $result);
 
-        $result = $this->processManager->execute('test.filter_task.not_empty', null, $input);
+        $result = $this->processManager->execute('test.filter_task.not_empty', $input);
         self::assertEquals([$input[0], $input[1]], $result);
     }
 }

@@ -60,13 +60,10 @@ class ProcessExecutorTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $input = $state->getInput();
-        $consoleOutput = $state->getConsoleOutput();
-
         $processCode = $this->getOption($state, 'process');
         try {
             $output = $this->processManager->execute(
                 $this->getOption($state, 'process'),
-                $consoleOutput,
                 $input,
                 $this->getOption($state, 'context')
             );

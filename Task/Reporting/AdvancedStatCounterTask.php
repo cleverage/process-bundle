@@ -75,10 +75,6 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
             $fullText .= " in {$now->diff($this->startedAt)->format('%H:%I:%S')}";
 
             $this->logger->info($fullText, $state->getLogContext());
-            $consoleOutput = $state->getConsoleOutput();
-            if ($consoleOutput) {
-                $consoleOutput->writeln("<info>### {$fullText}</info>");
-            }
         }
         $this->counter++;
         $this->lastUpdate = $now;

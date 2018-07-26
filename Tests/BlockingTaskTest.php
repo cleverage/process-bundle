@@ -25,14 +25,14 @@ class BlockingTaskTest extends AbstractProcessTest
 
     public function testBlockingSolo()
     {
-        $result = $this->processManager->execute('test.blocking_solo', null, 'success');
+        $result = $this->processManager->execute('test.blocking_solo', 'success');
 
         self::assertEquals(['success'], $result);
     }
 
     public function testMultipleBlockingSolo()
     {
-        $result = $this->processManager->execute('test.multiple_blocking_solo', null, 'success');
+        $result = $this->processManager->execute('test.multiple_blocking_solo', 'success');
 
         self::assertEquals([['success']], $result);
     }

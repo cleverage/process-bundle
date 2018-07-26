@@ -11,7 +11,6 @@
 namespace CleverAge\ProcessBundle\Model;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
-use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * Logs information about a process
@@ -51,11 +50,6 @@ class ProcessHistory
     protected $state = self::STATE_STARTED;
 
     /**
-     * @var TaskHistory[]
-     */
-    protected $taskHistories;
-
-    /**
      * @param ProcessConfiguration $processConfiguration
      */
     public function __construct(ProcessConfiguration $processConfiguration)
@@ -63,7 +57,6 @@ class ProcessHistory
         $this->id = microtime(true);
         $this->processCode = $processConfiguration->getCode();
         $this->startDate = new \DateTime();
-        $this->taskHistories = new ArrayCollection();
     }
 
     /**
@@ -104,22 +97,6 @@ class ProcessHistory
     public function getState(): string
     {
         return $this->state;
-    }
-
-    /**
-     * @return TaskHistory[]
-     */
-    public function getTaskHistories()
-    {
-        return $this->taskHistories;
-    }
-
-    /**
-     * @param TaskHistory $taskHistory
-     */
-    public function addTaskHistory(TaskHistory $taskHistory)
-    {
-        $this->taskHistories[] = $taskHistory;
     }
 
     /**

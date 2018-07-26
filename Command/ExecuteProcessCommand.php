@@ -83,9 +83,9 @@ class ExecuteProcessCommand extends Command
             if (!$output->isQuiet()) {
                 $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
-            $returnValue = $this->processManager->execute($code, $output, $inputData, $context);
+            $returnValue = $this->processManager->execute($code, $inputData, $context);
             if ($output->isVeryVerbose() && class_exists(VarDumper::class)) {
-                VarDumper::dump($returnValue);
+                VarDumper::dump($returnValue); // @todo remove this please
             }
             if (!$output->isQuiet()) {
                 $output->writeln("<info>Process '{$code}' executed successfully</info>");

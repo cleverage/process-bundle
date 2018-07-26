@@ -13,8 +13,6 @@ namespace CleverAge\ProcessBundle\Model;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
-use Psr\Log\LogLevel;
-use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Used to pass information between tasks
@@ -48,14 +46,6 @@ class ProcessState
     /** @var mixed */
     protected $error;
 
-    /**
-     * @var TaskHistory[]
-     *
-     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::taskHistories attribute is deprecated since
-     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
-     */
-    protected $taskHistories = [];
-
     /** @var bool */
     protected $stopped = false;
 
@@ -64,13 +54,6 @@ class ProcessState
 
     /** @var array */
     protected $errorContext = [];
-
-    /** @var OutputInterface
-     *
-     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::consoleOutput attribute is deprecated since
-     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
-     */
-    protected $consoleOutput;
 
     /** @var int */
     protected $returnCode;
@@ -154,63 +137,6 @@ class ProcessState
     public function setTaskConfiguration(TaskConfiguration $taskConfiguration)
     {
         $this->taskConfiguration = $taskConfiguration;
-    }
-
-    /**
-     * @param string $message
-     * @param string $level
-     * @param string $reference
-     * @param array  $context
-     *
-     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::log() function is deprecated since version 1.2 and
-     *             will be removed in 2.0. Use default Symfony logger service instead.
-     */
-    public function log(string $message, string $level = LogLevel::ERROR, string $reference = null, array $context = [])
-    {
-        trigger_error(
-            "The CleverAge\ProcessBundle\Model\ProcessState::log() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
-            E_USER_DEPRECATED
-        );
-
-        $taskHistory = new TaskHistory($this->getTaskConfiguration());
-        $taskHistory->setMessage($message);
-        $taskHistory->setLevel($level);
-        $taskHistory->setReference($reference);
-        $taskHistory->setContext(array_merge($this->getErrorContext(), $context));
-
-        $this->taskHistories[] = $taskHistory;
-    }
-
-    /**
-     * @return TaskHistory[]
-     *
-     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::getTaskHistories() function is deprecated since
-     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
-     */
-    public function getTaskHistories(): array
-    {
-        trigger_error(
-            "The CleverAge\ProcessBundle\Model\ProcessState::getTaskHistories() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
-            E_USER_DEPRECATED
-        );
-
-        return $this->taskHistories;
-    }
-
-    /**
-     * Cleanup log
-     *
-     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::clearTaskHistories() function is deprecated since
-     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
-     */
-    public function clearTaskHistories()
-    {
-        trigger_error(
-            "The CleverAge\ProcessBundle\Model\ProcessState::clearTaskHistories() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
-            E_USER_DEPRECATED
-        );
-
-        $this->taskHistories = [];
     }
 
     /**
@@ -345,38 +271,6 @@ class ProcessState
     public function removeErrorContext($key)
     {
         unset($this->errorContext[$key]);
-    }
-
-    /**
-     * @return OutputInterface
-     *
-     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::getConsoleOutput() function is deprecated since
-     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
-     */
-    public function getConsoleOutput()
-    {
-        trigger_error(
-            "The CleverAge\ProcessBundle\Model\ProcessState::getConsoleOutput() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
-            E_USER_DEPRECATED
-        );
-
-        return $this->consoleOutput;
-    }
-
-    /**
-     * @param OutputInterface $consoleOutput
-     *
-     * @deprecated The CleverAge\ProcessBundle\Model\ProcessState::getConsoleOutput() function is deprecated since
-     *             version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.
-     */
-    public function setConsoleOutput(OutputInterface $consoleOutput)
-    {
-        trigger_error(
-            "The CleverAge\ProcessBundle\Model\ProcessState::setConsoleOutput() function is deprecated since version 1.2 and will be removed in 2.0. Use default Symfony logger service instead.",
-            E_USER_DEPRECATED
-        );
-
-        $this->consoleOutput = $consoleOutput;
     }
 
     /**

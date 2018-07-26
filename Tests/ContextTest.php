@@ -18,7 +18,7 @@ class ContextTest extends AbstractProcessTest
      */
     public function testSimpleContext()
     {
-        $result = $this->processManager->execute('test.context', null, 'ko', ['value' => 'ok']);
+        $result = $this->processManager->execute('test.context', 'ko', ['value' => 'ok']);
 
         self::assertEquals('ok', $result);
     }

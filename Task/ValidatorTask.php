@@ -103,7 +103,7 @@ class ValidatorTask extends AbstractConfigurableTask
         $resolver->setNormalizer(
             'constraints',
             function (Options $options, $constraints) {
-                if (is_null($constraints)) {
+                if (null === $constraints) {
                     return null;
                 }
 

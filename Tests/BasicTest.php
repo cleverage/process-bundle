@@ -31,7 +31,7 @@ class BasicTest extends AbstractProcessTest
      */
     public function testSimpleProcess()
     {
-        $result = $this->processManager->execute('test.simple_process', null, 'success');
+        $result = $this->processManager->execute('test.simple_process', 'success');
 
         self::assertEquals('success', $result);
     }

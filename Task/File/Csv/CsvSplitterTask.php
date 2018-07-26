@@ -43,9 +43,8 @@ class CsvSplitterTask extends InputCsvReaderTask
                 $options['mode']
             );
 
-            $output = $state->getConsoleOutput();
-            if ($output && $csv->getLineCount() > $options['max_lines']) {
-                $output->writeln("<info>Found big CSV file ({$csv->getLineCount()} lines), splitting...</info>");
+            if ($csv->getLineCount() > $options['max_lines']) {
+                $this->logger->debug("Found big CSV file ({$csv->getLineCount()} lines), splitting...");
             }
             $this->csv = $csv;
         }

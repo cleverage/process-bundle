@@ -15,7 +15,6 @@ use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\Options;
@@ -92,17 +91,9 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
             return;
         }
 
-        $output = $state->getConsoleOutput();
         while (\count($this->launchedProcesses) > 0) {
-            $processCount = \count($this->launchedProcesses);
-            if ($output) {
-                $output->writeln("<info>Waiting for {$processCount} processes to end...</info>");
-            }
             $this->handleProcesses($state);
             sleep($this->getOption($state, 'sleep_on_finalize_interval'));
-        }
-        if ($output) {
-            $output->writeln('<info>No more process !</info>');
         }
     }
 
@@ -134,7 +125,6 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
             throw new \RuntimeException("Unable to resolve path to symfony console '{$consolePath}'");
         }
 
-        $consoleOutput = $state->getConsoleOutput();
         $arguments = [
             $pathFinder->find(),
             $consolePath,
@@ -143,11 +133,6 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
             '--input-from-stdin',
         ];
         $arguments = array_merge($arguments, $processOptions);
-
-        $verbosity = $this->getVerbosityParameter($consoleOutput);
-        if ($verbosity) {
-            $arguments[] = $verbosity;
-        }
         $arguments[] = $processCode;
 
         // Even if parent process is launched with nohup, all subprocesses are sensitive to SIGHUP so we need to prepend
@@ -159,26 +144,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
         $processBuilder->setInput($state->getInput());
         $processBuilder->enableOutput();
         $process = $processBuilder->getProcess();
-
-        if ($consoleOutput) {
-            $consoleOutput->writeln("<info>{$process->getCommandLine()}</info>");
-            if ($consoleOutput->isVeryVerbose() && \function_exists('dump')) {
-                $consoleOutput->writeln('<info>Input:</info>');
-                dump($state->getInput());
-            }
-        }
-
-        $process->start(
-            function ($type, $output) use ($consoleOutput) {
-                if ($consoleOutput) {
-                    if ('err' === $type) {
-                        $consoleOutput->write('<error>'.$output.'</error>');
-                    } else {
-                        $consoleOutput->write($output);
-                    }
-                }
-            }
-        );
+        $process->start();
 
         return $process;
     }
@@ -255,29 +221,5 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
         foreach ($this->launchedProcesses as $process) {
             $process->stop(5);
         }
-    }
-
-    /**
-     * @param OutputInterface|null $output
-     *
-     * @return string
-     */
-    protected function getVerbosityParameter(OutputInterface $output = null)
-    {
-        if (!$output) {
-            return null;
-        }
-        switch ($output->getVerbosity()) {
-            case OutputInterface::VERBOSITY_QUIET:
-                return '-q';
-            case OutputInterface::VERBOSITY_VERBOSE:
-                return '-v';
-            case OutputInterface::VERBOSITY_VERY_VERBOSE:
-                return '-vv';
-            case OutputInterface::VERBOSITY_DEBUG:
-                return '-vvv';
-        }
-
-        return null;
     }
 }

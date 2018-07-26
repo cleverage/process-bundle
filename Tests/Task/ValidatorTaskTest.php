@@ -28,7 +28,7 @@ class ValidatorTaskTest extends AbstractProcessTest
             'any_field'    => 'hello',
             'choice_field' => 'Some random value 1',
         ];
-        $result = $this->processManager->execute('test.validator_task', null, $input);
+        $result = $this->processManager->execute('test.validator_task', $input);
         self::assertEquals($input, $result);
     }
 

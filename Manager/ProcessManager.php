@@ -13,7 +13,6 @@ namespace CleverAge\ProcessBundle\Manager;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
-use CleverAge\ProcessBundle\Entity\TaskHistory;
 use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
@@ -26,8 +25,6 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -78,19 +75,18 @@ class ProcessManager
     }
 
     /**
-     * @param string          $processCode
-     * @param OutputInterface $output
-     * @param mixed           $input
-     * @param array           $context
+     * @param string $processCode
+     * @param mixed  $input
+     * @param array  $context
      *
      * @throws \Exception
      *
      * @return mixed
      */
-    public function execute(string $processCode, OutputInterface $output = null, $input = null, array $context = [])
+    public function execute(string $processCode, $input = null, array $context = [])
     {
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
-        $processHistory = $this->initializeStates($processConfiguration, $output, $context);
+        $processHistory = $this->initializeStates($processConfiguration, $context);
         $this->checkProcess($processConfiguration);
 
         // First initialize the whole stack in a linear way, tasks are initialized in the order they are configured
@@ -139,7 +135,6 @@ class ProcessManager
      * @throws \Exception
      *
      * @return bool
-     * @throws \Exception
      */
     protected function resolve(TaskConfiguration $taskConfiguration): bool
     {
@@ -303,7 +298,6 @@ class ProcessManager
 
     /**
      * @param ProcessConfiguration $processConfiguration
-     * @param OutputInterface      $output
      * @param array                $context
      *
      * @throws \RuntimeException
@@ -314,7 +308,6 @@ class ProcessManager
      */
     protected function initializeStates(
         ProcessConfiguration $processConfiguration,
-        OutputInterface $output = null,
         array $context = []
     ): ProcessHistory {
         $processHistory = new ProcessHistory($processConfiguration);
@@ -323,9 +316,6 @@ class ProcessManager
             $state = new ProcessState($processConfiguration, $processHistory);
             $state->setContext($context);
             $state->setContextualOptionResolver($this->contextualOptionResolver);
-            if ($output) {
-                $state->setConsoleOutput($output);
-            }
 
             $taskConfiguration->setState($state);
             $state->setTaskConfiguration($taskConfiguration);
@@ -364,10 +354,7 @@ class ProcessManager
         $state->setOutput(null);
         $state->setSkipped(false);
 
-        $consoleOutput = $state->getConsoleOutput();
-        if ($consoleOutput && $consoleOutput->isDebug()) {
-            $consoleOutput->writeln("<info>Processing task {$taskConfiguration->getCode()}</info>");
-        }
+        $this->logger->info("Processing task {$taskConfiguration->getCode()}");
 
         $task = $taskConfiguration->getTask();
         try {
@@ -393,10 +380,7 @@ class ProcessManager
         $state->setPreviousState(null);
         $state->setSkipped(false);
 
-        $consoleOutput = $state->getConsoleOutput();
-        if ($consoleOutput && $consoleOutput->isDebug()) {
-            $consoleOutput->writeln("<info>Proceeding task {$taskConfiguration->getCode()}</info>");
-        }
+        $this->logger->info("Proceeding task {$taskConfiguration->getCode()}");
 
         $task = $taskConfiguration->getTask();
         if (!$task instanceof BlockingTaskInterface) {
@@ -424,38 +408,6 @@ class ProcessManager
     protected function handleState(ProcessState $state): void
     {
         $processHistory = $state->getProcessHistory();
-
-        $consoleOutput = $state->getConsoleOutput();
-        foreach ($state->getTaskHistories() as $taskHistory) {
-            if ($consoleOutput && ($consoleOutput->isVerbose() || !$this->entityManager->isOpen())) {
-                switch ($taskHistory->getLevel()) {
-                    case LogLevel::WARNING:
-                    case LogLevel::NOTICE:
-                        $level = 'comment';
-                        break;
-                    case LogLevel::INFO:
-                    case LogLevel::DEBUG:
-                        $level = 'info';
-                        break;
-                    default:
-                        $level = 'error';
-                }
-                $msg = "<{$level}>{$taskHistory->getTaskCode()} ({$taskHistory->getLevel()}): ";
-                $msg .= "{$taskHistory->getMessage()} [{$taskHistory->getReference()}]</{$level}>";
-                $consoleOutput->writeln($msg);
-                $consoleOutput->writeln(json_encode($taskHistory->getContext()));
-            }
-            $this->logger->${$taskHistory->getLevel()}($taskHistory->getMessage(), $taskHistory->getContext());
-            $taskHistory->setProcessHistory($processHistory);
-            $processHistory->addTaskHistory($taskHistory);
-        }
-
-        if (!$this->entityManager->isOpen()) {
-            throw new \RuntimeException('Doctrine has closed the entity manager, aborting process');
-        }
-        $state->clearTaskHistories();
-        $this->entityManager->clear(TaskHistory::class);
-
         if ($state->getException()) {
             $processHistory->setFailed();
 
@@ -525,7 +477,7 @@ class ProcessManager
                 // We won't throw an error to ease development... but there must be some kind of warning
                 $state = $taskConfiguration->getState();
                 $logContext = $state->getLogContext();
-                $logContext ['main_task_list'] = $mainTaskList;
+                $logContext['main_task_list'] = $mainTaskList;
                 $this->logger->warning("The task won't be executed", $logContext);
                 $this->handleState($state);
             }
