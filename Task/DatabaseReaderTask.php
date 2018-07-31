@@ -68,7 +68,7 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
 
         $this->nextItem = $this->statement->fetch();
 
-        return (bool)$this->nextItem;
+        return (bool) $this->nextItem;
     }
 
     /**

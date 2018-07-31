@@ -1,0 +1,20 @@
+clever_age_process:
+    configurations:
+        test.simple_flushable:
+            entry_point: data
+            end_point: aggregate
+            tasks:
+                data:
+                    service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+                    options:
+                        output: [1, 2, 3]
+                    outputs: [batch]
+
+                batch:
+                    service: '@CleverAge\ProcessBundle\Task\SimpleBatchTask'
+                    options:
+                        batch_count: 2
+                    outputs: [aggregate]
+
+                aggregate:
+                    service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'

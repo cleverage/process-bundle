@@ -11,7 +11,7 @@
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
+use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -29,7 +29,7 @@ use Symfony\Component\Process\ProcessBuilder;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class ProcessLauncherTask extends AbstractConfigurableTask implements FinalizableTaskInterface
+class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface
 {
     /** @var ProcessConfigurationRegistry */
     protected $processRegistry;
@@ -84,7 +84,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements Finalizabl
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
-    public function finalize(ProcessState $state)
+    public function flush(ProcessState $state)
     {
         $processCount = \count($this->launchedProcesses);
         if (0 === $processCount) {

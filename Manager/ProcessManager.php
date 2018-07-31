@@ -17,6 +17,7 @@ use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
+use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
@@ -35,6 +36,10 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class ProcessManager
 {
+    protected const EXECUTE_PROCESS = 1;
+    protected const EXECUTE_PROCEED = 2;
+    protected const EXECUTE_FLUSH = 4;
+
     /** @var ContainerInterface */
     protected $container;
 
@@ -132,7 +137,8 @@ class ProcessManager
      *
      * @param TaskConfiguration $taskConfiguration
      *
-     * @throws \Exception
+     * @throws \RuntimeException
+     * @throws \UnexpectedValueException
      *
      * @return bool
      */
@@ -167,7 +173,7 @@ class ProcessManager
 
         // Then we can process BlockingTask
         if ($taskConfiguration->getTask() instanceof BlockingTaskInterface) {
-            $this->process($taskConfiguration, true);
+            $this->process($taskConfiguration, self::EXECUTE_PROCEED);
         }
 
         $state->setStatus(ProcessState::STATUS_RESOLVED);
@@ -180,7 +186,10 @@ class ProcessManager
      *
      * @param TaskConfiguration $taskConfiguration
      *
-     * @throws \Exception
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @throws \UnexpectedValueException
+     * @throws \RuntimeException
      */
     protected function initialize(TaskConfiguration $taskConfiguration): void
     {
@@ -219,20 +228,17 @@ class ProcessManager
 
     /**
      * @param TaskConfiguration $taskConfiguration
-     * @param bool              $doProceed
+     * @param int               $executionFlag
      *
-     * @throws \Exception
+     * @throws \RuntimeException
      */
-    protected function process(TaskConfiguration $taskConfiguration, $doProceed = false): void
+    protected function process(TaskConfiguration $taskConfiguration, int $executionFlag = self::EXECUTE_PROCESS): void
     {
         $state = $taskConfiguration->getState();
         do {
             // Execute the current task, and fetch status
-            if ($doProceed) {
-                $this->doProceedTask($taskConfiguration);
-            } else {
-                $this->doProcessTask($taskConfiguration);
-            }
+            $this->processExecution($taskConfiguration, $executionFlag);
+
             $this->handleState($state);
             if ($state->isStopped()) {
                 return;
@@ -243,7 +249,6 @@ class ProcessManager
                 foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTask) {
                     $this->prepareNextProcess($taskConfiguration, $errorTask, true);
                     $this->process($errorTask);
-                    /** @noinspection DisconnectedForeachInstructionInspection */
                     if ($state->isStopped()) {
                         return;
                     }
@@ -252,13 +257,14 @@ class ProcessManager
 
             // Run child items only if the state is not "skipped" and task is not blocking
             $task = $taskConfiguration->getTask();
-            $shouldContinue = (!$task instanceof BlockingTaskInterface || $doProceed) && !$state->isSkipped();
+            $shouldContinue =
+                (!$task instanceof BlockingTaskInterface || self::EXECUTE_PROCEED === $executionFlag)
+                && !$state->isSkipped();
 
             if ($shouldContinue) {
-                foreach ($taskConfiguration->getNextTasksConfigurations() as $nextTask) {
-                    $this->prepareNextProcess($taskConfiguration, $nextTask);
-                    $this->process($nextTask);
-                    /** @noinspection DisconnectedForeachInstructionInspection */
+                foreach ($taskConfiguration->getNextTasksConfigurations() as $nextTaskConfiguration) {
+                    $this->prepareNextProcess($taskConfiguration, $nextTaskConfiguration);
+                    $this->process($nextTaskConfiguration);
                     if ($state->isStopped()) {
                         return;
                     }
@@ -269,20 +275,91 @@ class ProcessManager
             $hasMoreItem = false; // By default, a task is not iterable
             if ($task instanceof IterableTaskInterface) {
                 $hasMoreItem = $task->next($state); // Check if task has more items
+                if (!$hasMoreItem) {
+                    $this->flush($taskConfiguration);
+                }
             }
         } while ($hasMoreItem);
     }
 
     /**
      * @param TaskConfiguration $taskConfiguration
+     * @param int               $executionFlag
+     */
+    protected function processExecution(TaskConfiguration $taskConfiguration, int $executionFlag): void
+    {
+        $task = $taskConfiguration->getTask();
+        $state = $taskConfiguration->getState();
+        $state->setOutput(null);
+        $state->setSkipped(false);
+        try {
+            if (self::EXECUTE_PROCESS === $executionFlag) {
+                $this->logger->info("Processing task {$taskConfiguration->getCode()}");
+                $task->execute($state);
+            } else {
+                $state->setInput(null);
+                $state->setPreviousState(null);
+                if (self::EXECUTE_PROCEED === $executionFlag) {
+                    if (!$task instanceof BlockingTaskInterface) {
+                        // This exception should never be thrown
+                        throw new \UnexpectedValueException(
+                            "Task {$taskConfiguration->getCode()} is not blocking"
+                        );
+                    }
+                    $this->logger->info("Proceeding task {$taskConfiguration->getCode()}");
+                    $task->proceed($state);
+                } elseif (self::EXECUTE_FLUSH === $executionFlag) {
+                    if (!$task instanceof FlushableTaskInterface) {
+                        // This exception should never be thrown
+                        throw new \UnexpectedValueException(
+                            "Task {$taskConfiguration->getCode()} is not flushable"
+                        );
+                    }
+                    $this->logger->info("Flushing task {$taskConfiguration->getCode()}");
+                    $task->flush($state);
+                } else {
+                    throw new \UnexpectedValueException("Unknown execution flag: {$executionFlag}");
+                }
+            }
+        } catch (\Throwable $e) {
+            $logContext = $state->getLogContext();
+            $logContext['exception'] = $e;
+            $this->logger->critical($e->getMessage(), $logContext);
+            $state->stop($e);
+        }
+    }
+
+    /**
+     * Browse all children for FlushableTask until a BlockingTask is found
      *
-     * @throws \Exception
+     * @param TaskConfiguration $taskConfiguration
+     *
+     * @throws \RuntimeException
+     */
+    protected function flush(TaskConfiguration $taskConfiguration): void
+    {
+        $task = $taskConfiguration->getTask();
+        if ($task instanceof BlockingTaskInterface) {
+            return;
+        }
+        if ($task instanceof FlushableTaskInterface) {
+            $this->process($taskConfiguration, self::EXECUTE_FLUSH);
+        }
+        foreach ($taskConfiguration->getNextTasksConfigurations() as $nextTaskConfiguration) {
+            $this->flush($nextTaskConfiguration);
+        }
+    }
+
+    /**
+     * @param TaskConfiguration $taskConfiguration
+     *
+     * @throws \RuntimeException
      */
     protected function finalize(TaskConfiguration $taskConfiguration): void
     {
-        $state = $taskConfiguration->getState();
         $task = $taskConfiguration->getTask();
         if ($task instanceof FinalizableTaskInterface) {
+            $state = $taskConfiguration->getState();
             try {
                 $task->finalize($taskConfiguration->getState());
             } catch (\Throwable $e) {
@@ -291,9 +368,8 @@ class ProcessManager
                 $this->logger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
             }
+            $this->handleState($state);
         }
-
-        $this->handleState($state);
     }
 
     /**
@@ -343,59 +419,6 @@ class ProcessManager
         $nextState = $nextTaskConfiguration->getState();
         $nextState->setInput($input);
         $nextState->setPreviousState($previousTaskConfiguration->getState());
-    }
-
-    /**
-     * @param TaskConfiguration $taskConfiguration
-     */
-    protected function doProcessTask(TaskConfiguration $taskConfiguration): void
-    {
-        $state = $taskConfiguration->getState();
-        $state->setOutput(null);
-        $state->setSkipped(false);
-
-        $this->logger->info("Processing task {$taskConfiguration->getCode()}");
-
-        $task = $taskConfiguration->getTask();
-        try {
-            $task->execute($state);
-        } catch (\Throwable $e) {
-            $logContext = $state->getLogContext();
-            $logContext['exception'] = $e;
-            $this->logger->critical($e->getMessage(), $logContext);
-            $state->stop($e);
-        }
-    }
-
-    /**
-     * @param TaskConfiguration $taskConfiguration
-     *
-     * @throws \UnexpectedValueException
-     */
-    protected function doProceedTask(TaskConfiguration $taskConfiguration): void
-    {
-        $state = $taskConfiguration->getState();
-        $state->setInput(null);
-        $state->setOutput(null);
-        $state->setPreviousState(null);
-        $state->setSkipped(false);
-
-        $this->logger->info("Proceeding task {$taskConfiguration->getCode()}");
-
-        $task = $taskConfiguration->getTask();
-        if (!$task instanceof BlockingTaskInterface) {
-            // This exception should never be thrown
-            throw new \UnexpectedValueException("Task {$taskConfiguration->getCode()} is not blocking");
-        }
-
-        try {
-            $task->proceed($state);
-        } catch (\Throwable $e) {
-            $logContext = $state->getLogContext();
-            $logContext['exception'] = $e;
-            $this->logger->critical($e->getMessage(), $logContext);
-            $state->stop($e);
-        }
     }
 
     /**

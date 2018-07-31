@@ -10,7 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
+use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
@@ -23,7 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTaskInterface
+class DoctrineWriterTask extends AbstractDoctrineTask implements FlushableTaskInterface
 {
     /** @var array */
     protected $batch = [];
@@ -37,7 +37,7 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \InvalidArgumentException
      */
-    public function finalize(ProcessState $state)
+    public function flush(ProcessState $state)
     {
         $this->writeBatch($state);
     }
@@ -47,7 +47,6 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FinalizableTask
      *
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\Common\Persistence\Mapping\MappingException
      * @throws \UnexpectedValueException
      * @throws \Doctrine\ORM\ORMException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
