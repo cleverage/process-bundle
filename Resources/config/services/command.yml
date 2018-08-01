@@ -1,16 +1,5 @@
 services:
-    CleverAge\ProcessBundle\Command\ExecuteProcessCommand:
-        autowire: true
-        autoconfigure: true
-
-    CleverAge\ProcessBundle\Command\ListProcessCommand:
-        autowire: true
-        autoconfigure: true
-
-    CleverAge\ProcessBundle\Command\CleanLogCommand:
-        autowire: true
-        autoconfigure: true
-
-    CleverAge\ProcessBundle\Command\ProcessHelpCommand:
+    CleverAge\ProcessBundle\Command\:
+        resource: '../../../Command/*'
         autowire: true
         autoconfigure: true

@@ -40,8 +40,11 @@ class MappingTransformer implements ConfigurableTransformerInterface
      * @param LoggerInterface           $logger
      * @param PropertyAccessorInterface $accessor
      */
-    public function __construct(TransformerRegistry $transformerRegistry, LoggerInterface $logger, PropertyAccessorInterface $accessor)
-    {
+    public function __construct(
+        TransformerRegistry $transformerRegistry,
+        LoggerInterface $logger,
+        PropertyAccessorInterface $accessor
+    ) {
         $this->transformerRegistry = $transformerRegistry;
         $this->logger = $logger;
         $this->accessor = $accessor;
@@ -53,19 +56,6 @@ class MappingTransformer implements ConfigurableTransformerInterface
      * @param mixed $input
      * @param array $options
      *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \RuntimeException
-     * @throws \CleverAge\ProcessBundle\Exception\TransformerException
-     * @throws \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
-     * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\PropertyAccess\Exception\AccessException
      * @throws \Exception
      *
      * @return mixed $value

@@ -20,10 +20,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class ArrayMapTransformer implements ConfigurableTransformerInterface, TransformerRegistryAwareInterface
+class ArrayMapTransformer implements ConfigurableTransformerInterface
 {
     /** @var TransformerRegistry */
     protected $transformerRegistry;
+
+    /**
+     * @param TransformerRegistry $transformerRegistry
+     */
+    public function __construct(TransformerRegistry $transformerRegistry)
+    {
+        $this->transformerRegistry = $transformerRegistry;
+    }
 
     /**
      * Must return the transformed $value
@@ -116,13 +124,5 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface, Transform
                 return $transformers;
             }
         );
-    }
-
-    /**
-     * @param TransformerRegistry $transformerRegistry
-     */
-    public function setTransformerRegistry(TransformerRegistry $transformerRegistry)
-    {
-        $this->transformerRegistry = $transformerRegistry;
     }
 }

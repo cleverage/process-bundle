@@ -12,7 +12,6 @@ namespace CleverAge\ProcessBundle\Registry;
 
 use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
-use CleverAge\ProcessBundle\Transformer\TransformerRegistryAwareInterface;
 
 /**
  * Holds all tagged transformer services
@@ -30,9 +29,6 @@ class TransformerRegistry
      */
     public function addTransformer(TransformerInterface $transformer)
     {
-        if ($transformer instanceof TransformerRegistryAwareInterface) {
-            $transformer->setTransformerRegistry($this);
-        }
         $this->transformers[$transformer->getCode()] = $transformer;
     }
 
