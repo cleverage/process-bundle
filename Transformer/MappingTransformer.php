@@ -24,7 +24,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class MappingTransformer implements ConfigurableTransformerInterface, TransformerRegistryAwareInterface
+class MappingTransformer implements ConfigurableTransformerInterface
 {
     /** @var TransformerRegistry */
     protected $transformerRegistry;
@@ -36,11 +36,13 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
     protected $accessor;
 
     /**
+     * @param TransformerRegistry       $transformerRegistry
      * @param LoggerInterface           $logger
      * @param PropertyAccessorInterface $accessor
      */
-    public function __construct(LoggerInterface $logger, PropertyAccessorInterface $accessor)
+    public function __construct(TransformerRegistry $transformerRegistry, LoggerInterface $logger, PropertyAccessorInterface $accessor)
     {
+        $this->transformerRegistry = $transformerRegistry;
         $this->logger = $logger;
         $this->accessor = $accessor;
     }
@@ -235,14 +237,6 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
     public function getCode()
     {
         return 'mapping';
-    }
-
-    /**
-     * @param TransformerRegistry $transformerRegistry
-     */
-    public function setTransformerRegistry(TransformerRegistry $transformerRegistry)
-    {
-        $this->transformerRegistry = $transformerRegistry;
     }
 
     /**
