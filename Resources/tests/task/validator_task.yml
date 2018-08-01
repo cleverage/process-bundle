@@ -5,9 +5,9 @@ clever_age_process:
             end_point: validate_item
             tasks:
                 validate_item:
-                    service: '@CleverAge\ProcessBundle\Task\ValidatorTask'
+                    service: '@CleverAge\ProcessBundle\Task\Validation\ValidatorTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
                         constraints:
                             - Collection:
                                 int_field:

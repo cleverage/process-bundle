@@ -133,10 +133,8 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
                         $this->matchingFiles[] = $file;
                     }
                 }
-            } else {
-                if (!\in_array($input, $this->matchingFiles, true)) {
-                    $this->matchingFiles[] = $input;
-                }
+            } elseif (!\in_array($input, $this->matchingFiles, true)) {
+                $this->matchingFiles[] = $input;
             }
         }
     }

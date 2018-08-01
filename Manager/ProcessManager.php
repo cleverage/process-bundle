@@ -322,10 +322,15 @@ class ProcessManager
                 }
             }
         } catch (\Throwable $e) {
-            $logContext = $state->getLogContext();
-            $logContext['exception'] = $e;
-            $this->logger->critical($e->getMessage(), $logContext);
-            $state->stop($e);
+            $state->setException($e);
+            $state->setError($state->getInput());
+            if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
+                $this->logger->warning($e->getMessage(), $state->getLogContext());
+                $state->setSkipped(true);
+            } elseif ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
+                $this->logger->critical($e->getMessage(), $state->getLogContext());
+                $state->stop($e);
+            }
         }
     }
 

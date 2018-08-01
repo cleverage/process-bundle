@@ -6,8 +6,8 @@ clever_age_process:
             tasks:
                 transform:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
                         mapping:
                             field2:
                                 code: '[field]'
@@ -18,8 +18,8 @@ clever_age_process:
             tasks:
                 transform:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
                         mapping:
                             field2:
                                 code: 'probably_not_a_field'
@@ -30,8 +30,8 @@ clever_age_process:
             tasks:
                 transform:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
                         mapping:
                             field2:
                                 code: '[field]'
@@ -47,8 +47,8 @@ clever_age_process:
             tasks:
                 transform:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
                         mapping:
                             "[field1][field2][field3]":
                                 code: '[value]'

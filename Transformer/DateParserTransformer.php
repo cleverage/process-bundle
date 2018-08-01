@@ -38,7 +38,7 @@ class DateParserTransformer implements ConfigurableTransformerInterface
         $date = \DateTime::createFromFormat($options['format'], $value);
 
         if (!$date) {
-            throw new \UnexpectedValueException("Given value cannot be parsed into a date");
+            throw new \UnexpectedValueException('Given value cannot be parsed into a date');
         }
 
         return $date;

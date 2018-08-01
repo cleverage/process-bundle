@@ -17,7 +17,7 @@ clever_age_process:
                     outputs: [subprocess]
 
                 subprocess:
-                    service: '@CleverAge\ProcessBundle\Task\ProcessExecutorTask'
+                    service: '@CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask'
                     options:
                         process: 'test.process_execute_task.subprocess'
                     outputs: [aggregate]
@@ -36,7 +36,7 @@ clever_age_process:
                     outputs: [subprocess]
 
                 subprocess:
-                    service: '@CleverAge\ProcessBundle\Task\ProcessExecutorTask'
+                    service: '@CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask'
                     options:
                         process: 'test.process_execute_task.unknown_subprocess'
                     outputs: [aggregate]

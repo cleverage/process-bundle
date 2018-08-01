@@ -21,6 +21,10 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
  */
 class TaskConfiguration
 {
+    public const STRATEGY_SKIP = 'skip';
+    public const STRATEGY_STOP = 'stop';
+    public const STRATEGY_CONTINUE = 'continue';
+
     /** @var string */
     protected $code;
 
@@ -54,20 +58,37 @@ class TaskConfiguration
     /** @var bool */
     protected $inErrorBranch = false;
 
+    /** @var string */
+    protected $errorStrategy;
+
+    /** @var bool */
+    protected $logErrors;
+
     /**
      * @param string $code
      * @param string $serviceReference
      * @param array  $options
      * @param array  $outputs
      * @param array  $errors
+     * @param string $errorStrategy
+     * @param bool   $logErrors
      */
-    public function __construct($code, $serviceReference, array $options, array $outputs = [], array $errors = [])
-    {
+    public function __construct(
+        $code,
+        $serviceReference,
+        array $options,
+        array $outputs = [],
+        array $errors = [],
+        string $errorStrategy = self::STRATEGY_SKIP,
+        bool $logErrors = true
+    ) {
         $this->code = $code;
         $this->serviceReference = $serviceReference;
         $this->options = $options;
         $this->outputs = $outputs;
         $this->errors = $errors;
+        $this->errorStrategy = $errorStrategy;
+        $this->logErrors = $logErrors;
     }
 
     /**
@@ -284,5 +305,21 @@ class TaskConfiguration
         }
 
         return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function getErrorStrategy(): string
+    {
+        return $this->errorStrategy;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLogErrors(): bool
+    {
+        return $this->logErrors;
     }
 }

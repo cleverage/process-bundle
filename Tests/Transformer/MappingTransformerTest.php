@@ -45,8 +45,8 @@ class MappingTransformerTest extends AbstractProcessTest
      */
     public function testDeepMapping()
     {
-        $result = $this->processManager->execute('test.mapping_transformer.deep_mapping', ['value' => "ok"]);
+        $result = $this->processManager->execute('test.mapping_transformer.deep_mapping', ['value' => 'ok']);
 
-        self::assertEquals(['field1' => ["field2" => ["field3" => "ok"]]], $result);
+        self::assertEquals(['field1' => ['field2' => ['field3' => 'ok']]], $result);
     }
 }

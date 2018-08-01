@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
@@ -67,6 +68,7 @@ class TransformerTask extends AbstractConfigurableTask
         $output = null;
         $options = $this->getOptions($state);
         $transformerOptions = $options;
+        // @todo remove me in 2.0
         unset(
             $transformerOptions[self::ERROR_STRATEGY],
             $transformerOptions[self::LOG_ERRORS],
@@ -85,9 +87,9 @@ class TransformerTask extends AbstractConfigurableTask
                 $logContext['error'] = $e->getPrevious()->getMessage();
             }
             $this->logger->error($e->getMessage(), $logContext);
-            if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
+            if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
-            } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {
+            } elseif ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
                 $state->stop($e);
             }
         }

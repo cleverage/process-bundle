@@ -10,9 +10,11 @@
 
 namespace CleverAge\ProcessBundle\Tests;
 
+/**
+ * Test context replacement mechanism
+ */
 class ContextTest extends AbstractProcessTest
 {
-
     /**
      * Assert a value can correctly by passed through context
      */

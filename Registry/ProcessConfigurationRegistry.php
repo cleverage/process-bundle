@@ -42,7 +42,9 @@ class ProcessConfigurationRegistry
                     $rawTaskConfiguration['service'],
                     $rawTaskConfiguration['options'],
                     $rawTaskConfiguration['outputs'],
-                    $rawTaskConfiguration['errors']
+                    $rawTaskConfiguration['errors'],
+                    $rawTaskConfiguration['error_strategy'],
+                    $rawTaskConfiguration['log_errors']
                 );
             }
 

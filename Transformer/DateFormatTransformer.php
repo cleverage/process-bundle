@@ -43,7 +43,7 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
         } elseif (is_string($value)) {
             $date = new \DateTime($value);
         } else {
-            throw new \UnexpectedValueException("Given value cannot be parsed into a date");
+            throw new \UnexpectedValueException('Given value cannot be parsed into a date');
         }
 
         return $date->format($options['format']);

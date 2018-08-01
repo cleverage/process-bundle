@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
+use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -105,6 +106,8 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('service')->isRequired()->end()
             ->arrayNode('options')->prototype('variable')->end()->end()
             ->arrayNode('outputs')->prototype('scalar')->defaultValue([])->end()->end()
-            ->arrayNode('errors')->prototype('scalar')->defaultValue([])->end()->end();
+            ->arrayNode('errors')->prototype('scalar')->defaultValue([])->end()->end()
+            ->scalarNode('error_strategy')->defaultValue(TaskConfiguration::STRATEGY_SKIP)->end()
+            ->booleanNode('log_errors')->defaultTrue()->end();
     }
 }

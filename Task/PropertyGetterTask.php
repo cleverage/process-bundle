@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
@@ -58,9 +59,9 @@ class PropertyGetterTask extends AbstractConfigurableTask
             $logContext = $state->getLogContext();
             $logContext['property'] = $property;
             $this->logger->error($e->getMessage(), $logContext);
-            if ($options[self::ERROR_STRATEGY] === self::STRATEGY_SKIP) {
+            if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
-            } elseif ($options[self::ERROR_STRATEGY] === self::STRATEGY_STOP) {
+            } elseif ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
                 $state->stop($e);
             }
         }

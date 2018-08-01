@@ -11,7 +11,6 @@
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
-use CleverAge\ProcessBundle\Task\CsvReaderTask;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -31,7 +30,7 @@ class InputCsvReaderTask extends CsvReaderTask
     protected function getOptions(ProcessState $state)
     {
         $options = parent::getOptions($state);
-        if ($state->getInput() !== null) {
+        if (null !== $state->getInput()) {
             $options['file_path'] = $this->getFilePath($options, $state->getInput());
         }
 

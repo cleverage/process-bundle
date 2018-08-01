@@ -19,7 +19,7 @@ clever_age_process:
                     outputs: [pushDataEvent]
 
                 pushDataEvent:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -32,7 +32,7 @@ clever_age_process:
                     outputs: [errorForwarder]
 
                 errorForwarder:
-                    service: '@CleverAge\ProcessBundle\Task\ErrorForwarderTask'
+                    service: '@CleverAge\ProcessBundle\Task\Debug\ErrorForwarderTask'
                     outputs: [doNothing]
                     errors: [doNothing2]
 
@@ -49,6 +49,6 @@ clever_age_process:
                     outputs: [pushDataEvent]
 
                 pushDataEvent:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue

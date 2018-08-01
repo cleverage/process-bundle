@@ -6,8 +6,8 @@ clever_age_process:
             tasks:
                 transform:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
                         transformer: date_format
                         format: 'Y-m-d'
 
@@ -17,8 +17,8 @@ clever_age_process:
             tasks:
                 transform:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
                         transformer: date_parser
                         format: 'Y-m-d'
 
@@ -28,15 +28,15 @@ clever_age_process:
             tasks:
                 parse:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
                         transformer: date_parser
                         format: 'Y-m-d\TH:i:sP'
                     outputs: [format]
 
                 format:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
                         transformer: date_format
                         format: 'Y-m-d'

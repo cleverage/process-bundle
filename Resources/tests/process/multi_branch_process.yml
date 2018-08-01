@@ -9,7 +9,7 @@ clever_age_process:
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -20,7 +20,7 @@ clever_age_process:
                     outputs: [pushDataEvent2]
 
                 pushDataEvent2:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -34,7 +34,7 @@ clever_age_process:
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -45,7 +45,7 @@ clever_age_process:
                     outputs: [pushDataEvent2]
 
                 pushDataEvent2:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -53,7 +53,7 @@ clever_age_process:
             entry_point: data2
             tasks:
                 pushDataEvent2:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -64,7 +64,7 @@ clever_age_process:
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -84,7 +84,7 @@ clever_age_process:
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -95,7 +95,7 @@ clever_age_process:
                     outputs: [pushDataEvent2]
 
                 pushDataEvent2:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -110,7 +110,7 @@ clever_age_process:
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -121,7 +121,7 @@ clever_age_process:
                     outputs: [pushDataEvent2]
 
                 pushDataEvent2:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -136,7 +136,7 @@ clever_age_process:
                     outputs: [pushDataEvent1]
 
                 pushDataEvent1:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
 
@@ -147,6 +147,6 @@ clever_age_process:
                     outputs: [pushDataEvent2]
 
                 pushDataEvent2:
-                    service: '@CleverAge\ProcessBundle\Task\EventDispatcherTask'
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
                     options:
                         event_name: cleverage_process.data_queue
