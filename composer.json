@@ -23,6 +23,12 @@
             "name": "Valentin Clavreul",
             "email": "vclavreul@clever-age.com",
             "role": "Developer"
+        },
+        {
+            "name": "Madeline Veyrenc",
+            "email": "mveyrenc@clever-age.com",
+            "homepage": "https://github.com/mveyrenc",
+            "role": "Developer"
         }
     ],
     "autoload": {
