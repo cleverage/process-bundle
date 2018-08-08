@@ -10,7 +10,6 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 
@@ -19,7 +18,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
  *
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
-class InputIteratorTask extends AbstractConfigurableTask implements IterableTaskInterface
+class InputIteratorTask implements IterableTaskInterface
 {
     /** @var \Iterator */
     protected $iterator;

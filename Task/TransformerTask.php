@@ -68,17 +68,12 @@ class TransformerTask extends AbstractConfigurableTask
         $output = null;
         $options = $this->getOptions($state);
         $transformerOptions = $options;
-        // @todo remove me in 2.0
-        unset(
-            $transformerOptions[self::ERROR_STRATEGY],
-            $transformerOptions[self::LOG_ERRORS],
-            $transformerOptions[self::ACTIVE_TRANSFORMER]
-        );
+        unset($transformerOptions[self::ACTIVE_TRANSFORMER]);
 
         try {
             $output = $this->transformer->transform(
                 $state->getInput(),
-                $transformerOptions
+                $this->getOptions($state)
             );
         } catch (\Exception $e) {
             $state->setError($state->getInput());

@@ -66,10 +66,6 @@ class MappingTransformer implements ConfigurableTransformerInterface
         $this->configureOptions($resolver);
         $options = $resolver->resolve($options);
 
-        if ($options['ignore_extra']) {
-            throw new InvalidOptionsException('"ignore_extra" option is deprecated, please use "keep_input" instead.');
-        }
-
         if (!empty($options['initial_value']) && $options['keep_input']) {
             throw new InvalidOptionsException(
                 'The options "initial_value" and "keep_input" can\'t be both enabled.'
@@ -190,13 +186,11 @@ class MappingTransformer implements ConfigurableTransformerInterface
             [
                 'ignore_missing' => false,
                 'keep_input' => false,
-                'ignore_extra' => false,
                 'initial_value' => [],
                 'merge_callback' => null,
             ]
         );
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
-        $resolver->setAllowedTypes('ignore_extra', ['boolean']);
         $resolver->setAllowedTypes('keep_input', ['boolean']);
         $resolver->setAllowedTypes('merge_callback', ['NULL', 'callable']);
 

@@ -15,12 +15,11 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
- * Detach Doctrine entities from unit of work
+ * Clear Doctrine's unit of work
  *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class DoctrineDetacherTask extends AbstractDoctrineTask
+class ClearEntityManagerTask extends AbstractDoctrineTask
 {
     /**
      * @param ProcessState $state
@@ -34,13 +33,15 @@ class DoctrineDetacherTask extends AbstractDoctrineTask
     {
         $entity = $state->getInput();
         if (null === $entity) {
-            throw new \RuntimeException('DoctrineWriterTask does not allow null input');
+            $entityManager = $this->getManager($state);
+        } else {
+            $class = ClassUtils::getClass($entity);
+            $entityManager = $this->doctrine->getManagerForClass($class);
+            if (!$entityManager instanceof EntityManagerInterface) {
+                throw new \UnexpectedValueException("No manager found for class {$class}");
+            }
         }
-        $class = ClassUtils::getClass($entity);
-        $entityManager = $this->doctrine->getManagerForClass($class);
-        if (!$entityManager instanceof EntityManagerInterface) {
-            throw new \UnexpectedValueException("No manager found for class {$class}");
-        }
-        $entityManager->detach($entity);
+
+        $entityManager->clear();
     }
 }

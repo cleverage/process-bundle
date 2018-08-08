@@ -10,60 +10,28 @@
 
 namespace CleverAge\ProcessBundle\Task\Doctrine;
 
-use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Persists Doctrine entities
+ * Persists and flush Doctrine entities
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class DoctrineWriterTask extends AbstractDoctrineTask implements FlushableTaskInterface
+class DoctrineWriterTask extends AbstractDoctrineTask
 {
-    /** @var array */
-    protected $batch = [];
-
     /**
      * @param ProcessState $state
      *
-     * @throws \Doctrine\ORM\ORMInvalidArgumentException
-     * @throws \UnexpectedValueException
      * @throws \Doctrine\ORM\ORMException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \InvalidArgumentException
-     */
-    public function flush(ProcessState $state)
-    {
-        $state->setSkipped(true);
-        $this->writeBatch($state);
-    }
-
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \Doctrine\ORM\ORMInvalidArgumentException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \UnexpectedValueException
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \InvalidArgumentException
      */
     public function execute(ProcessState $state)
     {
-        $entity = $state->getInput();
-        $this->batch[] = $entity;
-        if (\count($this->batch) >= $this->getOption($state, 'batch_count')) {
-            $this->writeBatch($state);
-        }
-
-        $state->setOutput($entity);
+        $state->setOutput($this->writeEntity($state));
     }
 
     /**
@@ -78,78 +46,44 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FlushableTaskIn
         parent::configureOptions($resolver);
         $resolver->setDefaults(
             [
-                'batch_count' => 1,
                 'global_flush' => true,
-                'clear_em' => false,
-                'global_clear' => true,
             ]
         );
-        $resolver->setAllowedTypes('batch_count', ['integer']);
         $resolver->setAllowedTypes('global_flush', ['boolean']);
-        $resolver->setAllowedTypes('clear_em', ['boolean']);
-        $resolver->setAllowedTypes('global_clear', ['boolean']);
-        $resolver->setNormalizer(
-            'batch_count',
-            function (Options $options, $batchCount) {
-                if (1 !== $batchCount) {
-                    throw new InvalidConfigurationException('batch_count must be set to 1');
-                }
-
-                return $batchCount;
-            }
-        );
     }
 
     /**
      * @param ProcessState $state
      *
-     * @throws \UnexpectedValueException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \UnexpectedValueException
      * @throws \Doctrine\ORM\ORMException
+     *
+     * @return mixed
      */
-    protected function writeBatch(ProcessState $state)
+    protected function writeEntity(ProcessState $state)
     {
-        if (0 === \count($this->batch)) {
-            return;
-        }
         $options = $this->getOptions($state);
+        $entity = $state->getInput();
 
-        $entityManagers = new \SplObjectStorage();
-        foreach ($this->batch as $entity) {
-            $class = ClassUtils::getClass($entity);
-            $entityManager = $this->doctrine->getManagerForClass($class);
-            if (!$entityManager instanceof EntityManagerInterface) {
-                throw new \UnexpectedValueException("No manager found for class {$class}");
-            }
-            $entityManager->persist($entity);
-
-            if (!$options['global_flush']) {
-                if (!$entityManager instanceof EntityManager) {
-                    throw new \UnexpectedValueException("Manager for class {$class} does not support unitary flush");
-                }
-                $entityManager->flush($entity);
-            }
-            $entityManagers->attach($entityManager);
+        if (null === $entity) {
+            throw new \RuntimeException('DoctrineWriterTask does not allow null input');
         }
+        $class = ClassUtils::getClass($entity);
+        $entityManager = $this->doctrine->getManagerForClass($class);
+        if (!$entityManager instanceof EntityManagerInterface) {
+            throw new \UnexpectedValueException("No manager found for class {$class}");
+        }
+        $entityManager->persist($entity);
 
         if ($options['global_flush']) {
-            foreach ($entityManagers as $entityManager) {
-                $entityManager->flush();
+            $entityManager->flush();
+        } else {
+            if (!$entityManager instanceof EntityManager) {
+                throw new \UnexpectedValueException("Manager for class {$class} does not support unitary flush");
             }
+            $entityManager->flush($entity);
         }
 
-        if ($options['clear_em']) {
-            foreach ($entityManagers as $entityManager) {
-                if ($options['global_clear']) {
-                    $entityManager->clear();
-                } else {
-                    foreach ($this->batch as $entity) {
-                        $entityManager->detach($entity);
-                    }
-                }
-            }
-        }
-        $this->batch = [];
+        return $entity;
     }
 }
