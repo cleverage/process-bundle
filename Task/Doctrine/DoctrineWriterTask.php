@@ -39,6 +39,7 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FlushableTaskIn
      */
     public function flush(ProcessState $state)
     {
+        $state->setSkipped(true);
         $this->writeBatch($state);
     }
 
@@ -55,7 +56,6 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FlushableTaskIn
     public function execute(ProcessState $state)
     {
         $entity = $state->getInput();
-
         $this->batch[] = $entity;
         if (\count($this->batch) >= $this->getOption($state, 'batch_count')) {
             $this->writeBatch($state);
