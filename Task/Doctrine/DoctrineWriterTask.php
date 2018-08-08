@@ -15,6 +15,8 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -86,6 +88,16 @@ class DoctrineWriterTask extends AbstractDoctrineTask implements FlushableTaskIn
         $resolver->setAllowedTypes('global_flush', ['boolean']);
         $resolver->setAllowedTypes('clear_em', ['boolean']);
         $resolver->setAllowedTypes('global_clear', ['boolean']);
+        $resolver->setNormalizer(
+            'batch_count',
+            function (Options $options, $batchCount) {
+                if (1 !== $batchCount) {
+                    throw new InvalidConfigurationException('batch_count must be set to 1');
+                }
+
+                return $batchCount;
+            }
+        );
     }
 
     /**
