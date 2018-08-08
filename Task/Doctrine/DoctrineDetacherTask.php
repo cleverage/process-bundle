@@ -35,6 +35,9 @@ class DoctrineDetacherTask extends AbstractDoctrineTask
     public function execute(ProcessState $state)
     {
         $entity = $state->getInput();
+        if(null === $entity) {
+            throw new \UnexpectedValueException("Entity is null");
+        }
         $class = ClassUtils::getClass($entity);
         $entityManager = $this->doctrine->getManagerForClass($class);
         if (!$entityManager instanceof EntityManagerInterface) {
