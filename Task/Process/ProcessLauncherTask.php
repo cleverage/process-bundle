@@ -21,7 +21,6 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * Launch a new process for each input received, input must be a scalar, a resource or a \Traversable
@@ -109,7 +108,6 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     protected function launchProcess(ProcessState $state)
     {
-        $processBuilder = new ProcessBuilder();
         $pathFinder = new PhpExecutableFinder();
         $consolePath = $this->kernel->getRootDir().'/../bin/console';
         $logDir = $this->kernel->getLogDir().'/process';
@@ -123,24 +121,21 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         }
 
         $arguments = [
+            'nohup',
             $pathFinder->find(),
             $consolePath,
             '--env='.$this->kernel->getEnvironment(),
             'cleverage:process:execute',
             '--input-from-stdin',
         ];
+
         $arguments = array_merge($arguments, $processOptions);
         $arguments[] = $processCode;
 
-        // Even if parent process is launched with nohup, all subprocesses are sensitive to SIGHUP so we need to prepend
-        // this all the time. Sub-processes are still sensitive to other signal so there is no risk here.
-        $processBuilder->setPrefix('nohup');
-
-        $processBuilder->setArguments($arguments);
-        /** @noinspection PhpParamsInspection */
-        $processBuilder->setInput($state->getInput());
-        $processBuilder->enableOutput();
-        $process = $processBuilder->getProcess();
+        $process = new Process($arguments, null, null, $state->getInput());
+        $process->setCommandLine($process->getCommandLine());
+        $process->inheritEnvironmentVariables();
+        $process->enableOutput();
         $process->start();
 
         return $process;
