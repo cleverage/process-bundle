@@ -14,6 +14,7 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -30,6 +31,9 @@ use Symfony\Component\Process\Process;
  */
 class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface
 {
+    /** @var LoggerInterface */
+    protected $logger;
+
     /** @var ProcessConfigurationRegistry */
     protected $processRegistry;
 
@@ -40,13 +44,16 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     protected $launchedProcesses = [];
 
     /**
+     * @param LoggerInterface              $logger
      * @param ProcessConfigurationRegistry $processRegistry
      * @param KernelInterface              $kernel
      */
     public function __construct(
+        LoggerInterface $logger,
         ProcessConfigurationRegistry $processRegistry,
         KernelInterface $kernel
     ) {
+        $this->logger = $logger;
         $this->processRegistry = $processRegistry;
         $this->kernel = $kernel;
     }
@@ -72,7 +79,14 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             sleep($options['sleep_interval']);
         }
 
-        $this->launchedProcesses[] = $this->launchProcess($state);
+        $process = $this->launchProcess($state);
+        $this->launchedProcesses[] = $process;
+
+        $logContext = $state->getLogContext();
+        $logContext['cmd'] = $process->getCommandLine();
+        $logContext['input'] = $process->getInput();
+        $this->logger->debug('Running command', $logContext);
+
         sleep($options['sleep_interval_after_launch']);
     }
 
@@ -152,6 +166,14 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             if (!$process->isTerminated()) {
                 continue;
             }
+
+            $logContext = $state->getLogContext();
+            $logContext['cmd'] = $process->getCommandLine();
+            $logContext['input'] = $process->getInput();
+            $logContext['exit_code'] = $process->getExitCode();
+            $logContext['exit_code_text'] = $process->getExitCodeText();
+            $this->logger->debug('Command terminated', $logContext);
+
             unset($this->launchedProcesses[$key]);
             if (0 !== $process->getExitCode()) {
                 $state->addErrorContextValue('subprocess_cmd', $process->getCommandLine());
