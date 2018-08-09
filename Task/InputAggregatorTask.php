@@ -87,8 +87,6 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
-
         $resolver->setRequired('input_codes');
         $resolver->setDefault('clean_input_on_override', true);
         $resolver->setAllowedTypes('input_codes', 'array');

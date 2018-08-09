@@ -103,7 +103,6 @@ class FilterTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
         $resolver->setDefault('not_match', []);
         $resolver->setDefault('match', []);
         $resolver->setDefault('not_empty', []);

@@ -180,8 +180,6 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
-
         $resolver->setRequired(['source_filesystem', 'destination_filesystem']);
         $resolver->setAllowedTypes('source_filesystem', 'string');
         $resolver->setAllowedTypes('destination_filesystem', 'string');

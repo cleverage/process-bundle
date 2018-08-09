@@ -121,8 +121,6 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
-
         $resolver->setRequired('aggregate_by');
         $resolver->setRequired('aggregate_columns');
         $resolver->setRequired('aggregation_key');

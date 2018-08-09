@@ -65,7 +65,6 @@ class DenormalizerTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
         $resolver->setRequired(
             [
                 'class',

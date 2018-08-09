@@ -73,7 +73,7 @@ class TransformerTask extends AbstractConfigurableTask
         try {
             $output = $this->transformer->transform(
                 $state->getInput(),
-                $this->getOptions($state)
+                $transformerOptions
             );
         } catch (\Exception $e) {
             $state->setError($state->getInput());
@@ -98,7 +98,6 @@ class TransformerTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
         $transformerCodes = array_keys($this->transformerRegistry->getTransformers());
         $resolver->setDefault(static::ACTIVE_TRANSFORMER, static::DEFAULT_TRANSFORMER);
         $resolver->setAllowedValues(static::ACTIVE_TRANSFORMER, $transformerCodes);

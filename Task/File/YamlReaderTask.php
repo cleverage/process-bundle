@@ -33,7 +33,6 @@ class YamlReaderTask extends AbstractIterableOutputTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
         $resolver->setRequired(
             [
                 'file_path',

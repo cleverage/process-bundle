@@ -94,8 +94,6 @@ class ValidatorTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
-
         $resolver->setDefault('groups', null);
         $resolver->addAllowedTypes('groups', ['NULL', 'array']);
 

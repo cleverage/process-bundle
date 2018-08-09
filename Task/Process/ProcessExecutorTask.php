@@ -80,8 +80,6 @@ class ProcessExecutorTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
-
         $resolver->setRequired('process');
         $resolver->setDefaults(
             [

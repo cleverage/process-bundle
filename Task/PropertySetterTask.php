@@ -79,7 +79,6 @@ class PropertySetterTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        parent::configureOptions($resolver);
         $resolver->setRequired(
             [
                 'values',
