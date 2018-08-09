@@ -294,7 +294,13 @@ class ProcessManager
         $state->setSkipped(false);
         try {
             if (self::EXECUTE_PROCESS === $executionFlag) {
-                $this->logger->info("Processing task {$taskConfiguration->getCode()}");
+                $this->logger->info(
+                    "Processing task {$taskConfiguration->getCode()}",
+                    [
+                        'process_id' => $state->getProcessHistory()->getId(),
+                        'process_code' => $state->getProcessHistory()->getProcessCode(),
+                    ]
+                );
                 $task->execute($state);
             } else {
                 $state->setInput(null);
@@ -306,7 +312,13 @@ class ProcessManager
                             "Task {$taskConfiguration->getCode()} is not blocking"
                         );
                     }
-                    $this->logger->info("Proceeding task {$taskConfiguration->getCode()}");
+                    $this->logger->info(
+                        "Proceeding task {$taskConfiguration->getCode()}",
+                        [
+                            'process_id' => $state->getProcessHistory()->getId(),
+                            'process_code' => $state->getProcessHistory()->getProcessCode(),
+                        ]
+                    );
                     $task->proceed($state);
                 } elseif (self::EXECUTE_FLUSH === $executionFlag) {
                     if (!$task instanceof FlushableTaskInterface) {
@@ -315,7 +327,13 @@ class ProcessManager
                             "Task {$taskConfiguration->getCode()} is not flushable"
                         );
                     }
-                    $this->logger->info("Flushing task {$taskConfiguration->getCode()}");
+                    $this->logger->info(
+                        "Flushing task {$taskConfiguration->getCode()}",
+                        [
+                            'process_id' => $state->getProcessHistory()->getId(),
+                            'process_code' => $state->getProcessHistory()->getProcessCode(),
+                        ]
+                    );
                     $task->flush($state);
                 } else {
                     throw new \UnexpectedValueException("Unknown execution flag: {$executionFlag}");
@@ -469,6 +487,7 @@ class ProcessManager
                 "Process {$history->getProcessCode()} succeed",
                 [
                     'process_id' => $history->getId(),
+                    'process_code' => $history->getProcessCode(),
                     'duration' => $history->getDuration(),
                 ]
             );
