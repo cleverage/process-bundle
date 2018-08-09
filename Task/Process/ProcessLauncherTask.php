@@ -86,15 +86,12 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     public function flush(ProcessState $state)
     {
-        $processCount = \count($this->launchedProcesses);
-        if (0 === $processCount) {
-            $state->setSkipped(true);
-        }
-
-        while ($processCount > 0) {
+        while (\count($this->launchedProcesses) > 0) {
             $this->handleProcesses($state);
             sleep($this->getOption($state, 'sleep_on_finalize_interval'));
         }
+
+        $state->setSkipped(true);
     }
 
     /**
