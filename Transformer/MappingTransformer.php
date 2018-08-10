@@ -26,8 +26,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class MappingTransformer implements ConfigurableTransformerInterface
 {
-    /** @var TransformerRegistry */
-    protected $transformerRegistry;
+    use TransformerTrait;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -125,15 +124,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
             }
 
             try {
-                /** @noinspection ForeachSourceInspection */
-                foreach ($mapping['transformers'] as $transformerCode => $transformerOptions) {
-                    $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
-                    $transformer = $this->transformerRegistry->getTransformer($transformerCode);
-                    $transformedValue = $transformer->transform(
-                        $transformedValue,
-                        $transformerOptions ?: []
-                    );
-                }
+                $transformedValue = $this->applyTransformers($mapping['transformers'], $transformedValue);
             } catch (\Throwable $exception) {
                 $this->logger->debug(
                     'Transformation exception',
@@ -243,63 +234,12 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 'constant' => null,
                 'set_null' => false, // Because the "null" value cannot be covered by the constant option
                 'ignore_missing' => false,
-                'transformers' => [],
             ]
         );
         $resolver->setAllowedTypes('code', ['NULL', 'string', 'array']);
         $resolver->setAllowedTypes('set_null', ['boolean']);
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
-        $resolver->setAllowedTypes('transformers', ['array']);
-        /** @noinspection PhpUnusedParameterInspection */
-        $resolver->setNormalizer( // This logic is duplicated from the array_map transformer @todo fix me
-            'transformers',
-            function (Options $options, $transformers) {
-                /** @var array $transformers */
-                foreach ($transformers as $transformerCode => &$transformerOptions) {
-                    $transformerOptionsResolver = new OptionsResolver();
-                    $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */// @todo remove me sometimes
-                    $transformer = $this->transformerRegistry->getTransformer($transformerCode);
-                    if ($transformer instanceof ConfigurableTransformerInterface) {
-                        $transformer->configureOptions($transformerOptionsResolver);
-                        $transformerOptions = $transformerOptionsResolver->resolve(
-                            $transformerOptions ?? []
-                        );
-                    }
-                }
 
-                return $transformers;
-            }
-        );
-    }
-
-    /**
-     * This allows to use transformer codes suffixes to avoid limitations to the "transformers" option using codes as
-     * keys This way you can chain multiple times the same transformer. Without this, it would silently call only the
-     * 1st one.
-     *
-     * @example
-     * transformers:
-     *     callback#1:
-     *         callback: array_filter
-     *     callback#2:
-     *         callback: array_reverse
-     *
-     *
-     * @param string $transformerCode
-     *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
-     *
-     * @return string
-     */
-    protected function getCleanedTransfomerCode(string $transformerCode)
-    {
-        $match = preg_match('/([^#]+)(#[\d]+)?/', $transformerCode, $parts);
-
-        if (1 === $match && $this->transformerRegistry->hasTransformer($parts[1])) {
-            return $parts[1];
-        }
-
-        return $transformerCode;
+        $this->configureTransformersOptions($resolver);
     }
 }

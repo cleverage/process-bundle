@@ -222,21 +222,22 @@ Accepts an array as input and sets values before returning it as the output
     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
     options:
         # Required options
-        transformer: mapping # the code of the transformer that you want to apply, 'mapping' by default
-        mapping:
-            <property>:
-                code: null # Source property, default to the key of the config
-                constant: null # If you want to output a constant value
-                set_null: false # Because the "null" value cannot be covered by the constant option
-                ignore_missing: false # Will ignore missing properties
-                transformers: # Applies a series of other transformers
-                    <transformer_code>: [] # Transformer options
-            # ...
-
-        # Optional options
-        ignore_missing: false # Globally ignore any missing property
-        ignore_extra: false # Ignore extra properties
-        initial_value: [] # The value from which the transformer reset to before applying any mapping
+        transformers:
+            mapping: # the code of the transformer that you want to apply
+                mapping:
+                    <property>:
+                        code: null # Source property, default to the key of the config
+                        constant: null # If you want to output a constant value
+                        set_null: false # Because the "null" value cannot be covered by the constant option
+                        ignore_missing: false # Will ignore missing properties
+                        transformers: # Applies a series of other transformers
+                            <transformer_code>: [] # Transformer options
+                    # ...
+        
+                # Optional options
+                ignore_missing: false # Globally ignore any missing property
+                ignore_extra: false # Ignore extra properties
+                initial_value: [] # The value from which the transformer reset to before applying any mapping
     outputs: [<task_code>] # Array of tasks accepting an array as input
 ```
 
