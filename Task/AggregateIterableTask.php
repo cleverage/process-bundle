@@ -22,9 +22,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
  */
 class AggregateIterableTask implements BlockingTaskInterface
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $result = [];
 
     /**
@@ -42,6 +40,10 @@ class AggregateIterableTask implements BlockingTaskInterface
      */
     public function proceed(ProcessState $state)
     {
-        $state->setOutput($this->result);
+        if (0 === \count($this->result)) {
+            $state->setSkipped(true);
+        } else {
+            $state->setOutput($this->result);
+        }
     }
 }

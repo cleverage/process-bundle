@@ -58,6 +58,12 @@ class ProcessManager
     /** @var ContextualOptionResolver */
     protected $contextualOptionResolver;
 
+    /** @var TaskConfiguration[] */
+    protected $processedIterables = [];
+
+    /** @var TaskConfiguration[] */
+    protected $processedBlockings = [];
+
     /**
      * @param ContainerInterface           $container
      * @param LoggerInterface              $logger
@@ -134,6 +140,7 @@ class ProcessManager
      * Resolve a task, by checking if parents are resolved and processing roots and BlockingTasks
      *
      * @TODO handle properly resolution of stopped task
+     * @todo might be fixed?
      *
      * @param TaskConfiguration $taskConfiguration
      *
@@ -171,8 +178,10 @@ class ProcessManager
             $this->process($taskConfiguration);
         }
 
-        // Then we can process BlockingTask
-        if ($taskConfiguration->getTask() instanceof BlockingTaskInterface) {
+        // Then we can proceed with BlockingTask only if they have been processed normally and where never "proceeded"
+        if ($taskConfiguration->getTask() instanceof BlockingTaskInterface
+            && $this->hasProcessedBlocking($taskConfiguration)
+        ) {
             $this->process($taskConfiguration, self::EXECUTE_PROCEED);
         }
 
@@ -193,13 +202,13 @@ class ProcessManager
      */
     protected function initialize(TaskConfiguration $taskConfiguration): void
     {
+        // @todo Refactor this using a Registry with this feature:
+        // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
         $serviceReference = $taskConfiguration->getServiceReference();
         if (0 === strpos($serviceReference, '@')) {
             $task = $this->container->get(ltrim($serviceReference, '@'));
         } elseif ($this->container->has($serviceReference)) {
             $task = $this->container->get($serviceReference);
-        } elseif (class_exists($serviceReference)) {
-            $task = new $serviceReference();
         } else {
             throw new \UnexpectedValueException(
                 "Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'"
@@ -274,10 +283,22 @@ class ProcessManager
 
             $hasMoreItem = false; // By default, a task is not iterable
             if ($task instanceof IterableTaskInterface) {
-                $hasMoreItem = $task->next($state); // Check if task has more items
+                // Check if task has more items
+                $hasMoreItem = $task->next($state);
                 if (!$hasMoreItem) {
+                    if (!$this->hasProcessedIterable($taskConfiguration)) {
+                        return; // This means the task is empty
+                    }
                     $this->flush($taskConfiguration);
+                    // This means we are over iterating this task so we can remove it from registry
+                    $this->removeProcessedIterable($taskConfiguration);
+                    if ($state->isStopped()) {
+                        return;
+                    }
+                    $this->proceed($taskConfiguration);
                 }
+                // Register the task has not empty
+                $this->addProcessedIterable($taskConfiguration);
             }
         } while ($hasMoreItem);
     }
@@ -302,6 +323,9 @@ class ProcessManager
                     ]
                 );
                 $task->execute($state);
+                if ($task instanceof BlockingTaskInterface) {
+                    $this->addProcessedBlocking($taskConfiguration);
+                }
             } else {
                 $state->setInput(null);
                 $state->setPreviousState(null);
@@ -320,6 +344,7 @@ class ProcessManager
                         ]
                     );
                     $task->proceed($state);
+                    $this->removeProcessedBlocking($taskConfiguration);
                 } elseif (self::EXECUTE_FLUSH === $executionFlag) {
                     if (!$task instanceof FlushableTaskInterface) {
                         // This exception should never be thrown
@@ -367,9 +392,43 @@ class ProcessManager
         }
         if ($task instanceof FlushableTaskInterface) {
             $this->process($taskConfiguration, self::EXECUTE_FLUSH);
+            if ($taskConfiguration->getState()->isStopped()) {
+                return;
+            }
         }
+        // Check outputs
         foreach ($taskConfiguration->getNextTasksConfigurations() as $nextTaskConfiguration) {
             $this->flush($nextTaskConfiguration);
+        }
+        // Check errors
+        foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTasksConfiguration) {
+            $this->flush($errorTasksConfiguration);
+        }
+    }
+
+    /**
+     * Browse all children for BlockingTask and proceed with them
+     *
+     * @param TaskConfiguration $taskConfiguration
+     *
+     * @throws \RuntimeException
+     */
+    protected function proceed(TaskConfiguration $taskConfiguration): void
+    {
+        $task = $taskConfiguration->getTask();
+        if ($task instanceof BlockingTaskInterface) {
+            $this->process($taskConfiguration, self::EXECUTE_PROCEED);
+            if ($taskConfiguration->getState()->isStopped()) {
+                return;
+            }
+        }
+        // Check outputs
+        foreach ($taskConfiguration->getNextTasksConfigurations() as $nextTaskConfiguration) {
+            $this->proceed($nextTaskConfiguration);
+        }
+        // Check errors
+        foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTasksConfiguration) {
+            $this->proceed($errorTasksConfiguration);
         }
     }
 
@@ -538,5 +597,69 @@ class ProcessManager
         if ($endPoint && !\in_array($endPoint->getCode(), $mainTaskList, true)) {
             throw InvalidProcessConfigurationException::createNotInMain($endPoint, $mainTaskList);
         }
+    }
+
+    /**
+     * When an iterable task returns at least one element, it gets added here
+     *
+     * @param TaskConfiguration $taskConfiguration
+     */
+    protected function addProcessedIterable(TaskConfiguration $taskConfiguration): void
+    {
+        $this->processedIterables[$taskConfiguration->getCode()] = $taskConfiguration;
+    }
+
+    /**
+     * If true this means that the tasks returned an element at least once
+     *
+     * @param TaskConfiguration $taskConfiguration
+     *
+     * @return bool
+     */
+    protected function hasProcessedIterable(TaskConfiguration $taskConfiguration): bool
+    {
+        return array_key_exists($taskConfiguration->getCode(), $this->processedIterables);
+    }
+
+    /**
+     * Once everything was flushed, the task is resolved and can be removed from the stack
+     *
+     * @param TaskConfiguration $taskConfiguration
+     */
+    protected function removeProcessedIterable(TaskConfiguration $taskConfiguration): void
+    {
+        unset($this->processedIterables[$taskConfiguration->getCode()]);
+    }
+
+    /**
+     * Add blocking tasks that were just processed
+     *
+     * @param TaskConfiguration $taskConfiguration
+     */
+    protected function addProcessedBlocking(TaskConfiguration $taskConfiguration): void
+    {
+        $this->processedBlockings[$taskConfiguration->getCode()] = $taskConfiguration;
+    }
+
+    /**
+     * If true this means the task was processed normally but was never run with proceed
+     *
+     * @param TaskConfiguration $taskConfiguration
+     *
+     * @return bool
+     */
+    protected function hasProcessedBlocking(TaskConfiguration $taskConfiguration): bool
+    {
+        return array_key_exists($taskConfiguration->getCode(), $this->processedBlockings);
+    }
+
+    /**
+     * Once a blocking task has been proceeded, we can remove it from the stack
+     *
+     * @param TaskConfiguration $taskConfiguration
+     */
+    protected function removeProcessedBlocking(TaskConfiguration $taskConfiguration): void
+    {
+        unset($this->processedBlockings[$taskConfiguration->getCode()]);
     }
 }
