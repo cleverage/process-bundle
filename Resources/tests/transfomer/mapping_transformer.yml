@@ -8,9 +8,11 @@ clever_age_process:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
                     error_strategy: stop
                     options:
-                        mapping:
-                            field2:
-                                code: '[field]'
+                        transformers:
+                            mapping:
+                                mapping:
+                                    field2:
+                                        code: '[field]'
 
         test.mapping_transformer.error:
             entry_point: transform
@@ -20,9 +22,11 @@ clever_age_process:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
                     error_strategy: stop
                     options:
-                        mapping:
-                            field2:
-                                code: 'probably_not_a_field'
+                        transformers:
+                            mapping:
+                                mapping:
+                                    field2:
+                                        code: 'probably_not_a_field'
 
         test.mapping_transformer.multi_subtransformers:
             entry_point: transform
@@ -32,14 +36,16 @@ clever_age_process:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
                     error_strategy: stop
                     options:
-                        mapping:
-                            field2:
-                                code: '[field]'
-                                transformers:
-                                    callback#1:
-                                        callback: array_filter
-                                    callback#2:
-                                        callback: array_reverse
+                        transformers:
+                            mapping:
+                                mapping:
+                                    field2:
+                                        code: '[field]'
+                                        transformers:
+                                            callback#1:
+                                                callback: array_filter
+                                            callback#2:
+                                                callback: array_reverse
 
         test.mapping_transformer.deep_mapping:
             entry_point: transform
@@ -49,6 +55,8 @@ clever_age_process:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
                     error_strategy: stop
                     options:
-                        mapping:
-                            "[field1][field2][field3]":
-                                code: '[value]'
+                        transformers:
+                            mapping:
+                                mapping:
+                                    "[field1][field2][field3]":
+                                        code: '[value]'

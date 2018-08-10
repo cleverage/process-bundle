@@ -14,8 +14,8 @@ use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
-use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
+use CleverAge\ProcessBundle\Transformer\TransformerTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -27,14 +27,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TransformerTask extends AbstractConfigurableTask
 {
-    public const DEFAULT_TRANSFORMER = 'mapping';
-    public const ACTIVE_TRANSFORMER = 'transformer';
+    use TransformerTrait;
 
     /** @var LoggerInterface */
     protected $logger;
-
-    /** @var TransformerRegistry */
-    protected $transformerRegistry;
 
     /** @var TransformerInterface */
     protected $transformer;
@@ -67,14 +63,9 @@ class TransformerTask extends AbstractConfigurableTask
     {
         $output = null;
         $options = $this->getOptions($state);
-        $transformerOptions = $options;
-        unset($transformerOptions[self::ACTIVE_TRANSFORMER]);
 
         try {
-            $output = $this->transformer->transform(
-                $state->getInput(),
-                $transformerOptions
-            );
+            $output = $this->applyTransformers($options['transformers'], $state->getInput());
         } catch (\Exception $e) {
             $state->setError($state->getInput());
             $logContext = $state->getLogContext();
@@ -94,20 +85,6 @@ class TransformerTask extends AbstractConfigurableTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     */
-    protected function configureOptions(OptionsResolver $resolver)
-    {
-        $transformerCodes = array_keys($this->transformerRegistry->getTransformers());
-        $resolver->setDefault(static::ACTIVE_TRANSFORMER, static::DEFAULT_TRANSFORMER);
-        $resolver->setAllowedValues(static::ACTIVE_TRANSFORMER, $transformerCodes);
-    }
-
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     *
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
      * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
@@ -115,29 +92,10 @@ class TransformerTask extends AbstractConfigurableTask
      * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
-     * @throws \UnexpectedValueException
-     *
-     * @return array
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
-    protected function getOptions(ProcessState $state)
+    protected function configureOptions(OptionsResolver $resolver)
     {
-        if (null === $this->options) {
-            $resolver = new OptionsResolver();
-            $this->configureOptions($resolver);
-
-            $options = $state->getTaskConfiguration()->getOptions();
-            if (!array_key_exists(static::ACTIVE_TRANSFORMER, $options)) {
-                $options[static::ACTIVE_TRANSFORMER] = static::DEFAULT_TRANSFORMER;
-            }
-
-            $this->transformer = $this->transformerRegistry->getTransformer($options[static::ACTIVE_TRANSFORMER]);
-            if ($this->transformer instanceof ConfigurableTransformerInterface) {
-                $this->transformer->configureOptions($resolver);
-            }
-
-            $this->options = $resolver->resolve($state->getContextualizedOptions());
-        }
-
-        return $this->options;
+        $this->configureTransformersOptions($resolver);
     }
 }

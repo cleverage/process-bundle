@@ -1,6 +1,6 @@
 clever_age_process:
     configurations:
-        test.date_transformers.date_format:
+        test.transformer_task.simple:
             entry_point: transform
             end_point: transform
             tasks:
@@ -9,10 +9,10 @@ clever_age_process:
                     error_strategy: stop
                     options:
                         transformers:
-                            date_format:
-                                format: 'Y-m-d'
+                            wrapper:
+                                wrapper_key: 'field'
 
-        test.date_transformers.date_parser:
+        test.transformer_task.error:
             entry_point: transform
             end_point: transform
             tasks:
@@ -21,26 +21,20 @@ clever_age_process:
                     error_strategy: stop
                     options:
                         transformers:
-                            date_parser:
-                                format: 'Y-m-d'
+                            probably_not_a_transformer: ~
 
-        test.date_transformers.date_parse_format:
-            entry_point: parse
-            end_point: format
+        test.transformer_task.multi_subtransformers:
+            entry_point: transform
+            end_point: transform
             tasks:
-                parse:
+                transform:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
                     error_strategy: stop
                     options:
                         transformers:
-                            date_parser:
-                                format: 'Y-m-d\TH:i:sP'
-                    outputs: [format]
-
-                format:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
-                    error_strategy: stop
-                    options:
-                        transformers:
-                            date_format:
-                                format: 'Y-m-d'
+                            callback#1:
+                                callback: array_filter
+                            callback#2:
+                                callback: array_reverse
+                            wrapper:
+                                wrapper_key: 'field'
