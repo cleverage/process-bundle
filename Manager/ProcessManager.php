@@ -368,7 +368,7 @@ class ProcessManager
             $state->setException($e);
             $state->setError($state->getInput());
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
-                $this->logger->warning($e->getMessage(), $state->getLogContext());
+                $this->logger->critical($e->getMessage(), $state->getLogContext());
                 $state->setSkipped(true);
             } elseif ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
                 $this->logger->critical($e->getMessage(), $state->getLogContext());
@@ -515,14 +515,6 @@ class ProcessManager
         $processHistory = $state->getProcessHistory();
         if ($state->getException()) {
             $processHistory->setFailed();
-
-            $this->logger->critical(
-                "Process {$state->getProcessConfiguration()->getCode()} has failed",
-                [
-                    'duration' => $processHistory->getDuration(),
-                    'state' => $state->getLogContext(),
-                ]
-            );
 
             throw new \RuntimeException(
                 "Process {$state->getProcessConfiguration()->getCode()} has failed",
