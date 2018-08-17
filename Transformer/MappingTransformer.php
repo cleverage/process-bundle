@@ -125,18 +125,19 @@ class MappingTransformer implements ConfigurableTransformerInterface
 
             try {
                 $transformedValue = $this->applyTransformers($mapping['transformers'], $transformedValue);
-            } catch (\Throwable $exception) {
+            } catch (TransformerException $exception) {
+                $exception->setTargetProperty($targetProperty);
                 $this->logger->debug(
                     'Transformation exception',
                     [
-                        'message' => $exception->getMessage(),
-                        'file' => $exception->getFile(),
-                        'line' => $exception->getLine(),
-                        'trace' => $exception->getTraceAsString(),
+                        'message' => $exception->getPrevious()->getMessage(),
+                        'file' => $exception->getPrevious()->getFile(),
+                        'line' => $exception->getPrevious()->getLine(),
+                        'trace' => $exception->getPrevious()->getTraceAsString(),
                     ]
                 );
 
-                throw new TransformerException($targetProperty, 0, $exception);
+                throw $exception;
             }
 
             if (\is_callable($options['merge_callback'])) {

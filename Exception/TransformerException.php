@@ -18,16 +18,49 @@ namespace CleverAge\ProcessBundle\Exception;
  */
 class TransformerException extends \RuntimeException implements ProcessExceptionInterface
 {
+    /** @var string */
+    protected $transformerCode;
+
+    /** @var string */
+    protected $targetProperty;
+
     /**
      * {@inheritDoc}
      */
-    public function __construct($targetProperty, $code = 0, \Throwable $previous = null)
+    public function __construct($transformerCode, $code = 0, \Throwable $previous = null)
     {
-        $m = "Transformation have failed for target property '{$targetProperty}'";
-        if ($previous) {
-            $m .= ": {$previous->getMessage()}";
-        }
+        $this->transformerCode = $transformerCode;
 
-        parent::__construct($m, $code, $previous);
+        parent::__construct('', $code, $previous);
+        $this->updateMessage();
+    }
+
+    /**
+     * @param string $targetProperty
+     */
+    public function setTargetProperty(string $targetProperty): void
+    {
+        $this->targetProperty = $targetProperty;
+        $this->updateMessage();
+    }
+
+    protected function updateMessage()
+    {
+        if ($this->targetProperty) {
+            $m = sprintf(
+                "Transformation '%s' have failed for target property '%s'",
+                $this->transformerCode,
+                $this->targetProperty
+            );
+        } else {
+            $m = sprintf(
+                "Transformation '%s' have failed",
+                $this->transformerCode
+            );
+        }
+        if ($this->getPrevious()) {
+            $m .= ": {$this->getPrevious()->getMessage()}";
+        }
+        $this->message = $m;
     }
 }

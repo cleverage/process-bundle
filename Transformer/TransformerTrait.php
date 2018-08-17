@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -30,7 +31,6 @@ trait TransformerTrait
      * @param array $transformers
      * @param mixed $value
      *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
      * @throws \CleverAge\ProcessBundle\Exception\TransformerException
      *
      * @return mixed
@@ -39,12 +39,16 @@ trait TransformerTrait
     {
         /** @noinspection ForeachSourceInspection */
         foreach ($transformers as $transformerCode => $transformerOptions) {
-            $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
-            $transformer = $this->transformerRegistry->getTransformer($transformerCode);
-            $value = $transformer->transform(
-                $value,
-                $transformerOptions ?: []
-            );
+            try {
+                $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
+                $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+                $value = $transformer->transform(
+                    $value,
+                    $transformerOptions ?: []
+                );
+            } catch (\Throwable $exception) {
+                throw new TransformerException($transformerCode, 0, $exception);
+            }
         }
 
         return $value;

@@ -11,6 +11,7 @@
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
@@ -66,7 +67,7 @@ class TransformerTask extends AbstractConfigurableTask
 
         try {
             $output = $this->applyTransformers($options['transformers'], $state->getInput());
-        } catch (\Exception $e) {
+        } catch (TransformerException $e) {
             $state->setError($state->getInput());
             $logContext = $state->getLogContext();
             if ($e->getPrevious()) {
