@@ -30,5 +30,7 @@ class DebugTask implements TaskInterface
         if (class_exists(VarDumper::class)) {
             VarDumper::dump($state->getInput());
         }
+
+        $state->setOutput($state->getInput());
     }
 }
