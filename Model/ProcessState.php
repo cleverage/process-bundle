@@ -428,7 +428,7 @@ class ProcessState
         }
 
         if ($this->exception) {
-            $context['exception'] = $this->getException()->getMessage();
+            $context['exception'] = $this->exception;
         }
 
         return $context;
