@@ -26,4 +26,15 @@ class FlushableTaskTest extends AbstractProcessTest
         self::assertEquals([1, 2], $result[0]);
         self::assertEquals([3], $result[1]);
     }
+
+    /**
+     * @throws \Exception
+     */
+    public function testSingleBlocking()
+    {
+        $result = $this->processManager->execute('test.single_flushable');
+
+        self::assertCount(1, $result);
+        self::assertEquals([1], $result[0]);
+    }
 }

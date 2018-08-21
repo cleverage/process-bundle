@@ -271,6 +271,10 @@ class ProcessManager
                 && !$state->isSkipped();
 
             if ($shouldContinue) {
+                if ($task instanceof IterableTaskInterface) {
+                    // Register the task as not empty
+                    $this->addProcessedIterable($taskConfiguration);
+                }
                 foreach ($taskConfiguration->getNextTasksConfigurations() as $nextTaskConfiguration) {
                     $this->prepareNextProcess($taskConfiguration, $nextTaskConfiguration);
                     $this->process($nextTaskConfiguration);
@@ -297,8 +301,6 @@ class ProcessManager
                     }
                     $this->proceed($taskConfiguration);
                 }
-                // Register the task has not empty
-                $this->addProcessedIterable($taskConfiguration);
             }
         } while ($hasMoreItem);
     }
