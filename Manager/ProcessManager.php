@@ -317,7 +317,7 @@ class ProcessManager
         $state->setSkipped(false);
         try {
             if (self::EXECUTE_PROCESS === $executionFlag) {
-                $this->logger->info(
+                $this->logger->debug(
                     "Processing task {$taskConfiguration->getCode()}",
                     [
                         'process_id' => $state->getProcessHistory()->getId(),
@@ -338,7 +338,7 @@ class ProcessManager
                             "Task {$taskConfiguration->getCode()} is not blocking"
                         );
                     }
-                    $this->logger->info(
+                    $this->logger->debug(
                         "Proceeding task {$taskConfiguration->getCode()}",
                         [
                             'process_id' => $state->getProcessHistory()->getId(),
@@ -354,7 +354,7 @@ class ProcessManager
                             "Task {$taskConfiguration->getCode()} is not flushable"
                         );
                     }
-                    $this->logger->info(
+                    $this->logger->debug(
                         "Flushing task {$taskConfiguration->getCode()}",
                         [
                             'process_id' => $state->getProcessHistory()->getId(),
