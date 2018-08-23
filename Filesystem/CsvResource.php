@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Filesystem;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class CsvResource
+class CsvResource implements FileStreamInterface
 {
     /** @var string */
     protected $delimiter;
@@ -83,7 +83,7 @@ class CsvResource
     /**
      * @return string
      */
-    public function getDelimiter()
+    public function getDelimiter(): string
     {
         return $this->delimiter;
     }
@@ -91,7 +91,7 @@ class CsvResource
     /**
      * @return string
      */
-    public function getEnclosure()
+    public function getEnclosure(): string
     {
         return $this->enclosure;
     }
@@ -99,7 +99,7 @@ class CsvResource
     /**
      * @return string
      */
-    public function getEscape()
+    public function getEscape(): string
     {
         return $this->escape;
     }
@@ -119,7 +119,7 @@ class CsvResource
      *
      * @return int
      */
-    public function getLineCount()
+    public function getLineCount(): int
     {
         if (null === $this->lineCount) {
             $this->rewind();
@@ -139,7 +139,7 @@ class CsvResource
     /**
      * @return array
      */
-    public function getHeaders()
+    public function getHeaders(): array
     {
         return $this->headers;
     }
@@ -147,7 +147,7 @@ class CsvResource
     /**
      * @return int
      */
-    public function getHeaderCount()
+    public function getHeaderCount(): int
     {
         return $this->headerCount;
     }
@@ -157,7 +157,7 @@ class CsvResource
      *
      * @throws \RuntimeException
      */
-    public function writeHeaders()
+    public function writeHeaders(): void
     {
         $this->writeRaw($this->headers);
     }
@@ -167,7 +167,7 @@ class CsvResource
      *
      * @return int
      */
-    public function getCurrentLine()
+    public function getCurrentLine(): int
     {
         if ($this->seekCalled) {
             throw new \LogicException('Cannot get current line number after calling "seek": the line number is lost');
@@ -181,7 +181,7 @@ class CsvResource
      *
      * @return bool
      */
-    public function isEndOfFile()
+    public function isEndOfFile(): bool
     {
         $this->assertOpened();
 
@@ -195,7 +195,7 @@ class CsvResource
      *
      * @throws \RuntimeException
      *
-     * @return array
+     * @return array|false
      */
     public function readRaw($length = null)
     {
@@ -211,9 +211,9 @@ class CsvResource
      * @throws \UnexpectedValueException
      * @throws \RuntimeException
      *
-     * @return array|null
+     * @return array
      */
-    public function readLine($length = null)
+    public function readLine($length = null): ?array
     {
         $values = $this->readRaw($length);
 
@@ -232,7 +232,12 @@ class CsvResource
             throw new \UnexpectedValueException($message);
         }
 
-        return array_combine($this->headers, $values);
+        $combined = array_combine($this->headers, $values);
+        if (false === $combined) {
+            throw new \RuntimeException('Cannot combine headers with values');
+        }
+
+        return $combined;
     }
 
     /**
@@ -244,7 +249,7 @@ class CsvResource
      *
      * @return int
      */
-    public function writeRaw(array $fields)
+    public function writeRaw(array $fields): int
     {
         $this->assertOpened();
         ++$this->currentLine;
@@ -259,7 +264,7 @@ class CsvResource
      *
      * @return int
      */
-    public function writeLine(array $fields)
+    public function writeLine(array $fields): int
     {
         $count = \count($fields);
         if ($count !== $this->headerCount) {
@@ -290,7 +295,7 @@ class CsvResource
      *
      * @throws \RuntimeException
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->assertOpened();
         if (!rewind($this->handler)) {
@@ -307,7 +312,7 @@ class CsvResource
      *
      * @return int
      */
-    public function tell()
+    public function tell(): int
     {
         $this->assertOpened();
 
@@ -321,7 +326,7 @@ class CsvResource
      *
      * @return int
      */
-    public function seek($offset)
+    public function seek($offset): int
     {
         $this->assertOpened();
         $this->seekCalled = true;
@@ -332,7 +337,7 @@ class CsvResource
     /**
      * @return bool
      */
-    public function close()
+    public function close(): bool
     {
         if ($this->closed) {
             return true;
@@ -344,17 +349,17 @@ class CsvResource
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isManualHeaders()
+    public function isManualHeaders(): bool
     {
         return $this->manualHeaders;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isClosed()
+    public function isClosed(): bool
     {
         return $this->closed;
     }
@@ -370,7 +375,7 @@ class CsvResource
     /**
      * @throws \RuntimeException
      */
-    protected function assertOpened()
+    protected function assertOpened(): void
     {
         if ($this->closed) {
             throw new \RuntimeException("{$this->getResourceName()} was closed earlier");
@@ -384,7 +389,7 @@ class CsvResource
      *
      * @return array
      */
-    protected function parseHeaders(array $headers = null)
+    protected function parseHeaders(array $headers = null): array
     {
         // If headers are not passed in the constructor but file is readable, try to read headers from file
         if (null === $headers) {
@@ -417,7 +422,7 @@ class CsvResource
     /**
      * @return string
      */
-    protected function getResourceName()
+    protected function getResourceName(): string
     {
         return "CSV resource '{$this->handler}'";
     }

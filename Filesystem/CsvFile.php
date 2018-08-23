@@ -68,7 +68,7 @@ class CsvFile extends CsvResource
      *
      * @return string|resource
      */
-    public function getFilePath()
+    public function getFilePath(): string
     {
         return $this->filePath;
     }
@@ -76,7 +76,7 @@ class CsvFile extends CsvResource
     /**
      * @return string
      */
-    protected function getResourceName()
+    protected function getResourceName(): string
     {
         return "CSV file '{$this->filePath}'";
     }
