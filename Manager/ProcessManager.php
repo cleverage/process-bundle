@@ -409,7 +409,7 @@ class ProcessManager
     }
 
     /**
-     * Browse all children for BlockingTask and proceed with them
+     * Proceed the task, only if blocking
      *
      * @param TaskConfiguration $taskConfiguration
      *
@@ -423,14 +423,6 @@ class ProcessManager
             if ($taskConfiguration->getState()->isStopped()) {
                 return;
             }
-        }
-        // Check outputs
-        foreach ($taskConfiguration->getNextTasksConfigurations() as $nextTaskConfiguration) {
-            $this->proceed($nextTaskConfiguration);
-        }
-        // Check errors
-        foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTasksConfiguration) {
-            $this->proceed($errorTasksConfiguration);
         }
     }
 

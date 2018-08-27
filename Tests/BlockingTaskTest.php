@@ -47,6 +47,6 @@ class BlockingTaskTest extends AbstractProcessTest
     {
         $result = $this->processManager->execute('test.multiple_blocking');
 
-        self::assertEquals([[1, 2, 3]], $result);
+        self::assertEquals([1, 2, 3], $result);
     }
 }
