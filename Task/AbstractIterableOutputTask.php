@@ -38,7 +38,11 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
         }
         $state->addErrorContextValue('iterator_key', $this->iterator->key());
 
-        $state->setOutput($this->iterator->current());
+        if ($this->iterator->valid()) {
+            $state->setOutput($this->iterator->current());
+        } else {
+            $state->setSkipped(true);
+        }
     }
 
     /**

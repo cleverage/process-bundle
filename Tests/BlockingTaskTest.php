@@ -49,4 +49,14 @@ class BlockingTaskTest extends AbstractProcessTest
 
         self::assertEquals([1, 2, 3], $result);
     }
+
+    /**
+     * Assert that if a blocking is never executed, it will automatically skip subsequent tasks
+     */
+    public function testBlockingEmptyData()
+    {
+        $this->processManager->execute('test.blocking_empty_data');
+
+        $this->assertDataQueue([], 'test.blocking_empty_data');
+    }
 }
