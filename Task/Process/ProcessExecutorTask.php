@@ -10,10 +10,12 @@
 
 namespace CleverAge\ProcessBundle\Task\Process;
 
+use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -32,16 +34,24 @@ class ProcessExecutorTask extends AbstractConfigurableTask
     /** @var array */
     protected $process;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
+     * ProcessExecutorTask constructor.
+     *
      * @param ProcessManager               $processManager
      * @param ProcessConfigurationRegistry $processRegistry
+     * @param LoggerInterface              $logger
      */
     public function __construct(
         ProcessManager $processManager,
-        ProcessConfigurationRegistry $processRegistry
+        ProcessConfigurationRegistry $processRegistry,
+        LoggerInterface $logger
     ) {
         $this->processManager = $processManager;
         $this->processRegistry = $processRegistry;
+        $this->logger = $logger;
     }
 
     /**
@@ -54,12 +64,26 @@ class ProcessExecutorTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $input = $state->getInput();
-        $output = $this->processManager->execute(
-            $this->getOption($state, 'process'),
-            $input,
-            $this->getOption($state, 'context')
-        );
-        $state->setOutput($output);
+        $process = $this->getOption($state, 'process');
+
+        try {
+            $output = $this->processManager->execute(
+                $process,
+                $input,
+                $this->getOption($state, 'context')
+            );
+            $state->setOutput($output);
+        } catch (\RuntimeException $exception) {
+            if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
+                // Allow input to go into an error branch
+                $this->logger->info("Subprocess {$process} have failed, result is skipped", $state->getLogContext() + ['input' => $input]);
+                $state->setSkipped(true);
+                $state->setError($input);
+            } else {
+                // Otherwise, let the default behavior catch or not the error
+                throw $exception;
+            }
+        }
     }
 
     /**
