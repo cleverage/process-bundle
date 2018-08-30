@@ -68,6 +68,7 @@ class ProcessHelpCommand extends Command
     protected function configure()
     {
         $this->setName('cleverage:process:help');
+        $this->setDescription('Describe the process');
         $this->addArgument('process_code');
     }
 
@@ -89,7 +90,26 @@ class ProcessHelpCommand extends Command
         $processCode = $input->getArgument('process_code');
         $process = $this->processConfigRegistry->getProcessConfiguration($processCode);
 
-        $output->writeln("<info>The process </info>{$processCode}<info> contains the following tasks:</info>");
+        $output->writeln("<comment>Process: </comment>");
+        $output->writeln("    {$processCode}");
+        $output->writeln('');
+
+        if ($process->getDescription()) {
+            $output->writeln("<comment>Description:</comment>");
+            $output->writeln("    {$process->getDescription()}");
+            $output->writeln('');
+        }
+
+        if ($process->getHelp()) {
+            $output->writeln("<comment>Help:</comment>");
+            $helpLines = explode("\n", $process->getHelp());
+            foreach ($helpLines as $helpLine) {
+                $output->writeln("    {$helpLine}");
+            }
+            $output->writeln('');
+        }
+
+        $output->writeln("<comment>Tasks tree:</comment>");
 
         $branches = [];
 
@@ -299,7 +319,7 @@ class ProcessHelpCommand extends Command
 
         $branches = array_filter($branches);
         if (!empty($branches)) {
-            $branchStr = '['.implode(', ', $branches).']';
+            $branchStr = '[' . implode(', ', $branches) . ']';
             $output->writeln("<error>All branches are not resolved : {$branchStr}</error>");
         }
     }
@@ -364,7 +384,7 @@ class ProcessHelpCommand extends Command
         }
 
         if (\count($interfaces)) {
-            $description .= ' <info>('.implode(', ', $interfaces).')</info>';
+            $description .= ' <info>(' . implode(', ', $interfaces) . ')</info>';
         }
 
         return $description;
