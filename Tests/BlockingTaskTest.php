@@ -37,6 +37,12 @@ class BlockingTaskTest extends AbstractProcessTest
         self::assertEquals([['success']], $result);
     }
 
+    /**
+     * Assert a process with multiple blocking tasks can execute properly.
+     * Check
+     *  - a subsequent blocking task will be proceeded at least once
+     *  - a subsequent blocking task will be proceeded at most once
+     */
     public function testMultipleBlocking()
     {
         $result = $this->processManager->execute('test.multiple_blocking');

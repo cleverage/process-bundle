@@ -33,7 +33,7 @@ clever_age_process:
 
         test.multiple_blocking:
             entry_point: data
-            end_point: aggregate2
+            end_point: aggregate3
             tasks:
                 data:
                     service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
@@ -43,7 +43,19 @@ clever_age_process:
 
                 aggregate:
                     service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
+                    outputs: [iterate]
+
+                iterate:
+                    service: '@CleverAge\ProcessBundle\Task\InputIteratorTask'
                     outputs: [aggregate2]
 
                 aggregate2:
+                    service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
+                    outputs: [iterate2]
+
+                iterate2:
+                    service: '@CleverAge\ProcessBundle\Task\InputIteratorTask'
+                    outputs: [aggregate3]
+
+                aggregate3:
                     service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
