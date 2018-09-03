@@ -47,6 +47,33 @@ class BlockingTaskTest extends AbstractProcessTest
     {
         $result = $this->processManager->execute('test.multiple_blocking');
 
-        self::assertEquals([[1, 2, 3]], $result);
+        self::assertEquals([1, 2, 3], $result);
+    }
+
+    /**
+     * Assert when there is multiple iterations before a blocking that all are successfully resolved, and the blocking
+     * is executed only once
+     */
+    public function testMultipleIterationBlocking()
+    {
+        $this->processManager->execute('test.multiple_iteration_blocking');
+
+        $this->assertDataQueue(
+            [
+                [
+                    'task'  => 'aggregate',
+                    'value' => [1, 2, 3, 1, 2, 3, 1, 2, 3],
+                ],
+            ], 'test.multiple_iteration_blocking');
+    }
+
+    /**
+     * Assert that if a blocking is never executed, it will automatically skip subsequent tasks
+     */
+    public function testBlockingEmptyData()
+    {
+        $this->processManager->execute('test.blocking_empty_data');
+
+        $this->assertDataQueue([], 'test.blocking_empty_data');
     }
 }
