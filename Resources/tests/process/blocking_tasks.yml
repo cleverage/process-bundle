@@ -60,6 +60,32 @@ clever_age_process:
                 aggregate3:
                     service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
 
+        test.multiple_iteration_blocking:
+            entry_point: data
+            end_point: pushDataEvent
+            tasks:
+                data:
+                    service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+                    options:
+                        output:
+                        - [1, 2, 3]
+                        - [1, 2, 3]
+                        - [1, 2, 3]
+                    outputs: [iterate]
+
+                iterate:
+                    service: '@CleverAge\ProcessBundle\Task\InputIteratorTask'
+                    outputs: [aggregate]
+
+                aggregate:
+                    service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
+                    outputs: [pushDataEvent]
+
+                pushDataEvent:
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
+                    options:
+                        event_name: cleverage_process.data_queue
+
         test.blocking_empty_data:
             entry_point: data
             end_point: pushDataEvent

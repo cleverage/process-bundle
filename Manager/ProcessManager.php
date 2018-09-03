@@ -299,7 +299,6 @@ class ProcessManager
                     if ($state->isStopped()) {
                         return;
                     }
-                    $this->proceed($taskConfiguration);
                 }
             }
         } while ($hasMoreItem);
@@ -405,24 +404,6 @@ class ProcessManager
         // Check errors
         foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTasksConfiguration) {
             $this->flush($errorTasksConfiguration);
-        }
-    }
-
-    /**
-     * Proceed the task, only if blocking
-     *
-     * @param TaskConfiguration $taskConfiguration
-     *
-     * @throws \RuntimeException
-     */
-    protected function proceed(TaskConfiguration $taskConfiguration): void
-    {
-        $task = $taskConfiguration->getTask();
-        if ($task instanceof BlockingTaskInterface) {
-            $this->process($taskConfiguration, self::EXECUTE_PROCEED);
-            if ($taskConfiguration->getState()->isStopped()) {
-                return;
-            }
         }
     }
 
