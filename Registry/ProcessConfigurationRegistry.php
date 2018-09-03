@@ -41,6 +41,8 @@ class ProcessConfigurationRegistry
                     $taskCode,
                     $rawTaskConfiguration['service'],
                     $rawTaskConfiguration['options'],
+                    $rawTaskConfiguration['description'],
+                    $rawTaskConfiguration['help'],
                     $rawTaskConfiguration['outputs'],
                     $rawTaskConfiguration['errors'],
                     $rawTaskConfiguration['error_strategy'],
@@ -53,7 +55,10 @@ class ProcessConfigurationRegistry
                 $taskConfigurations,
                 $rawProcessConfiguration['options'],
                 $rawProcessConfiguration['entry_point'],
-                $rawProcessConfiguration['end_point']
+                $rawProcessConfiguration['end_point'],
+                $rawProcessConfiguration['description'],
+                $rawProcessConfiguration['help'],
+                $rawProcessConfiguration['public']
             );
 
             // Set links between tasks

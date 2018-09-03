@@ -40,6 +40,7 @@ class ProcessHelpCommand extends Command
     protected const CHAR_NODE = '■';
 
     protected const BRANCH_SIZE = 2;
+    protected const INDENT_SIZE = 4;
 
     /** @var ProcessConfigurationRegistry */
     protected $processConfigRegistry;
@@ -68,6 +69,7 @@ class ProcessHelpCommand extends Command
     protected function configure()
     {
         $this->setName('cleverage:process:help');
+        $this->setDescription('Describe the process');
         $this->addArgument('process_code');
     }
 
@@ -89,7 +91,26 @@ class ProcessHelpCommand extends Command
         $processCode = $input->getArgument('process_code');
         $process = $this->processConfigRegistry->getProcessConfiguration($processCode);
 
-        $output->writeln("<info>The process </info>{$processCode}<info> contains the following tasks:</info>");
+        $output->writeln("<comment>Process: </comment>");
+        $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $processCode);
+        $output->writeln('');
+
+        if ($process->getDescription()) {
+            $output->writeln("<comment>Description:</comment>");
+            $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $process->getDescription());
+            $output->writeln('');
+        }
+
+        if ($process->getHelp()) {
+            $output->writeln("<comment>Help:</comment>");
+            $helpLines = array_filter(explode("\n", $process->getHelp()));
+            foreach ($helpLines as $helpLine) {
+                $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $helpLine);
+            }
+            $output->writeln('');
+        }
+
+        $output->writeln("<comment>Tasks tree:</comment>");
 
         $branches = [];
 
@@ -214,6 +235,14 @@ class ProcessHelpCommand extends Command
                 $nodeStr
             );
 
+            // Write task help message
+            if ($output->isVerbose() && $task->getHelp()) {
+                $helpLines = array_filter(explode("\n", $task->getHelp()));
+                foreach ($helpLines as $helpLine) {
+                    $this->writeBranches($output, $branches, str_repeat(' ', self::INDENT_SIZE) . $helpLine);
+                }
+            }
+
             // Check next tasks
             $nextTasks = array_map(
                 function (TaskConfiguration $task) {
@@ -299,7 +328,7 @@ class ProcessHelpCommand extends Command
 
         $branches = array_filter($branches);
         if (!empty($branches)) {
-            $branchStr = '['.implode(', ', $branches).']';
+            $branchStr = '[' . implode(', ', $branches) . ']';
             $output->writeln("<error>All branches are not resolved : {$branchStr}</error>");
         }
     }
@@ -315,6 +344,8 @@ class ProcessHelpCommand extends Command
      */
     protected function writeBranches(OutputInterface $output, $branches, $comment = '', $match = null, $char = null)
     {
+        $output->write(str_repeat(' ', self::INDENT_SIZE));
+
         // Merge lines
         foreach ($branches as $i => $branchTask) {
             $str = '';
@@ -364,7 +395,11 @@ class ProcessHelpCommand extends Command
         }
 
         if (\count($interfaces)) {
-            $description .= ' <info>('.implode(', ', $interfaces).')</info>';
+            $description .= ' <info>(' . implode(', ', $interfaces) . ')</info>';
+        }
+
+        if ($task->getDescription()) {
+            $description .= " <comment>{$task->getDescription()}</comment>";
         }
 
         return $description;

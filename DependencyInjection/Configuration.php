@@ -77,6 +77,9 @@ class Configuration implements ConfigurationInterface
         $definition
             ->scalarNode('entry_point')->defaultNull()->end()
             ->scalarNode('end_point')->defaultNull()->end()
+            ->scalarNode('description')->defaultValue('')->end()
+            ->scalarNode('help')->defaultValue('')->end()
+            ->scalarNode('public')->defaultTrue()->end()
             ->arrayNode('options')->prototype('variable')->end()->end();
 
         /** @var ArrayNodeDefinition $tasksArrayDefinition */
@@ -104,6 +107,8 @@ class Configuration implements ConfigurationInterface
     {
         $definition
             ->scalarNode('service')->isRequired()->end()
+            ->scalarNode('description')->defaultValue('')->end()
+            ->scalarNode('help')->defaultValue('')->end()
             ->arrayNode('options')->prototype('variable')->end()->end()
             ->arrayNode('outputs')->prototype('scalar')->defaultValue([])->end()->end()
             ->arrayNode('errors')->prototype('scalar')->defaultValue([])->end()->end()

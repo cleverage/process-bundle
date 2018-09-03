@@ -32,6 +32,15 @@ class ProcessConfiguration
     /** @var TaskConfiguration */
     protected $endPoint;
 
+    /** @var string */
+    protected $description;
+
+    /** @var string */
+    protected $help;
+
+    /** @var boolean */
+    protected $public;
+
     /** @var TaskConfiguration[] */
     protected $taskConfigurations;
 
@@ -42,24 +51,36 @@ class ProcessConfiguration
     protected $mainTaskGroup;
 
     /**
+     * ProcessConfiguration constructor.
+     *
      * @param string              $code
      * @param TaskConfiguration[] $taskConfigurations
      * @param array               $options
      * @param string              $entryPoint
      * @param string              $endPoint
+     * @param string              $description
+     * @param string              $help
+     * @param bool                $public
      */
     public function __construct(
         $code,
         array $taskConfigurations,
         array $options = [],
         $entryPoint = null,
-        $endPoint = null
-    ) {
+        $endPoint = null,
+        $description = '',
+        $help = '',
+        $public = true
+    )
+    {
         $this->code = $code;
         $this->taskConfigurations = $taskConfigurations;
         $this->options = $options;
         $this->entryPoint = $entryPoint;
         $this->endPoint = $endPoint;
+        $this->description = $description;
+        $this->public = $public;
+        $this->help = $help;
     }
 
     /**
@@ -104,6 +125,38 @@ class ProcessConfiguration
         }
 
         return $this->getTaskConfiguration($this->endPoint);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHelp(): string
+    {
+        return $this->help;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPublic(): bool
+    {
+        return $this->public;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPrivate(): bool
+    {
+        return !$this->public;
     }
 
     /**
