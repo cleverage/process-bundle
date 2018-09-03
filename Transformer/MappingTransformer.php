@@ -85,6 +85,7 @@ class MappingTransformer implements ConfigurableTransformerInterface, Transforme
 
         /** @noinspection ForeachSourceInspection */
         foreach ($options['mapping'] as $targetProperty => $mapping) {
+            $targetProperty = (string)$targetProperty;
             if (null !== $mapping['constant']) {
                 $transformedValue = $mapping['constant'];
             } elseif ($mapping['set_null']) {

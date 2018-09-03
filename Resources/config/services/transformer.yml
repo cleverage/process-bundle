@@ -104,3 +104,10 @@ services:
         public: false
         tags:
             - { name: cleverage.transformer }
+
+    CleverAge\ProcessBundle\Transformer\UnsetTransformer:
+        public: false
+        arguments:
+            - '@property_accessor'
+        tags:
+            - { name: cleverage.transformer }
