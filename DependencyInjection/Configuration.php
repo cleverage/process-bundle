@@ -107,6 +107,8 @@ class Configuration implements ConfigurationInterface
     {
         $definition
             ->scalarNode('service')->isRequired()->end()
+            ->scalarNode('description')->defaultValue('')->end()
+            ->scalarNode('help')->defaultValue('')->end()
             ->arrayNode('options')->prototype('variable')->end()->end()
             ->arrayNode('outputs')->prototype('scalar')->defaultValue([])->end()->end()
             ->arrayNode('errors')->prototype('scalar')->defaultValue([])->end()->end()

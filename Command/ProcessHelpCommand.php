@@ -40,6 +40,7 @@ class ProcessHelpCommand extends Command
     protected const CHAR_NODE = '■';
 
     protected const BRANCH_SIZE = 2;
+    protected const INDENT_SIZE = 4;
 
     /** @var ProcessConfigurationRegistry */
     protected $processConfigRegistry;
@@ -91,20 +92,20 @@ class ProcessHelpCommand extends Command
         $process = $this->processConfigRegistry->getProcessConfiguration($processCode);
 
         $output->writeln("<comment>Process: </comment>");
-        $output->writeln("    {$processCode}");
+        $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $processCode);
         $output->writeln('');
 
         if ($process->getDescription()) {
             $output->writeln("<comment>Description:</comment>");
-            $output->writeln("    {$process->getDescription()}");
+            $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $process->getDescription());
             $output->writeln('');
         }
 
         if ($process->getHelp()) {
             $output->writeln("<comment>Help:</comment>");
-            $helpLines = explode("\n", $process->getHelp());
+            $helpLines = array_filter(explode("\n", $process->getHelp()));
             foreach ($helpLines as $helpLine) {
-                $output->writeln("    {$helpLine}");
+                $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $helpLine);
             }
             $output->writeln('');
         }
@@ -234,6 +235,14 @@ class ProcessHelpCommand extends Command
                 $nodeStr
             );
 
+            // Write task help message
+            if ($output->isVerbose() && $task->getHelp()) {
+                $helpLines = array_filter(explode("\n", $task->getHelp()));
+                foreach ($helpLines as $helpLine) {
+                    $this->writeBranches($output, $branches, str_repeat(' ', self::INDENT_SIZE) . $helpLine);
+                }
+            }
+
             // Check next tasks
             $nextTasks = array_map(
                 function (TaskConfiguration $task) {
@@ -335,6 +344,8 @@ class ProcessHelpCommand extends Command
      */
     protected function writeBranches(OutputInterface $output, $branches, $comment = '', $match = null, $char = null)
     {
+        $output->write(str_repeat(' ', self::INDENT_SIZE));
+
         // Merge lines
         foreach ($branches as $i => $branchTask) {
             $str = '';
@@ -385,6 +396,10 @@ class ProcessHelpCommand extends Command
 
         if (\count($interfaces)) {
             $description .= ' <info>(' . implode(', ', $interfaces) . ')</info>';
+        }
+
+        if ($task->getDescription()) {
+            $description .= " <comment>{$task->getDescription()}</comment>";
         }
 
         return $description;

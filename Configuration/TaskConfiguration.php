@@ -37,6 +37,12 @@ class TaskConfiguration
     /** @var array */
     protected $options = [];
 
+    /** @var string */
+    protected $description = '';
+
+    /** @var string */
+    protected $help = '';
+
     /** @var array */
     protected $outputs = [];
 
@@ -65,9 +71,13 @@ class TaskConfiguration
     protected $logErrors;
 
     /**
-     * @param string $code
-     * @param string $serviceReference
+     * TaskConfiguration constructor.
+     *
+     * @param        $code
+     * @param        $serviceReference
      * @param array  $options
+     * @param string $description
+     * @param string $help
      * @param array  $outputs
      * @param array  $errors
      * @param string $errorStrategy
@@ -77,6 +87,8 @@ class TaskConfiguration
         $code,
         $serviceReference,
         array $options,
+        string $description = '',
+        string $help = '',
         array $outputs = [],
         array $errors = [],
         string $errorStrategy = self::STRATEGY_SKIP,
@@ -85,6 +97,8 @@ class TaskConfiguration
         $this->code = $code;
         $this->serviceReference = $serviceReference;
         $this->options = $options;
+        $this->description = $description;
+        $this->help = $help;
         $this->outputs = $outputs;
         $this->errors = $errors;
         $this->errorStrategy = $errorStrategy;
@@ -121,6 +135,22 @@ class TaskConfiguration
     public function setTask(TaskInterface $task)
     {
         $this->task = $task;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription(): string
+    {
+        return $this->description;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHelp(): string
+    {
+        return $this->help;
     }
 
     /**

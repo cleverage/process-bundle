@@ -41,6 +41,8 @@ class ProcessConfigurationRegistry
                     $taskCode,
                     $rawTaskConfiguration['service'],
                     $rawTaskConfiguration['options'],
+                    $rawTaskConfiguration['description'],
+                    $rawTaskConfiguration['help'],
                     $rawTaskConfiguration['outputs'],
                     $rawTaskConfiguration['errors'],
                     $rawTaskConfiguration['error_strategy'],
