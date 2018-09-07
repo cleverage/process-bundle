@@ -11,7 +11,6 @@
 namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -21,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @see README.md:Known issues
  */
-class InputAggregatorTask extends AbstractConfigurableTask implements FinalizableTaskInterface
+class InputAggregatorTask extends AbstractConfigurableTask
 {
     /** @var array */
     protected $inputs = [];
@@ -43,11 +42,9 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
             throw new \UnexpectedValueException('This task cannot be used without a previous task');
         }
 
-        $cleanInputOnOverride = $this->getOption($state, 'clean_input_on_override');
-
         $inputCode = $this->getInputCode($state);
         if (array_key_exists($inputCode, $this->inputs)) {
-            if ($cleanInputOnOverride) {
+            if ($this->getOption($state, 'clean_input_on_override')) {
                 $this->inputs = [];
             } else {
                 throw new \UnexpectedValueException(
@@ -60,23 +57,15 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
 
         if ($this->isResolved($state)) {
             $state->setOutput($this->inputs);
-            $this->inputs = [];
+            // Only clear inputs that are not in the keep_inputs option
+            foreach ($this->inputs as $inputCode => $value) {
+                if (!\in_array($inputCode, $this->getOption($state, 'keep_inputs'), true)) {
+                    unset($this->inputs[$inputCode]);
+                }
+            }
         } else {
             $state->setSkipped(true);
         }
-    }
-
-    /**
-     * If there is pending inputs, something went wrong
-     *
-     * @param ProcessState $state
-     *
-     * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     */
-    public function finalize(ProcessState $state)
-    {
     }
 
     /**
@@ -88,9 +77,13 @@ class InputAggregatorTask extends AbstractConfigurableTask implements Finalizabl
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired('input_codes');
-        $resolver->setDefault('clean_input_on_override', true);
+        $resolver->setDefaults([
+            'clean_input_on_override' => true,
+            'keep_inputs' => null,
+        ]);
         $resolver->setAllowedTypes('input_codes', 'array');
         $resolver->setAllowedTypes('clean_input_on_override', 'boolean');
+        $resolver->setAllowedTypes('keep_inputs', ['NULL', 'array']);
     }
 
     /**
