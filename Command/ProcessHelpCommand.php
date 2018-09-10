@@ -121,11 +121,17 @@ class ProcessHelpCommand extends Command
             $origin = null;
             $final = null;
 
+            // Get unique previous branches
+            $previousTasks = [];
+            foreach ($task->getPreviousTasksConfigurations() as $previousTasksConfiguration) {
+                $previousTasks[$previousTasksConfiguration->getCode()] = $previousTasksConfiguration;
+            }
+
             // Check previous branches
-            if (empty($task->getPreviousTasksConfigurations())) {
+            if (empty($previousTasks)) {
                 $branches[] = $task->getCode();
-            } elseif (1 === \count($task->getPreviousTasksConfigurations())) {
-                $prevTask = $task->getPreviousTasksConfigurations()[0]->getCode();
+            } elseif (1 === \count($previousTasks)) {
+                $prevTask = current($previousTasks)->getCode();
                 foreach (array_reverse($branches, true) as $i => $branchTask) {
                     if ($branchTask === $prevTask) {
                         $branches[$i] = $taskCode;
@@ -133,7 +139,7 @@ class ProcessHelpCommand extends Command
                     }
                 }
             } else {
-                foreach ($task->getPreviousTasksConfigurations() as $prevTask) {
+                foreach ($previousTasks as $prevTask) {
                     $foundBranch = false;
                     foreach (array_reverse($branches, true) as $i => $branchTask) {
                         if ($branchTask === $prevTask->getCode()) {
@@ -244,12 +250,12 @@ class ProcessHelpCommand extends Command
             }
 
             // Check next tasks
-            $nextTasks = array_map(
+            $nextTasks = array_unique(array_map(
                 function (TaskConfiguration $task) {
                     return $task->getCode();
                 },
                 array_merge($task->getNextTasksConfigurations(), $task->getErrorTasksConfigurations())
-            );
+            ));
             if (\count($nextTasks) > 1) {
                 $this->writeBranches($output, $branches);
                 array_shift($nextTasks);
