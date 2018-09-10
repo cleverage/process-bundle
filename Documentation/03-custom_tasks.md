@@ -77,3 +77,14 @@ for your project you should use an internal prefix in your codes to avoid confli
 Just as tasks, options can be managed with 
 [Symfony's OptionsResolver Component](https://symfony.com/doc/current/components/options_resolver.html), so be sure to 
 implement a few of them.
+
+## Logging
+
+_TODO_
+
+A logging chanel has been defined for tasks 
+
+```yaml
+        tags:
+            - { name: monolog.logger, channel: cleverage_process_task }
+```

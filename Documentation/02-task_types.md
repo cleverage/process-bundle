@@ -86,6 +86,10 @@ The idea is to allow a great flexibility (especially using the [MappingTransform
 They implement `CleverAge\ProcessBundle\Transformer\TransformerInterface` or 
 `CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface`.
 
+## Flushable tasks
+
+_TODO_
+
 ## Finalizable tasks
 
 On the opposite, some tasks may require cleanup work at the very end of the process (e.g. cleanup a temporary folder).

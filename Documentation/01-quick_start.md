@@ -63,7 +63,7 @@ clever_age_process:
         project_prefix.process_name:
             tasks:
                 extract:
-                    service: '@cleverage_process.task.constant_output'
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
                     options:
                         output:
                             id: 123
@@ -72,23 +72,25 @@ clever_age_process:
                     outputs: [transform]
 
                 transform:
-                    service: '@cleverage_process.task.transformer'
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
                     options:
-                        mapping:
-                            id:
-                                code: '[id]'
-                            slug:
-                                code:
-                                    - id
-                                    - firstname
-                                    - lastname
-                                transformers:
-                                    implode:
-                                        separator: '-'
+                        transformers:
+                            mapping:
+                                mapping:
+                                    id:
+                                        code: '[id]'
+                                    slug:
+                                        code:
+                                            - id
+                                            - firstname
+                                            - lastname
+                                        transformers:
+                                            implode:
+                                                separator: '-'
                     outputs: [load]
 
                 load:
-                    service: '@cleverage_process.task.debug'
+                    service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
 ```
 
 There is more to know about process configuration. See [the full process configuration reference]().
@@ -112,12 +114,15 @@ There are 1 process configurations defined :
 
 ```
 $ ./bin/console cleverage:process:help project_prefix.process_name
-The process project_prefix.process_name contains the following tasks:
-■ extract
-│ 
-■ transform
-│ 
-■ load
+Process: 
+    project_prefix.process_name
+
+Tasks tree:
+    ■ extract
+    │ 
+    ■ transform
+    │ 
+    ■ load
 ```
 
 ```
