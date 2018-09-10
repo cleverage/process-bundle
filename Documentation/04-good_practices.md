@@ -3,5 +3,6 @@ pure functions
 - no side effect 
 
 découper les process
+- testing
 
 do not rely on execution order ?
