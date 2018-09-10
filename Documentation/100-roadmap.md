@@ -38,4 +38,3 @@ Planned (v2+)
 * changes in interfaces
     * allow blocking + iterable
 * FIFO queues for in/out
-* Allow to hide process (private mode), write small documentation in YML
