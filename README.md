@@ -15,6 +15,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
 - [Good practices]
 - [Testing]
 - Cookbooks
+    - [Common Setup](Documentation/cookbooks/01-common_setup.md)
     - [Transformations]
     - [Flow manipulation]
     - [Dummy tasks]
@@ -24,8 +25,8 @@ Basically, it will greatly ease the configuration of import and exports but can 
     - [File manipulation]
     - [Direct call (in controller)]
 - Reference
-    - [Process definition]
-    - Tasks
+    - [Process definition](Documentation/reference/01-process_definition.md)
+    - [Task definition](Documentation/reference/02-task_definition.md)
     - Transformers
 - Examples
     - [Simple ETL]
