@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Command;
 
+use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
@@ -114,222 +115,19 @@ class ProcessHelpCommand extends Command
 
         $branches = [];
 
-        foreach ($process->getMainTaskGroup() as $taskCode) {
-            $task = $process->getTaskConfiguration($taskCode);
-            $branchesToMerge = [];
-            $gapBranches = [];
-            $origin = null;
-            $final = null;
+        $taskList = $process->getMainTaskGroup();
+        $remainingTasks = $taskList;
+        $totalBranches = \count($taskList);
+        for ($i = 0; $i < $totalBranches; $i++) {
+            // Find the best task to display
+            $nextTaskCode = $this->findBestNextTask($branches, $remainingTasks, $process);
 
-            // Get unique previous branches
-            $previousTasks = [];
-            foreach ($task->getPreviousTasksConfigurations() as $previousTasksConfiguration) {
-                $previousTasks[$previousTasksConfiguration->getCode()] = $previousTasksConfiguration;
-            }
+            $this->resolveBranchOutput($branches, $nextTaskCode, $process, $output);
 
-            // Check previous branches
-            if (empty($previousTasks)) {
-                $branches[] = $task->getCode();
-            } elseif (1 === \count($previousTasks)) {
-                $prevTask = current($previousTasks)->getCode();
-                foreach (array_reverse($branches, true) as $i => $branchTask) {
-                    if ($branchTask === $prevTask) {
-                        $branches[$i] = $taskCode;
-                        break;
-                    }
-                }
-            } else {
-                foreach ($previousTasks as $prevTask) {
-                    $foundBranch = false;
-                    foreach (array_reverse($branches, true) as $i => $branchTask) {
-                        if ($branchTask === $prevTask->getCode()) {
-                            $branchesToMerge[] = $i;
-                            $foundBranch = true;
-                            break;
-                        }
-                    }
-
-                    if (!$foundBranch) {
-                        $output->writeln(
-                            "<error>Could not find previous branch : {$taskCode} depends on {$prevTask->getCode()}</error>"
-                        );
-                    }
-                }
-
-                // Don't touch the 1st branch to merge
-                sort($branchesToMerge);
-
-                $gapFrom = null;
-                $gapTo = null;
-                foreach ($branchesToMerge as $i) {
-                    $gapTo = $i;
-                    if (null !== $gapFrom) {
-                        for ($j = $gapFrom + 1; $j < $gapTo; ++$j) {
-                            $gapBranches[] = $j;
-                        }
-                    }
-                    $gapFrom = $i;
-                }
-
-                $origin = array_shift($branchesToMerge);
-                $final = $gapFrom;
-                $branches[$origin] = $taskCode;
-            }
-
-            // Merge branches
-            if (!empty($branchesToMerge)) {
-                $this->writeBranches($output, $branches);
-
-                $this->writeBranches(
-                    $output,
-                    $branches,
-                    '',
-                    function ($taskCode, $i) use ($branchesToMerge, $gapBranches, $origin) {
-                        return \in_array($i, $branchesToMerge, true)
-                            || \in_array($i, $gapBranches, true)
-                            || $i === $origin;
-                    },
-                    function ($taskCode, $i) use ($gapBranches, $origin, $final, $branches) {
-                        if ($i === $origin) {
-                            return self::CHAR_RECEIVE;
-                        }
-                        if (\in_array($i, $gapBranches, true)) {
-                            if (null !== $branches[$i]) {
-                                return self::CHAR_JUMP;
-                            }
-
-                            return self::CHAR_HORIZ;
-                        }
-
-                        if ($i === $final) {
-                            return self::CHAR_MERGE;
-                        }
-
-                        return self::CHAR_MULTIMERGE;
-                    }
-                );
-
-                foreach ($branches as $i => $branchTask) {
-                    if (\in_array($i, $branchesToMerge, true)) {
-                        $branches[$i] = null;
-                    }
-                }
-                $this->writeBranches($output, $branches);
-            }
-
-            // Cleanup empty trailing branches
-            foreach (array_reverse($branches, true) as $i => $branchTask) {
-                if (null !== $branchTask) {
-                    $branches = \array_slice($branches, 0, $i + 1);
-                    break;
-                }
-            }
-
-            // Write main line
-            $nodeStr = self::CHAR_NODE;
-            if ($task->isInErrorBranch()) {
-                $nodeStr = "<fire>{$nodeStr}</fire>";
-            }
-
-            $this->writeBranches(
-                $output,
-                $branches,
-                $this->getTaskDescription($task),
-                function ($branchTask, $i) use ($taskCode) {
-                    return $branchTask === $taskCode;
-                },
-                $nodeStr
-            );
-
-            // Write task help message
-            if ($output->isVerbose() && $task->getHelp()) {
-                $helpLines = array_filter(explode("\n", $task->getHelp()));
-                foreach ($helpLines as $helpLine) {
-                    $this->writeBranches($output, $branches, str_repeat(' ', self::INDENT_SIZE) . $helpLine);
-                }
-            }
-
-            // Check next tasks
-            $nextTasks = array_unique(array_map(
-                function (TaskConfiguration $task) {
-                    return $task->getCode();
-                },
-                array_merge($task->getNextTasksConfigurations(), $task->getErrorTasksConfigurations())
-            ));
-            if (\count($nextTasks) > 1) {
-                $this->writeBranches($output, $branches);
-                array_shift($nextTasks);
-                $origin = array_search($taskCode, $branches, true);
-                $expandBranches = [];
-                foreach ($nextTasks as $nextTask) {
-                    $index = array_search(null, $branches, true);
-                    if (false !== $index && $index >= $origin) {
-                        /** @var $index int */
-                        $branches[$index] = $taskCode;
-                        $expandBranches[] = $index;
-                    } else {
-                        $expandBranches[] = \count($branches);
-                        $branches[] = $taskCode;
-                    }
-                }
-                $gapBranches = [];
-                sort($expandBranches);
-                $gapFrom = $origin;
-                $gapTo = null;
-
-                foreach ($expandBranches as $i) {
-                    $gapTo = $i;
-                    for ($j = $gapFrom + 1; $j < $gapTo; ++$j) {
-                        $gapBranches[] = $j;
-                    }
-                    $gapFrom = $i;
-                }
-                $final = $gapFrom;
-
-                $this->writeBranches(
-                    $output,
-                    $branches,
-                    '',
-                    function ($branchTask, $i) use ($origin, $final) {
-                        return $i >= $origin && $i <= $final;
-                    },
-                    function ($branchTask, $i) use ($origin, $branches, $gapBranches, $final) {
-                        if ($i === $origin) {
-                            return self::CHAR_RECEIVE;
-                        }
-                        if (\in_array($i, $gapBranches, true)) {
-                            if (null !== $branches[$i]) {
-                                return self::CHAR_JUMP;
-                            }
-
-                            return self::CHAR_HORIZ;
-                        }
-                        if ($final === $i) {
-                            return self::CHAR_EXPAND;
-                        }
-
-                        return self::CHAR_MULTIEXPAND;
-                    }
-                );
-            }
-
-            if (empty($nextTasks)) {
-                foreach ($branches as $i => $branchTask) {
-                    if ($branchTask === $taskCode) {
-                        $branches[$i] = null;
-                    }
-                }
-            }
-
-            // Cleanup empty trailing branches
-            foreach (array_reverse($branches, true) as $i => $branchTask) {
-                if (null !== $branchTask) {
-                    $branches = \array_slice($branches, 0, $i + 1);
-                    break;
-                }
-            }
-
-            $this->writeBranches($output, $branches);
+            // Remove the task from the remaining list
+            $remainingTasks = array_filter($remainingTasks, function ($task) use ($nextTaskCode) {
+                return $task != $nextTaskCode;
+            });
         }
 
         $branches = array_filter($branches);
@@ -337,6 +135,292 @@ class ProcessHelpCommand extends Command
             $branchStr = '[' . implode(', ', $branches) . ']';
             $output->writeln("<error>All branches are not resolved : {$branchStr}</error>");
         }
+    }
+
+    /**
+     * Try to find a best candidate for next display
+     *
+     * @param                      $branches
+     * @param                      $taskList
+     * @param ProcessConfiguration $process
+     *
+     * @return int|null|string
+     */
+    protected function findBestNextTask($branches, $taskList, ProcessConfiguration $process)
+    {
+        $taskCandidates = [];
+        foreach ($taskList as $taskCode) {
+            $task = $process->getTaskConfiguration($taskCode);
+            if (empty($task->getPreviousTasksConfigurations())) {
+                return $taskCode;
+            }
+
+            // Check if task has all necessary ancestors in branches
+            $hasAllAncestors = array_reduce($task->getPreviousTasksConfigurations(), function ($result, TaskConfiguration $prevTask) use ($branches) {
+                return $result && \in_array($prevTask->getCode(), $branches);
+            }, true);
+
+            if ($hasAllAncestors) {
+                $taskCandidates[] = $taskCode;
+            }
+        }
+
+        if (empty($taskCandidates)) {
+            throw new \UnexpectedValueException('Cannot find a task to output');
+        }
+
+        $taskWeights = [];
+        foreach ($taskCandidates as $taskCandidate) {
+            $weight = 0;
+            $task = $process->getTaskConfiguration($taskCandidate);
+            foreach ($task->getPreviousTasksConfigurations() as $prevTask) {
+                $key = array_search($prevTask->getCode(), $branches);
+
+                // Should never be non-numeric...
+                if (!is_numeric($key)) {
+                    throw new \UnexpectedValueException('Invalid key type');
+                }
+                $weight += $key;
+            }
+
+            if (!empty($task->getPreviousTasksConfigurations())) {
+                $weight = $weight / \count($task->getPreviousTasksConfigurations());
+            }
+
+            $taskWeights[$taskCandidate] = $weight;
+        }
+
+        arsort($taskWeights);
+
+        return key($taskWeights);
+    }
+
+
+    /**
+     * Merge needed branches, display a task node, split following needed branches
+     *
+     * @param                      $branches
+     * @param                      $taskCode
+     * @param ProcessConfiguration $process
+     * @param OutputInterface      $output
+     */
+    protected function resolveBranchOutput(&$branches, $taskCode, ProcessConfiguration $process, OutputInterface $output)
+    {
+        $task = $process->getTaskConfiguration($taskCode);
+        $branchesToMerge = [];
+        $gapBranches = [];
+        $origin = null;
+        $final = null;
+
+        // Get unique previous branches
+        $previousTasks = [];
+        foreach ($task->getPreviousTasksConfigurations() as $previousTasksConfiguration) {
+            $previousTasks[$previousTasksConfiguration->getCode()] = $previousTasksConfiguration;
+        }
+
+        // Check previous branches
+        if (empty($previousTasks)) {
+            $branches[] = $task->getCode();
+        } elseif (1 === \count($previousTasks)) {
+            $prevTask = current($previousTasks)->getCode();
+            foreach (array_reverse($branches, true) as $i => $branchTask) {
+                if ($branchTask === $prevTask) {
+                    $branches[$i] = $taskCode;
+                    break;
+                }
+            }
+        } else {
+            foreach ($previousTasks as $prevTask) {
+                $foundBranch = false;
+                foreach (array_reverse($branches, true) as $i => $branchTask) {
+                    if ($branchTask === $prevTask->getCode()) {
+                        $branchesToMerge[] = $i;
+                        $foundBranch = true;
+                        break;
+                    }
+                }
+
+                if (!$foundBranch) {
+                    $output->writeln(
+                        "<error>Could not find previous branch : {$taskCode} depends on {$prevTask->getCode()}</error>"
+                    );
+                }
+            }
+
+            // Don't touch the 1st branch to merge
+            sort($branchesToMerge);
+
+            $gapFrom = null;
+            $gapTo = null;
+            foreach ($branchesToMerge as $i) {
+                $gapTo = $i;
+                if (null !== $gapFrom) {
+                    for ($j = $gapFrom + 1; $j < $gapTo; ++$j) {
+                        $gapBranches[] = $j;
+                    }
+                }
+                $gapFrom = $i;
+            }
+
+            $origin = array_shift($branchesToMerge);
+            $final = $gapFrom;
+            $branches[$origin] = $taskCode;
+        }
+
+        // Merge branches
+        if (!empty($branchesToMerge)) {
+            $this->writeBranches($output, $branches);
+
+            $this->writeBranches(
+                $output,
+                $branches,
+                '',
+                function ($taskCode, $i) use ($branchesToMerge, $gapBranches, $origin) {
+                    return \in_array($i, $branchesToMerge, true)
+                        || \in_array($i, $gapBranches, true)
+                        || $i === $origin;
+                },
+                function ($taskCode, $i) use ($gapBranches, $origin, $final, $branches) {
+                    if ($i === $origin) {
+                        return self::CHAR_RECEIVE;
+                    }
+                    if (\in_array($i, $gapBranches, true)) {
+                        if (null !== $branches[$i]) {
+                            return self::CHAR_JUMP;
+                        }
+
+                        return self::CHAR_HORIZ;
+                    }
+
+                    if ($i === $final) {
+                        return self::CHAR_MERGE;
+                    }
+
+                    return self::CHAR_MULTIMERGE;
+                }
+            );
+
+            foreach ($branches as $i => $branchTask) {
+                if (\in_array($i, $branchesToMerge, true)) {
+                    $branches[$i] = null;
+                }
+            }
+            $this->writeBranches($output, $branches);
+        }
+
+        // Cleanup empty trailing branches
+        foreach (array_reverse($branches, true) as $i => $branchTask) {
+            if (null !== $branchTask) {
+                $branches = \array_slice($branches, 0, $i + 1);
+                break;
+            }
+        }
+
+        // Write main line
+        $nodeStr = self::CHAR_NODE;
+        if ($task->isInErrorBranch()) {
+            $nodeStr = "<fire>{$nodeStr}</fire>";
+        }
+
+        $this->writeBranches(
+            $output,
+            $branches,
+            $this->getTaskDescription($task),
+            function ($branchTask, $i) use ($taskCode) {
+                return $branchTask === $taskCode;
+            },
+            $nodeStr
+        );
+
+        // Write task help message
+        if ($output->isVerbose() && $task->getHelp()) {
+            $helpLines = array_filter(explode("\n", $task->getHelp()));
+            foreach ($helpLines as $helpLine) {
+                $this->writeBranches($output, $branches, str_repeat(' ', self::INDENT_SIZE) . $helpLine);
+            }
+        }
+
+        // Check next tasks
+        $nextTasks = array_unique(array_map(
+            function (TaskConfiguration $task) {
+                return $task->getCode();
+            },
+            array_merge($task->getNextTasksConfigurations(), $task->getErrorTasksConfigurations())
+        ));
+        if (\count($nextTasks) > 1) {
+            $this->writeBranches($output, $branches);
+            array_shift($nextTasks);
+            $origin = array_search($taskCode, $branches, true);
+            $expandBranches = [];
+            foreach ($nextTasks as $nextTask) {
+                $index = array_search(null, $branches, true);
+                if (false !== $index && $index >= $origin) {
+                    /** @var $index int */
+                    $branches[$index] = $taskCode;
+                    $expandBranches[] = $index;
+                } else {
+                    $expandBranches[] = \count($branches);
+                    $branches[] = $taskCode;
+                }
+            }
+            $gapBranches = [];
+            sort($expandBranches);
+            $gapFrom = $origin;
+            $gapTo = null;
+
+            foreach ($expandBranches as $i) {
+                $gapTo = $i;
+                for ($j = $gapFrom + 1; $j < $gapTo; ++$j) {
+                    $gapBranches[] = $j;
+                }
+                $gapFrom = $i;
+            }
+            $final = $gapFrom;
+
+            $this->writeBranches(
+                $output,
+                $branches,
+                '',
+                function ($branchTask, $i) use ($origin, $final) {
+                    return $i >= $origin && $i <= $final;
+                },
+                function ($branchTask, $i) use ($origin, $branches, $gapBranches, $final) {
+                    if ($i === $origin) {
+                        return self::CHAR_RECEIVE;
+                    }
+                    if (\in_array($i, $gapBranches, true)) {
+                        if (null !== $branches[$i]) {
+                            return self::CHAR_JUMP;
+                        }
+
+                        return self::CHAR_HORIZ;
+                    }
+                    if ($final === $i) {
+                        return self::CHAR_EXPAND;
+                    }
+
+                    return self::CHAR_MULTIEXPAND;
+                }
+            );
+        }
+
+        if (empty($nextTasks)) {
+            foreach ($branches as $i => $branchTask) {
+                if ($branchTask === $taskCode) {
+                    $branches[$i] = null;
+                }
+            }
+        }
+
+        // Cleanup empty trailing branches
+        foreach (array_reverse($branches, true) as $i => $branchTask) {
+            if (null !== $branchTask) {
+                $branches = \array_slice($branches, 0, $i + 1);
+                break;
+            }
+        }
+
+        $this->writeBranches($output, $branches);
     }
 
     /**
