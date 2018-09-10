@@ -13,9 +13,12 @@ namespace CleverAge\ProcessBundle\Command;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
+use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask;
+use CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
@@ -336,7 +339,8 @@ class ProcessHelpCommand extends Command
         if ($output->isVerbose() && $task->getHelp()) {
             $helpLines = array_filter(explode("\n", $task->getHelp()));
             foreach ($helpLines as $helpLine) {
-                $this->writeBranches($output, $branches, str_repeat(' ', self::INDENT_SIZE) . $helpLine);
+                $helpMessage = str_repeat(' ', self::INDENT_SIZE) . "<info>{$helpLine}</info>";
+                $this->writeBranches($output, $branches, $helpMessage);
             }
         }
 
@@ -474,6 +478,7 @@ class ProcessHelpCommand extends Command
     {
         $description = $task->getCode();
         $interfaces = [];
+        $subprocess = [];
         $taskService = $this->getTaskService($task);
 
         if ($taskService instanceof IterableTaskInterface) {
@@ -484,8 +489,20 @@ class ProcessHelpCommand extends Command
             $interfaces[] = 'Blocking';
         }
 
+        if ($taskService instanceof FlushableTaskInterface) {
+            $interfaces[] = 'Flushable';
+        }
+
+        if ($taskService instanceof ProcessExecutorTask || $taskService instanceof ProcessLauncherTask) {
+            $subprocess[] = $task->getOption('process');
+        }
+
         if (\count($interfaces)) {
             $description .= ' <info>(' . implode(', ', $interfaces) . ')</info>';
+        }
+
+        if (\count($subprocess)) {
+            $description .= ' <fire>{' . implode(', ', $subprocess) . '}</fire>';
         }
 
         if ($task->getDescription()) {

@@ -5,22 +5,30 @@ clever_age_process:
             tasks:
                 test0:
                     service: '@CleverAge\ProcessBundle\Task\DummyTask'
+                    description: 'Task description'
+                    help: |
+                        Multiline task help
+                        1. help
+                        2. help
+                        3. help
                     outputs: [test1]
 
                 test0a:
-                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
+                    service: '@CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask'
+                    options:
+                        process: test.help_command
                     outputs: [test1]
 
                 test0b:
-                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
+                    service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
                     outputs: [test1]
 
                 test1:
-                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
+                    service: '@CleverAge\ProcessBundle\Task\InputIteratorTask'
                     outputs: [test2, test4, test1b, test3b]
 
                 test1a:
-                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
+                    service: '@CleverAge\ProcessBundle\Task\SimpleBatchTask'
                     outputs: [test2, test4, test1b, test3b]
 
                 test1b:
