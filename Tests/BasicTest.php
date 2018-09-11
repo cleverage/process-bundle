@@ -37,54 +37,6 @@ class BasicTest extends AbstractProcessTest
     }
 
     /**
-     * Check the execution order of a process containing one iterable loop and a blocking task
-     */
-    public function testIterableProcess()
-    {
-        $this->processManager->execute('test.iterable_process');
-
-        $this->assertDataQueue(
-            [
-                [
-                    'task'  => 'data',
-                    'value' => 1,
-                ],
-                [
-                    'task'  => 'doNothing',
-                    'value' => 1,
-                ],
-                [
-                    'task'  => 'data',
-                    'value' => 2,
-                ],
-                [
-                    'task'  => 'doNothing',
-                    'value' => 2,
-                ],
-                [
-                    'task'  => 'data',
-                    'value' => 3,
-                ],
-                [
-                    'task'  => 'doNothing',
-                    'value' => 3,
-                ],
-                [
-                    'task'  => 'data',
-                    'value' => 4,
-                ],
-                [
-                    'task'  => 'doNothing',
-                    'value' => 4,
-                ],
-                [
-                    'task'  => 'aggregate',
-                    'value' => [1, 2, 3, 4],
-                ],
-            ], 'test.iterable_process');
-    }
-
-    /**
      * Assert that the error branch is not called
      */
     public function testErrorProcess()
