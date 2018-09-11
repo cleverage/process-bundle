@@ -33,8 +33,6 @@ class DoctrineReaderTask extends AbstractDoctrineQueryTask implements IterableTa
     protected $iterator;
 
     /**
-     * DoctrineReaderTask constructor.
-     *
      * @param LoggerInterface $logger
      * @param ManagerRegistry $doctrine
      */

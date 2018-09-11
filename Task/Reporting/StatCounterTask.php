@@ -29,8 +29,6 @@ class StatCounterTask implements FinalizableTaskInterface
     protected $counter = 0;
 
     /**
-     * StatCounterTask constructor.
-     *
      * @param LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger)

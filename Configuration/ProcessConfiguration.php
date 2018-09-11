@@ -51,8 +51,6 @@ class ProcessConfiguration
     protected $mainTaskGroup;
 
     /**
-     * ProcessConfiguration constructor.
-     *
      * @param string              $code
      * @param TaskConfiguration[] $taskConfigurations
      * @param array               $options

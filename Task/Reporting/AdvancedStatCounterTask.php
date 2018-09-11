@@ -36,8 +36,6 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
     protected $preInitCounter = 0;
 
     /**
-     * AdvancedStatCounterTask constructor.
-     *
      * @param LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger)

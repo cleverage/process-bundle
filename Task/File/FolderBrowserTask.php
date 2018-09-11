@@ -32,8 +32,6 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
     protected $files;
 
     /**
-     * FolderBrowserTask constructor.
-     *
      * @param LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger)

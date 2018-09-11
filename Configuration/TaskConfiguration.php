@@ -71,10 +71,8 @@ class TaskConfiguration
     protected $logErrors;
 
     /**
-     * TaskConfiguration constructor.
-     *
-     * @param        $code
-     * @param        $serviceReference
+     * @param string $code
+     * @param string $serviceReference
      * @param array  $options
      * @param string $description
      * @param string $help

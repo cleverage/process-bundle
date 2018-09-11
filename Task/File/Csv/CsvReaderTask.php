@@ -29,8 +29,6 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     protected $logger;
 
     /**
-     * CsvReaderTask constructor.
-     *
      * @param \Psr\Log\LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger)

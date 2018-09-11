@@ -38,8 +38,6 @@ class ProcessExecutorTask extends AbstractConfigurableTask
     protected $logger;
 
     /**
-     * ProcessExecutorTask constructor.
-     *
      * @param ProcessManager               $processManager
      * @param ProcessConfigurationRegistry $processRegistry
      * @param LoggerInterface              $logger

@@ -35,8 +35,6 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
     protected $result = [];
 
     /**
-     * RowAggregatorTask constructor.
-     *
      * @param LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger)
