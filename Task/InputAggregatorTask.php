@@ -57,11 +57,13 @@ class InputAggregatorTask extends AbstractConfigurableTask
 
         if ($this->isResolved($state)) {
             $state->setOutput($this->inputs);
+            $keepInputs = $this->getOption($state, 'keep_inputs');
             // Only clear inputs that are not in the keep_inputs option
             foreach ($this->inputs as $inputCode => $value) {
-                if (!\in_array($inputCode, $this->getOption($state, 'keep_inputs'), true)) {
-                    unset($this->inputs[$inputCode]);
+                if (null !== $keepInputs && \in_array($inputCode, $keepInputs, true)) {
+                    continue;
                 }
+                unset($this->inputs[$inputCode]);
             }
         } else {
             $state->setSkipped(true);
