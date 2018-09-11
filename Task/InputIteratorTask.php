@@ -31,10 +31,7 @@ class InputIteratorTask implements IterableTaskInterface
      */
     public function execute(ProcessState $state)
     {
-        // Recreate an iterator with input if the current iterator is finish
-        if (null === $this->iterator || (!$this->iterator->valid() && \is_array($state->getInput()))) {
-            $this->iterator = new \ArrayIterator($state->getInput());
-        }
+        $this->handleIteratorFromInput($state);
 
         $state->addErrorContextValue('iterate_on_array_key', $this->iterator->key());
 
@@ -61,5 +58,40 @@ class InputIteratorTask implements IterableTaskInterface
         $state->removeErrorContext('iterate_on_array_key');
 
         return $this->iterator->valid();
+    }
+
+    /**
+     * Create or recreate an iterator from input
+     *
+     * @param ProcessState $state
+     */
+    protected function handleIteratorFromInput(ProcessState $state)
+    {
+        // No action needed, execution is in progress
+        if ($this->iterator instanceof \Iterator && $this->iterator->valid()) {
+            return;
+        }
+
+        // Cleanup invalid iterator => prepare for new iteration cycle
+        if ($this->iterator instanceof \Iterator && !$this->iterator->valid()) {
+            $this->iterator = null;
+        }
+
+        // This should never be reached
+        if ($this->iterator !== null) {
+            throw new \UnexpectedValueException("At this point iterator should have been null, maybe it's a wrong type...");
+        }
+
+        // Create iterator
+        if ($state->getInput() instanceof \Iterator) {
+            $this->iterator = $state->getInput();
+        } elseif (\is_array($state->getInput())) {
+            $this->iterator = new \ArrayIterator($state->getInput());
+        }
+
+        // Assert iterator is OK
+        if (!$this->iterator instanceof \Iterator) {
+            throw new \UnexpectedValueException("Cannot create iterator from input");
+        }
     }
 }
