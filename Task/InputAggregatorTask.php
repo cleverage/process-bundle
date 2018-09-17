@@ -19,6 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Should have been a BlockingTask, but due to limitations in the current model, it's a hack using skips and finalize.
  *
  * @see README.md:Known issues
+ * @deprecated It's way too much error prone - should be refactored as a blocking task
  */
 class InputAggregatorTask extends AbstractConfigurableTask
 {
