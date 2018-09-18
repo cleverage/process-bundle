@@ -81,19 +81,23 @@ class ListProcessCommand extends Command
 
         // Add process descriptions at a fixed position
         $maxMessageLength = \array_reduce($messages, [$this, 'maxMessageLengthFilter'], 0);
-        foreach ($messages as &$message) {
+        $outputMessages = [];
+        foreach ($messages as $message) {
             /** @var ProcessConfiguration $processConfiguration */
             $processConfiguration = $message['process'];
+            $outputMessage = $message['output'];
 
             if ($processConfiguration->getDescription()) {
-                $message['output'] = $this->padMessage($message['output'], $maxMessageLength + 3);
-                $message['output'] .= "{$processConfiguration->getDescription()}";
+                $outputMessage = $this->padMessage($outputMessage, $maxMessageLength + 3);
+                $outputMessage .= "{$processConfiguration->getDescription()}";
             }
+
+            $outputMessages[] = $outputMessage;
         }
 
         // Output messages
-        foreach ($messages as $message) {
-            $output->writeln($message['output']);
+        foreach ($outputMessages as $message) {
+            $output->writeln($message);
         }
     }
 
