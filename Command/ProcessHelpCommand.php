@@ -151,6 +151,7 @@ class ProcessHelpCommand extends Command
      */
     protected function findBestNextTask($branches, $taskList, ProcessConfiguration $process)
     {
+        // Get resolvable tasks
         $taskCandidates = [];
         foreach ($taskList as $taskCode) {
             $task = $process->getTaskConfiguration($taskCode);
@@ -172,6 +173,7 @@ class ProcessHelpCommand extends Command
             throw new \UnexpectedValueException('Cannot find a task to output');
         }
 
+        // Try to find the task the most on the right
         $taskWeights = [];
         foreach ($taskCandidates as $taskCandidate) {
             $weight = 0;
@@ -194,8 +196,48 @@ class ProcessHelpCommand extends Command
         }
 
         arsort($taskWeights);
+        $bestCandidate = key($taskWeights);
+        $bestWeight = $taskWeights[$bestCandidate];
 
-        return key($taskWeights);
+        $equalWeights = array_filter($taskWeights, function ($item) use ($bestWeight) {
+            return $item == $bestWeight;
+        });
+
+        if (count($equalWeights) == 1) {
+            return $bestCandidate;
+        }
+
+        // If a few tasks have the same weight, return the tasks with the lowest number of children
+        $childCounts = [];
+        foreach ($equalWeights as $taskCode => $weight) {
+            $task = $process->getTaskConfiguration($taskCode);
+            $childCounts[$taskCode] = $this->getTaskChildrenCount($task);
+        }
+        asort($childCounts);
+
+        return key($childCounts);
+    }
+
+    /**
+     * Get the number of children (error or not) of a task
+     *
+     * @param TaskConfiguration $task
+     *
+     * @return int
+     */
+    protected function getTaskChildrenCount(TaskConfiguration $task)
+    {
+        $count = 0;
+
+        foreach ($task->getNextTasksConfigurations() as $nextTasksConfiguration) {
+            $count += 1 + $this->getTaskChildrenCount($nextTasksConfiguration);
+        }
+
+        foreach ($task->getErrorTasksConfigurations() as $errorTasksConfiguration) {
+            $count += 1 + $this->getTaskChildrenCount($errorTasksConfiguration);
+        }
+
+        return $count;
     }
 
 
