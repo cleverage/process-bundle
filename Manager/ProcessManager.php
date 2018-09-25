@@ -258,7 +258,10 @@ class ProcessManager
                 foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTask) {
                     $this->prepareNextProcess($taskConfiguration, $errorTask, true);
                     $this->process($errorTask);
-                    if ($state->isStopped()) {
+
+                    // Bubble up the stop signal
+                    if ($errorTask->getState()->isStopped()) {
+                        $state->setStopped(true);
                         return;
                     }
                 }
@@ -278,7 +281,10 @@ class ProcessManager
                 foreach ($taskConfiguration->getNextTasksConfigurations() as $nextTaskConfiguration) {
                     $this->prepareNextProcess($taskConfiguration, $nextTaskConfiguration);
                     $this->process($nextTaskConfiguration);
-                    if ($state->isStopped()) {
+
+                    // Bubble up the stop signal
+                    if ($nextTaskConfiguration->getState()->isStopped()) {
+                        $state->setStopped(true);
                         return;
                     }
                 }

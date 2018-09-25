@@ -23,7 +23,7 @@ class StopTask implements TaskInterface
      */
     public function execute(ProcessState $state)
     {
-        $state->stop();
+        $state->setStopped(true);
         $state->getProcessHistory()->setFailed();
     }
 }
