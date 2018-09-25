@@ -70,12 +70,17 @@ class ValidatorTask extends AbstractConfigurableTask
                 $logContext['property'] = $violation->getPropertyPath();
                 $logContext['violation_code'] = $violation->getCode();
                 $logContext['invalid_value'] = \is_object($invalidValue) ? \get_class($invalidValue) : $invalidValue;
-                $this->logger->warning($violation->getMessage(), $logContext);
+                if ($this->getOption($state, 'log_errors')) {
+                    $this->logger->warning($violation->getMessage(), $logContext);
+                }
             }
 
             $state->setError($state->getInput());
-            $logContext = $defaultLogContext;
-            $this->logger->warning("{$violations->count()} constraint violations detected on validation", $logContext);
+
+            if ($this->getOption($state, 'log_errors')) {
+                $logContext = $defaultLogContext;
+                $this->logger->warning("{$violations->count()} constraint violations detected on validation", $logContext);
+            }
 
             if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
@@ -94,6 +99,9 @@ class ValidatorTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
+        $resolver->setDefault('log_errors', true);
+        $resolver->addAllowedTypes('log_errors', ['bool']);
+
         $resolver->setDefault('groups', null);
         $resolver->addAllowedTypes('groups', ['NULL', 'array']);
 
