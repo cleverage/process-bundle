@@ -67,18 +67,18 @@ class LoggerTask extends AbstractConfigurableTask
     {
         $options = $this->getOptions($state);
         $context = [
-            'process_id' => $state->getProcessHistory()->getId(),
+            'process_id'   => $state->getProcessHistory()->getId(),
             'process_code' => $state->getProcessConfiguration()->getCode(),
         ];
         foreach ($options['context'] as $contextInfo) {
             $value = $this->accessor->getValue($state, $contextInfo);
-            if ($value instanceof \stdClass) {
-                $context[$contextInfo] = json_decode(json_encode($value), true);
-            } else {
+            if ($this->normalizer->supportsNormalization($value, 'json')) {
                 $context[$contextInfo] = $this->normalizer->normalize(
                     $value,
                     'json'
                 );
+            } else {
+                $context[$contextInfo] = json_decode(json_encode($value), true);
             }
         }
         if ($options['reference']) {
@@ -97,9 +97,9 @@ class LoggerTask extends AbstractConfigurableTask
     {
         $resolver->setDefaults(
             [
-                'level' => 'debug',
-                'message' => 'Log state input',
-                'context' => ['input'],
+                'level'     => 'debug',
+                'message'   => 'Log state input',
+                'context'   => ['input'],
                 'reference' => null,
             ]
         );
