@@ -1,0 +1,18 @@
+clever_age_process:
+    configurations:
+        test.task.stop_task.iterable_interruption:
+            tasks:
+                data:
+                    service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+                    options:
+                        output: [1, 2, 3, 4]
+                    outputs: [pushDataEvent]
+
+                pushDataEvent:
+                    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
+                    options:
+                        event_name: cleverage_process.data_queue
+                    outputs: [stop]
+
+                stop:
+                    service: '@CleverAge\ProcessBundle\Task\StopTask'
