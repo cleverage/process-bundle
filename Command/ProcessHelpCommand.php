@@ -565,11 +565,14 @@ class ProcessHelpCommand extends Command
      */
     protected function getTaskService(TaskConfiguration $taskConfiguration)
     {
+        // Duplicate code from \CleverAge\ProcessBundle\Manager\ProcessManager::initialize
+        // @todo Refactor this using a Registry with this feature:
+        // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
         $serviceReference = $taskConfiguration->getServiceReference();
         if (0 === strpos($serviceReference, '@')) {
             $task = $this->container->get(ltrim($serviceReference, '@'));
-        } elseif (class_exists($serviceReference)) {
-            $task = new $serviceReference();
+        } elseif ($this->container->has($serviceReference)) {
+            $task = $this->container->get($serviceReference);
         } else {
             throw new \UnexpectedValueException(
                 "Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'"
