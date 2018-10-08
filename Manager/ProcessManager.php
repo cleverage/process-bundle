@@ -262,6 +262,7 @@ class ProcessManager
                     // Bubble up the stop signal
                     if ($errorTask->getState()->isStopped()) {
                         $state->setStopped(true);
+
                         return;
                     }
                 }
@@ -285,6 +286,7 @@ class ProcessManager
                     // Bubble up the stop signal
                     if ($nextTaskConfiguration->getState()->isStopped()) {
                         $state->setStopped(true);
+
                         return;
                     }
                 }
