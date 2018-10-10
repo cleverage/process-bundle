@@ -178,6 +178,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             if (0 !== $process->getExitCode()) {
                 $state->addErrorContextValue('subprocess_cmd', $process->getCommandLine());
                 $state->addErrorContextValue('subprocess_exit_code', $process->getExitCode());
+                $this->logger->critical($process->getErrorOutput(), $state->getLogContext());
                 $state->stop(new \RuntimeException("Sub-process has failed: {$process->getExitCodeText()}"));
 
                 $this->killProcesses();
