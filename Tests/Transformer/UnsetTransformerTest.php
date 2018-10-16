@@ -20,7 +20,7 @@ class UnsetTransformerTest extends AbstractProcessTest
             'to_unset' => 1,
             'to_test'  => 2,
         ];
-        $result = $this->processManager->execute('test.unset_transformer.simple', null, $input);
+        $result = $this->processManager->execute('test.unset_transformer.simple', $input);
         self::assertEquals(['other' => 1, 'to_test' => 2], $result);
     }
 
@@ -36,21 +36,21 @@ class UnsetTransformerTest extends AbstractProcessTest
         ];
 
         // Should unset
-        $result = $this->processManager->execute('test.unset_transformer.condition', null, $input);
+        $result = $this->processManager->execute('test.unset_transformer.condition', $input);
         self::assertEquals(['other' => 1, 'to_test' => 2], $result);
 
         // No unset
         $input['to_test'] = 3;
-        $result = $this->processManager->execute('test.unset_transformer.condition', null, $input);
+        $result = $this->processManager->execute('test.unset_transformer.condition', $input);
         self::assertEquals(['other' => 1, 'to_unset' => 1, 'to_test' => 3], $result);
 
         // Checking null, no unset
-        $result = $this->processManager->execute('test.unset_transformer.condition_null', null, $input);
+        $result = $this->processManager->execute('test.unset_transformer.condition_null', $input);
         self::assertEquals(['other' => 1, 'to_unset' => 1, 'to_test' => 3], $result);
 
         // Should unset
         $input['to_test'] = null;
-        $result = $this->processManager->execute('test.unset_transformer.condition_null', null, $input);
+        $result = $this->processManager->execute('test.unset_transformer.condition_null', $input);
         self::assertEquals(['other' => 1, 'to_test' => null], $result);
     }
 
@@ -61,7 +61,7 @@ class UnsetTransformerTest extends AbstractProcessTest
      */
     public function testWrongUnsetString()
     {
-        $this->processManager->execute('test.unset_transformer.simple', null, 'not an array');
+        $this->processManager->execute('test.unset_transformer.simple', 'not an array');
     }
 
     /**
@@ -71,7 +71,7 @@ class UnsetTransformerTest extends AbstractProcessTest
      */
     public function testWrongUnsetMissingProperty()
     {
-        $this->processManager->execute('test.unset_transformer.simple', null, ['no property found']);
+        $this->processManager->execute('test.unset_transformer.simple', ['no property found']);
     }
 
 }

@@ -5,36 +5,39 @@ clever_age_process:
             end_point: transform
             tasks:
                 transform:
-                    service: '@cleverage_process.task.transformer'
+                    service:        '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
-                        transformer: unset
-                        property: 'to_unset'
+                        transformers:
+                            unset:
+                                property: 'to_unset'
 
         test.unset_transformer.condition:
             entry_point: transform
             end_point: transform
             tasks:
                 transform:
-                    service: '@cleverage_process.task.transformer'
+                    service:        '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
-                        transformer: unset
-                        condition:
-                            match:
-                                '[to_test]': 2
-                        property: 'to_unset'
+                        transformers:
+                            unset:
+                                condition:
+                                    match:
+                                        '[to_test]': 2
+                                property: 'to_unset'
 
         test.unset_transformer.condition_null:
             entry_point: transform
             end_point: transform
             tasks:
                 transform:
-                    service: '@cleverage_process.task.transformer'
+                    service:        '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
                     options:
-                        error_strategy: stop
-                        transformer: unset
-                        condition:
-                            match:
-                                '[to_test]': ~
-                        property: 'to_unset'
+                        transformers:
+                            unset:
+                                condition:
+                                    match:
+                                        '[to_test]': ~
+                                property: 'to_unset'
