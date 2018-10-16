@@ -540,17 +540,12 @@ class ProcessManager
      */
     protected function checkProcess(ProcessConfiguration $processConfiguration): void
     {
+        $processConfiguration->checkCircularDependencies();
+
         $taskConfigurations = $processConfiguration->getTaskConfigurations();
         $mainTaskList = $processConfiguration->getMainTaskGroup();
         $entryPoint = $processConfiguration->getEntryPoint();
         $endPoint = $processConfiguration->getEndPoint();
-
-        // Check circular dependencies
-        foreach ($taskConfigurations as $taskConfiguration) {
-            if ($taskConfiguration->hasAncestor($taskConfiguration)) {
-                throw CircularProcessException::create($processConfiguration->getCode(), $taskConfiguration->getCode());
-            }
-        }
 
         // Check multi-branch processes
         foreach ($taskConfigurations as $taskConfiguration) {

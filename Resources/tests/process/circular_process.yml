@@ -9,3 +9,79 @@ clever_age_process:
                 data2:
                     service: '@CleverAge\ProcessBundle\Task\DummyTask'
                     outputs: [data1]
+
+        test.circular_process.reversed:
+            tasks:
+                data1:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data3]
+
+                data2:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data3]
+
+                data3:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data2]
+
+        test.circular_process.self:
+            tasks:
+                data_self:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data_self]
+
+        test.circular_process.long:
+            tasks:
+                data1:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data3, data4]
+
+                data2:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data3]
+
+                data3:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data2, data3b]
+
+                data3b:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data3c]
+
+                data3c:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data3d]
+
+                data3d:
+                    service: '@cleverage_process.task.dummy'
+
+                data3b:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data2]
+
+                data4:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data5]
+
+                data5:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data6]
+
+                data6:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data7]
+
+                data7:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data8]
+
+                data8:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data9]
+
+                data9:
+                    service: '@cleverage_process.task.dummy'
+                    outputs: [data10]
+
+                data10:
+                    service: '@cleverage_process.task.dummy'
