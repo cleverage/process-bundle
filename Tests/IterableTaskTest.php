@@ -24,42 +24,44 @@ class IterableTaskTest extends AbstractProcessTest
         $this->assertDataQueue(
             [
                 [
-                    'task'  => 'data',
+                    'task' => 'data',
                     'value' => 1,
                 ],
                 [
-                    'task'  => 'doNothing',
+                    'task' => 'doNothing',
                     'value' => 1,
                 ],
                 [
-                    'task'  => 'data',
+                    'task' => 'data',
                     'value' => 2,
                 ],
                 [
-                    'task'  => 'doNothing',
+                    'task' => 'doNothing',
                     'value' => 2,
                 ],
                 [
-                    'task'  => 'data',
+                    'task' => 'data',
                     'value' => 3,
                 ],
                 [
-                    'task'  => 'doNothing',
+                    'task' => 'doNothing',
                     'value' => 3,
                 ],
                 [
-                    'task'  => 'data',
+                    'task' => 'data',
                     'value' => 4,
                 ],
                 [
-                    'task'  => 'doNothing',
+                    'task' => 'doNothing',
                     'value' => 4,
                 ],
                 [
-                    'task'  => 'aggregate',
+                    'task' => 'aggregate',
                     'value' => [1, 2, 3, 4],
                 ],
-            ], 'test.iterable_process');
+            ],
+            'test.iterable_process'
+        );
     }
 
     /**
@@ -73,22 +75,70 @@ class IterableTaskTest extends AbstractProcessTest
         $this->assertDataQueue(
             [
                 [
-                    'task'  => 'iterate',
+                    'task' => 'iterate',
                     'value' => 1,
                 ],
                 [
-                    'task'  => 'iterate',
+                    'task' => 'iterate',
                     'value' => 2,
                 ],
                 [
-                    'task'  => 'iterate',
+                    'task' => 'iterate',
                     'value' => 3,
                 ],
                 [
-                    'task'  => 'iterate',
+                    'task' => 'iterate',
                     'value' => 4,
                 ],
-            ], 'test.double_iterable_alone');
+            ],
+            'test.double_iterable_alone'
+        );
     }
 
+
+    /**
+     * Assert the SplitJoinLineTask works the way it's supposed to
+     */
+    public function testSplitJoinLine()
+    {
+        $this->processManager->execute('test.split_join_iterable');
+
+        $this->assertDataQueue(
+            [
+                [
+                    'product' => 'toto',
+                    'asset' => 'a',
+                ],
+                [
+                    'product' => 'toto',
+                    'asset' => 'b',
+                ],
+                [
+                    'product' => 'toto',
+                    'asset' => 'c',
+                ],
+                [
+                    'product' => 'toto',
+                    'asset' => 'd',
+                ],
+                [
+                    'product' => 'tata',
+                    'asset' => 'e',
+                ],
+                [
+                    'product' => 'tata',
+                    'asset' => 'f',
+                ],
+                [
+                    'product' => 'tata',
+                    'asset' => 'g',
+                ],
+                [
+                    'product' => 'tata',
+                    'asset' => 'h',
+                ],
+            ],
+            'test.split_join_iterable'
+        );
+    }
 }
