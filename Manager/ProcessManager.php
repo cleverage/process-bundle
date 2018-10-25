@@ -496,7 +496,7 @@ class ProcessManager
     protected function handleState(ProcessState $state): void
     {
         $processHistory = $state->getProcessHistory();
-        if ($state->getException()) {
+        if ($state->getException() && $state->isStopped()) {
             $processHistory->setFailed();
 
             throw new \RuntimeException(
