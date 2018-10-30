@@ -1,0 +1,15 @@
+services:
+    CleverAge\ProcessBundle\Logger\ProcessProcessor:
+        autowire: true
+        tags:
+        - { name: monolog.processor, channel: cleverage_process }
+
+    CleverAge\ProcessBundle\Logger\TaskProcessor:
+        autowire: true
+        tags:
+        - { name: monolog.processor, channel: cleverage_process_task }
+
+    CleverAge\ProcessBundle\Logger\TransformerProcessor:
+        autowire: true
+        tags:
+        - { name: monolog.processor, channel: cleverage_process_transformer }

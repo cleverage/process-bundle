@@ -82,9 +82,11 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $process = $this->launchProcess($state);
         $this->launchedProcesses[] = $process;
 
-        $logContext = $state->getLogContext();
-        $logContext['cmd'] = $process->getCommandLine();
-        $logContext['input'] = $process->getInput();
+        $logContext = [
+            'cmd' => $process->getCommandLine(),
+            'input' => $process->getInput(),
+        ];
+
         $this->logger->debug('Running command', $logContext);
 
         sleep($options['sleep_interval_after_launch']);
@@ -167,18 +169,19 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
                 continue;
             }
 
-            $logContext = $state->getLogContext();
-            $logContext['cmd'] = $process->getCommandLine();
-            $logContext['input'] = $process->getInput();
-            $logContext['exit_code'] = $process->getExitCode();
-            $logContext['exit_code_text'] = $process->getExitCodeText();
+            $logContext = [
+                'cmd' => $process->getCommandLine(),
+                'input' => $process->getInput(),
+                'exit_code' => $process->getExitCode(),
+                'exit_code_text' => $process->getExitCodeText(),
+            ];
             $this->logger->debug('Command terminated', $logContext);
 
             unset($this->launchedProcesses[$key]);
             if (0 !== $process->getExitCode()) {
                 $state->addErrorContextValue('subprocess_cmd', $process->getCommandLine());
                 $state->addErrorContextValue('subprocess_exit_code', $process->getExitCode());
-                $this->logger->critical($process->getErrorOutput(), $state->getLogContext());
+                $this->logger->critical($process->getErrorOutput());
                 $state->stop(new \RuntimeException("Sub-process has failed: {$process->getExitCodeText()}"));
 
                 $this->killProcesses();

@@ -74,7 +74,8 @@ class ProcessExecutorTask extends AbstractConfigurableTask
         } catch (\RuntimeException $exception) {
             if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 // Allow input to go into an error branch
-                $this->logger->info("Subprocess {$process} have failed, result is skipped", $state->getLogContext() + ['input' => $input]);
+                $logContext = ['input' => $input];
+                $this->logger->info("Subprocess {$process} have failed, result is skipped", $logContext);
                 $state->setSkipped(true);
                 $state->setError($input);
             } else {

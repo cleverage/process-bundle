@@ -60,7 +60,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
         }
 
         if (!$this->files->valid()) {
-            $this->logger->warning("No item found in path {$options['folder_path']}", $state->getLogContext());
+            $this->logger->warning("No item found in path {$options['folder_path']}");
             $state->setSkipped(true);
             $state->setError($options['folder_path']);
 

@@ -56,8 +56,7 @@ class PropertyGetterTask extends AbstractConfigurableTask
             $output = $this->accessor->getValue($input, $property);
         } catch (\Exception $e) {
             $state->setError($input);
-            $logContext = $state->getLogContext();
-            $logContext['property'] = $property;
+            $logContext = ['property' => $property];
             $this->logger->error($e->getMessage(), $logContext);
             if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
