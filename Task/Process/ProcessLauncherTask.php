@@ -164,6 +164,8 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     {
         foreach ($this->launchedProcesses as $key => $process) {
             if (!$process->isTerminated()) {
+                // @todo handle incremental error output properly, specially for terminal where logs are lost
+//                echo $process->getIncrementalErrorOutput();
                 continue;
             }
 

@@ -10,26 +10,21 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Unset a given property
  */
 class UnsetTransformer implements ConfigurableTransformerInterface
 {
-
     use ConditionTrait;
 
-
     /**
-     * UnsetTransformer constructor.
-     *
-     * @param PropertyAccessor $accessor
+     * @param PropertyAccessorInterface $accessor
      */
-    public function __construct(PropertyAccessor $accessor)
+    public function __construct(PropertyAccessorInterface $accessor)
     {
         $this->accessor = $accessor;
     }
@@ -43,7 +38,7 @@ class UnsetTransformer implements ConfigurableTransformerInterface
         $this->configureOptions($resolver);
         $options = $resolver->resolve($options);
 
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             throw new \UnexpectedValueException('Given value must be an array');
         }
 
@@ -68,12 +63,15 @@ class UnsetTransformer implements ConfigurableTransformerInterface
 
         $resolver->setDefault('condition', []);
         $resolver->setAllowedTypes('condition', ['array']);
-        $resolver->setNormalizer('condition', function (Options $options, $value) {
-            $conditionResolver = new OptionsResolver();
-            $this->configureConditionOptions($conditionResolver);
+        $resolver->setNormalizer(
+            'condition',
+            function (Options $options, $value) {
+                $conditionResolver = new OptionsResolver();
+                $this->configureConditionOptions($conditionResolver);
 
-            return $conditionResolver->resolve($value);
-        });
+                return $conditionResolver->resolve($value);
+            }
+        );
     }
 
     /**
@@ -83,5 +81,4 @@ class UnsetTransformer implements ConfigurableTransformerInterface
     {
         return 'unset';
     }
-
 }

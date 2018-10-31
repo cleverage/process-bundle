@@ -10,17 +10,15 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Configurable set of conditions to use in tasks or transformers options
  */
 trait ConditionTrait
 {
-
-    /** @var PropertyAccessor */
+    /** @var PropertyAccessorInterface */
     protected $accessor;
 
     /**
