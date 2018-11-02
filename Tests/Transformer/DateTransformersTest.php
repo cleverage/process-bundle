@@ -37,6 +37,11 @@ class DateTransformersTest extends AbstractProcessTest
     {
         $date = \DateTime::createFromFormat('d/m/Y', '01/01/2001');
         $result = $this->processManager->execute('test.date_transformers.date_parser', '2001-01-01');
+
+        // There could be a 1s difference, depending on execution time...
+        $date->setTime(0,0);
+        $result->setTime(0,0);
+
         self::assertInstanceOf(\DateTime::class, $result);
         if ($result instanceof \DateTime) {
             self::assertEquals($date->getTimestamp(), $result->getTimestamp());
