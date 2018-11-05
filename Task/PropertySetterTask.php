@@ -44,7 +44,7 @@ class PropertySetterTask extends AbstractConfigurableTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \Exception
      */
     public function execute(ProcessState $state)
     {
@@ -55,17 +55,11 @@ class PropertySetterTask extends AbstractConfigurableTask
             try {
                 $this->accessor->setValue($input, $key, $value);
             } catch (\Exception $e) {
-                $state->setError($input);
-                $logContext = [
-                    'property' => $key,
-                    'value' => $value,
-                ];
-                $this->logger->error($e->getMessage(), $logContext);
-                if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
-                    $state->setSkipped(true);
-                } elseif ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
-                    $state->stop($e);
-                }
+                $state->addErrorContextValue('property', $key);
+                $state->addErrorContextValue('value', $value);
+                $state->setException($e);
+
+                return;
             }
         }
 

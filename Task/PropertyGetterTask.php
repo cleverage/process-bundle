@@ -43,26 +43,21 @@ class PropertyGetterTask extends AbstractConfigurableTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws \Exception
      */
     public function execute(ProcessState $state)
     {
         $options = $this->getOptions($state);
         $input = $state->getInput();
         $property = $options['property'];
-        $output = null;
 
         try {
             $output = $this->accessor->getValue($input, $property);
         } catch (\Exception $e) {
-            $state->setError($input);
-            $logContext = ['property' => $property];
-            $this->logger->error($e->getMessage(), $logContext);
-            if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
-                $state->setSkipped(true);
-            } elseif ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
-                $state->stop($e);
-            }
+            $state->addErrorContextValue('property', $property);
+            $state->setException($e);
+
+            return;
         }
 
         $state->setOutput($output);

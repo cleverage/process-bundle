@@ -68,17 +68,10 @@ class TransformerTask extends AbstractConfigurableTask
         try {
             $output = $this->applyTransformers($options['transformers'], $state->getInput());
         } catch (TransformerException $e) {
-            $state->setError($state->getInput());
-            $logContext = [];
-            if ($e->getPrevious()) {
-                $logContext['error'] = $e->getPrevious()->getMessage();
-            }
-            $this->logger->error($e->getMessage(), $logContext);
-            if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
-                $state->setSkipped(true);
-            } elseif ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
-                $state->stop($e);
-            }
+            $state->addErrorContextValue('error', $e->getPrevious()->getMessage());
+            $state->setException($e);
+
+            return;
         }
         $state->setOutput($output);
     }

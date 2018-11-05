@@ -112,7 +112,7 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('options')->prototype('variable')->end()->end()
             ->arrayNode('outputs')->prototype('scalar')->defaultValue([])->end()->end()
             ->arrayNode('errors')->prototype('scalar')->defaultValue([])->end()->end()
-            ->scalarNode('error_strategy')->defaultValue(TaskConfiguration::STRATEGY_STOP)->end()
+            ->scalarNode('error_strategy')->defaultValue(TaskConfiguration::STRATEGY_SKIP)->end()
             ->booleanNode('log_errors')->defaultTrue()->end();
     }
 }

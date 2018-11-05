@@ -44,7 +44,7 @@ class ProcessState
     protected $output;
 
     /** @var mixed */
-    protected $error;
+    protected $errorOutput;
 
     /** @var bool */
     protected $stopped = false;
@@ -174,17 +174,17 @@ class ProcessState
     /**
      * @return mixed
      */
-    public function getError()
+    public function getErrorOutput()
     {
-        return $this->error;
+        return $this->errorOutput;
     }
 
     /**
-     * @param mixed $error
+     * @param mixed $errorOutput
      */
-    public function setError($error)
+    public function setErrorOutput($errorOutput)
     {
-        $this->error = $error;
+        $this->errorOutput = $errorOutput;
     }
 
     /**
@@ -194,7 +194,7 @@ class ProcessState
      */
     public function hasError()
     {
-        return null !== $this->error;
+        return null !== $this->errorOutput;
     }
 
     /**
@@ -410,11 +410,13 @@ class ProcessState
     }
 
     /**
-     * @return array
      * @deprecated Use monolog processors instead
+     *
+     * @return array
      */
     public function getLogContext()
     {
+        @trigger_error('Deprecated method, use monolog processors instead', E_USER_DEPRECATED);
         $context = [
             'process_id' => $this->processHistory->getId(),
             'process_code' => $this->processConfiguration->getCode(),
@@ -424,7 +426,7 @@ class ProcessState
         ];
 
         if ($this->hasError()) {
-            $context['error'] = $this->getError();
+            $context['error'] = $this->getErrorOutput();
             $context['error_context'] = $this->getErrorContext();
         }
 

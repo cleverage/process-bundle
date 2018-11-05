@@ -10,7 +10,6 @@
 
 namespace CleverAge\ProcessBundle\Task\Validation;
 
-use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
@@ -74,19 +73,7 @@ class ValidatorTask extends AbstractConfigurableTask
                 }
             }
 
-            $state->setError($state->getInput());
-
-            if ($this->getOption($state, 'log_errors')) {
-                $this->logger->warning("{$violations->count()} constraint violations detected on validation");
-            }
-
-            if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
-                $state->setSkipped(true);
-            } elseif ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
-                $state->stop(
-                    new \UnexpectedValueException("{$violations->count()} constraint violations detected on validation")
-                );
-            }
+            throw new \UnexpectedValueException("{$violations->count()} constraint violations detected on validation");
         }
 
         $state->setOutput($state->getInput());

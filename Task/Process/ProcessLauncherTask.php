@@ -83,11 +83,10 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $this->launchedProcesses[] = $process;
 
         $logContext = [
-            'cmd' => $process->getCommandLine(),
             'input' => $process->getInput(),
         ];
 
-        $this->logger->debug('Running command', $logContext);
+        $this->logger->debug("Running command: {$process->getCommandLine()}", $logContext);
 
         sleep($options['sleep_interval_after_launch']);
     }
@@ -167,7 +166,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         foreach ($this->launchedProcesses as $key => $process) {
             if (!$process->isTerminated()) {
                 // @todo handle incremental error output properly, specially for terminal where logs are lost
-//                echo $process->getIncrementalErrorOutput();
+                echo $process->getIncrementalErrorOutput();
                 continue;
             }
 
@@ -181,14 +180,10 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
 
             unset($this->launchedProcesses[$key]);
             if (0 !== $process->getExitCode()) {
-                $state->addErrorContextValue('subprocess_cmd', $process->getCommandLine());
-                $state->addErrorContextValue('subprocess_exit_code', $process->getExitCode());
-                $this->logger->critical($process->getErrorOutput());
-                $state->stop(new \RuntimeException("Sub-process has failed: {$process->getExitCodeText()}"));
-
+                $this->logger->critical($process->getErrorOutput(), $logContext);
                 $this->killProcesses();
 
-                return;
+                throw new \RuntimeException("Sub-process has failed: {$process->getExitCodeText()}");
             }
         }
     }
