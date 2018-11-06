@@ -188,11 +188,9 @@ class ProcessState
     }
 
     /**
-     * @TODO use a flag in setter instead of null check
-     *
      * @return bool
      */
-    public function hasError()
+    public function hasErrorOutput()
     {
         return null !== $this->errorOutput;
     }
@@ -418,21 +416,15 @@ class ProcessState
     {
         @trigger_error('Deprecated method, use monolog processors instead', E_USER_DEPRECATED);
         $context = [
-            'process_id' => $this->processHistory->getId(),
-            'process_code' => $this->processConfiguration->getCode(),
-            'process_context' => $this->context,
-            'task_code' => $this->taskConfiguration->getCode(),
-            'task_service' => $this->taskConfiguration->getServiceReference(),
+            'process_id' => $this->getProcessHistory()->getId(),
+            'process_code' => $this->getProcessConfiguration()->getCode(),
+            'process_context' => $this->getContext(),
+            'task_code' => $this->getTaskConfiguration()->getCode(),
+            'task_service' => $this->getTaskConfiguration()->getServiceReference(),
+            'error_context' => $this->getErrorContext(),
+            'error_output' => $this->getErrorOutput(),
+            'exception' => $this->getException(),
         ];
-
-        if ($this->hasError()) {
-            $context['error'] = $this->getErrorOutput();
-            $context['error_context'] = $this->getErrorContext();
-        }
-
-        if ($this->exception) {
-            $context['exception'] = $this->exception;
-        }
 
         return $context;
     }

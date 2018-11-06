@@ -277,7 +277,7 @@ class ProcessManager
             }
 
             // An error feed cannot be blocked or skipped (except if the process has been stopped)
-            if ($state->hasError()) {
+            if ($state->hasErrorOutput()) {
                 foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTask) {
                     $this->prepareNextProcess($taskConfiguration, $errorTask, true);
                     $this->process($errorTask);
