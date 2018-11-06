@@ -1,0 +1,44 @@
+clever_age_process:
+    configurations:
+        test.column_aggregator_task.simple:
+            entry_point: iterate
+            end_point: outputs
+            tasks:
+                iterate:
+                    service: CleverAge\ProcessBundle\Task\InputIteratorTask
+                    outputs: [aggregateAny, aggregateA, aggregateB]
+
+                aggregateAny:
+                    service: CleverAge\ProcessBundle\Task\ColumnAggregatorTask
+                    options:
+                        columns:
+                            - col1
+                    outputs: [outputs]
+
+                aggregateA:
+                    service: CleverAge\ProcessBundle\Task\ColumnAggregatorTask
+                    options:
+                        columns:
+                            - col1
+                        condition:
+                            match:
+                                "[input_column_value]": A
+                    outputs: [outputs]
+
+                aggregateB:
+                    service: CleverAge\ProcessBundle\Task\ColumnAggregatorTask
+                    options:
+                        columns:
+                            - col1
+                        condition:
+                            match:
+                                "[input_column_value]": B
+                    outputs: [outputs]
+
+                outputs:
+                    service: CleverAge\ProcessBundle\Task\InputAggregatorTask
+                    options:
+                        input_codes:
+                            aggregateAny: aggregateAny
+                            aggregateA: aggregateA
+                            aggregateB: aggregateB
