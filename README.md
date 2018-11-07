@@ -27,6 +27,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
 - Reference
     - [Process definition](Documentation/reference/01-process_definition.md)
     - [Task definition](Documentation/reference/02-task_definition.md)
+      - [CsvReaderTask](Documentation/reference/tasks/csv_reader_task.md)
     - Transformers
         - [ArrayFilterTransformer](Documentation/reference/transformers/array_filter_transformer.md)
 - Examples
@@ -95,24 +96,6 @@ Same as ConstantOutputTask but only accepts an array of values and iterates over
         # Required options
         output: <array> # Will iterate over the elements
     outputs: [<task_code>] # Array of tasks to pass the output to
-```
-
-#### CsvReaderTask
-Reads a CSV file and iterate on each line, returning an array of key -> values
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
-    options:
-        # Required options
-        file_path: <string> # Required, the path of the file to read from
-
-        # Optional options
-        delimiter: ';'
-        enclosure: '"'
-        escape: '\\'
-        headers: null # Use this if you want to manually passed headers
-        mode: 'r' # Used by fopen
-    outputs: [<task_code>] # Array of tasks accepting an array as input
 ```
 
 #### CsvWriterTask
