@@ -30,7 +30,7 @@ class ProcessExecutorTaskTest extends AbstractProcessTest
     /**
      * Assert correct error if it doesn't match a good subprocess name
      *
-     * @expectedException \RuntimeException
+     * @expectedException \TypeError
      */
     public function testExecutorError()
     {
