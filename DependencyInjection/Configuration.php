@@ -11,6 +11,7 @@
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -50,6 +51,7 @@ class Configuration implements ConfigurationInterface
 
         /** @var ArrayNodeDefinition $configurationsArrayDefinition */
         $configurationsArrayDefinition = $definition
+            ->scalarNode('default_error_strategy')->defaultValue(TaskConfiguration::STRATEGY_SKIP)->end()
             ->arrayNode('configurations')
             ->useAttributeAsKey('code')
             ->prototype('array');
@@ -105,6 +107,16 @@ class Configuration implements ConfigurationInterface
      */
     protected function appendTaskConfigDefinition(NodeBuilder $definition)
     {
+        $logLevels = [
+            LogLevel::EMERGENCY,
+            LogLevel::ALERT,
+            LogLevel::CRITICAL,
+            LogLevel::ERROR,
+            LogLevel::WARNING,
+            LogLevel::NOTICE,
+            LogLevel::INFO,
+            LogLevel::DEBUG,
+        ];
         $definition
             ->scalarNode('service')->isRequired()->end()
             ->scalarNode('description')->defaultValue('')->end()
@@ -112,7 +124,8 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('options')->prototype('variable')->end()->end()
             ->arrayNode('outputs')->prototype('scalar')->defaultValue([])->end()->end()
             ->arrayNode('errors')->prototype('scalar')->defaultValue([])->end()->end()
-            ->scalarNode('error_strategy')->defaultValue(TaskConfiguration::STRATEGY_SKIP)->end()
-            ->booleanNode('log_errors')->defaultTrue()->end();
+            ->scalarNode('error_strategy')->defaultNull()->end()
+            ->enumNode('log_level')->values($logLevels)->defaultValue(LogLevel::CRITICAL)->end()
+            ->booleanNode('log_errors')->defaultTrue()->setDeprecated()->end();
     }
 }

@@ -99,8 +99,8 @@ class AbstractProcessor
         if (!$state) {
             return;
         }
-        if ($state->hasError()) {
-            $this->addToRecord($record, 'error', $state->getError());
+        if ($state->hasErrorOutput()) {
+            $this->addToRecord($record, 'error', $state->getErrorOutput());
         }
 
         if ($state->getException()) {

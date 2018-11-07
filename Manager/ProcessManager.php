@@ -389,10 +389,7 @@ class ProcessManager
             $exception = $e;
         }
         if ($exception) {
-            if ($taskConfiguration->isLogErrors()) {
-                // @todo make the log level configurable and change logger channel
-                $this->logger->critical($exception->getMessage(), $state->getErrorContext());
-            }
+            $this->logger->log($taskConfiguration->getLogLevel(), $exception->getMessage(), $state->getErrorContext());
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
                 if (null === $state->getErrorOutput()) {

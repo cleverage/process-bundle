@@ -13,6 +13,7 @@ namespace CleverAge\ProcessBundle\Registry;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Exception\MissingProcessException;
+use Psr\Log\LogLevel;
 
 /**
  * Build and holds all the process configurations
@@ -26,11 +27,10 @@ class ProcessConfigurationRegistry
     protected $processConfigurations = [];
 
     /**
-     * @param array $rawConfiguration
-     *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @param array  $rawConfiguration
+     * @param string $defaultErrorStrategy
      */
-    public function __construct(array $rawConfiguration)
+    public function __construct(array $rawConfiguration, string $defaultErrorStrategy)
     {
         foreach ($rawConfiguration as $processCode => $rawProcessConfiguration) {
             /** @var TaskConfiguration[] $taskConfigurations */
@@ -45,8 +45,8 @@ class ProcessConfigurationRegistry
                     $rawTaskConfiguration['help'],
                     $rawTaskConfiguration['outputs'],
                     $rawTaskConfiguration['errors'],
-                    $rawTaskConfiguration['error_strategy'],
-                    $rawTaskConfiguration['log_errors']
+                    $rawTaskConfiguration['error_strategy'] ?? $defaultErrorStrategy,
+                    $rawTaskConfiguration['log_errors'] ? $rawTaskConfiguration['log_level'] : LogLevel::DEBUG
                 );
             }
 

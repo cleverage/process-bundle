@@ -12,6 +12,7 @@ namespace CleverAge\ProcessBundle\Configuration;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
+use Psr\Log\LogLevel;
 
 /**
  * Represents a task configuration inside a process
@@ -66,6 +67,9 @@ class TaskConfiguration
     /** @var string */
     protected $errorStrategy;
 
+    /** @var string */
+    protected $logLevel;
+
     /** @var bool */
     protected $logErrors;
 
@@ -78,7 +82,7 @@ class TaskConfiguration
      * @param array  $outputs
      * @param array  $errors
      * @param string $errorStrategy
-     * @param bool   $logErrors
+     * @param string $logLevel
      */
     public function __construct(
         $code,
@@ -89,7 +93,7 @@ class TaskConfiguration
         array $outputs = [],
         array $errors = [],
         string $errorStrategy = self::STRATEGY_SKIP,
-        bool $logErrors = true
+        string $logLevel = LogLevel::CRITICAL
     ) {
         $this->code = $code;
         $this->serviceReference = $serviceReference;
@@ -99,7 +103,8 @@ class TaskConfiguration
         $this->outputs = $outputs;
         $this->errors = $errors;
         $this->errorStrategy = $errorStrategy;
-        $this->logErrors = $logErrors;
+        $this->logLevel = $logLevel;
+        $this->logErrors = $logLevel !== LogLevel::DEBUG; // @deprecated, remove me in next version
     }
 
     /**
@@ -121,7 +126,7 @@ class TaskConfiguration
     /**
      * @return TaskInterface
      */
-    public function getTask(): TaskInterface
+    public function getTask(): ?TaskInterface
     {
         return $this->task;
     }
@@ -358,10 +363,22 @@ class TaskConfiguration
     }
 
     /**
+     * @return string
+     */
+    public function getLogLevel(): string
+    {
+        return $this->logLevel;
+    }
+
+    /**
+     * @deprecated Use getLogLevel instead
+     *
      * @return bool
      */
     public function isLogErrors(): bool
     {
+        @trigger_error('Deprecated method, use getLogLevel instead', E_USER_DEPRECATED);
+
         return $this->logErrors;
     }
 }
