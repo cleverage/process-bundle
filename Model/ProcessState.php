@@ -416,15 +416,20 @@ class ProcessState
     {
         @trigger_error('Deprecated method, use monolog processors instead', E_USER_DEPRECATED);
         $context = [
-            'process_id' => $this->getProcessHistory()->getId(),
-            'process_code' => $this->getProcessConfiguration()->getCode(),
-            'process_context' => $this->getContext(),
-            'task_code' => $this->getTaskConfiguration()->getCode(),
-            'task_service' => $this->getTaskConfiguration()->getServiceReference(),
-            'error_context' => $this->getErrorContext(),
-            'error_output' => $this->getErrorOutput(),
-            'exception' => $this->getException(),
+            'process_id' => $this->processHistory->getId(),
+            'process_code' => $this->processConfiguration->getCode(),
+            'process_context' => $this->context,
+            'task_code' => $this->taskConfiguration->getCode(),
+            'task_service' => $this->taskConfiguration->getServiceReference(),
         ];
+
+        if ($this->hasErrorOutput()) {
+            $context['error'] = $this->getErrorOutput();
+        }
+
+        if ($this->exception) {
+            $context['exception'] = $this->exception;
+        }
 
         return $context;
     }
