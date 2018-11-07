@@ -30,5 +30,5 @@ Options
 | `enclosure` | `string` |  | `"` | CSV enclosure character |
 | `escape` | `string` |  | `\\` | CSV escape character |
 | `headers` | `array` or `null` |  | `null` | Static list of CSV headers, without the option, it will be dynamically read from first input |
-| `mode` | `string` |  | `r` | File open mode (see [fopen mode parameter](https://secure.php.net/manual/en/function.fopen.php)) |
+| `mode` | `string` |  | `rb` | File open mode (see [fopen mode parameter](https://secure.php.net/manual/en/function.fopen.php)) |
 | `log_empty_lines` | `bool` |  | `false` | Log when the output is empty |

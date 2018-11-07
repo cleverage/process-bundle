@@ -27,7 +27,13 @@ Basically, it will greatly ease the configuration of import and exports but can 
 - Reference
     - [Process definition](Documentation/reference/01-process_definition.md)
     - [Task definition](Documentation/reference/02-task_definition.md)
-      - [CsvReaderTask](Documentation/reference/tasks/csv_reader_task.md)
+      - Basic and debug
+        - [ConstantOutputTask](Documentation/reference/tasks/constant_output_task.md)
+        - [ConstantIterableOutputTask](Documentation/reference/tasks/constant_iterable_output_task.md)
+        - [DebugTask](Documentation/reference/tasks/debug_task.md)
+      - File/CSV
+        - [CsvReaderTask](Documentation/reference/tasks/csv_reader_task.md)
+        - [CsvWriterTask](Documentation/reference/tasks/csv_writer_task.md)
     - Transformers
         - [ArrayFilterTransformer](Documentation/reference/transformers/array_filter_transformer.md)
 - Examples
@@ -75,57 +81,6 @@ clever_age_process:
 Note that orphan tasks will be reported as errors before the process starts
 
 ### Existing tasks
-
-#### ConstantOutputTask
-Simply outputs the same configured value all the time, ignores any input
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
-    options:
-        # Required options
-        output: <mixed> # Will always output the value configured here
-    outputs: [<task_code>] # Array of tasks to pass the output to
-```
-
-#### ConstantIterableOutputTask
-Same as ConstantOutputTask but only accepts an array of values and iterates over each element.
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
-    options:
-        # Required options
-        output: <array> # Will iterate over the elements
-    outputs: [<task_code>] # Array of tasks to pass the output to
-```
-
-#### CsvWriterTask
-Write to a CSV file, will wait until the end of the previous iteration (this is a blocking task) and outputs the file
-path.
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
-    options:
-        # Required options
-        file_path: <string> # Required, the path of the file to write to
-
-        # Optional options
-        delimiter: ';'
-        enclosure: '"'
-        escape: '\\'
-        headers: null # Use this if you want to manually passed headers
-        mode: 'r' # Used by fopen
-        split_character: '|' # Tries to implode array values based on this character
-    outputs: [<task_code>] # This task will output the filepath of the written file
-```
-If the tasks read anything else than an array as input the process will stops.
-
-#### DebugTask
-Dumps the input value to the console, obviously for debug purposes
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
-```
-No supported options, no output.
 
 #### DoctrineReaderTask
 Reads data from a Doctrine Repository, iterating over the results. Ignores any input.
