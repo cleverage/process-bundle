@@ -45,6 +45,10 @@ Basically, it will greatly ease the configuration of import and exports but can 
       - File/CSV
         - [CsvReaderTask](Documentation/reference/tasks/csv_reader_task.md)
         - [CsvWriterTask](Documentation/reference/tasks/csv_writer_task.md)
+      - Flow manipulation
+        - [AggregateIterableTask](Documentation/reference/tasks/aggregate_iterable_task.md)
+        - [InputAggregatorTask](Documentation/reference/tasks/input_aggregator_task.md)
+        - [InputIteratorTask](Documentation/reference/tasks/input_iterator_task.md)
     - Transformers
         - [ArrayFilterTransformer](Documentation/reference/transformers/array_filter_transformer.md)
         - [MappingTransformer](Documentation/reference/transformers/mapping_transformer.md)
