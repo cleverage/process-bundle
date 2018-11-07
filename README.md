@@ -31,6 +31,9 @@ Basically, it will greatly ease the configuration of import and exports but can 
         - [ConstantOutputTask](Documentation/reference/tasks/constant_output_task.md)
         - [ConstantIterableOutputTask](Documentation/reference/tasks/constant_iterable_output_task.md)
         - [DebugTask](Documentation/reference/tasks/debug_task.md)
+      - Entities
+        - [DoctrineReaderTask](Documentation/reference/tasks/doctrine_reader_task.md)
+        - [DoctrineWriterTask](Documentation/reference/tasks/doctrine_writer_task.md)
       - File/CSV
         - [CsvReaderTask](Documentation/reference/tasks/csv_reader_task.md)
         - [CsvWriterTask](Documentation/reference/tasks/csv_writer_task.md)
@@ -81,36 +84,6 @@ clever_age_process:
 Note that orphan tasks will be reported as errors before the process starts
 
 ### Existing tasks
-
-#### DoctrineReaderTask
-Reads data from a Doctrine Repository, iterating over the results. Ignores any input.
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Doctrine\DoctrineReaderTask'
-    options:
-        # Required options
-        class_name: <string> # Required, the class name of the entity
-
-        # Optional options
-        criteria: []
-        order_by: []
-        limit: null
-        offset: null
-        entity_manager: null # If the entity manager is not the default one, use this option
-    outputs: [<task_code>] # Array of tasks accepting an entity as input
-```
-All the criteria, order_by, limit and offset options behave like the ```EntityRepository::findBy``` method.
-
-#### DoctrineWriterTask
-Write a Doctrine entity to the database.
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Doctrine\DoctrineWriterTask'
-    options:
-        # Optional options
-        entity_manager: null # If the entity manager is not the default one, use this option
-    outputs: [<task_code>] # Array of tasks accepting an entity as input
-```
 
 #### NormalizerTask
 Normalize data from the input and pass it to the output
