@@ -31,6 +31,8 @@ Basically, it will greatly ease the configuration of import and exports but can 
         - [ConstantOutputTask](Documentation/reference/tasks/constant_output_task.md)
         - [ConstantIterableOutputTask](Documentation/reference/tasks/constant_iterable_output_task.md)
         - [DebugTask](Documentation/reference/tasks/debug_task.md)
+        - [DummyTask](Documentation/reference/tasks/dummy_task.md)
+        - [EventDispatcherTask](Documentation/reference/tasks/event_dispatcher_task.md)
       - Data manipulation and transformations
         - [DenormalizerTask](Documentation/reference/tasks/denormalizer_task.md)
         - [NormalizerTask](Documentation/reference/tasks/normalizer_task.md)
@@ -142,23 +144,6 @@ Validate data from the input and pass it to the output
 <task_code>:
     service: '@CleverAge\ProcessBundle\Task\Validation\ValidatorTask'
     outputs: [<task_code>] # Array of tasks accepting the same data than the input
-```
-
-#### EventDispatcherTask
-Call the Symfony event dispatcher
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
-    options:
-        event_name: <event_name> # The name of your event
-```
-
-#### DummyTask
-Passes the input to the output, can be used as an entry point allow multiple tasks to be run at the entry point
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\DummyTask'
-    outputs: [<task_code>] # Array of tasks to be called, does not pass any input
 ```
 
 ## Creating a custom task
