@@ -32,7 +32,7 @@ Sometimes, when you execute a task, you need to change how the process may conti
 the [next chapter about error management]() but here are the main methods
 * `ProcessState::setSkipped`: process won't continue to next step
 * `ProcessState::setStopped`: process will fully stop
-* `ProcessState::setError`: allow to direct an output to an error branch from your workflow
+* `ProcessState::setErrorOutput`: allow to direct an output to an error branch from your workflow
 
 ## Options
 

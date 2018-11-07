@@ -61,16 +61,9 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         $aggregationKey = $this->getOption($state, 'aggregation_key');
 
         if (!array_key_exists($aggregateBy, $input)) {
-            $state->setError($state->getInput());
-            $message = sprintf('Array aggregator exception: missing column %s', $aggregateBy);
-            $this->logger->error($message);
-            if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
-                $state->setSkipped(true);
-            } elseif ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
-                $state->stop(new InvalidProcessConfigurationException($message));
-            }
-
-            return;
+            throw new InvalidProcessConfigurationException(
+                "Array aggregator exception: missing column '{$aggregateBy}'"
+            );
         }
 
         $inputAggregateBy = $input[$aggregateBy];
@@ -87,16 +80,9 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         $inputAggregateColumns = [];
         foreach ($aggregateColumns as $aggregateColumn) {
             if (!array_key_exists($aggregateColumn, $input)) {
-                $message = sprintf('Array aggregator exception: missing column %s', $aggregateColumn);
-                $state->setError($state->getInput());
-                $this->logger->error($message);
-                if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
-                    $state->setSkipped(true);
-                } elseif ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
-                    $state->stop(new InvalidProcessConfigurationException($message));
-                }
-
-                return;
+                throw new InvalidProcessConfigurationException(
+                    "Array aggregator exception: missing column {$aggregateColumn}"
+                );
             }
             $inputAggregateColumns[$aggregateColumn] = $input[$aggregateColumn];
         }

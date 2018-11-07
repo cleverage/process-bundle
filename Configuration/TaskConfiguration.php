@@ -23,7 +23,6 @@ class TaskConfiguration
 {
     public const STRATEGY_SKIP = 'skip';
     public const STRATEGY_STOP = 'stop';
-    public const STRATEGY_CONTINUE = 'continue';
 
     /** @var string */
     protected $code;

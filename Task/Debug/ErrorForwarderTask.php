@@ -28,6 +28,6 @@ class ErrorForwarderTask implements TaskInterface
     public function execute(ProcessState $state)
     {
         $state->setSkipped(true);
-        $state->setError($state->getInput());
+        $state->setErrorOutput($state->getInput());
     }
 }

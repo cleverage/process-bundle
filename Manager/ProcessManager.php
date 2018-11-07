@@ -164,9 +164,6 @@ class ProcessManager
     /**
      * Resolve a task, by checking if parents are resolved and processing roots and BlockingTasks
      *
-     * @TODO handle properly resolution of stopped task
-     * @todo might be fixed?
-     *
      * @param TaskConfiguration $taskConfiguration
      *
      * @throws \RuntimeException
@@ -280,7 +277,7 @@ class ProcessManager
             }
 
             // An error feed cannot be blocked or skipped (except if the process has been stopped)
-            if ($state->hasError()) {
+            if ($state->hasErrorOutput()) {
                 foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTask) {
                     $this->prepareNextProcess($taskConfiguration, $errorTask, true);
                     $this->process($errorTask);
@@ -387,15 +384,22 @@ class ProcessManager
                     throw new \UnexpectedValueException("Unknown execution flag: {$executionFlag}");
                 }
             }
+            $exception = $state->getException();
         } catch (\Throwable $e) {
-            $state->setException($e);
-            $state->setError($state->getInput());
+            $exception = $e;
+        }
+        if ($exception) {
+            if ($taskConfiguration->isLogErrors()) {
+                // @todo make the log level configurable and change logger channel
+                $this->logger->critical($exception->getMessage(), $state->getErrorContext());
+            }
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
-                $this->logger->critical($e->getMessage());
                 $state->setSkipped(true);
+                if (null === $state->getErrorOutput()) {
+                    $state->setErrorOutput($state->getInput());
+                }
             } elseif ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
-                $this->logger->critical($e->getMessage());
-                $state->stop($e);
+                $state->stop($exception);
             }
         }
     }
@@ -489,7 +493,7 @@ class ProcessManager
         $isError = false
     ): void {
         if ($isError) {
-            $input = $previousTaskConfiguration->getState()->getError();
+            $input = $previousTaskConfiguration->getState()->getErrorOutput();
         } else {
             $input = $previousTaskConfiguration->getState()->getOutput();
         }
