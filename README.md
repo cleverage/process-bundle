@@ -31,6 +31,9 @@ Basically, it will greatly ease the configuration of import and exports but can 
         - [ConstantOutputTask](Documentation/reference/tasks/constant_output_task.md)
         - [ConstantIterableOutputTask](Documentation/reference/tasks/constant_iterable_output_task.md)
         - [DebugTask](Documentation/reference/tasks/debug_task.md)
+      - Data manipulation and transformations
+        - [DenormalizerTask](Documentation/reference/tasks/denormalizer_task.md)
+        - [NormalizerTask](Documentation/reference/tasks/normalizer_task.md)
       - Entities
         - [DoctrineReaderTask](Documentation/reference/tasks/doctrine_reader_task.md)
         - [DoctrineWriterTask](Documentation/reference/tasks/doctrine_writer_task.md)
@@ -84,35 +87,6 @@ clever_age_process:
 Note that orphan tasks will be reported as errors before the process starts
 
 ### Existing tasks
-
-#### NormalizerTask
-Normalize data from the input and pass it to the output
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Serialization\NormalizerTask'
-    options:
-        # Required options
-        format: <string> # Required, format for normalization
-
-        # Optional options
-        context: [] # Will be passed directly to the third parameter of the normalize method
-    outputs: [<task_code>] # Array of tasks accepting the normalized data as input
-```
-
-#### DenormalizerTask
-Denormalize data from the input and pass it to the output
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask'
-    options:
-        # Required options
-        class: <string>
-
-        # Optional options
-        format: <string>
-        context: [] # Will be passed directly to the third parameter of the normalize method
-    outputs: [<task_code>] # Array of tasks accepting the denormalized data as input
-```
 
 #### PropertySetterTask
 Accepts an array or an object as an input and sets values before returning it as the output
