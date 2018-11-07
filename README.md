@@ -36,6 +36,8 @@ Basically, it will greatly ease the configuration of import and exports but can 
       - Data manipulation and transformations
         - [DenormalizerTask](Documentation/reference/tasks/denormalizer_task.md)
         - [NormalizerTask](Documentation/reference/tasks/normalizer_task.md)
+        - [PropertyGetterTask](Documentation/reference/tasks/property_getter_task.md)
+        - [PropertySetterTask](Documentation/reference/tasks/property_setter_task.md)
       - Entities
         - [DoctrineReaderTask](Documentation/reference/tasks/doctrine_reader_task.md)
         - [DoctrineWriterTask](Documentation/reference/tasks/doctrine_writer_task.md)
@@ -89,19 +91,6 @@ clever_age_process:
 Note that orphan tasks will be reported as errors before the process starts
 
 ### Existing tasks
-
-#### PropertySetterTask
-Accepts an array or an object as an input and sets values before returning it as the output
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\PropertySetterTask'
-    options:
-        # Required options
-        values:
-            <property>: <mixed> # The value you want to set
-            # ...
-    outputs: [<task_code>] # Array of tasks accepting the same data as the input
-```
 
 #### StatCounterTask
 Accepts an array or an object as an input and sets values before returning it as the output.
