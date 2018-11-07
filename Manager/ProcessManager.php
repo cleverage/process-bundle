@@ -224,6 +224,12 @@ class ProcessManager
      */
     protected function initialize(TaskConfiguration $taskConfiguration): void
     {
+        if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP
+            && \count($taskConfiguration->getErrorOutputs()) > 0) {
+            $m = "Task configuration {$taskConfiguration->getCode()} has error outputs ";
+            $m .= "but it's error strategy 'stop' implies they will never be reached.";
+            $this->logger->error($m);
+        }
         // @todo Refactor this using a Registry with this feature:
         // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
         $serviceReference = $taskConfiguration->getServiceReference();

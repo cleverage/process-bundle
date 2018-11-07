@@ -47,7 +47,7 @@ class TaskConfiguration
     protected $outputs = [];
 
     /** @var array */
-    protected $errors = [];
+    protected $errorOutputs = [];
 
     /** @var ProcessState */
     protected $state;
@@ -80,7 +80,7 @@ class TaskConfiguration
      * @param string $description
      * @param string $help
      * @param array  $outputs
-     * @param array  $errors
+     * @param array  $errorOutputs
      * @param string $errorStrategy
      * @param string $logLevel
      */
@@ -91,7 +91,7 @@ class TaskConfiguration
         string $description = '',
         string $help = '',
         array $outputs = [],
-        array $errors = [],
+        array $errorOutputs = [],
         string $errorStrategy = self::STRATEGY_SKIP,
         string $logLevel = LogLevel::CRITICAL
     ) {
@@ -101,7 +101,7 @@ class TaskConfiguration
         $this->description = $description;
         $this->help = $help;
         $this->outputs = $outputs;
-        $this->errors = $errors;
+        $this->errorOutputs = $errorOutputs;
         $this->errorStrategy = $errorStrategy;
         $this->logLevel = $logLevel;
         $this->logErrors = $logLevel !== LogLevel::DEBUG; // @deprecated, remove me in next version
@@ -187,11 +187,23 @@ class TaskConfiguration
     }
 
     /**
+     * @deprecated Use getErrorOutputs method instead
+     *
      * @return array
      */
     public function getErrors(): array
     {
-        return $this->errors;
+        @trigger_error('Deprecated method, use getErrorOutputs instead', E_USER_DEPRECATED);
+
+        return $this->getErrorOutputs();
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrorOutputs(): array
+    {
+        return $this->errorOutputs;
     }
 
     /**

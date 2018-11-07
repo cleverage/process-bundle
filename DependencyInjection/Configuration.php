@@ -122,8 +122,9 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('description')->defaultValue('')->end()
             ->scalarNode('help')->defaultValue('')->end()
             ->arrayNode('options')->prototype('variable')->end()->end()
-            ->arrayNode('outputs')->prototype('scalar')->defaultValue([])->end()->end()
-            ->arrayNode('errors')->prototype('scalar')->defaultValue([])->end()->end()
+            ->arrayNode('outputs')->prototype('scalar')->end()->end()
+            ->arrayNode('errors')->prototype('scalar')->end()->setDeprecated()->end()
+            ->arrayNode('error_outputs')->prototype('scalar')->end()->end()
             ->scalarNode('error_strategy')->defaultNull()->end()
             ->enumNode('log_level')->values($logLevels)->defaultValue(LogLevel::CRITICAL)->end()
             ->booleanNode('log_errors')->defaultTrue()->setDeprecated()->end();

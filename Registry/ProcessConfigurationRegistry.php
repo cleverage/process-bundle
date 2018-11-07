@@ -27,7 +27,7 @@ class ProcessConfigurationRegistry
     protected $processConfigurations = [];
 
     /**
-     * @param array  $rawConfiguration
+     * @param array $rawConfiguration
      * @param string $defaultErrorStrategy
      */
     public function __construct(array $rawConfiguration, string $defaultErrorStrategy)
@@ -37,6 +37,14 @@ class ProcessConfigurationRegistry
             $taskConfigurations = [];
             /** @noinspection ForeachSourceInspection */
             foreach ($rawProcessConfiguration['tasks'] as $taskCode => $rawTaskConfiguration) {
+                if (\count($rawTaskConfiguration['errors']) > 0) {
+                    if (\count($rawTaskConfiguration['error_outputs']) > 0) {
+                        $m = "Don't define both 'errors' and 'error_outputs' for task {$taskCode}, these options ";
+                        $m .= "are the same, 'errors' is deprecated, just use the new one 'error_outputs'";
+                        throw new \LogicException($m);
+                    }
+                    $rawTaskConfiguration['error_outputs'] = $rawTaskConfiguration['errors'];
+                }
                 $taskConfigurations[$taskCode] = new TaskConfiguration(
                     $taskCode,
                     $rawTaskConfiguration['service'],
@@ -44,7 +52,7 @@ class ProcessConfigurationRegistry
                     $rawTaskConfiguration['description'],
                     $rawTaskConfiguration['help'],
                     $rawTaskConfiguration['outputs'],
-                    $rawTaskConfiguration['errors'],
+                    $rawTaskConfiguration['error_outputs'],
                     $rawTaskConfiguration['error_strategy'] ?? $defaultErrorStrategy,
                     $rawTaskConfiguration['log_errors'] ? $rawTaskConfiguration['log_level'] : LogLevel::DEBUG
                 );
@@ -69,7 +77,7 @@ class ProcessConfigurationRegistry
                     $nextTaskConfig->addPreviousTaskConfiguration($taskConfig);
                 }
 
-                foreach ($taskConfig->getErrors() as $errorTaskCode) {
+                foreach ($taskConfig->getErrorOutputs() as $errorTaskCode) {
                     $errorTaskConfig = $processConfig->getTaskConfiguration($errorTaskCode);
                     $taskConfig->addErrorTaskConfiguration($errorTaskConfig);
                     $errorTaskConfig->addPreviousTaskConfiguration($taskConfig);

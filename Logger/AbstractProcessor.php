@@ -1,14 +1,18 @@
 <?php
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2018 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Logger;
 
 use CleverAge\ProcessBundle\Manager\ProcessManager;
-use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
- * Class AbstractProcessor
- *
- * @package CleverAge\ProcessBundle\Logger
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class AbstractProcessor
@@ -16,25 +20,17 @@ class AbstractProcessor
     /** @var ProcessManager */
     protected $processManager;
 
-    /** @var NormalizerInterface */
-    protected $normalizer;
-
     /**
-     * AbstractProcessor constructor.
-     *
-     * @param ProcessManager      $processManager
-     * @param NormalizerInterface $normalizer
+     * @param ProcessManager $processManager
      */
-    public function __construct(
-        ProcessManager $processManager,
-        NormalizerInterface $normalizer
-    ) {
+    public function __construct(ProcessManager $processManager)
+    {
         $this->processManager = $processManager;
-        $this->normalizer = $normalizer;
     }
 
     /**
      * @param array $record
+     *
      * @return array
      */
     public function __invoke(array $record)
@@ -54,6 +50,7 @@ class AbstractProcessor
 
     /**
      * @param array $record
+     *
      * @return array
      */
     protected function normalizeRecordData(array $record): array
@@ -68,6 +65,7 @@ class AbstractProcessor
 
     /**
      * @param array $record
+     *
      * @return void
      */
     protected function addProcessInfoToRecord(array &$record): void
@@ -84,6 +82,7 @@ class AbstractProcessor
 
     /**
      * @param array $record
+     *
      * @return void
      */
     protected function addTaskInfoToRecord(array &$record): void
@@ -112,19 +111,11 @@ class AbstractProcessor
      * @param array  $record
      * @param string $name
      * @param mixed  $data
+     *
      * @return void
      */
     protected function addToRecord(array &$record, $name, $data): void
     {
-        if (!array_key_exists($name, $record)) {
-            if ($this->normalizer->supportsNormalization($data, 'json')) {
-                $record[$name] = $this->normalizer->normalize(
-                    $data,
-                    'json'
-                );
-            } else {
-                $record[$name] = json_decode(json_encode($data), true);
-            }
-        }
+        $record[$name] = $data;
     }
 }
