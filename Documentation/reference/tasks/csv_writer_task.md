@@ -24,8 +24,8 @@ Possible outputs
 Options
 -------
 
-| Command | Type | Required | Default | Description |
-| ------- | ---- | :------: | ------- | ----------- |
+| Code | Type | Required | Default | Description |
+| ---- | ---- | :------: | ------- | ----------- |
 | `file_path` | `string` | **X** |  | Path of the file to write to (relative to symfony root or absolute). It can also take two placeholders (`{date}` and `{date_time}`) to insert timestamps into the filename |
 | `delimiter` | `string` |  | `;` | CSV delimiter |
 | `enclosure` | `string` |  | `"` | CSV enclosure character |

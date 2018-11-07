@@ -21,8 +21,8 @@ Possible outputs
 Options
 -------
 
-| Command | Type | Required | Default | Description |
-| ------- | ---- | :------: | ------- | ----------- |
+| Code | Type | Required | Default | Description |
+| ---- | ---- | :------: | ------- | ----------- |
 | `class` | `string` | **X** | | Destination class for denormalization |
 | `format` | `string` | | `null` | Format for denormalization ("json", "xml", ... an empty string should also work) |
 | `context` | `array` | | `[]` | Will be passed directly to the 4th parameter of the denormalize method |

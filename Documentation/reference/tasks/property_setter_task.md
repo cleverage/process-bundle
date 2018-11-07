@@ -23,7 +23,7 @@ Same `array` or `object`, with the property changed
 Options
 -------
 
-| Command | Type | Required | Default | Description |
-| ------- | ---- | :------: | ------- | ----------- |
+| Code | Type | Required | Default | Description |
+| ---- | ---- | :------: | ------- | ----------- |
 | `values` | `array` | **X** | | List of property path => value to set in the input |
 

@@ -24,8 +24,8 @@ Options
 
 All the criteria, order_by, limit and offset options behave like the [`EntityRepository::findBy`](https://www.doctrine-project.org/projects/doctrine-orm/en/latest/reference/working-with-objects.html#by-simple-conditions) method.
 
-| Command | Type | Required | Default | Description |
-| ------- | ---- | :------: | ------- | ----------- |
+| Code | Type | Required | Default | Description |
+| ---- | ---- | :------: | ------- | ----------- |
 | `class_name` | `string` | **X** |  | Class name of the entity |
 | `criteria` | `array` | | `[]` | List of field => value to use while matching entities |
 | `order_by` | `array` | | `[]` | List of field => direction |

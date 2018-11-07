@@ -21,8 +21,8 @@ A normalized value as an array.
 Options
 -------
 
-| Command | Type | Required | Default | Description |
-| ------- | ---- | :------: | ------- | ----------- |
+| Code | Type | Required | Default | Description |
+| ---- | ---- | :------: | ------- | ----------- |
 | `format` | `string` | **X** | | Format for normalization ("json", "xml", ... an empty string should also work) |
 | `context` | `array` | | `[]` | Will be passed directly to the third parameter of the normalize method |
 

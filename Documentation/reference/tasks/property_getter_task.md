@@ -23,7 +23,7 @@ Value of the property extracted from input.
 Options
 -------
 
-| Command | Type | Required | Default | Description |
-| ------- | ---- | :------: | ------- | ----------- |
+| Code | Type | Required | Default | Description |
+| ---- | ---- | :------: | ------- | ----------- |
 | `property` | `string` | **X** | | Property path to read from input |
 

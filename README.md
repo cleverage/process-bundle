@@ -38,6 +38,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
         - [NormalizerTask](Documentation/reference/tasks/normalizer_task.md)
         - [PropertyGetterTask](Documentation/reference/tasks/property_getter_task.md)
         - [PropertySetterTask](Documentation/reference/tasks/property_setter_task.md)
+        - [TransformerTask](Documentation/reference/tasks/transformer_task.md)
       - Entities
         - [DoctrineReaderTask](Documentation/reference/tasks/doctrine_reader_task.md)
         - [DoctrineWriterTask](Documentation/reference/tasks/doctrine_writer_task.md)
@@ -46,6 +47,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
         - [CsvWriterTask](Documentation/reference/tasks/csv_writer_task.md)
     - Transformers
         - [ArrayFilterTransformer](Documentation/reference/transformers/array_filter_transformer.md)
+        - [MappingTransformer](Documentation/reference/transformers/mapping_transformer.md)
 - Examples
     - [Simple ETL]
 - [Roadmap and versions](Documentation/100-roadmap.md)
@@ -100,32 +102,6 @@ At the end of the process, during the finalize(), it will log the number of item
     service: '@CleverAge\ProcessBundle\Task\Reporting\StatCounterTask'
 ```
 No supported options, no output.
-
-#### TransformerTask
-Accepts an array as input and sets values before returning it as the output
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
-    options:
-        # Required options
-        transformers:
-            mapping: # the code of the transformer that you want to apply
-                mapping:
-                    <property>:
-                        code: null # Source property, default to the key of the config
-                        constant: null # If you want to output a constant value
-                        set_null: false # Because the "null" value cannot be covered by the constant option
-                        ignore_missing: false # Will ignore missing properties
-                        transformers: # Applies a series of other transformers
-                            <transformer_code>: [] # Transformer options
-                    # ...
-        
-                # Optional options
-                ignore_missing: false # Globally ignore any missing property
-                ignore_extra: false # Ignore extra properties
-                initial_value: [] # The value from which the transformer reset to before applying any mapping
-    outputs: [<task_code>] # Array of tasks accepting an array as input
-```
 
 #### ValidatorTask
 Validate data from the input and pass it to the output

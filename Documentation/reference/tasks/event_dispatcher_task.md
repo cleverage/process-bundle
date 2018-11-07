@@ -22,8 +22,8 @@ Possible outputs
 Options
 -------
 
-| Command | Type | Required | Default | Description |
-| ------- | ---- | :------: | ------- | ----------- |
+| Code | Type | Required | Default | Description |
+| ---- | ---- | :------: | ------- | ----------- |
 | `event_name` | `string` | **X** | | Format for normalization ("json", "xml", ... an empty string should also work) |
 | `passive` | `bool` | | `true` | Pass input to output |
 

@@ -23,8 +23,8 @@ Underlying method is [fgetcsv](https://secure.php.net/manual/en/function.fgetcsv
 Options
 -------
 
-| Command | Type | Required | Default | Description |
-| ------- | ---- | :------: | ------- | ----------- |
+| Code | Type | Required | Default | Description |
+| ---- | ---- | :------: | ------- | ----------- |
 | `file_path` | `string` | **X** |  | Path of the file to read from (relative to symfony root or absolute) |
 | `delimiter` | `string` |  | `;` | CSV delimiter |
 | `enclosure` | `string` |  | `"` | CSV enclosure character |

@@ -21,7 +21,7 @@ Possible outputs
 Options
 -------
 
-| Command | Type | Required | Default | Description |
-| ------- | ---- | :------: | ------- | ----------- |
+| Code | Type | Required | Default | Description |
+| ---- | ---- | :------: | ------- | ----------- |
 | `output` | `array` | **X** |  | Array of values to iterate onto |
 
