@@ -16,12 +16,60 @@ namespace CleverAge\ProcessBundle\Tests;
 class ContextTest extends AbstractProcessTest
 {
     /**
-     * Assert a value can correctly by passed through context
+     * Assert a value can correctly passed through context
      */
     public function testSimpleContext()
     {
         $result = $this->processManager->execute('test.context', 'ko', ['value' => 'ok']);
 
         self::assertEquals('ok', $result);
+
+        $result = $this->processManager->execute('test.context.sub_value', null, ['value' => 'ok']);
+
+        self::assertEquals(['key' => 'ok'], $result);
+    }
+
+    /**
+     * Assert a value can correctly passed and merged into a string, through context
+     */
+    public function testContextMergedValue()
+    {
+        $result = $this->processManager->execute('test.context.merged_value', null, ['value' => 'ok']);
+
+        self::assertEquals('value is ok', $result);
+    }
+
+    /**
+     * Assert 2 values can correctly passed and merged into a string, through context
+     */
+    public function testContextMultiValue()
+    {
+        $result = $this->processManager->execute('test.context.multi_values', null, ['value1' => 'red', 'value2' => 'dead']);
+
+        self::assertEquals('red is dead', $result);
+    }
+
+    /**
+     * Assert a complex value will fail while being merged into a string, through context
+     *
+     * @expectedException \RuntimeException
+     */
+    public function testContextCannotMergeValue()
+    {
+        $this->processManager->execute('test.context.merged_value', null, ['value' => ['another_key' => 'another_value']]);
+    }
+
+    /**
+     * Assert a complex value can correctly passed through context
+     */
+    public function testComplexContext()
+    {
+        $result = $this->processManager->execute('test.context', null, ['value' => ['another_key' => 'another_value']]);
+
+        self::assertEquals(['another_key' => 'another_value'], $result);
+
+        $result = $this->processManager->execute('test.context.sub_value', null, ['value' => ['another_key' => 'another_value']]);
+
+        self::assertEquals(['key' => ['another_key' => 'another_value']], $result);
     }
 }
