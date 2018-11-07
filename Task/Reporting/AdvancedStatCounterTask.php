@@ -72,7 +72,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
             $fullText .= " - {$rate} items/s - {$items} items processed";
             $fullText .= " in {$now->diff($this->startedAt)->format('%H:%I:%S')}";
 
-            $this->logger->info($fullText, $state->getLogContext());
+            $this->logger->info($fullText);
         }
         $this->counter++;
         $this->lastUpdate = $now;

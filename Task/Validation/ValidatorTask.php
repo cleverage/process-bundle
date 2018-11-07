@@ -60,16 +60,15 @@ class ValidatorTask extends AbstractConfigurableTask
         );
 
         if (0 < $violations->count()) {
-            $defaultLogContext = $state->getLogContext();
-
             /** @var  $violation ConstraintViolationInterface */
             foreach ($violations as $violation) {
                 $invalidValue = $violation->getInvalidValue();
 
-                $logContext = $defaultLogContext;
-                $logContext['property'] = $violation->getPropertyPath();
-                $logContext['violation_code'] = $violation->getCode();
-                $logContext['invalid_value'] = \is_object($invalidValue) ? \get_class($invalidValue) : $invalidValue;
+                $logContext = [
+                    'property' => $violation->getPropertyPath(),
+                    'violation_code' => $violation->getCode(),
+                    'invalid_value' => $invalidValue,
+                ];
                 if ($this->getOption($state, 'log_errors')) {
                     $this->logger->warning($violation->getMessage(), $logContext);
                 }
@@ -78,8 +77,7 @@ class ValidatorTask extends AbstractConfigurableTask
             $state->setError($state->getInput());
 
             if ($this->getOption($state, 'log_errors')) {
-                $logContext = $defaultLogContext;
-                $this->logger->warning("{$violations->count()} constraint violations detected on validation", $logContext);
+                $this->logger->warning("{$violations->count()} constraint violations detected on validation");
             }
 
             if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {

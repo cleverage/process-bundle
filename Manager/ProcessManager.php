@@ -13,7 +13,6 @@ namespace CleverAge\ProcessBundle\Manager;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
-use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
@@ -64,6 +63,12 @@ class ProcessManager
     /** @var TaskConfiguration[] */
     protected $processedBlockings = [];
 
+    /** @var ProcessHistory */
+    protected $processHistory;
+
+    /** @var TaskConfiguration */
+    protected $taskConfiguration;
+
     /**
      * @param ContainerInterface           $container
      * @param LoggerInterface              $logger
@@ -86,6 +91,22 @@ class ProcessManager
     }
 
     /**
+     * @return ProcessHistory|null
+     */
+    public function getProcessHistory(): ?ProcessHistory
+    {
+        return $this->processHistory;
+    }
+
+    /**
+     * @return TaskConfiguration|null
+     */
+    public function getTaskConfiguration(): ?TaskConfiguration
+    {
+        return $this->taskConfiguration;
+    }
+
+    /**
      * @param string $processCode
      * @param mixed  $input
      * @param array  $context
@@ -96,8 +117,10 @@ class ProcessManager
      */
     public function execute(string $processCode, $input = null, array $context = [])
     {
+        $parentProcessHistory = $this->processHistory;
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
         $processHistory = $this->initializeStates($processConfiguration, $context);
+        $this->processHistory = $processHistory;
         $this->checkProcess($processConfiguration);
 
         // First initialize the whole stack in a linear way, tasks are initialized in the order they are configured
@@ -132,6 +155,8 @@ class ProcessManager
         if ($processConfiguration->getEndPoint()) {
             $returnValue = $processConfiguration->getEndPoint()->getState()->getOutput();
         }
+
+        $this->processHistory = $parentProcessHistory;
 
         return $returnValue;
     }
@@ -226,8 +251,7 @@ class ProcessManager
             try {
                 $task->initialize($state);
             } catch (\Throwable $e) {
-                $logContext = $state->getLogContext();
-                $logContext['exception'] = $e;
+                $logContext = ['exception' => $e];
                 $this->logger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
             }
@@ -243,6 +267,8 @@ class ProcessManager
      */
     protected function process(TaskConfiguration $taskConfiguration, int $executionFlag = self::EXECUTE_PROCESS): void
     {
+        $this->taskConfiguration = $taskConfiguration;
+
         $state = $taskConfiguration->getState();
         do {
             // Execute the current task, and fetch status
@@ -310,6 +336,8 @@ class ProcessManager
                 }
             }
         } while ($hasMoreItem);
+
+        $this->taskConfiguration = null;
     }
 
     /**
@@ -324,13 +352,7 @@ class ProcessManager
         $state->setSkipped(false);
         try {
             if (self::EXECUTE_PROCESS === $executionFlag) {
-                $this->logger->debug(
-                    "Processing task {$taskConfiguration->getCode()}",
-                    [
-                        'process_id' => $state->getProcessHistory()->getId(),
-                        'process_code' => $state->getProcessHistory()->getProcessCode(),
-                    ]
-                );
+                $this->logger->debug("Processing task {$taskConfiguration->getCode()}");
                 $task->execute($state);
                 if ($task instanceof BlockingTaskInterface) {
                     $this->addProcessedBlocking($taskConfiguration);
@@ -346,11 +368,7 @@ class ProcessManager
                         );
                     }
                     $this->logger->debug(
-                        "Proceeding task {$taskConfiguration->getCode()}",
-                        [
-                            'process_id' => $state->getProcessHistory()->getId(),
-                            'process_code' => $state->getProcessHistory()->getProcessCode(),
-                        ]
+                        "Proceeding task {$taskConfiguration->getCode()}"
                     );
                     $task->proceed($state);
                     $this->removeProcessedBlocking($taskConfiguration);
@@ -362,11 +380,7 @@ class ProcessManager
                         );
                     }
                     $this->logger->debug(
-                        "Flushing task {$taskConfiguration->getCode()}",
-                        [
-                            'process_id' => $state->getProcessHistory()->getId(),
-                            'process_code' => $state->getProcessHistory()->getProcessCode(),
-                        ]
+                        "Flushing task {$taskConfiguration->getCode()}"
                     );
                     $task->flush($state);
                 } else {
@@ -377,10 +391,10 @@ class ProcessManager
             $state->setException($e);
             $state->setError($state->getInput());
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
-                $this->logger->critical($e->getMessage(), $state->getLogContext());
+                $this->logger->critical($e->getMessage());
                 $state->setSkipped(true);
             } elseif ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
-                $this->logger->critical($e->getMessage(), $state->getLogContext());
+                $this->logger->critical($e->getMessage());
                 $state->stop($e);
             }
         }
@@ -428,8 +442,7 @@ class ProcessManager
             try {
                 $task->finalize($taskConfiguration->getState());
             } catch (\Throwable $e) {
-                $logContext = $state->getLogContext();
-                $logContext['exception'] = $e;
+                $logContext = ['exception' => $e];
                 $this->logger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
             }
@@ -451,7 +464,7 @@ class ProcessManager
         ProcessConfiguration $processConfiguration,
         array $context = []
     ): ProcessHistory {
-        $processHistory = new ProcessHistory($processConfiguration);
+        $processHistory = new ProcessHistory($processConfiguration, $context);
 
         foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
             $state = new ProcessState($processConfiguration, $processHistory);
@@ -520,8 +533,6 @@ class ProcessManager
             $this->logger->info(
                 "Process {$history->getProcessCode()} succeed",
                 [
-                    'process_id' => $history->getId(),
-                    'process_code' => $history->getProcessCode(),
                     'duration' => $history->getDuration(),
                 ]
             );
@@ -552,8 +563,7 @@ class ProcessManager
             if (!\in_array($taskConfiguration->getCode(), $mainTaskList, true)) {
                 // We won't throw an error to ease development... but there must be some kind of warning
                 $state = $taskConfiguration->getState();
-                $logContext = $state->getLogContext();
-                $logContext['main_task_list'] = $mainTaskList;
+                $logContext = ['main_task_list' => $mainTaskList];
                 $this->logger->warning("The task won't be executed", $logContext);
                 $this->handleState($state);
             }

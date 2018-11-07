@@ -90,8 +90,7 @@ class DoctrineReaderTask extends AbstractDoctrineQueryTask implements IterableTa
 
         // Handle empty results
         if (false === $result) {
-            $logContext = $state->getLogContext();
-            $logContext['options'] = $options;
+            $logContext = ['options' => $options];
             $this->logger->error('Empty resultset for query', $logContext);
             $state->setStopped(true);
 

@@ -60,9 +60,10 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
 
         if (null === $output) {
             if ($this->getOption($state, 'log_empty_lines')) {
-                $logContext = $state->getLogContext();
-                $logContext['csv_file'] = $this->csv->getFilePath();
-                $logContext['csv_line'] = $this->csv->getCurrentLine();
+                $logContext = [
+                    'csv_file' => $this->csv->getFilePath(),
+                    'csv_line' => $this->csv->getCurrentLine(),
+                ];
                 $this->logger->warning("Empty line detected at line: {$this->csv->getCurrentLine()}", $logContext);
             }
 

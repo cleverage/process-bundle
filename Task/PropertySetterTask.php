@@ -56,9 +56,10 @@ class PropertySetterTask extends AbstractConfigurableTask
                 $this->accessor->setValue($input, $key, $value);
             } catch (\Exception $e) {
                 $state->setError($input);
-                $logContext = $state->getLogContext();
-                $logContext['property'] = $key;
-                $logContext['value'] = $value;
+                $logContext = [
+                    'property' => $key,
+                    'value' => $value,
+                ];
                 $this->logger->error($e->getMessage(), $logContext);
                 if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                     $state->setSkipped(true);

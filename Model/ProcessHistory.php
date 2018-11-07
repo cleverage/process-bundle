@@ -35,6 +35,11 @@ class ProcessHistory
     protected $processCode;
 
     /**
+     * @var array
+     */
+    protected $context;
+
+    /**
      * @var \DateTime
      */
     protected $startDate;
@@ -51,12 +56,14 @@ class ProcessHistory
 
     /**
      * @param ProcessConfiguration $processConfiguration
+     * @param array                $context
      */
-    public function __construct(ProcessConfiguration $processConfiguration)
+    public function __construct(ProcessConfiguration $processConfiguration, array $context = [])
     {
         $this->id = microtime(true);
         $this->processCode = $processConfiguration->getCode();
         $this->startDate = new \DateTime();
+        $this->context = $context;
     }
 
     /**
@@ -73,6 +80,14 @@ class ProcessHistory
     public function getProcessCode(): string
     {
         return $this->processCode;
+    }
+
+    /**
+     * @return array
+     */
+    public function getContext(): array
+    {
+        return $this->context;
     }
 
     /**

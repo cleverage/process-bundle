@@ -10,9 +10,9 @@
 
 namespace CleverAge\ProcessBundle\Task\Database;
 
+use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -53,10 +53,7 @@ class DatabaseUpdaterTask extends AbstractConfigurableTask
 
         // Handle empty results
         if (false === $statement->execute()) {
-            $this->logger->critical(
-                'Error while executing query: '.$statement->errorInfo(),
-                $state->getLogContext()
-            );
+            $this->logger->critical('Error while executing query: '.$statement->errorInfo());
             $state->setStopped(true);
 
             return;

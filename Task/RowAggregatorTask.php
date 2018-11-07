@@ -63,7 +63,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         if (!array_key_exists($aggregateBy, $input)) {
             $state->setError($state->getInput());
             $message = sprintf('Array aggregator exception: missing column %s', $aggregateBy);
-            $this->logger->error($message, $state->getLogContext());
+            $this->logger->error($message);
             if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
             } elseif ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
@@ -89,7 +89,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
             if (!array_key_exists($aggregateColumn, $input)) {
                 $message = sprintf('Array aggregator exception: missing column %s', $aggregateColumn);
                 $state->setError($state->getInput());
-                $this->logger->error($message, $state->getLogContext());
+                $this->logger->error($message);
                 if ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                     $state->setSkipped(true);
                 } elseif ($state->getTaskConfiguration()->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {

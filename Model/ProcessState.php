@@ -411,6 +411,7 @@ class ProcessState
 
     /**
      * @return array
+     * @deprecated Use monolog processors instead
      */
     public function getLogContext()
     {
