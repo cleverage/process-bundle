@@ -172,6 +172,41 @@ class ProcessState
     }
 
     /**
+     * @deprecated Use getErrorOutput instead
+     *
+     * @return mixed
+     */
+    public function getError()
+    {
+        @trigger_error('Deprecated method, use getErrorOutput instead', E_USER_DEPRECATED);
+
+        return $this->getErrorOutput();
+    }
+
+    /**
+     * @deprecated Use setErrorOutput instead
+     *
+     * @param mixed $error
+     */
+    public function setError($error)
+    {
+        @trigger_error('Deprecated method, use setErrorOutput instead', E_USER_DEPRECATED);
+
+        $this->setErrorOutput($error);
+    }
+
+    /**
+     * @deprecated Use hasErrorOutput instead
+     *
+     * @return bool
+     */
+    public function hasError()
+    {
+        @trigger_error('Deprecated method, use hasErrorOutput instead', E_USER_DEPRECATED);
+
+        return $this->hasErrorOutput();
+    }
+    /**
      * @return mixed
      */
     public function getErrorOutput()

@@ -39,5 +39,6 @@ class CleverAgeProcessExtension extends SidusBaseExtension
 
         $processConfigurationRegistry = $container->getDefinition(ProcessConfigurationRegistry::class);
         $processConfigurationRegistry->replaceArgument(0, $config['configurations']);
+        $processConfigurationRegistry->replaceArgument(1, $config['default_error_strategy']);
     }
 }

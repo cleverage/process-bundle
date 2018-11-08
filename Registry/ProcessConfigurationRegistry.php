@@ -13,6 +13,7 @@ namespace CleverAge\ProcessBundle\Registry;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Exception\MissingProcessException;
+use Psr\Log\LogLevel;
 
 /**
  * Build and holds all the process configurations
@@ -27,16 +28,23 @@ class ProcessConfigurationRegistry
 
     /**
      * @param array $rawConfiguration
-     *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @param string $defaultErrorStrategy
      */
-    public function __construct(array $rawConfiguration)
+    public function __construct(array $rawConfiguration, string $defaultErrorStrategy)
     {
         foreach ($rawConfiguration as $processCode => $rawProcessConfiguration) {
             /** @var TaskConfiguration[] $taskConfigurations */
             $taskConfigurations = [];
             /** @noinspection ForeachSourceInspection */
             foreach ($rawProcessConfiguration['tasks'] as $taskCode => $rawTaskConfiguration) {
+                if (\count($rawTaskConfiguration['errors']) > 0) {
+                    if (\count($rawTaskConfiguration['error_outputs']) > 0) {
+                        $m = "Don't define both 'errors' and 'error_outputs' for task {$taskCode}, these options ";
+                        $m .= "are the same, 'errors' is deprecated, just use the new one 'error_outputs'";
+                        throw new \LogicException($m);
+                    }
+                    $rawTaskConfiguration['error_outputs'] = $rawTaskConfiguration['errors'];
+                }
                 $taskConfigurations[$taskCode] = new TaskConfiguration(
                     $taskCode,
                     $rawTaskConfiguration['service'],
@@ -44,9 +52,9 @@ class ProcessConfigurationRegistry
                     $rawTaskConfiguration['description'],
                     $rawTaskConfiguration['help'],
                     $rawTaskConfiguration['outputs'],
-                    $rawTaskConfiguration['errors'],
-                    $rawTaskConfiguration['error_strategy'],
-                    $rawTaskConfiguration['log_errors']
+                    $rawTaskConfiguration['error_outputs'],
+                    $rawTaskConfiguration['error_strategy'] ?? $defaultErrorStrategy,
+                    $rawTaskConfiguration['log_errors'] ? $rawTaskConfiguration['log_level'] : LogLevel::DEBUG
                 );
             }
 
@@ -69,7 +77,7 @@ class ProcessConfigurationRegistry
                     $nextTaskConfig->addPreviousTaskConfiguration($taskConfig);
                 }
 
-                foreach ($taskConfig->getErrors() as $errorTaskCode) {
+                foreach ($taskConfig->getErrorOutputs() as $errorTaskCode) {
                     $errorTaskConfig = $processConfig->getTaskConfiguration($errorTaskCode);
                     $taskConfig->addErrorTaskConfiguration($errorTaskConfig);
                     $errorTaskConfig->addPreviousTaskConfiguration($taskConfig);

@@ -3,6 +3,7 @@ services:
         public: false
         arguments:
             - ~
+            - ~
 
     CleverAge\ProcessBundle\Registry\TransformerRegistry:
         public: false

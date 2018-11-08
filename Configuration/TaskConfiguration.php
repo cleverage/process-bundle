@@ -12,6 +12,7 @@ namespace CleverAge\ProcessBundle\Configuration;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
+use Psr\Log\LogLevel;
 
 /**
  * Represents a task configuration inside a process
@@ -46,7 +47,7 @@ class TaskConfiguration
     protected $outputs = [];
 
     /** @var array */
-    protected $errors = [];
+    protected $errorOutputs = [];
 
     /** @var ProcessState */
     protected $state;
@@ -66,6 +67,9 @@ class TaskConfiguration
     /** @var string */
     protected $errorStrategy;
 
+    /** @var string */
+    protected $logLevel;
+
     /** @var bool */
     protected $logErrors;
 
@@ -76,9 +80,9 @@ class TaskConfiguration
      * @param string $description
      * @param string $help
      * @param array  $outputs
-     * @param array  $errors
+     * @param array  $errorOutputs
      * @param string $errorStrategy
-     * @param bool   $logErrors
+     * @param string $logLevel
      */
     public function __construct(
         $code,
@@ -87,9 +91,9 @@ class TaskConfiguration
         string $description = '',
         string $help = '',
         array $outputs = [],
-        array $errors = [],
+        array $errorOutputs = [],
         string $errorStrategy = self::STRATEGY_SKIP,
-        bool $logErrors = true
+        string $logLevel = LogLevel::CRITICAL
     ) {
         $this->code = $code;
         $this->serviceReference = $serviceReference;
@@ -97,9 +101,10 @@ class TaskConfiguration
         $this->description = $description;
         $this->help = $help;
         $this->outputs = $outputs;
-        $this->errors = $errors;
+        $this->errorOutputs = $errorOutputs;
         $this->errorStrategy = $errorStrategy;
-        $this->logErrors = $logErrors;
+        $this->logLevel = $logLevel;
+        $this->logErrors = $logLevel !== LogLevel::DEBUG; // @deprecated, remove me in next version
     }
 
     /**
@@ -121,7 +126,7 @@ class TaskConfiguration
     /**
      * @return TaskInterface
      */
-    public function getTask(): TaskInterface
+    public function getTask(): ?TaskInterface
     {
         return $this->task;
     }
@@ -182,11 +187,23 @@ class TaskConfiguration
     }
 
     /**
+     * @deprecated Use getErrorOutputs method instead
+     *
      * @return array
      */
     public function getErrors(): array
     {
-        return $this->errors;
+        @trigger_error('Deprecated method, use getErrorOutputs instead', E_USER_DEPRECATED);
+
+        return $this->getErrorOutputs();
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrorOutputs(): array
+    {
+        return $this->errorOutputs;
     }
 
     /**
@@ -358,10 +375,22 @@ class TaskConfiguration
     }
 
     /**
+     * @return string
+     */
+    public function getLogLevel(): string
+    {
+        return $this->logLevel;
+    }
+
+    /**
+     * @deprecated Use getLogLevel instead
+     *
      * @return bool
      */
     public function isLogErrors(): bool
     {
+        @trigger_error('Deprecated method, use getLogLevel instead', E_USER_DEPRECATED);
+
         return $this->logErrors;
     }
 }

@@ -224,6 +224,12 @@ class ProcessManager
      */
     protected function initialize(TaskConfiguration $taskConfiguration): void
     {
+        if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP
+            && \count($taskConfiguration->getErrorOutputs()) > 0) {
+            $m = "Task configuration {$taskConfiguration->getCode()} has error outputs ";
+            $m .= "but it's error strategy 'stop' implies they will never be reached.";
+            $this->logger->error($m);
+        }
         // @todo Refactor this using a Registry with this feature:
         // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
         $serviceReference = $taskConfiguration->getServiceReference();
@@ -389,10 +395,7 @@ class ProcessManager
             $exception = $e;
         }
         if ($exception) {
-            if ($taskConfiguration->isLogErrors()) {
-                // @todo make the log level configurable and change logger channel
-                $this->logger->critical($exception->getMessage(), $state->getErrorContext());
-            }
+            $this->logger->log($taskConfiguration->getLogLevel(), $exception->getMessage(), $state->getErrorContext());
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
                 if (null === $state->getErrorOutput()) {

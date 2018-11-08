@@ -13,7 +13,8 @@ YAML Configuration
     outputs: <list of following task codes>
     errors: <list of following task codes>
     error_strategy: <skip|stop>
-    log_errors: <true|false>
+    log_errors: <true|false> # Deprecated
+    log_level: <emergency|alert|critical|error|warning|notice|info|debug>
 ```
 
 Process attributes
@@ -33,4 +34,7 @@ Process attributes
 
 **error_strategy**: either *skip* (default) or *stop*, defines if a task can be continued or not
 
-**log_errors**: optional boolean (defaults to true), to allow logging thrown errors
+**log_errors**: DEPRECATED: use log_level instead. Optional boolean (defaults to true), to allow logging thrown errors
+
+**log_level**: rfc5424 severity (emergency, alert, critical, error, warning, notice, info, debug) for error logged when
+an exception is thrown by a task. Default 'critical'. Case-independant.

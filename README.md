@@ -66,7 +66,7 @@ clever_age_process:
                     error_strategy: skip
                     
                     # Logs any errors encountered
-                    log_errors: true
+                    log_level: critical
 
                 # More tasks
 ```
