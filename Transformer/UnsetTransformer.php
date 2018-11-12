@@ -61,17 +61,7 @@ class UnsetTransformer implements ConfigurableTransformerInterface
         $resolver->setRequired('property');
         $resolver->setAllowedTypes('property', 'string');
 
-        $resolver->setDefault('condition', []);
-        $resolver->setAllowedTypes('condition', ['array']);
-        $resolver->setNormalizer(
-            'condition',
-            function (Options $options, $value) {
-                $conditionResolver = new OptionsResolver();
-                $this->configureConditionOptions($conditionResolver);
-
-                return $conditionResolver->resolve($value);
-            }
-        );
+        $this->configureWrappedConditionOptions('condition', $resolver);
     }
 
     /**

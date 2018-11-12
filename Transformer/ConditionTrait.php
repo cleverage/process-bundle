@@ -72,6 +72,24 @@ trait ConditionTrait
     }
 
     /**
+     * Configure available condition rules in a wrapper option
+     *
+     * @param string          $wrapperKey
+     * @param OptionsResolver $resolver
+     */
+    protected function configureWrappedConditionOptions(string $wrapperKey, OptionsResolver $resolver)
+    {
+        $resolver->setDefault($wrapperKey, []);
+        $resolver->setAllowedTypes($wrapperKey, ['array']);
+        $resolver->setNormalizer($wrapperKey, function (OptionsResolver $options, $value) {
+            $conditionResolver = new OptionsResolver();
+            $this->configureConditionOptions($conditionResolver);
+
+            return $conditionResolver->resolve($value);
+        });
+    }
+
+    /**
      * Configure available condition rules
      *
      * @param OptionsResolver $resolver
