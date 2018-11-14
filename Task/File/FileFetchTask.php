@@ -15,6 +15,7 @@ use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\MountManager;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -41,9 +42,9 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
     protected $matchingFiles = [];
 
     /**
-     * @param MountManager $mountManager
+     * @param MountManager|null $mountManager
      */
-    public function __construct(MountManager $mountManager)
+    public function __construct(MountManager $mountManager = null)
     {
         $this->mountManager = $mountManager;
     }
@@ -57,6 +58,9 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
      */
     public function initialize(ProcessState $state)
     {
+        if (!$this->mountManager) {
+            throw new ServiceNotFoundException('MountManager service not found, you need to install FlySystemBundle');
+        }
         // Configure options
         parent::initialize($state);
 
