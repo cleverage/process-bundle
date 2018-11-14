@@ -1,4 +1,12 @@
 <?php
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2018 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Task;
 
@@ -15,6 +23,11 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
 {
 
     use ConditionTrait;
+
+    /**
+     * @var array
+     */
+    protected $result = [];
 
 
     /**
@@ -46,19 +59,19 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
 
     public function proceed(ProcessState $state)
     {
-        $state->setOutput($this->aggregation);
+        $state->setOutput($this->result);
     }
 
     protected function addValueToAggregationGroup($column, $input, $referenceKey, $aggregationKey)
     {
-        if (!isset($this->aggregation[$column])) {
-            $this->aggregation[$column] = [
+        if (!isset($this->result[$column])) {
+            $this->result[$column] = [
                 $referenceKey   => $column,
                 $aggregationKey => [],
             ];
         }
 
-        $this->aggregation[$column][$aggregationKey][] = $input;
+        $this->result[$column][$aggregationKey][] = $input;
     }
 
     protected function configureOptions(OptionsResolver $resolver)
@@ -72,14 +85,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         $resolver->setDefault('aggregation_key', 'values');
         $resolver->setAllowedTypes('aggregation_key', 'string');
 
-        $resolver->setDefault('condition', []);
-        $resolver->setAllowedTypes('condition', ['array']);
-        $resolver->setNormalizer('condition', function (Options $options, $value) {
-            $conditionResolver = new OptionsResolver();
-            $this->configureConditionOptions($conditionResolver);
-
-            return $conditionResolver->resolve($value);
-        });
+        $this->configureWrappedConditionOptions('condition', $resolver);
     }
 
 

@@ -28,6 +28,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
     - [Process definition](Documentation/reference/01-process_definition.md)
     - [Task definition](Documentation/reference/02-task_definition.md)
     - Transformers
+        - [ArrayFilterTransformer](Documentation/reference/transformers/array_filter_transformer.md)
 - Examples
     - [Simple ETL]
 - [Roadmap and versions](Documentation/100-roadmap.md)
