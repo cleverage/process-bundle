@@ -14,6 +14,8 @@ use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
+use CleverAge\ProcessBundle\Logger\ProcessLogger;
+use CleverAge\ProcessBundle\Logger\TaskLogger;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
@@ -24,7 +26,6 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -42,8 +43,11 @@ class ProcessManager
     /** @var ContainerInterface */
     protected $container;
 
-    /** @var LoggerInterface */
-    protected $logger;
+    /** @var ProcessLogger */
+    protected $processLogger;
+
+    /** @var TaskLogger */
+    protected $taskLogger;
 
     /** @var EntityManagerInterface */
     protected $entityManager;
@@ -71,20 +75,23 @@ class ProcessManager
 
     /**
      * @param ContainerInterface           $container
-     * @param LoggerInterface              $logger
+     * @param ProcessLogger                $processLogger
+     * @param TaskLogger                   $taskLogger
      * @param EntityManagerInterface       $entityManager
      * @param ProcessConfigurationRegistry $processConfigurationRegistry
      * @param ContextualOptionResolver     $contextualOptionResolver
      */
     public function __construct(
         ContainerInterface $container,
-        LoggerInterface $logger,
+        ProcessLogger $processLogger,
+        TaskLogger $taskLogger,
         EntityManagerInterface $entityManager,
         ProcessConfigurationRegistry $processConfigurationRegistry,
         ContextualOptionResolver $contextualOptionResolver
     ) {
         $this->container = $container;
-        $this->logger = $logger;
+        $this->processLogger = $processLogger;
+        $this->taskLogger = $taskLogger;
         $this->entityManager = $entityManager;
         $this->processConfigurationRegistry = $processConfigurationRegistry;
         $this->contextualOptionResolver = $contextualOptionResolver;
@@ -224,11 +231,13 @@ class ProcessManager
      */
     protected function initialize(TaskConfiguration $taskConfiguration): void
     {
+        $this->taskConfiguration = $taskConfiguration;
+
         if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP
             && \count($taskConfiguration->getErrorOutputs()) > 0) {
             $m = "Task configuration {$taskConfiguration->getCode()} has error outputs ";
             $m .= "but it's error strategy 'stop' implies they will never be reached.";
-            $this->logger->error($m);
+            $this->taskLogger->error($m);
         }
         // @todo Refactor this using a Registry with this feature:
         // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
@@ -255,11 +264,13 @@ class ProcessManager
                 $task->initialize($state);
             } catch (\Throwable $e) {
                 $logContext = ['exception' => $e];
-                $this->logger->critical($e->getMessage(), $logContext);
+                $this->taskLogger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
             }
         }
         $this->handleState($taskConfiguration->getState());
+
+        $this->taskConfiguration = null;
     }
 
     /**
@@ -355,7 +366,7 @@ class ProcessManager
         $state->setSkipped(false);
         try {
             if (self::EXECUTE_PROCESS === $executionFlag) {
-                $this->logger->debug("Processing task {$taskConfiguration->getCode()}");
+                $this->processLogger->debug("Processing task {$taskConfiguration->getCode()}");
                 $task->execute($state);
                 if ($task instanceof BlockingTaskInterface) {
                     $this->addProcessedBlocking($taskConfiguration);
@@ -370,7 +381,7 @@ class ProcessManager
                             "Task {$taskConfiguration->getCode()} is not blocking"
                         );
                     }
-                    $this->logger->debug(
+                    $this->processLogger->debug(
                         "Proceeding task {$taskConfiguration->getCode()}"
                     );
                     $task->proceed($state);
@@ -382,7 +393,7 @@ class ProcessManager
                             "Task {$taskConfiguration->getCode()} is not flushable"
                         );
                     }
-                    $this->logger->debug(
+                    $this->processLogger->debug(
                         "Flushing task {$taskConfiguration->getCode()}"
                     );
                     $task->flush($state);
@@ -395,7 +406,7 @@ class ProcessManager
             $exception = $e;
         }
         if ($exception) {
-            $this->logger->log($taskConfiguration->getLogLevel(), $exception->getMessage(), $state->getErrorContext());
+            $this->taskLogger->log($taskConfiguration->getLogLevel(), $exception->getMessage(), $state->getErrorContext());
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
                 if (null === $state->getErrorOutput()) {
@@ -445,15 +456,17 @@ class ProcessManager
     {
         $task = $taskConfiguration->getTask();
         if ($task instanceof FinalizableTaskInterface) {
+            $this->taskConfiguration = $taskConfiguration;
             $state = $taskConfiguration->getState();
             try {
                 $task->finalize($taskConfiguration->getState());
             } catch (\Throwable $e) {
                 $logContext = ['exception' => $e];
-                $this->logger->critical($e->getMessage(), $logContext);
+                $this->taskLogger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
             }
             $this->handleState($state);
+            $this->taskConfiguration = null;
         }
     }
 
@@ -537,7 +550,7 @@ class ProcessManager
         if ($history->isStarted()) {
             $history->setSuccess();
 
-            $this->logger->info(
+            $this->processLogger->info(
                 "Process {$history->getProcessCode()} succeed",
                 [
                     'duration' => $history->getDuration(),
@@ -571,7 +584,7 @@ class ProcessManager
                 // We won't throw an error to ease development... but there must be some kind of warning
                 $state = $taskConfiguration->getState();
                 $logContext = ['main_task_list' => $mainTaskList];
-                $this->logger->warning("Task '{$taskConfiguration->getCode()}' is unreachable", $logContext);
+                $this->processLogger->warning("Task '{$taskConfiguration->getCode()}' is unreachable", $logContext);
                 $this->handleState($state);
             }
         }

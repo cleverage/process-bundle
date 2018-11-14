@@ -2,8 +2,6 @@ services:
     CleverAge\ProcessBundle\Manager\ProcessManager:
         autowire: true
         public: false
-        tags:
-            - { name: monolog.logger, channel: cleverage_process }
 
     CleverAge\ProcessBundle\Context\ContextualOptionResolver:
         public: false

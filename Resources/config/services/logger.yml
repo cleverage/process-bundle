@@ -13,3 +13,13 @@ services:
         autowire: true
         tags:
         - { name: monolog.processor, channel: cleverage_process_transformer }
+
+    CleverAge\ProcessBundle\Logger\ProcessLogger:
+        autowire: true
+        tags:
+        - { name: monolog.logger, channel: cleverage_process }
+
+    CleverAge\ProcessBundle\Logger\TaskLogger:
+        autowire: true
+        tags:
+        - { name: monolog.logger, channel: cleverage_process_task }

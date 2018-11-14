@@ -11,9 +11,9 @@
 namespace CleverAge\ProcessBundle;
 
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
+use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 
 /**
  * @author  Valentin Clavreul <vclavreul@clever-age.com>
