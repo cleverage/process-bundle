@@ -42,9 +42,11 @@ class CsvFile extends CsvResource
     ) {
         $this->filePath = $filePath;
 
-        $dirname = \dirname($this->filePath);
-        if (!@mkdir($dirname, 0755, true) && !is_dir($dirname)) {
-            throw new \RuntimeException(sprintf('Directory "%s" was not created', $dirname));
+        if (!\in_array($filePath, ['php://stdin', 'php://stdout', 'php://stderr'])) {
+            $dirname = \dirname($this->filePath);
+            if (!@mkdir($dirname, 0755, true) && !is_dir($dirname)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $dirname));
+            }
         }
 
         $resource = fopen($filePath, $mode);
