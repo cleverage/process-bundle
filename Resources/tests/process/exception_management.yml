@@ -2,7 +2,7 @@ clever_age_process:
     configurations:
         test.exception_management.set_exception_in_the_middle:
             entry_point: data
-            end_point: aggregator
+            end_point: input_aggregator
             tasks:
                 data:
                     service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
@@ -10,7 +10,7 @@ clever_age_process:
                         output:
                             - ['a', 'b', 'c']
                             - ['b', 'c', 'd']
-                            - 1
+                            - 1                     # triggers an error
                             - ['c', 'd', 'e']
                             - ['d', 'e', 'f']
                     outputs: [transformer]
@@ -22,6 +22,20 @@ clever_age_process:
                             implode:
                                 separator: ''
                     outputs: [aggregator]
+                    errors: [error_aggregator]
 
                 aggregator:
                     service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
+                    outputs: [input_aggregator]
+
+                error_aggregator:
+                    service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
+                    outputs: [input_aggregator]
+
+                input_aggregator:
+                    service: '@CleverAge\ProcessBundle\Task\InputAggregatorTask'
+                    options:
+                        input_codes:
+                            aggregator: success
+                            error_aggregator: errors
+
