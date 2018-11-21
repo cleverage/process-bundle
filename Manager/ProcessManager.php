@@ -362,8 +362,13 @@ class ProcessManager
     {
         $task = $taskConfiguration->getTask();
         $state = $taskConfiguration->getState();
+
+        // Reset state, TODO : wrap this in an explicit method ? where ?
         $state->setOutput(null);
         $state->setSkipped(false);
+        $state->setException(null);
+        $state->setErrorOutput(null);
+
         try {
             if (self::EXECUTE_PROCESS === $executionFlag) {
                 $this->processLogger->debug("Processing task {$taskConfiguration->getCode()}");
