@@ -108,6 +108,25 @@ class ProcessState
     }
 
     /**
+     * Reset the state object
+     * To be used before execution
+     *
+     * @param bool $cleanInput
+     */
+    public function reset($cleanInput = true)
+    {
+        $this->setOutput(null);
+        $this->setSkipped(false);
+        $this->setException(null);
+        $this->setErrorOutput(null);
+
+        if($cleanInput) {
+            $this->setInput(null);
+            $this->setPreviousState(null);
+        }
+    }
+
+    /**
      * @return ProcessConfiguration
      */
     public function getProcessConfiguration()
@@ -206,6 +225,7 @@ class ProcessState
 
         return $this->hasErrorOutput();
     }
+
     /**
      * @return mixed
      */
@@ -266,9 +286,9 @@ class ProcessState
     }
 
     /**
-     * @param \Throwable $exception
+     * @param \Throwable|null $exception
      */
-    public function setException(\Throwable $exception)
+    public function setException(\Throwable $exception = null)
     {
         $this->exception = $exception;
     }
