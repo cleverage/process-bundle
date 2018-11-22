@@ -113,7 +113,7 @@ class ProcessState
      *
      * @param bool $cleanInput
      */
-    public function reset($cleanInput = true)
+    public function reset($cleanInput)
     {
         $this->setOutput(null);
         $this->setSkipped(false);

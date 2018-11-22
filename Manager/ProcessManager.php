@@ -365,7 +365,7 @@ class ProcessManager
 
         try {
             if (self::EXECUTE_PROCESS === $executionFlag) {
-                $state->reset();
+                $state->reset(false);
                 $this->processLogger->debug("Processing task {$taskConfiguration->getCode()}");
                 $task->execute($state);
                 if ($task instanceof BlockingTaskInterface) {
