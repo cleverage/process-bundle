@@ -108,6 +108,25 @@ class ProcessState
     }
 
     /**
+     * Reset the state object
+     * To be used before execution
+     *
+     * @param bool $cleanInput
+     */
+    public function reset($cleanInput = true)
+    {
+        $this->setOutput(null);
+        $this->setSkipped(false);
+        $this->setException(null);
+        $this->setErrorOutput(null);
+
+        if($cleanInput) {
+            $this->setInput(null);
+            $this->setPreviousState(null);
+        }
+    }
+
+    /**
      * @return ProcessConfiguration
      */
     public function getProcessConfiguration()
@@ -452,11 +471,11 @@ class ProcessState
     {
         @trigger_error('Deprecated method, use monolog processors instead', E_USER_DEPRECATED);
         $context = [
-            'process_id'      => $this->processHistory->getId(),
-            'process_code'    => $this->processConfiguration->getCode(),
+            'process_id' => $this->processHistory->getId(),
+            'process_code' => $this->processConfiguration->getCode(),
             'process_context' => $this->context,
-            'task_code'       => $this->taskConfiguration->getCode(),
-            'task_service'    => $this->taskConfiguration->getServiceReference(),
+            'task_code' => $this->taskConfiguration->getCode(),
+            'task_service' => $this->taskConfiguration->getServiceReference(),
         ];
 
         if ($this->hasErrorOutput()) {

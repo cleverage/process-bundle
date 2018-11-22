@@ -363,53 +363,41 @@ class ProcessManager
         $task = $taskConfiguration->getTask();
         $state = $taskConfiguration->getState();
 
-        // Reset state, TODO : wrap this in an explicit method ? where ?
-        $state->setOutput(null);
-        $state->setSkipped(false);
-        $state->setException(null);
-        $state->setErrorOutput(null);
-
         try {
             if (self::EXECUTE_PROCESS === $executionFlag) {
+                $state->reset();
                 $this->processLogger->debug("Processing task {$taskConfiguration->getCode()}");
                 $task->execute($state);
                 if ($task instanceof BlockingTaskInterface) {
                     $this->addProcessedBlocking($taskConfiguration);
                 }
-            } else {
-                $state->setInput(null);
-                $state->setPreviousState(null);
-                if (self::EXECUTE_PROCEED === $executionFlag) {
-                    if (!$task instanceof BlockingTaskInterface) {
-                        // This exception should never be thrown
-                        throw new \UnexpectedValueException(
-                            "Task {$taskConfiguration->getCode()} is not blocking"
-                        );
-                    }
-                    $this->processLogger->debug(
-                        "Proceeding task {$taskConfiguration->getCode()}"
-                    );
-                    $task->proceed($state);
-                    $this->removeProcessedBlocking($taskConfiguration);
-                } elseif (self::EXECUTE_FLUSH === $executionFlag) {
-                    if (!$task instanceof FlushableTaskInterface) {
-                        // This exception should never be thrown
-                        throw new \UnexpectedValueException(
-                            "Task {$taskConfiguration->getCode()} is not flushable"
-                        );
-                    }
-                    $this->processLogger->debug(
-                        "Flushing task {$taskConfiguration->getCode()}"
-                    );
-                    $task->flush($state);
-                } else {
-                    throw new \UnexpectedValueException("Unknown execution flag: {$executionFlag}");
+            } elseif (self::EXECUTE_PROCEED === $executionFlag) {
+                $state->reset(true);
+                if (!$task instanceof BlockingTaskInterface) {
+                    // This exception should never be thrown
+                    throw new \UnexpectedValueException("Task {$taskConfiguration->getCode()} is not blocking");
                 }
+                $this->processLogger->debug("Proceeding task {$taskConfiguration->getCode()}");
+                $task->proceed($state);
+                $this->removeProcessedBlocking($taskConfiguration);
+            } elseif (self::EXECUTE_FLUSH === $executionFlag) {
+                $state->reset(true);
+                if (!$task instanceof FlushableTaskInterface) {
+                    // This exception should never be thrown
+                    throw new \UnexpectedValueException("Task {$taskConfiguration->getCode()} is not flushable");
+                }
+                $this->processLogger->debug("Flushing task {$taskConfiguration->getCode()}");
+                $task->flush($state);
+            } else {
+                throw new \UnexpectedValueException("Unknown execution flag: {$executionFlag}");
             }
+
             $exception = $state->getException();
         } catch (\Throwable $e) {
             $exception = $e;
         }
+
+        // Manage exception catching and setting the same
         if ($exception) {
             $this->taskLogger->log($taskConfiguration->getLogLevel(), $exception->getMessage(), $state->getErrorContext());
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
