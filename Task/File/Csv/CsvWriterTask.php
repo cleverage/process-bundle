@@ -77,8 +77,12 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
             'file_path',
             function (Options $options, $value) {
                 $value = str_replace(
-                    ['{date}', '{date_time}'],
-                    [(new \DateTime())->format('Ymd'), (new \DateTime())->format('Ymd_His')],
+                    ['{date}', '{date_time}', '{unique_token}'],
+                    [
+                        (new \DateTime())->format('Ymd'),
+                        (new \DateTime())->format('Ymd_His'),
+                        uniqid()
+                    ],
                     $value
                 );
 
