@@ -15,7 +15,7 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Transformer\ConditionTrait;
-use Symfony\Component\OptionsResolver\Options;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -29,15 +29,20 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
      */
     protected $result = [];
 
+    /** @var LoggerInterface */
+    protected $logger;
+
 
     /**
      * ColumnAggregatorTask constructor.
      *
      * @param PropertyAccessorInterface $accessor
+     * @param LoggerInterface           $logger
      */
-    public function __construct(PropertyAccessorInterface $accessor)
+    public function __construct(PropertyAccessorInterface $accessor, LoggerInterface $logger)
     {
         $this->accessor = $accessor;
+        $this->logger = $logger;
     }
 
     public function execute(ProcessState $state)
@@ -46,13 +51,26 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         $columns = $this->getOption($state, 'columns');
         $conditions = $this->getOption($state, 'condition');
 
+        $missingColumns = [];
         foreach ($columns as $column) {
             if (!isset($input[$column])) {
-                throw new \UnexpectedValueException("Missing column '{$column}' in input");
+                $missingColumns[] = $column;
+                continue;
             }
 
             if ($this->checkCondition(['input_column_value' => $input[$column], 'input' => $input], $conditions)) {
                 $this->addValueToAggregationGroup($column, $input, $this->getOption($state, 'reference_key'), $this->getOption($state, 'aggregation_key'));
+            }
+        }
+
+        if (!empty($missingColumns)) {
+            $colStr = implode(', ', $missingColumns);
+            $message = "Missing columns [{$colStr}] in input";
+
+            if ($this->getOption($state, 'ignore_missing')) {
+                $this->logger->warning($message);
+            } else {
+                throw new \UnexpectedValueException($message);
             }
         }
     }
@@ -66,7 +84,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
     {
         if (!isset($this->result[$column])) {
             $this->result[$column] = [
-                $referenceKey   => $column,
+                $referenceKey => $column,
                 $aggregationKey => [],
             ];
         }
@@ -86,6 +104,9 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         $resolver->setAllowedTypes('aggregation_key', 'string');
 
         $this->configureWrappedConditionOptions('condition', $resolver);
+
+        $resolver->setDefault('ignore_missing', false);
+        $resolver->setAllowedTypes('ignore_missing', 'boolean');
     }
 
 
