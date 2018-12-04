@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\VarDumper\VarDumper;
+use Symfony\Component\Yaml\Parser;
 
 /**
  * Run a process from the command line interface
@@ -104,6 +105,8 @@ class ExecuteProcessCommand extends Command
      */
     protected function parseContextValues(InputInterface $input)
     {
+        $parser = new Parser();
+
         $pattern = '/([\w]+):(.*)/';
         $contextValues = $input->getOption('context');
         $context = [];
@@ -113,7 +116,7 @@ class ExecuteProcessCommand extends Command
                 || $parts[0] !== $contextValue) {
                 throw new \InvalidArgumentException(sprintf('Invalid context %s', $contextValue));
             }
-            $context[$parts[1]] = $parts[2];
+            $context[$parts[1]] = $parser->parse($parts[2]);
         }
 
         return $context;
