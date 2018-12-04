@@ -10,13 +10,15 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Merge every input array, and return the result
  */
-class ArrayMergeTask implements BlockingTaskInterface
+class ArrayMergeTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
     /** @var array */
     protected $mergedOutput = [];
@@ -33,7 +35,18 @@ class ArrayMergeTask implements BlockingTaskInterface
             throw new \UnexpectedValueException('Input must be an array');
         }
 
-        $this->mergedOutput = array_merge($this->mergedOutput, $input);
+        $mergeFunction = $this->getOption($state, 'merge_function');
+        if ($mergeFunction == 'array_merge') {
+            $this->mergedOutput = \array_merge($this->mergedOutput, $input);
+        } elseif ($mergeFunction == 'array_merge_recursive') {
+            $this->mergedOutput = \array_merge_recursive($this->mergedOutput, $input);
+        } elseif ($mergeFunction == 'array_replace') {
+            $this->mergedOutput = \array_replace($this->mergedOutput, $input);
+        } elseif ($mergeFunction == 'array_replace_recursive') {
+            $this->mergedOutput = \array_replace_recursive($this->mergedOutput, $input);
+        } else {
+            throw new \InvalidArgumentException("Unknown merge function {$mergeFunction}");
+        }
     }
 
     /**
@@ -43,4 +56,13 @@ class ArrayMergeTask implements BlockingTaskInterface
     {
         $state->setOutput($this->mergedOutput);
     }
+
+    protected function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefault('merge_function', 'array_merge');
+        $resolver->setAllowedTypes('merge_function', 'string');
+        $resolver->setAllowedValues('merge_function', ['array_merge', 'array_merge_recursive', 'array_replace', 'array_replace_recursive']);
+    }
+
+
 }
