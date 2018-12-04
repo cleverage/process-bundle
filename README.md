@@ -27,8 +27,31 @@ Basically, it will greatly ease the configuration of import and exports but can 
 - Reference
     - [Process definition](Documentation/reference/01-process_definition.md)
     - [Task definition](Documentation/reference/02-task_definition.md)
+      - Basic and debug
+        - [ConstantOutputTask](Documentation/reference/tasks/constant_output_task.md)
+        - [ConstantIterableOutputTask](Documentation/reference/tasks/constant_iterable_output_task.md)
+        - [DebugTask](Documentation/reference/tasks/debug_task.md)
+        - [DummyTask](Documentation/reference/tasks/dummy_task.md)
+        - [EventDispatcherTask](Documentation/reference/tasks/event_dispatcher_task.md)
+      - Data manipulation and transformations
+        - [DenormalizerTask](Documentation/reference/tasks/denormalizer_task.md)
+        - [NormalizerTask](Documentation/reference/tasks/normalizer_task.md)
+        - [PropertyGetterTask](Documentation/reference/tasks/property_getter_task.md)
+        - [PropertySetterTask](Documentation/reference/tasks/property_setter_task.md)
+        - [TransformerTask](Documentation/reference/tasks/transformer_task.md)
+      - Entities
+        - [DoctrineReaderTask](Documentation/reference/tasks/doctrine_reader_task.md)
+        - [DoctrineWriterTask](Documentation/reference/tasks/doctrine_writer_task.md)
+      - File/CSV
+        - [CsvReaderTask](Documentation/reference/tasks/csv_reader_task.md)
+        - [CsvWriterTask](Documentation/reference/tasks/csv_writer_task.md)
+      - Flow manipulation
+        - [AggregateIterableTask](Documentation/reference/tasks/aggregate_iterable_task.md)
+        - [InputAggregatorTask](Documentation/reference/tasks/input_aggregator_task.md)
+        - [InputIteratorTask](Documentation/reference/tasks/input_iterator_task.md)
     - Transformers
         - [ArrayFilterTransformer](Documentation/reference/transformers/array_filter_transformer.md)
+        - [MappingTransformer](Documentation/reference/transformers/mapping_transformer.md)
 - Examples
     - [Simple ETL]
 - [Roadmap and versions](Documentation/100-roadmap.md)
@@ -75,147 +98,6 @@ Note that orphan tasks will be reported as errors before the process starts
 
 ### Existing tasks
 
-#### ConstantOutputTask
-Simply outputs the same configured value all the time, ignores any input
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
-    options:
-        # Required options
-        output: <mixed> # Will always output the value configured here
-    outputs: [<task_code>] # Array of tasks to pass the output to
-```
-
-#### ConstantIterableOutputTask
-Same as ConstantOutputTask but only accepts an array of values and iterates over each element.
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
-    options:
-        # Required options
-        output: <array> # Will iterate over the elements
-    outputs: [<task_code>] # Array of tasks to pass the output to
-```
-
-#### CsvReaderTask
-Reads a CSV file and iterate on each line, returning an array of key -> values
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
-    options:
-        # Required options
-        file_path: <string> # Required, the path of the file to read from
-
-        # Optional options
-        delimiter: ';'
-        enclosure: '"'
-        escape: '\\'
-        headers: null # Use this if you want to manually passed headers
-        mode: 'r' # Used by fopen
-    outputs: [<task_code>] # Array of tasks accepting an array as input
-```
-
-#### CsvWriterTask
-Write to a CSV file, will wait until the end of the previous iteration (this is a blocking task) and outputs the file
-path.
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
-    options:
-        # Required options
-        file_path: <string> # Required, the path of the file to write to
-
-        # Optional options
-        delimiter: ';'
-        enclosure: '"'
-        escape: '\\'
-        headers: null # Use this if you want to manually passed headers
-        mode: 'r' # Used by fopen
-        split_character: '|' # Tries to implode array values based on this character
-    outputs: [<task_code>] # This task will output the filepath of the written file
-```
-If the tasks read anything else than an array as input the process will stops.
-
-#### DebugTask
-Dumps the input value to the console, obviously for debug purposes
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
-```
-No supported options, no output.
-
-#### DoctrineReaderTask
-Reads data from a Doctrine Repository, iterating over the results. Ignores any input.
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Doctrine\DoctrineReaderTask'
-    options:
-        # Required options
-        class_name: <string> # Required, the class name of the entity
-
-        # Optional options
-        criteria: []
-        order_by: []
-        limit: null
-        offset: null
-        entity_manager: null # If the entity manager is not the default one, use this option
-    outputs: [<task_code>] # Array of tasks accepting an entity as input
-```
-All the criteria, order_by, limit and offset options behave like the ```EntityRepository::findBy``` method.
-
-#### DoctrineWriterTask
-Write a Doctrine entity to the database.
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Doctrine\DoctrineWriterTask'
-    options:
-        # Optional options
-        entity_manager: null # If the entity manager is not the default one, use this option
-    outputs: [<task_code>] # Array of tasks accepting an entity as input
-```
-
-#### NormalizerTask
-Normalize data from the input and pass it to the output
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Serialization\NormalizerTask'
-    options:
-        # Required options
-        format: <string> # Required, format for normalization
-
-        # Optional options
-        context: [] # Will be passed directly to the third parameter of the normalize method
-    outputs: [<task_code>] # Array of tasks accepting the normalized data as input
-```
-
-#### DenormalizerTask
-Denormalize data from the input and pass it to the output
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask'
-    options:
-        # Required options
-        class: <string>
-
-        # Optional options
-        format: <string>
-        context: [] # Will be passed directly to the third parameter of the normalize method
-    outputs: [<task_code>] # Array of tasks accepting the denormalized data as input
-```
-
-#### PropertySetterTask
-Accepts an array or an object as an input and sets values before returning it as the output
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\PropertySetterTask'
-    options:
-        # Required options
-        values:
-            <property>: <mixed> # The value you want to set
-            # ...
-    outputs: [<task_code>] # Array of tasks accepting the same data as the input
-```
-
 #### StatCounterTask
 Accepts an array or an object as an input and sets values before returning it as the output.
 At the end of the process, during the finalize(), it will log the number of item processed.
@@ -225,55 +107,12 @@ At the end of the process, during the finalize(), it will log the number of item
 ```
 No supported options, no output.
 
-#### TransformerTask
-Accepts an array as input and sets values before returning it as the output
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
-    options:
-        # Required options
-        transformers:
-            mapping: # the code of the transformer that you want to apply
-                mapping:
-                    <property>:
-                        code: null # Source property, default to the key of the config
-                        constant: null # If you want to output a constant value
-                        set_null: false # Because the "null" value cannot be covered by the constant option
-                        ignore_missing: false # Will ignore missing properties
-                        transformers: # Applies a series of other transformers
-                            <transformer_code>: [] # Transformer options
-                    # ...
-        
-                # Optional options
-                ignore_missing: false # Globally ignore any missing property
-                ignore_extra: false # Ignore extra properties
-                initial_value: [] # The value from which the transformer reset to before applying any mapping
-    outputs: [<task_code>] # Array of tasks accepting an array as input
-```
-
 #### ValidatorTask
 Validate data from the input and pass it to the output
 ```yml
 <task_code>:
     service: '@CleverAge\ProcessBundle\Task\Validation\ValidatorTask'
     outputs: [<task_code>] # Array of tasks accepting the same data than the input
-```
-
-#### EventDispatcherTask
-Call the Symfony event dispatcher
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
-    options:
-        event_name: <event_name> # The name of your event
-```
-
-#### DummyTask
-Passes the input to the output, can be used as an entry point allow multiple tasks to be run at the entry point
-```yml
-<task_code>:
-    service: '@CleverAge\ProcessBundle\Task\DummyTask'
-    outputs: [<task_code>] # Array of tasks to be called, does not pass any input
 ```
 
 ## Creating a custom task

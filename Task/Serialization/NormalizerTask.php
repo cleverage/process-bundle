@@ -45,6 +45,11 @@ class NormalizerTask extends AbstractConfigurableTask
     public function execute(ProcessState $state)
     {
         $options = $this->getOptions($state);
+
+        if (!$this->normalizer->supportsNormalization($state->getInput(), $options['format'])) {
+            throw new \UnexpectedValueException('Given value is not normalizable for format ' . $options['format']);
+        }
+
         $normalizedData = $this->normalizer->normalize(
             $state->getInput(),
             $options['format'],
