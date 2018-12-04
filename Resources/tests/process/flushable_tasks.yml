@@ -19,6 +19,25 @@ clever_age_process:
                 aggregate:
                     service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
 
+        test.simple_flushable_no_iterable:
+            entry_point: data
+            end_point: aggregate
+            tasks:
+                data:
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+                    options:
+                        output: 1
+                    outputs: [batch]
+
+                batch:
+                    service: '@CleverAge\ProcessBundle\Task\SimpleBatchTask'
+                    options:
+                        batch_count: 2
+                    outputs: [aggregate]
+
+                aggregate:
+                    service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
+
         test.single_flushable:
             entry_point: data
             end_point: aggregate
@@ -31,6 +50,31 @@ clever_age_process:
 
                 batch:
                     service: '@CleverAge\ProcessBundle\Task\SimpleBatchTask'
+                    options:
+                        batch_count: 2
+                    outputs: [aggregate]
+
+                aggregate:
+                    service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
+
+        test.iterable_flushable:
+            entry_point: data
+            end_point: aggregate
+            tasks:
+                data:
+                    service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+                    options:
+                        output:
+                            - [1, 2, 3]
+                            - [1, 2, 3]
+                    outputs: [iterator]
+
+                iterator:
+                    service: '@CleverAge\ProcessBundle\Task\InputIteratorTask'
+                    outputs: [batch]
+
+                batch:
+                    service: '@CleverAge\ProcessBundle\Task\IterableBatchTask'
                     options:
                         batch_count: 2
                     outputs: [aggregate]

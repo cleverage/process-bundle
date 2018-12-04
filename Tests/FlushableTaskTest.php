@@ -18,7 +18,7 @@ class FlushableTaskTest extends AbstractProcessTest
     /**
      * @throws \Exception
      */
-    public function testSimpleBlocking()
+    public function testSimpleFlushable()
     {
         $result = $this->processManager->execute('test.simple_flushable');
 
@@ -30,11 +30,32 @@ class FlushableTaskTest extends AbstractProcessTest
     /**
      * @throws \Exception
      */
-    public function testSingleBlocking()
+    public function testSingleFlushable()
     {
         $result = $this->processManager->execute('test.single_flushable');
 
         self::assertCount(1, $result);
         self::assertEquals([1], $result[0]);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testSimpleFlushableNoIterable()
+    {
+        $result = $this->processManager->execute('test.simple_flushable_no_iterable');
+
+        self::assertCount(1, $result);
+        self::assertEquals([1], $result[0]);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testIterableFlushable()
+    {
+        $result = $this->processManager->execute('test.iterable_flushable');
+
+        self::assertEquals([1, 2, 3, 1, 2, 3], $result);
     }
 }

@@ -214,6 +214,9 @@ class ProcessManager
             $this->process($taskConfiguration, self::EXECUTE_PROCEED);
         }
 
+        // This task is now finished, we may flush it to test if there is anything lasting
+        $this->flush($taskConfiguration);
+
         $state->setStatus(ProcessState::STATUS_RESOLVED);
 
         return $state->isResolved();
@@ -341,7 +344,6 @@ class ProcessManager
                     if (!$this->hasProcessedIterable($taskConfiguration)) {
                         return; // This means the task is empty
                     }
-                    $this->flush($taskConfiguration);
                     // This means we are over iterating this task so we can remove it from registry
                     $this->removeProcessedIterable($taskConfiguration);
                     if ($state->isStopped()) {
