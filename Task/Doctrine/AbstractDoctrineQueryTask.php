@@ -11,6 +11,7 @@
 namespace CleverAge\ProcessBundle\Task\Doctrine;
 
 use Doctrine\ORM\EntityRepository;
+use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
