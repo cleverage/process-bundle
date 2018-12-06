@@ -17,6 +17,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\DBAL\Driver\PDOStatement;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -96,8 +97,8 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
         // Handle empty results
         if (false === $result) {
             $logContext = ['options' => $options];
-            $this->logger->error('Empty resultset for query', $logContext);
-            $state->setStopped(true);
+            $this->logger->log($options['empty_log_level'], 'Empty resultset for query', $logContext);
+            $state->setSkipped(true);
 
             return;
         }
@@ -177,6 +178,7 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
                 'limit' => null,
                 'offset' => null,
                 'paginate' => null,
+                'empty_log_level' => LogLevel::WARNING,
             ]
         );
         $resolver->setAllowedTypes('connection', ['NULL', 'string']);
@@ -184,6 +186,19 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
         $resolver->setAllowedTypes('paginate', ['NULL', 'int']);
         $resolver->setAllowedTypes('limit', ['NULL', 'integer']);
         $resolver->setAllowedTypes('offset', ['NULL', 'integer']);
+        $resolver->setAllowedValues(
+            'empty_log_level',
+            [
+                LogLevel::ALERT,
+                LogLevel::CRITICAL,
+                LogLevel::DEBUG,
+                LogLevel::EMERGENCY,
+                LogLevel::ERROR,
+                LogLevel::INFO,
+                LogLevel::NOTICE,
+                LogLevel::WARNING,
+            ]
+        );
     }
 
     /**

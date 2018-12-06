@@ -17,6 +17,7 @@ clever_age_process:
 
                 transformer:
                     service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: skip
                     options:
                         transformers:
                             implode:

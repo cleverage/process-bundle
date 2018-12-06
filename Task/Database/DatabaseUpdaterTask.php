@@ -51,12 +51,8 @@ class DatabaseUpdaterTask extends AbstractConfigurableTask
     {
         $statement = $this->initializeStatement($state);
 
-        // Handle empty results
         if (false === $statement->execute()) {
-            $this->logger->critical('Error while executing query: '.$statement->errorInfo());
-            $state->setStopped(true);
-
-            return;
+            throw new \RuntimeException("Error while executing query: {$statement->errorInfo()}");
         }
     }
 
