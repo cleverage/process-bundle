@@ -1,0 +1,9 @@
+parameters:
+    clever_age_process.instanced_transformer.class: CleverAge\ProcessBundle\Transformer\InstancedTransformer
+
+services:
+    CleverAge\ProcessBundle\Factory\InstancedTransformerFactory:
+        public:   false
+        autowire: true
+        arguments:
+            $className: '%clever_age_process.instanced_transformer.class%'

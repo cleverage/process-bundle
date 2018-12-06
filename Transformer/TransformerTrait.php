@@ -11,6 +11,7 @@
 namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
+use CleverAge\ProcessBundle\Factory\InstancedTransformerFactory;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -27,6 +28,9 @@ trait TransformerTrait
     /** @var TransformerRegistry */
     protected $transformerRegistry;
 
+    /** @var InstancedTransformerFactory */
+    protected $instancedTransformerFactory;
+
     /**
      * @param array $transformers
      * @param mixed $value
@@ -38,14 +42,16 @@ trait TransformerTrait
     protected function applyTransformers(array $transformers, $value)
     {
         /** @noinspection ForeachSourceInspection */
-        foreach ($transformers as $transformerCode => $transformerOptions) {
+        foreach ($transformers as $transformerCode => $transformer) {
             try {
-                $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
-                $transformer = $this->transformerRegistry->getTransformer($transformerCode);
-                $value = $transformer->transform(
-                    $value,
-                    $transformerOptions ?: []
-                );
+                if ($transformer instanceof TransformerInterface) {
+                    $value = $transformer->transform($value);
+                } elseif (is_callable($transformer)) {
+                    /** @deprecated TODO remove this part in next major version */
+                    $value = $transformer($value);
+                } else {
+                    throw new \UnexpectedValueException("Transformer {$transformerCode} cannot be executed");
+                }
             } catch (\Throwable $exception) {
                 throw new TransformerException($transformerCode, 0, $exception);
             }
@@ -86,6 +92,7 @@ trait TransformerTrait
 
     /**
      * @param \Symfony\Component\OptionsResolver\OptionsResolver $resolver
+     *
      * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
@@ -103,20 +110,43 @@ trait TransformerTrait
         $resolver->setNormalizer( // This logic is duplicated from the array_map transformer @todo fix me
             'transformers',
             function (Options $options, $transformers) {
+                $transformerInstances = [];
+
                 /** @var array $transformers */
-                foreach ($transformers as $transformerCode => &$transformerOptions) {
-                    $transformerOptionsResolver = new OptionsResolver();
-                    $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
-                    $transformer = $this->transformerRegistry->getTransformer($transformerCode);
-                    if ($transformer instanceof ConfigurableTransformerInterface) {
-                        $transformer->configureOptions($transformerOptionsResolver);
-                        $transformerOptions = $transformerOptionsResolver->resolve(
-                            $transformerOptions ?? []
-                        );
+                foreach ($transformers as $originalTransformerCode => $transformerOptions) {
+                    // Default is an empty array
+                    if ($transformerOptions === null) {
+                        $transformerOptions = [];
+                    } elseif (is_callable($transformerOptions) || $transformerOptions instanceof TransformerInterface) {
+                        // May happen if configureOptions is called twice... but it's not a good idea...
+                        // TODO should throw ?
+                        $transformerInstances[$originalTransformerCode] = $transformerOptions;
+
+                        continue;
+                    }
+
+                    $transformerCode = $this->getCleanedTransfomerCode($originalTransformerCode);
+
+                    if ($this->instancedTransformerFactory instanceof InstancedTransformerFactory) {
+                        $transformerInstances[$originalTransformerCode] = $this->instancedTransformerFactory->create($transformerCode, $transformerOptions);
+                    } else {
+                        /** @deprecated TODO remove this block in next major version */
+                        @trigger_error('Deprecated method (will be dropped), you need to provide instancedTransformerFactory', E_USER_DEPRECATED);
+
+                        $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+                        if ($transformer instanceof ConfigurableTransformerInterface) {
+                            $transformerOptionsResolver = new OptionsResolver();
+                            $transformer->configureOptions($transformerOptionsResolver);
+                            $transformerOptions = $transformerOptionsResolver->resolve($transformerOptions);
+                        }
+
+                        $transformerInstances[$originalTransformerCode] = function ($value) use ($transformer, $transformerOptions) {
+                            return $transformer->transform($value, $transformerOptions);
+                        };
                     }
                 }
 
-                return $transformers;
+                return $transformerInstances;
             }
         );
     }

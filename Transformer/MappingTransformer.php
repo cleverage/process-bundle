@@ -11,6 +11,7 @@
 namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
+use CleverAge\ProcessBundle\Factory\InstancedTransformerFactory;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -34,19 +35,27 @@ class MappingTransformer implements ConfigurableTransformerInterface
     /** @var PropertyAccessorInterface */
     protected $accessor;
 
+    /** @var InstancedTransformerFactory */
+    protected $instancedTransformerFactory;
+
     /**
-     * @param TransformerRegistry       $transformerRegistry
-     * @param LoggerInterface           $logger
-     * @param PropertyAccessorInterface $accessor
+     * MappingTransformer constructor.
+     *
+     * @param TransformerRegistry         $transformerRegistry
+     * @param LoggerInterface             $logger
+     * @param PropertyAccessorInterface   $accessor
+     * @param InstancedTransformerFactory $instancedTransformerFactory
      */
     public function __construct(
         TransformerRegistry $transformerRegistry,
         LoggerInterface $logger,
-        PropertyAccessorInterface $accessor
+        PropertyAccessorInterface $accessor,
+        InstancedTransformerFactory $instancedTransformerFactory
     ) {
         $this->transformerRegistry = $transformerRegistry;
         $this->logger = $logger;
         $this->accessor = $accessor;
+        $this->instancedTransformerFactory = $instancedTransformerFactory;
     }
 
     /**
@@ -61,10 +70,6 @@ class MappingTransformer implements ConfigurableTransformerInterface
      */
     public function transform($input, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
-
         if (!empty($options['initial_value']) && $options['keep_input']) {
             throw new InvalidOptionsException(
                 'The options "initial_value" and "keep_input" can\'t be both enabled.'

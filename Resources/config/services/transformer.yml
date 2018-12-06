@@ -1,6 +1,7 @@
 services:
     CleverAge\ProcessBundle\Transformer\:
         resource: '../../../Transformer/*'
+        exclude: '../../../Transformer/InstancedTransformer.php'
         autowire: true
         public: false
         tags:

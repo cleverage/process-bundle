@@ -10,8 +10,8 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Exception\TransformerException;
+use CleverAge\ProcessBundle\Factory\InstancedTransformerFactory;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
@@ -36,15 +36,21 @@ class TransformerTask extends AbstractConfigurableTask
     /** @var TransformerInterface */
     protected $transformer;
 
+    /** @var InstancedTransformerFactory */
+    protected $instancedTransformerFactory;
+
     /**
-     * @param LoggerInterface     $logger
-     * @param TransformerRegistry $transformerRegistry
+     * TransformerTask constructor.
      *
+     * @param LoggerInterface             $logger
+     * @param TransformerRegistry         $transformerRegistry
+     * @param InstancedTransformerFactory $instancedTransformerFactory
      */
-    public function __construct(LoggerInterface $logger, TransformerRegistry $transformerRegistry)
+    public function __construct(LoggerInterface $logger, TransformerRegistry $transformerRegistry, InstancedTransformerFactory $instancedTransformerFactory)
     {
         $this->logger = $logger;
         $this->transformerRegistry = $transformerRegistry;
+        $this->instancedTransformerFactory = $instancedTransformerFactory;
     }
 
     /**
