@@ -22,13 +22,16 @@ use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 class TransformerRegistry
 {
     /** @var TransformerInterface[] */
-    protected $transformers;
+    protected $transformers = [];
 
     /**
      * @param TransformerInterface $transformer
      */
     public function addTransformer(TransformerInterface $transformer)
     {
+        if (array_key_exists($transformer->getCode(), $this->transformers)) {
+            throw new \UnexpectedValueException("Transformer {$transformer->getCode()} is already defined");
+        }
         $this->transformers[$transformer->getCode()] = $transformer;
     }
 

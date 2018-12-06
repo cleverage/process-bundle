@@ -14,6 +14,7 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
@@ -60,7 +61,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
         }
 
         if (!$this->files->valid()) {
-            $this->logger->warning("No item found in path {$options['folder_path']}");
+            $this->logger->log($options['empty_log_level'], "No item found in path {$options['folder_path']}");
             $state->setSkipped(true);
             $state->setErrorOutput($options['folder_path']);
 
@@ -129,8 +130,22 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
         $resolver->setDefaults(
             [
                 'name_pattern' => null,
+                'empty_log_level' => LogLevel::WARNING,
             ]
         );
         $resolver->setAllowedTypes('name_pattern', ['NULL', 'string']);
+        $resolver->setAllowedValues(
+            'empty_log_level',
+            [
+                LogLevel::ALERT,
+                LogLevel::CRITICAL,
+                LogLevel::DEBUG,
+                LogLevel::EMERGENCY,
+                LogLevel::ERROR,
+                LogLevel::INFO,
+                LogLevel::NOTICE,
+                LogLevel::WARNING,
+            ]
+        );
     }
 }

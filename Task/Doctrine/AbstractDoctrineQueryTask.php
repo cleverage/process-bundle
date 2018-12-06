@@ -39,12 +39,26 @@ abstract class AbstractDoctrineQueryTask extends AbstractDoctrineTask
                 'order_by' => [],
                 'limit' => null,
                 'offset' => null,
+                'empty_log_level' => LogLevel::WARNING,
             ]
         );
         $resolver->setAllowedTypes('criteria', ['array']);
         $resolver->setAllowedTypes('order_by', ['array']);
         $resolver->setAllowedTypes('limit', ['NULL', 'integer']);
         $resolver->setAllowedTypes('offset', ['NULL', 'integer']);
+        $resolver->setAllowedValues(
+            'empty_log_level',
+            [
+                LogLevel::ALERT,
+                LogLevel::CRITICAL,
+                LogLevel::DEBUG,
+                LogLevel::EMERGENCY,
+                LogLevel::ERROR,
+                LogLevel::INFO,
+                LogLevel::NOTICE,
+                LogLevel::WARNING,
+            ]
+        );
     }
 
     /**
