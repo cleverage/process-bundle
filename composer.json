@@ -39,11 +39,21 @@
     "require": {
         "php": ">=7.1",
         "ext-json": "*",
-        "symfony/symfony": "~3.0|~4.0",
+
+        "symfony/framework-bundle": "~3.0|~4.0",
         "doctrine/orm": "~2.5",
         "doctrine/doctrine-bundle": "~1.6",
         "symfony/expression-language": "~3.0|~4.0",
         "symfony/monolog-bundle": "~3.3",
+        "symfony/console": "~3.0|~4.0",
+        "symfony/options-resolver": "~3.0|~4.0",
+        "symfony/process": "~3.0|~4.0",
+        "symfony/property-access": "~3.0|~4.0",
+        "symfony/serializer": "~3.0|~4.0",
+        "symfony/swiftmailer-bundle": "~3.0|~4.0",
+        "symfony/validator": "~3.0|~4.0",
+        "symfony/yaml": "~3.0|~4.0",
+
         "sidus/base-bundle": "~1.0"
     },
     "require-dev": {
