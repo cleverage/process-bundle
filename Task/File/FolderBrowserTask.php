@@ -64,6 +64,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
             $this->logger->log($options['empty_log_level'], "No item found in path {$options['folder_path']}");
             $state->setSkipped(true);
             $state->setErrorOutput($options['folder_path']);
+            $this->files = null;
 
             return;
         }
@@ -81,14 +82,12 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
      *
      * @param ProcessState $state
      *
-     * @throws \LogicException
-     *
      * @return bool
      */
     public function next(ProcessState $state)
     {
         if (!$this->files) {
-            throw new \LogicException('No file iterator defined');
+            return false;
         }
         $this->files->next();
         $state->removeErrorContext('current_file_path');

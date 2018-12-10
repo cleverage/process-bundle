@@ -55,8 +55,8 @@ class DoctrineReaderTask extends AbstractDoctrineQueryTask implements IterableTa
      */
     public function next(ProcessState $state)
     {
-        if (!$this->iterator instanceof IterableResult) {
-            throw new \LogicException('No iterator initialized');
+        if (!$this->iterator) {
+            return false;
         }
         $this->iterator->next();
 
@@ -93,6 +93,7 @@ class DoctrineReaderTask extends AbstractDoctrineQueryTask implements IterableTa
             $logContext = ['options' => $options];
             $this->logger->log($options['empty_log_level'], 'Empty resultset for query', $logContext);
             $state->setSkipped(true);
+            $this->iterator = null;
 
             return;
         }
