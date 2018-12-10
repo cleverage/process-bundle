@@ -32,6 +32,13 @@ class InputCsvReaderTask extends CsvReaderTask
         $options = parent::getOptions($state);
         if (null !== $state->getInput()) {
             $options['file_path'] = $this->getFilePath($options, $state->getInput());
+        } else {
+            throw new \InvalidArgumentException("Input must be defined");
+        }
+
+        if (!isset($options['file_path'])) {
+            $state->addErrorContextValue('input', $state->getInput());
+            throw new \UnexpectedValueException("Could not determine file path from input");
         }
 
         return $options;
@@ -65,9 +72,9 @@ class InputCsvReaderTask extends CsvReaderTask
     {
         $basePath = $options['base_path'];
         if (\strlen($basePath) > 0) {
-            $basePath = rtrim($options['base_path'], '/').'/';
+            $basePath = rtrim($options['base_path'], '/') . '/';
         }
 
-        return $basePath.$input;
+        return $basePath . $input;
     }
 }
