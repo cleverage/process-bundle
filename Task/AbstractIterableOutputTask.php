@@ -42,6 +42,7 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
             $state->setOutput($this->iterator->current());
         } else {
             $state->setSkipped(true);
+            $this->iterator = null;
         }
     }
 
@@ -56,6 +57,9 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
      */
     public function next(ProcessState $state)
     {
+        if (!$this->iterator) {
+            return false;
+        }
         $this->iterator->next();
 
         $state->removeErrorContext('iterator_key');

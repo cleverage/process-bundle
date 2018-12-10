@@ -45,7 +45,9 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
         $this->logger = $logger;
     }
 
-
+    /**
+     * @param ProcessState $state
+     */
     public function initialize(ProcessState $state)
     {
         parent::initialize($state);
@@ -59,8 +61,11 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     public function flush(ProcessState $state)
     {
         $this->flushMode = true;
-
-        $state->setOutput($this->outputQueue->dequeue());
+        if ($this->outputQueue->isEmpty()) {
+            $state->setSkipped(true);
+        } else {
+            $state->setOutput($this->outputQueue->dequeue());
+        }
     }
 
     /**
@@ -92,6 +97,21 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     }
 
     /**
+     * @param ProcessState $state
+     *
+     * @return bool
+     */
+    public function next(ProcessState $state)
+    {
+        // Stop flushing once over
+        if (!\count($this->outputQueue)) {
+            $this->flushMode = false;
+        }
+
+        return $this->flushMode;
+    }
+
+    /**
      * @param OptionsResolver $resolver
      *
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
@@ -108,21 +128,6 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     }
 
     /**
-     * @param ProcessState $state
-     *
-     * @return bool
-     */
-    public function next(ProcessState $state)
-    {
-        // Stop flushing once over
-        if (!\count($this->outputQueue)) {
-            $this->flushMode = false;
-        }
-
-        return $this->flushMode;
-    }
-
-    /**
      * Override this method to add a custom processing behavior
      *
      * @param ProcessState $state
@@ -133,5 +138,4 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     {
         return $state->getInput();
     }
-
 }

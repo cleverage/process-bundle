@@ -40,6 +40,7 @@ class InputIteratorTask implements IterableTaskInterface
             $state->setOutput($this->iterator->current());
         } else {
             $state->setSkipped(true);
+            $this->iterator = null;
         }
     }
 
@@ -54,6 +55,9 @@ class InputIteratorTask implements IterableTaskInterface
      */
     public function next(ProcessState $state)
     {
+        if (!$this->iterator) {
+            return false;
+        }
         $this->iterator->next();
         $state->removeErrorContext('iterate_on_array_key');
 
@@ -67,19 +71,20 @@ class InputIteratorTask implements IterableTaskInterface
      */
     protected function handleIteratorFromInput(ProcessState $state)
     {
-        // No action needed, execution is in progress
-        if ($this->iterator instanceof \Iterator && $this->iterator->valid()) {
-            return;
-        }
-
-        // Cleanup invalid iterator => prepare for new iteration cycle
-        if ($this->iterator instanceof \Iterator && !$this->iterator->valid()) {
+        if ($this->iterator instanceof \Iterator) {
+            if ($this->iterator->valid()) {
+                // No action needed, execution is in progress
+                return;
+            }
+            // Cleanup invalid iterator => prepare for new iteration cycle
             $this->iterator = null;
         }
 
         // This should never be reached
-        if ($this->iterator !== null) {
-            throw new \UnexpectedValueException("At this point iterator should have been null, maybe it's a wrong type...");
+        if (null !== $this->iterator) {
+            throw new \UnexpectedValueException(
+                "At this point iterator should have been null, maybe it's a wrong type..."
+            );
         }
 
         // Create iterator
@@ -91,7 +96,7 @@ class InputIteratorTask implements IterableTaskInterface
 
         // Assert iterator is OK
         if (!$this->iterator instanceof \Iterator) {
-            throw new \UnexpectedValueException("Cannot create iterator from input");
+            throw new \UnexpectedValueException('Cannot create iterator from input');
         }
     }
 }

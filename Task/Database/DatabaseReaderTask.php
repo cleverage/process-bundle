@@ -63,8 +63,8 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
      */
     public function next(ProcessState $state)
     {
-        if (!$this->statement instanceof PDOStatement) {
-            throw new \LogicException('No iterator initialized');
+        if (!$this->statement) {
+            return false;
         }
 
         $this->nextItem = $this->statement->fetch();
@@ -99,6 +99,7 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
             $logContext = ['options' => $options];
             $this->logger->log($options['empty_log_level'], 'Empty resultset for query', $logContext);
             $state->setSkipped(true);
+            $this->statement = null;
 
             return;
         }
