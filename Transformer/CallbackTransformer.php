@@ -100,7 +100,9 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         $resolver->setNormalizer(
             'additional_parameters',
             function (Options $options, $value) {
-                @trigger_error('The "additional_parameters" option is deprecated. Use "right_parameters" instead.', E_USER_DEPRECATED);
+                if ($value) {
+                    @trigger_error('The "additional_parameters" option is deprecated. Use "right_parameters" instead.', E_USER_DEPRECATED);
+                }
 
                 return $value;
             }
