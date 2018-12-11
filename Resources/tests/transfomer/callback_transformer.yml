@@ -1,0 +1,64 @@
+clever_age_process:
+    configurations:
+        test.callback_transformer.simple:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            callback:
+                                callback: '\CleverAge\ProcessBundle\Tests\Transformer\CallbackTransformerTest::doCallback'
+
+
+        test.callback_transformer.left_parameters:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            callback:
+                                callback: '\CleverAge\ProcessBundle\Tests\Transformer\CallbackTransformerTest::doCallback'
+                                left_parameters:
+                                    - '1'
+                                    - '2'
+
+
+        test.callback_transformer.right_parameters:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            callback:
+                                callback: '\CleverAge\ProcessBundle\Tests\Transformer\CallbackTransformerTest::doCallback'
+                                right_parameters:
+                                    - '4'
+                                    - '5'
+
+
+        test.callback_transformer.left_right_parameters:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            callback:
+                                callback: '\CleverAge\ProcessBundle\Tests\Transformer\CallbackTransformerTest::doCallback'
+                                left_parameters:
+                                    - '1'
+                                    - '2'
+                                right_parameters:
+                                    - '4'
+                                    - '5'
