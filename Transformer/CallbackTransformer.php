@@ -10,9 +10,9 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 /**
  * Convert input based on a callback
@@ -38,8 +38,13 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         $this->configureOptions($resolver);
         $options = $resolver->resolve($options);
 
-        $parameters = $options['additional_parameters'];
-        array_unshift($parameters, $value);
+        if (array_key_exists('additional_parameters', $options)
+            && !array_key_exists('right_parameters', $options)) {
+            $options['right_parameters'] = $options['additional_parameters'];
+        }
+
+        $parameters = $options['left_parameters'];
+        array_push($parameters, $value, ...$options['right_parameters']);
 
         return \call_user_func_array($options['callback'], $parameters);
     }
@@ -80,9 +85,27 @@ class CallbackTransformer implements ConfigurableTransformerInterface
                 return $value;
             }
         );
-        $resolver->setDefaults([
-            'additional_parameters' => [],
-        ]);
+        $resolver->setDefaults(
+            [
+                'left_parameters' => [],
+                'right_parameters' => [],
+                'additional_parameters' => [],
+            ]
+        );
+        $resolver->setAllowedTypes('left_parameters', ['array']);
+        $resolver->setAllowedTypes('right_parameters', ['array']);
         $resolver->setAllowedTypes('additional_parameters', ['array']);
+
+        /** @noinspection PhpUnusedParameterInspection */
+        $resolver->setNormalizer(
+            'additional_parameters',
+            function (Options $options, $value) {
+                if ($value) {
+                    @trigger_error('The "additional_parameters" option is deprecated. Use "right_parameters" instead.', E_USER_DEPRECATED);
+                }
+
+                return $value;
+            }
+        );
     }
 }
