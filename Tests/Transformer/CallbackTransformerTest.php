@@ -64,6 +64,18 @@ class CallbackTransformerTest extends AbstractProcessTest
     /**
      * Assert data is correctly filtered
      */
+    public function testAdditionalParametersCallback()
+    {
+        $input = '6';
+
+        $result = $this->processManager->execute('test.callback_transformer.additional_parameters', $input);
+
+        self::assertEquals('6-7-8', $result);
+    }
+
+    /**
+     * Assert data is correctly filtered
+     */
     public function testLeftAndRightParametersCallback()
     {
         $input = '3';

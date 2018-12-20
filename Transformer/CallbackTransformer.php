@@ -38,8 +38,8 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         $this->configureOptions($resolver);
         $options = $resolver->resolve($options);
 
-        if (array_key_exists('additional_parameters', $options)
-            && !array_key_exists('right_parameters', $options)) {
+        if (count($options['additional_parameters'])
+            && !count($options['right_parameters'])) {
             $options['right_parameters'] = $options['additional_parameters'];
         }
 
