@@ -402,6 +402,7 @@ class ProcessManager
         // Manage exception catching and setting the same
         if ($exception) {
             $this->taskLogger->log($taskConfiguration->getLogLevel(), $exception->getMessage(), $state->getErrorContext());
+            $state->setException($exception);
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
                 if (null === $state->getErrorOutput()) {
