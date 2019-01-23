@@ -10,20 +10,17 @@
 
 namespace CleverAge\ProcessBundle\Tests;
 
+use CleverAge\ProcessBundle\EventListener\DataQueueEventListener;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use CleverAge\ProcessBundle\EventListener\DataQueueEventListener;
 
 /**
  * Provide all necessary setup to test a process
  */
 abstract class AbstractProcessTest extends KernelTestCase
 {
-    /** @var  ContainerInterface */
-    protected $container;
 
     /** @var ProcessManager */
     protected $processManager;
@@ -36,16 +33,8 @@ abstract class AbstractProcessTest extends KernelTestCase
      */
     protected function setUp()
     {
-        $kernel = static::bootKernel(
-            [
-                'environment' => 'test',
-                'debug' => true,
-            ]
-        );
-
-        $this->container = $kernel->getContainer();
-        $this->processManager = $this->container->get(ProcessManager::class);
-        $this->processConfigurationRegistry = $this->container->get(ProcessConfigurationRegistry::class);
+        $this->processManager = static::$container->get(ProcessManager::class);
+        $this->processConfigurationRegistry = static::$container->get(ProcessConfigurationRegistry::class);
     }
 
     /**
@@ -58,7 +47,7 @@ abstract class AbstractProcessTest extends KernelTestCase
      */
     protected function assertDataQueue(array $expected, string $processName, bool $checkTask = true)
     {
-        $dataQueueListener = $this->container->get(DataQueueEventListener::class);
+        $dataQueueListener = static::$container->get(DataQueueEventListener::class);
         $actualQueue = $dataQueueListener->getQueue($processName);
 
         self::assertEquals(\count($expected), \count($actualQueue), 'Event count does not match');
