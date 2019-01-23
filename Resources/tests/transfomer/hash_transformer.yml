@@ -1,0 +1,25 @@
+clever_age_process:
+    configurations:
+        test.hash_transformer.md5:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            hash:
+                                algo: 'md5'
+
+        test.hash_transformer.sha512:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            hash:
+                                algo: 'sha512'
