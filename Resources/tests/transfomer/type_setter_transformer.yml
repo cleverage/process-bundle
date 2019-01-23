@@ -1,0 +1,37 @@
+clever_age_process:
+    configurations:
+        test.type_setter_transformer.int_to_int:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            type_setter:
+                                type: 'integer'
+
+        test.type_setter_transformer.string_to_int:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            type_setter:
+                                type: 'integer'
+
+        test.type_setter_transformer.int_to_string:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            type_setter:
+                                type: 'string'
