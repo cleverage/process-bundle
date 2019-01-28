@@ -39,8 +39,17 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
 
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
-        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
         $options = $resolver->resolve($options);
+
+        if (!is_string($value) && !is_int($value)) { // If not a valid array index
+            if (!$options['auto_cast']) {
+                $type = gettype($value);
+                throw new \UnexpectedValueException(
+                    "Value of type {$type} is not a valid array index, set auto_cast to true to cast it to a string"
+                );
+            }
+            $value = (string) $value; // Let's cast it to string
+        }
 
         if (!array_key_exists($value, $options['map'])) {
             if ($options['keep_missing']) {
@@ -79,11 +88,15 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
             ]
         );
         $resolver->setAllowedTypes('map', ['array']);
-        $resolver->setDefaults([
-            'ignore_missing' => false,
-            'keep_missing' => false,
-        ]);
+        $resolver->setDefaults(
+            [
+                'ignore_missing' => false,
+                'keep_missing' => false,
+                'auto_cast' => false,
+            ]
+        );
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
         $resolver->setAllowedTypes('keep_missing', ['boolean']);
+        $resolver->setAllowedTypes('auto_cast', ['boolean']);
     }
 }
