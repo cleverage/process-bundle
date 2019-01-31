@@ -57,6 +57,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
         }
         if ($this->preInitCounter < $this->getOption($state, 'skip_first')) {
             $this->preInitCounter++;
+            $state->setSkipped(true);
 
             return;
         }
@@ -73,6 +74,8 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
             $fullText .= " in {$now->diff($this->startedAt)->format('%H:%I:%S')}";
 
             $this->logger->info($fullText);
+        } else {
+            $state->setSkipped(true);
         }
         $this->counter++;
         $this->lastUpdate = $now;

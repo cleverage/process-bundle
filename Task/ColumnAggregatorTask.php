@@ -10,7 +10,6 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -19,9 +18,13 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+/**
+ * @todo @vclavreul describe this task
+ *
+ * @author Valentin Clavreul <vclavreul@clever-age.com>
+ */
 class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
-
     use ConditionTrait;
 
     /**
@@ -45,6 +48,9 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         $this->logger = $logger;
     }
 
+    /**
+     * @param ProcessState $state
+     */
     public function execute(ProcessState $state)
     {
         $input = $state->getInput();
@@ -59,7 +65,12 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
             }
 
             if ($this->checkCondition(['input_column_value' => $input[$column], 'input' => $input], $conditions)) {
-                $this->addValueToAggregationGroup($column, $input, $this->getOption($state, 'reference_key'), $this->getOption($state, 'aggregation_key'));
+                $this->addValueToAggregationGroup(
+                    $column,
+                    $input,
+                    $this->getOption($state, 'reference_key'),
+                    $this->getOption($state, 'aggregation_key')
+                );
             }
         }
 
@@ -75,11 +86,20 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         }
     }
 
+    /**
+     * @param ProcessState $state
+     */
     public function proceed(ProcessState $state)
     {
         $state->setOutput($this->result);
     }
 
+    /**
+     * @param string $column
+     * @param mixed  $input
+     * @param string $referenceKey
+     * @param string $aggregationKey
+     */
     protected function addValueToAggregationGroup($column, $input, $referenceKey, $aggregationKey)
     {
         if (!isset($this->result[$column])) {
@@ -92,6 +112,9 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         $this->result[$column][$aggregationKey][] = $input;
     }
 
+    /**
+     * @param OptionsResolver $resolver
+     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired('columns');
@@ -108,6 +131,4 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         $resolver->setDefault('ignore_missing', false);
         $resolver->setAllowedTypes('ignore_missing', 'boolean');
     }
-
-
 }
