@@ -59,6 +59,7 @@
     },
     "suggest": {
         "doctrine/orm": "~2.5",
-        "doctrine/doctrine-bundle": "~1.6"
+        "doctrine/doctrine-bundle": "~1.6",
+        "oneup/flysystem-bundle": "~1.13"
     }
 }

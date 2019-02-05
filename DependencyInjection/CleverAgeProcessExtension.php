@@ -36,8 +36,15 @@ class CleverAgeProcessExtension extends SidusBaseExtension
         parent::load($configs, $container);
 
         $loader = new ServiceLoader($container);
+        $bundles = $container->getParameter('kernel.bundles');
+
         if (class_exists('\Doctrine\ORM\Version')) {
             $serviceFolderPath = __DIR__.'/../Resources/config/services-doctrine';
+            $loader->loadFiles($serviceFolderPath);
+        }
+
+        if (array_key_exists('OneupFlysystemBundle', $bundles)) {
+            $serviceFolderPath = __DIR__.'/Resources/config/services-flysystem';
             $loader->loadFiles($serviceFolderPath);
         }
 
