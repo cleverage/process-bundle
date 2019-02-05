@@ -53,7 +53,7 @@ class TransformerRegistry
     public function getTransformer($code)
     {
         if (!$this->hasTransformer($code)) {
-            throw new MissingTransformerException($code);
+            throw MissingTransformerException::create($code);
         }
 
         return $this->transformers[$code];

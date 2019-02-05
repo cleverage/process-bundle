@@ -20,9 +20,13 @@ class MissingTransformerException extends \UnexpectedValueException implements P
 {
     /**
      * @param string $code
+     *
+     * @return MissingTransformerException
      */
-    public function __construct($code)
+    public static function create($code)
     {
-        parent::__construct("No transformer with code : {$code}");
+        $errorStr = "No transformer with code : {$code}";
+
+        return new self($errorStr);
     }
 }
