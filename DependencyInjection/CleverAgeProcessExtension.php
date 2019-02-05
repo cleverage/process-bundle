@@ -22,6 +22,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
+ * @author Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class CleverAgeProcessExtension extends SidusBaseExtension
 {
@@ -45,6 +46,11 @@ class CleverAgeProcessExtension extends SidusBaseExtension
 
         if (array_key_exists('OneupFlysystemBundle', $bundles)) {
             $serviceFolderPath = __DIR__.'/Resources/config/services-flysystem';
+            $loader->loadFiles($serviceFolderPath);
+        }
+
+        if (extension_loaded('soap')) {
+            $serviceFolderPath = __DIR__.'/../Resources/config/services-soap';
             $loader->loadFiles($serviceFolderPath);
         }
 

@@ -58,6 +58,7 @@
         "phpunit/phpunit": "~6.4"
     },
     "suggest": {
+        "ext-soap": "*",
         "doctrine/orm": "~2.5",
         "doctrine/doctrine-bundle": "~1.6",
         "oneup/flysystem-bundle": "~1.13"
