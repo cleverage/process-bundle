@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace CleverAge\ProcessBundle\Task\Database;
+namespace CleverAge\ProcessBundle\Addon\Doctrine\Task\Database;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -63,7 +63,7 @@ class DatabaseUpdaterTask extends AbstractConfigurableTask
      * @throws \InvalidArgumentException
      * @throws \Doctrine\DBAL\DBALException
      *
-     * @return \Doctrine\DBAL\Driver\Statement
+     * @return \Doctrine\DBAL\Driver\ResultStatement
      */
     protected function initializeStatement(ProcessState $state)
     {

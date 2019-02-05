@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace CleverAge\ProcessBundle\Task\Doctrine;
+namespace CleverAge\ProcessBundle\Addon\Doctrine\Task\EntityManager;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;

@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace CleverAge\ProcessBundle\Task\Doctrine;
+namespace CleverAge\ProcessBundle\Addon\Doctrine\Task\EntityManager;
 
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -32,7 +32,6 @@ class DoctrineBatchWriterTask extends AbstractDoctrineTask implements FlushableT
      *
      * @throws \Doctrine\ORM\ORMInvalidArgumentException
      * @throws \UnexpectedValueException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \InvalidArgumentException
      */
     public function flush(ProcessState $state)
@@ -80,8 +79,6 @@ class DoctrineBatchWriterTask extends AbstractDoctrineTask implements FlushableT
     /**
      * @param ProcessState $state
      *
-     * @throws \UnexpectedValueException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \UnexpectedValueException
      */
     protected function writeBatch(ProcessState $state): void

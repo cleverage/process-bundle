@@ -161,7 +161,7 @@ clever_age_process:
             entry_point: read
             tasks:
                 read:
-                    service: '@CleverAge\ProcessBundle\Task\Doctrine\DoctrineReaderTask'
+                    service: '@CleverAge\ProcessBundle\Addon\Doctrine\Task\EntityManager\DoctrineReaderTask'
                     options:
                         class_name: MyNamespace\FooBarBundle\Entity\Data
                     outputs: [normalize]

@@ -10,14 +10,15 @@
 
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
+use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use Sidus\BaseBundle\DependencyInjection\Loader\ServiceLoader;
 use Sidus\BaseBundle\DependencyInjection\SidusBaseExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 
 /**
  * This is the class that loads and manages your bundle configuration.
  *
- * @see http://symfony.com/doc/current/cookbook/bundles/extension.html
+ * @see    http://symfony.com/doc/current/cookbook/bundles/extension.html
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
@@ -33,6 +34,12 @@ class CleverAgeProcessExtension extends SidusBaseExtension
     public function load(array $configs, ContainerBuilder $container)
     {
         parent::load($configs, $container);
+
+        $loader = new ServiceLoader($container);
+        if (class_exists('\Doctrine\ORM\Version')) {
+            $serviceFolderPath = __DIR__.'/../Resources/config/services-doctrine';
+            $loader->loadFiles($serviceFolderPath);
+        }
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
