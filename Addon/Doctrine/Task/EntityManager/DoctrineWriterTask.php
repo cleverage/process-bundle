@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace CleverAge\ProcessBundle\Task\Doctrine;
+namespace CleverAge\ProcessBundle\Addon\Doctrine\Task\EntityManager;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Util\ClassUtils;
@@ -28,6 +28,7 @@ class DoctrineWriterTask extends AbstractDoctrineTask
      * @param ProcessState $state
      *
      * @throws \Doctrine\ORM\ORMException
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     public function execute(ProcessState $state)
     {

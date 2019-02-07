@@ -6,7 +6,7 @@ Reads data from a Doctrine Repository.
 Task reference
 --------------
 
-* **Service**: `CleverAge\ProcessBundle\Task\Doctrine\DoctrineReaderTask`
+* **Service**: `CleverAge\ProcessBundle\Addon\Doctrine\Task\EntityManager\DoctrineReaderTask`
 * **Iterable task**
 
 Accepted inputs

@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace CleverAge\ProcessBundle\Task\Doctrine;
+namespace CleverAge\ProcessBundle\Addon\Doctrine\Task\EntityManager;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -47,6 +47,8 @@ class PurgeDoctrineCacheTask extends AbstractConfigurableTask
 
     /**
      * @param ProcessState $state
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
@@ -65,6 +67,8 @@ class PurgeDoctrineCacheTask extends AbstractConfigurableTask
     /**
      * @param EntityManagerInterface $entityManager
      * @param ProcessState           $state
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     protected function purgeEntityManagerCache(EntityManagerInterface $entityManager, ProcessState $state): void
     {

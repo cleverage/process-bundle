@@ -41,8 +41,6 @@
         "ext-json": "*",
 
         "symfony/framework-bundle": "~3.0|~4.0",
-        "doctrine/orm": "~2.5",
-        "doctrine/doctrine-bundle": "~1.6",
         "symfony/expression-language": "~3.0|~4.0",
         "symfony/monolog-bundle": "~3.3",
         "symfony/console": "~3.0|~4.0",
@@ -58,5 +56,10 @@
     },
     "require-dev": {
         "phpunit/phpunit": "~6.4"
+    },
+    "suggest": {
+        "doctrine/orm": "~2.5",
+        "doctrine/doctrine-bundle": "~1.6",
+        "oneup/flysystem-bundle": "~1.13"
     }
 }
