@@ -54,6 +54,11 @@ class CleverAgeProcessExtension extends SidusBaseExtension
             $loader->loadFiles($serviceFolderPath);
         }
 
+        if (class_exists('\Httpful\Request')) {
+            $serviceFolderPath = __DIR__.'/../Resources/config/services-rest';
+            $loader->loadFiles($serviceFolderPath);
+        }
+
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 

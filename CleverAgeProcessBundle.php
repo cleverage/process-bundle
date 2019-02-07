@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle;
 
+use CleverAge\ProcessBundle\Addon\Rest\Registry as RestRegistry;
 use CleverAge\ProcessBundle\Addon\Soap\Registry as SoapRegistry;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
@@ -17,8 +18,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
+ * Class CleverAgeProcessBundle
+ *
  * @author  Valentin Clavreul <vclavreul@clever-age.com>
  * @author  Vincent Chalnot <vchalnot@clever-age.com>
+ * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class CleverAgeProcessBundle extends Bundle
 {
@@ -42,6 +46,16 @@ class CleverAgeProcessBundle extends Bundle
                 new RegistryCompilerPass(
                     SoapRegistry::class,
                     'cleverage.soap.client',
+                    'addClient'
+                )
+            );
+        }
+
+        if (class_exists('\Httpful\Request')) {
+            $container->addCompilerPass(
+                new RegistryCompilerPass(
+                    RestRegistry::class,
+                    'cleverage.rest.client',
                     'addClient'
                 )
             );

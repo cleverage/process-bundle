@@ -61,6 +61,7 @@
         "ext-soap": "*",
         "doctrine/orm": "~2.5",
         "doctrine/doctrine-bundle": "~1.6",
-        "oneup/flysystem-bundle": "~1.13"
+        "oneup/flysystem-bundle": "~1.13",
+        "nategood/httpful": "~0.2.20"
     }
 }
