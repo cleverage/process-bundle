@@ -20,9 +20,13 @@ class MissingProcessException extends \UnexpectedValueException implements Proce
 {
     /**
      * @param string $code
+     *
+     * @return MissingProcessException
      */
-    public function __construct($code)
+    public static function create($code)
     {
-        parent::__construct("No process with code : {$code}");
+        $errorStr = "No process with code : {$code}";
+
+        return new self($errorStr);
     }
 }

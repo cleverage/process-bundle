@@ -176,7 +176,7 @@ class ProcessConfiguration
     public function getTaskConfiguration(string $taskCode): TaskConfiguration
     {
         if (!array_key_exists($taskCode, $this->taskConfigurations)) {
-            throw new MissingTaskConfigurationException($taskCode);
+            throw MissingTaskConfigurationException::create($taskCode);
         }
 
         return $this->taskConfigurations[$taskCode];

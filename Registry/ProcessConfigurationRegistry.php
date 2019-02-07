@@ -113,7 +113,7 @@ class ProcessConfigurationRegistry
     public function getProcessConfiguration(string $processCode): ProcessConfiguration
     {
         if (!$this->hasProcessConfiguration($processCode)) {
-            throw new MissingProcessException($processCode);
+            throw MissingProcessException::create($processCode);
         }
 
         return $this->processConfigurations[$processCode];

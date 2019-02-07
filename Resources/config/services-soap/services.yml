@@ -1,0 +1,3 @@
+services:
+    CleverAge\ProcessBundle\Addon\Soap\Registry:
+        public: false

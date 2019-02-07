@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle;
 
+use CleverAge\ProcessBundle\Addon\Soap\Registry as SoapRegistry;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -35,5 +36,15 @@ class CleverAgeProcessBundle extends Bundle
                 'addTransformer'
             )
         );
+
+        if (extension_loaded('soap')) {
+            $container->addCompilerPass(
+                new RegistryCompilerPass(
+                    SoapRegistry::class,
+                    'cleverage.soap.client',
+                    'addClient'
+                )
+            );
+        }
     }
 }

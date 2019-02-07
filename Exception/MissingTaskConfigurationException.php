@@ -20,9 +20,13 @@ class MissingTaskConfigurationException extends \UnexpectedValueException implem
 {
     /**
      * @param string $code
+     *
+     * @return MissingTaskConfigurationException
      */
-    public function __construct($code)
+    public static function create($code)
     {
-        parent::__construct("No task configuration with code : {$code}");
+        $errorStr = "No task configuration with code : {$code}";
+
+        return new self($errorStr);
     }
 }

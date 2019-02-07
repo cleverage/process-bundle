@@ -1,0 +1,8 @@
+services:
+    CleverAge\ProcessBundle\Addon\Soap\Transformer\:
+        resource: '../../../Addon/Soap/Transformer/*'
+        autowire: true
+        public: false
+        tags:
+            - { name: cleverage.transformer }
+            - { name: monolog.logger, channel: cleverage_process_transformer }
