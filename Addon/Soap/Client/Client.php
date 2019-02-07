@@ -26,7 +26,7 @@ class Client implements ClientInterface
     private $wsdl;
 
     /** @var array */
-    private $options = [];
+    private $options;
 
     /** @var LoggerInterface */
     private $logger;
