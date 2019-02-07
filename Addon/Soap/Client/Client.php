@@ -22,7 +22,7 @@ class Client implements ClientInterface
     /** @var string */
     private $code;
 
-    /** @var string */
+    /** @var string|null */
     private $wsdl;
 
     /** @var array */
@@ -51,10 +51,10 @@ class Client implements ClientInterface
      *
      * @param LoggerInterface $logger
      * @param string          $code
-     * @param string          $wsdl
+     * @param string|null     $wsdl
      * @param array           $options
      */
-    public function __construct(LoggerInterface $logger, string $code, string $wsdl, array $options)
+    public function __construct(LoggerInterface $logger, string $code, ?string $wsdl, array $options)
     {
         $this->logger = $logger;
         $this->code = $code;
