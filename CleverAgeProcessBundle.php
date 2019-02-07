@@ -10,9 +10,9 @@
 
 namespace CleverAge\ProcessBundle;
 
+use CleverAge\ProcessBundle\Addon\Soap\Registry as SoapRegistry;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
-use CleverAge\ProcessBundle\Soap\Registry as SoapRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 

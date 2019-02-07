@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace CleverAge\ProcessBundle\Soap\Exception;
+namespace CleverAge\ProcessBundle\Addon\Soap\Exception;
 
 use CleverAge\ProcessBundle\Exception\ProcessExceptionInterface;
 

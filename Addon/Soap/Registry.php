@@ -8,10 +8,10 @@
 * file that was distributed with this source code.
 */
 
-namespace CleverAge\ProcessBundle\Soap;
+namespace CleverAge\ProcessBundle\Addon\Soap;
 
-use CleverAge\ProcessBundle\Soap\Client\ClientInterface;
-use CleverAge\ProcessBundle\Soap\Exception\MissingClientException;
+use CleverAge\ProcessBundle\Addon\Soap\Client\ClientInterface;
+use CleverAge\ProcessBundle\Addon\Soap\Exception\MissingClientException;
 
 /**
  * Holds all tagged soap client services

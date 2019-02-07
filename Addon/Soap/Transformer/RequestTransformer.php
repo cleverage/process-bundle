@@ -8,9 +8,9 @@
 * file that was distributed with this source code.
 */
 
-namespace CleverAge\ProcessBundle\Soap\Transformer;
+namespace CleverAge\ProcessBundle\Addon\Soap\Transformer;
 
-use CleverAge\ProcessBundle\Soap\Registry;
+use CleverAge\ProcessBundle\Addon\Soap\Registry;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 

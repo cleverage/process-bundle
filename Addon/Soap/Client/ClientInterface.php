@@ -8,7 +8,7 @@
 * file that was distributed with this source code.
 */
 
-namespace CleverAge\ProcessBundle\Soap\Client;
+namespace CleverAge\ProcessBundle\Addon\Soap\Client;
 
 /**
  * Interface ClientInterface

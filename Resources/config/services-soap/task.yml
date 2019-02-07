@@ -1,6 +1,6 @@
 services:
-    CleverAge\ProcessBundle\Soap\Task\:
-        resource: '../../../Soap/Task/*'
+    CleverAge\ProcessBundle\Addon\Soap\Task\:
+        resource: '../../../Addon/Soap/Task/*'
         autowire: true
         public: true
         shared: false

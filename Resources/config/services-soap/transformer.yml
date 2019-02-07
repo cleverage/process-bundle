@@ -1,6 +1,6 @@
 services:
-    CleverAge\ProcessBundle\Soap\Transformer\:
-        resource: '../../../Soap/Transformer/*'
+    CleverAge\ProcessBundle\Addon\Soap\Transformer\:
+        resource: '../../../Addon/Soap/Transformer/*'
         autowire: true
         public: false
         tags:

@@ -8,12 +8,12 @@
 * file that was distributed with this source code.
 */
 
-namespace CleverAge\ProcessBundle\Soap\Task;
+namespace CleverAge\ProcessBundle\Addon\Soap\Task;
 
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use CleverAge\ProcessBundle\Soap\Registry;
+use CleverAge\ProcessBundle\Addon\Soap\Registry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
