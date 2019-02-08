@@ -1,0 +1,65 @@
+clever_age_process:
+    configurations:
+        test.cache_setter_task.set_existing_cache:
+            entry_point: get_cache
+            end_point: dummy
+            tasks:
+                get_cache:
+                    service: '@CleverAge\ProcessBundle\Task\Cache\SetterTask'
+                    options:
+                        key:
+                            constant: 'SetterTaskTest_testSetExistingCache'
+                    outputs: [dummy]
+
+                dummy:
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
+
+        test.cache_setter_task.set_missing_cache:
+            entry_point: get_cache
+            end_point: dummy
+            tasks:
+                get_cache:
+                    service: '@CleverAge\ProcessBundle\Task\Cache\SetterTask'
+                    options:
+                        key:
+                            constant: 'SetterTaskTest_testSetMissingCache'
+                    outputs: [dummy]
+
+                dummy:
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
+
+        test.cache_setter_task.transform_cache_key:
+            entry_point: get_cache
+            end_point: dummy
+            tasks:
+                get_cache:
+                    service: '@CleverAge\ProcessBundle\Task\Cache\SetterTask'
+                    options:
+                        key:
+                            transformers:
+                                implode:
+                                    separator: '_'
+                    outputs: [dummy]
+
+                dummy:
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
+
+        test.cache_setter_task.bad_cache_key:
+            entry_point: get_cache
+            end_point: dummy
+            tasks:
+                get_cache:
+                    service: '@CleverAge\ProcessBundle\Task\Cache\SetterTask'
+                    options:
+                        key: ~
+                    outputs: [dummy]
+                    error_outputs: [missing_cache]
+
+                missing_cache:
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+                    options:
+                        output: 'missing cache'
+                    outputs: [dummy]
+
+                dummy:
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'

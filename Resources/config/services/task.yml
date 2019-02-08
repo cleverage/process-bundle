@@ -6,3 +6,8 @@ services:
         shared: false
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }
+
+    CleverAge\ProcessBundle\Task\Cache\:
+        resource: '../../../Task/Cache\*'
+        arguments:
+            $cache: '@cache.app'

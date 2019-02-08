@@ -12,6 +12,7 @@ namespace CleverAge\ProcessBundle;
 
 use CleverAge\ProcessBundle\Addon\Rest\Registry as RestRegistry;
 use CleverAge\ProcessBundle\Addon\Soap\Registry as SoapRegistry;
+use CleverAge\ProcessBundle\DependencyInjection\Compiler\CachePoolPass;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -60,5 +61,9 @@ class CleverAgeProcessBundle extends Bundle
                 )
             );
         }
+
+//        $container->addCompilerPass(
+//            new CachePoolPass()
+//        );
     }
 }

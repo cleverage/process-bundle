@@ -6,3 +6,8 @@ services:
         tags:
             - { name: cleverage.transformer }
             - { name: monolog.logger, channel: cleverage_process_transformer }
+
+    CleverAge\ProcessBundle\Transformer\Cache\:
+        resource: '../../../Transformer/Cache\*'
+        arguments:
+            $cache: '@cache.app'

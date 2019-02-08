@@ -1,0 +1,94 @@
+clever_age_process:
+    configurations:
+        test.cache_deleter_transformer.delete_existing_cache:
+            entry_point: get_cache
+            end_point: dummy
+            tasks:
+                get_cache:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    options:
+                        transformers:
+                            cache_deleter:
+                                key:
+                                    constant: 'DeleterTransformerTest_testDeleteExistingCache'
+                    outputs: [dummy]
+                    error_outputs: [missing_cache]
+
+                missing_cache:
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+                    options:
+                        output: 'missing cache'
+                    outputs: [dummy]
+
+                dummy:
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
+
+        test.cache_deleter_transformer.delete_missing_cache:
+            entry_point: get_cache
+            end_point: dummy
+            tasks:
+                get_cache:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    options:
+                        transformers:
+                            cache_deleter:
+                                key:
+                                    constant: 'DeleterTransformerTest_testDeleteMissingCache'
+                    outputs: [dummy]
+                    error_outputs: [missing_cache]
+
+                missing_cache:
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+                    options:
+                        output: 'missing cache'
+                    outputs: [dummy]
+
+                dummy:
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
+
+        test.cache_deleter_transformer.transform_cache_key:
+            entry_point: get_cache
+            end_point: dummy
+            tasks:
+                get_cache:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    options:
+                        transformers:
+                            cache_deleter:
+                                key:
+                                    transformers:
+                                        implode:
+                                            separator: '_'
+                    outputs: [dummy]
+                    error_outputs: [missing_cache]
+
+                missing_cache:
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+                    options:
+                        output: 'missing cache'
+                    outputs: [dummy]
+
+                dummy:
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
+
+        test.cache_deleter_transformer.bad_cache_key:
+            entry_point: get_cache
+            end_point: dummy
+            tasks:
+                get_cache:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    options:
+                        transformers:
+                            cache_deleter:
+                                key: ~
+                    outputs: [dummy]
+                    error_outputs: [missing_cache]
+
+                missing_cache:
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+                    options:
+                        output: 'missing cache'
+                    outputs: [dummy]
+
+                dummy:
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'

@@ -69,7 +69,10 @@ class DatabaseUpdaterTask extends AbstractConfigurableTask
     {
         $connection = $this->getConnection($state);
 
-        return $connection->executeQuery($this->getOption($state, 'sql'));
+        $input = $state->getInput();
+        $params = is_array($input) ? $input : [];
+
+        return $connection->executeQuery($this->getOption($state, 'sql'), $params);
     }
 
     /**

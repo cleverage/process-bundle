@@ -18,7 +18,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Trait TransformerTrait
  *
- * @package CleverAge\ProcessBundle\Transformer
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 trait TransformerTrait
@@ -26,6 +25,14 @@ trait TransformerTrait
 
     /** @var TransformerRegistry */
     protected $transformerRegistry;
+
+    /**
+     * @return TransformerRegistry
+     */
+    public function getTransformerRegistry(): TransformerRegistry
+    {
+        return $this->transformerRegistry;
+    }
 
     /**
      * @param array $transformers
@@ -41,7 +48,7 @@ trait TransformerTrait
         foreach ($transformers as $transformerCode => $transformerOptions) {
             try {
                 $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
-                $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+                $transformer = $this->getTransformerRegistry()->getTransformer($transformerCode);
                 $value = $transformer->transform(
                     $value,
                     $transformerOptions ?: []
@@ -77,7 +84,7 @@ trait TransformerTrait
     {
         $match = preg_match('/([^#]+)(#[\d]+)?/', $transformerCode, $parts);
 
-        if (1 === $match && $this->transformerRegistry->hasTransformer($parts[1])) {
+        if (1 === $match && $this->getTransformerRegistry()->hasTransformer($parts[1])) {
             return $parts[1];
         }
 
@@ -86,6 +93,7 @@ trait TransformerTrait
 
     /**
      * @param \Symfony\Component\OptionsResolver\OptionsResolver $resolver
+     *
      * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
@@ -107,7 +115,7 @@ trait TransformerTrait
                 foreach ($transformers as $transformerCode => &$transformerOptions) {
                     $transformerOptionsResolver = new OptionsResolver();
                     $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
-                    $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+                    $transformer = $this->getTransformerRegistry()->getTransformer($transformerCode);
                     if ($transformer instanceof ConfigurableTransformerInterface) {
                         $transformer->configureOptions($transformerOptionsResolver);
                         $transformerOptions = $transformerOptionsResolver->resolve(

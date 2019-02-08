@@ -27,7 +27,7 @@ class ProcessConfigurationRegistry
     protected $processConfigurations = [];
 
     /**
-     * @param array $rawConfiguration
+     * @param array  $rawConfiguration
      * @param string $defaultErrorStrategy
      */
     public function __construct(array $rawConfiguration, string $defaultErrorStrategy)
