@@ -33,6 +33,8 @@ abstract class AbstractProcessTest extends KernelTestCase
      */
     protected function setUp()
     {
+        static::bootKernel();
+
         $this->processManager = static::$container->get(ProcessManager::class);
         $this->processConfigurationRegistry = static::$container->get(ProcessConfigurationRegistry::class);
     }
