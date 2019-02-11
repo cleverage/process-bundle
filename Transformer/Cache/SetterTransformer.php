@@ -6,6 +6,9 @@
 
 namespace CleverAge\ProcessBundle\Transformer\Cache;
 
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 /**
  * Class SetterTransformer
  *
@@ -24,7 +27,11 @@ class SetterTransformer extends AbstractCacheTransformer
         $keyValue = $this->getKeyCache($value, $options);
 
         $cacheItem = $this->getCache()->getItem($keyValue);
-        $cacheItem->set($value);
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
+        $options = $resolver->resolve($options);
+        $cachedValue = $this->transformValue($value, $options['value']);
+        $cacheItem->set($cachedValue);
         $this->getCache()->save($cacheItem);
 
         return $value;
@@ -37,4 +44,36 @@ class SetterTransformer extends AbstractCacheTransformer
     {
         return 'cache_setter';
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver->setRequired(
+            [
+                'value',
+            ]
+        );
+        $resolver->setAllowedTypes('value', ['array', 'null']);
+
+        /** @noinspection PhpUnusedParameterInspection */
+        $resolver->setNormalizer(
+            'value',
+            function (Options $options, $value) {
+                $mappingResolver = new OptionsResolver();
+                $this->configureMappingOptions($mappingResolver);
+
+                return $mappingResolver->resolve(
+                    $value ?? []
+                );
+            }
+        );
+
+        return $resolver;
+    }
+
+
 }

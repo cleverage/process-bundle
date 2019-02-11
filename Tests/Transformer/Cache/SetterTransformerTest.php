@@ -50,7 +50,7 @@ class SetterTransformerTest extends AbstractProcessTest
             self::assertEquals($input, $result);
 
             $resultCacheItem = $this->cache->getItem('SetterTransformerTest_testSetExistingCache');
-            self::assertEquals($input, $resultCacheItem->get());
+            self::assertEquals($input[0], $resultCacheItem->get());
         }
     }
 
@@ -82,7 +82,7 @@ class SetterTransformerTest extends AbstractProcessTest
             self::assertEquals($input, $result);
 
             $resultCacheItem = $this->cache->getItem('SetterTransformerTest_testSetMissingCache');
-            self::assertEquals($input, $resultCacheItem->get());
+            self::assertEquals($input[0], $resultCacheItem->get());
         }
     }
 

@@ -9,6 +9,10 @@ clever_age_process:
                     options:
                         key:
                             constant: 'SetterTaskTest_testSetExistingCache'
+                        value:
+                            transformers:
+                                property_accessor:
+                                    property_path: '[0]'
                     outputs: [dummy]
 
                 dummy:
@@ -23,6 +27,10 @@ clever_age_process:
                     options:
                         key:
                             constant: 'SetterTaskTest_testSetMissingCache'
+                        value:
+                            transformers:
+                                property_accessor:
+                                    property_path: '[0]'
                     outputs: [dummy]
 
                 dummy:
@@ -39,6 +47,7 @@ clever_age_process:
                             transformers:
                                 implode:
                                     separator: '_'
+                        value: ~
                     outputs: [dummy]
 
                 dummy:
@@ -52,6 +61,7 @@ clever_age_process:
                     service: '@CleverAge\ProcessBundle\Task\Cache\SetterTask'
                     options:
                         key: ~
+                        value: ~
                     outputs: [dummy]
                     error_outputs: [missing_cache]
 

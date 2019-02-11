@@ -30,9 +30,6 @@ class TransformerTask extends AbstractConfigurableTask
 {
     use TransformerTrait;
 
-    /** @var LoggerInterface */
-    protected $logger;
-
     /** @var TransformerInterface */
     protected $transformer;
 

@@ -49,7 +49,7 @@ class SetterTaskTest extends AbstractProcessTest
             $this->processManager->execute('test.cache_setter_task.set_existing_cache', $input);
 
             $resultCacheItem = $this->cache->getItem('SetterTaskTest_testSetExistingCache');
-            self::assertEquals($input, $resultCacheItem->get());
+            self::assertEquals($input[0], $resultCacheItem->get());
         }
     }
 
@@ -81,7 +81,7 @@ class SetterTaskTest extends AbstractProcessTest
             self::assertEquals($input, $result);
 
             $resultCacheItem = $this->cache->getItem('SetterTaskTest_testSetMissingCache');
-            self::assertEquals($input, $resultCacheItem->get());
+            self::assertEquals($input[0], $resultCacheItem->get());
         }
     }
 
@@ -93,7 +93,7 @@ class SetterTaskTest extends AbstractProcessTest
         if ($this->cache) {
             $input = ['SetterTaskTest', 'testTransformCacheKey'];
 
-            $result = $this->processManager->execute('test.cache_setter_task.transform_cache_key', $input);
+            $this->processManager->execute('test.cache_setter_task.transform_cache_key', $input);
 
             $resultCacheItem = $this->cache->getItem('SetterTaskTest_testTransformCacheKey');
             self::assertEquals($input, $resultCacheItem->get());

@@ -11,6 +11,10 @@ clever_age_process:
                             cache_setter:
                                 key:
                                     constant: 'SetterTransformerTest_testSetExistingCache'
+                                value:
+                                    transformers:
+                                        property_accessor:
+                                            property_path: '[0]'
                     outputs: [dummy]
                     error_outputs: [missing_cache]
 
@@ -34,6 +38,10 @@ clever_age_process:
                             cache_setter:
                                 key:
                                     constant: 'SetterTransformerTest_testSetMissingCache'
+                                value:
+                                    transformers:
+                                        property_accessor:
+                                            property_path: '[0]'
                     outputs: [dummy]
                     error_outputs: [missing_cache]
 
@@ -59,6 +67,7 @@ clever_age_process:
                                     transformers:
                                         implode:
                                             separator: '_'
+                                value: ~
                     outputs: [dummy]
                     error_outputs: [missing_cache]
 
@@ -81,6 +90,7 @@ clever_age_process:
                         transformers:
                             cache_setter:
                                 key: ~
+                                value: ~
                     outputs: [dummy]
                     error_outputs: [missing_cache]
 

@@ -7,6 +7,8 @@
 namespace CleverAge\ProcessBundle\Task\Cache;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class SetterTask
@@ -27,9 +29,40 @@ class SetterTask extends AbstractCacheTask
         $input = $state->getInput();
 
         $cacheItem = $this->getCache()->getItem($keyValue);
-        $cacheItem->set($input);
+        $cachedValue = $this->transformValue($input, $this->getOption($state, 'value'));
+        $cacheItem->set($cachedValue);
         $this->getCache()->save($cacheItem);
 
         $state->setOutput($input);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function configureOptions(OptionsResolver $resolver)
+    {
+        parent::configureOptions($resolver);
+
+        $resolver->setRequired(
+            [
+                'value',
+            ]
+        );
+        $resolver->setAllowedTypes('value', ['array', 'null']);
+
+        /** @noinspection PhpUnusedParameterInspection */
+        $resolver->setNormalizer(
+            'value',
+            function (Options $options, $value) {
+                $mappingResolver = new OptionsResolver();
+                $this->configureMappingOptions($mappingResolver);
+
+                return $mappingResolver->resolve(
+                    $value ?? []
+                );
+            }
+        );
+
+        return $resolver;
     }
 }

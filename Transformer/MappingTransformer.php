@@ -28,12 +28,6 @@ class MappingTransformer implements ConfigurableTransformerInterface
 {
     use TransformerTrait;
 
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /** @var PropertyAccessorInterface */
-    protected $accessor;
-
     /**
      * @param TransformerRegistry       $transformerRegistry
      * @param LoggerInterface           $logger

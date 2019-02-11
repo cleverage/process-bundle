@@ -6,7 +6,6 @@
 
 namespace CleverAge\ProcessBundle\Task\Cache;
 
-use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
@@ -25,12 +24,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 abstract class AbstractCacheTask extends AbstractConfigurableTask
 {
     use TransformerTrait;
-
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var PropertyAccessorInterface */
-    private $accessor;
 
     /** @var CacheItemPoolInterface */
     private $cache;
@@ -53,22 +46,6 @@ abstract class AbstractCacheTask extends AbstractConfigurableTask
         $this->accessor = $accessor;
         $this->cache = $cache;
         $this->transformerRegistry = $transformerRegistry;
-    }
-
-    /**
-     * @return LoggerInterface
-     */
-    public function getLogger(): LoggerInterface
-    {
-        return $this->logger;
-    }
-
-    /**
-     * @return PropertyAccessorInterface
-     */
-    public function getAccessor(): PropertyAccessorInterface
-    {
-        return $this->accessor;
     }
 
     /**
@@ -136,65 +113,7 @@ abstract class AbstractCacheTask extends AbstractConfigurableTask
     protected function getKeyCache(ProcessState $state)
     {
         $options = $this->getOptions($state);
-        $input = $state->getInput();
-        $key = $options['key'];
-        $keyValue = null;
 
-        if (null !== $key['constant']) {
-            $keyValue = $key['constant'];
-        } elseif (null !== $key['code']) {
-            $sourceProperty = $key['code'];
-            if (\is_array($sourceProperty)) {
-                $keyValue = [];
-                /** @var array $sourceProperty */
-                foreach ($sourceProperty as $destKey => $srcKey) {
-                    try {
-                        $keyValue[$destKey] = $this->getAccessor()->getValue($input, $srcKey);
-                    } catch (\RuntimeException $missingPropertyError) {
-                        $this->getLogger()->debug(
-                            'Mapping exception',
-                            [
-                                'srcKey' => $srcKey,
-                                'message' => $missingPropertyError->getMessage(),
-                            ]
-                        );
-                        throw $missingPropertyError;
-                    }
-                }
-            } else {
-                try {
-                    $keyValue = $this->getAccessor()->getValue($input, $sourceProperty);
-                } catch (\RuntimeException $missingPropertyError) {
-                    $this->getLogger()->debug(
-                        'Mapping exception',
-                        [
-                            'message' => $missingPropertyError->getMessage(),
-                        ]
-                    );
-                    throw $missingPropertyError;
-                }
-            }
-        } else {
-            $keyValue = $input;
-        }
-
-        try {
-            $keyValue = $this->applyTransformers($key['transformers'], $keyValue);
-        } catch (TransformerException $exception) {
-            $exception->setTargetProperty('key');
-            $this->logger->debug(
-                'Transformation exception',
-                [
-                    'message' => $exception->getPrevious()->getMessage(),
-                    'file' => $exception->getPrevious()->getFile(),
-                    'line' => $exception->getPrevious()->getLine(),
-                    'trace' => $exception->getPrevious()->getTraceAsString(),
-                ]
-            );
-
-            throw $exception;
-        }
-
-        return $keyValue;
+        return $this->transformValue($state->getInput(), $options['key']);
     }
 }

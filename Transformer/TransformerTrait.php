@@ -12,8 +12,10 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Trait TransformerTrait
@@ -22,9 +24,30 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 trait TransformerTrait
 {
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var PropertyAccessorInterface */
+    private $accessor;
 
     /** @var TransformerRegistry */
-    protected $transformerRegistry;
+    private $transformerRegistry;
+
+    /**
+     * @return LoggerInterface
+     */
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    /**
+     * @return PropertyAccessorInterface
+     */
+    public function getAccessor(): PropertyAccessorInterface
+    {
+        return $this->accessor;
+    }
 
     /**
      * @return TransformerRegistry
@@ -89,6 +112,74 @@ trait TransformerTrait
         }
 
         return $transformerCode;
+    }
+
+    /**
+     * @param mixed $value
+     * @param array $options
+     *
+     * @return mixed
+     */
+    protected function transformValue($value, array $options = [])
+    {
+        $transformedValue = null;
+
+        if (null !== $options['constant']) {
+            $transformedValue = $options['constant'];
+        } elseif (null !== $options['code']) {
+            $sourceProperty = $options['code'];
+            if (\is_array($sourceProperty)) {
+                $transformedValue = [];
+                /** @var array $sourceProperty */
+                foreach ($sourceProperty as $destKey => $srcKey) {
+                    try {
+                        $transformedValue[$destKey] = $this->getAccessor()->getValue($value, $srcKey);
+                    } catch (\RuntimeException $missingPropertyError) {
+                        $this->getLogger()->debug(
+                            'Mapping exception',
+                            [
+                                'srcKey' => $srcKey,
+                                'message' => $missingPropertyError->getMessage(),
+                            ]
+                        );
+                        throw $missingPropertyError;
+                    }
+                }
+            } else {
+                try {
+                    $transformedValue = $this->getAccessor()->getValue($value, $sourceProperty);
+                } catch (\RuntimeException $missingPropertyError) {
+                    $this->getLogger()->debug(
+                        'Mapping exception',
+                        [
+                            'message' => $missingPropertyError->getMessage(),
+                        ]
+                    );
+                    throw $missingPropertyError;
+                }
+            }
+        } else {
+            $transformedValue = $value;
+        }
+
+        try {
+            $transformedValue = $this->applyTransformers($options['transformers'], $transformedValue);
+        } catch (TransformerException $exception) {
+            $exception->setTargetProperty('key');
+            $this->logger->debug(
+                'Transformation exception',
+                [
+                    'message' => $exception->getPrevious()->getMessage(),
+                    'file' => $exception->getPrevious()->getFile(),
+                    'line' => $exception->getPrevious()->getLine(),
+                    'trace' => $exception->getPrevious()->getTraceAsString(),
+                ]
+            );
+
+            throw $exception;
+        }
+
+        return $transformedValue;
     }
 
     /**
