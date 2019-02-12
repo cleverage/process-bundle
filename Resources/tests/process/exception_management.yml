@@ -23,7 +23,7 @@ clever_age_process:
                             implode:
                                 separator: ''
                     outputs: [aggregator]
-                    errors: [error_aggregator]
+                    error_outputs: [error_aggregator]
 
                 aggregator:
                     service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'

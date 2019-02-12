@@ -405,7 +405,7 @@ class ProcessManager
             $state->setException($exception);
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
-                if (null === $state->getErrorOutput()) {
+                if (!$state->hasErrorOutput()) {
                     $state->setErrorOutput($state->getInput());
                 }
             } elseif ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {

@@ -46,6 +46,9 @@ class ProcessState
     /** @var mixed */
     protected $errorOutput;
 
+    /** @var boolean */
+    protected $hasErrorOutput = false;
+
     /** @var bool */
     protected $stopped = false;
 
@@ -118,9 +121,10 @@ class ProcessState
         $this->setOutput(null);
         $this->setSkipped(false);
         $this->setException(null);
-        $this->setErrorOutput(null);
+        $this->errorOutput = null;
+        $this->hasErrorOutput = false;
 
-        if($cleanInput) {
+        if ($cleanInput) {
             $this->setInput(null);
             $this->setPreviousState(null);
         }
@@ -239,6 +243,7 @@ class ProcessState
      */
     public function setErrorOutput($errorOutput)
     {
+        $this->hasErrorOutput = true;
         $this->errorOutput = $errorOutput;
     }
 
@@ -247,7 +252,7 @@ class ProcessState
      */
     public function hasErrorOutput()
     {
-        return null !== $this->errorOutput;
+        return $this->hasErrorOutput;
     }
 
     /**
