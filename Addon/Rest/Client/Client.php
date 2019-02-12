@@ -99,7 +99,18 @@ class Client implements ClientInterface
         $this->setRequestQueryParameters($request, $options);
         $this->setRequestHeader($request, $options);
 
-        return $request->send();
+        try {
+            return $request->send();
+        } catch (\Exception $e) {
+            $this->logger->error(
+                'Rest request failed',
+                [
+                    'url' => $request->uri,
+                    'error' => $e->getMessage(),
+                ]
+            );
+            throw new RestRequestException('Rest request failed', 0, $e);
+        }
     }
 
     /**
