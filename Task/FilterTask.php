@@ -48,6 +48,7 @@ class FilterTask extends AbstractConfigurableTask
     {
         $input = $state->getInput();
         if (!$this->checkCondition($input, $this->getOptions($state))) {
+            $state->setErrorOutput($input);
             $state->setSkipped(true);
 
             return;
