@@ -264,6 +264,12 @@ class Client implements ClientInterface
                 }
             );
             $replace = array_values($options['url_parameters']);
+            array_walk(
+                $replace,
+                function (&$item) {
+                    $item = rawurlencode($item);
+                }
+            );
 
             $uri = str_replace($search, $replace, $uri);
         }
