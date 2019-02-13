@@ -87,7 +87,6 @@ class Client implements ClientInterface
      * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \InvalidArgumentException
-     * @throws \Httpful\Exception\ConnectionErrorException
      * @throws RestRequestException
      * @throws \Exception
      */
@@ -98,19 +97,7 @@ class Client implements ClientInterface
         $request = $this->initializeRequest($options);
         $this->setRequestQueryParameters($request, $options);
         $this->setRequestHeader($request, $options);
-
-        try {
-            return $request->send();
-        } catch (\Exception $e) {
-            $this->logger->error(
-                'Rest request failed',
-                [
-                    'url' => $request->uri,
-                    'error' => $e->getMessage(),
-                ]
-            );
-            throw new RestRequestException('Rest request failed', 0, $e);
-        }
+        return $this->sendRequest($request, $options);
     }
 
     /**
@@ -221,6 +208,30 @@ class Client implements ClientInterface
     {
         if ($options['headers']) {
             $request->addHeaders($options['headers']);
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @param array   $options
+     *
+     * @return Response|null
+     *
+     * @throws RestRequestException
+     */
+    protected function sendRequest(Request $request, array $options = []): ?Response
+    {
+        try {
+            return $request->send();
+        } catch (\Exception $e) {
+            $this->logger->error(
+                'Rest request failed',
+                [
+                    'url' => $request->uri,
+                    'error' => $e->getMessage(),
+                ]
+            );
+            throw new RestRequestException('Rest request failed', 0, $e);
         }
     }
 
