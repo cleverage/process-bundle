@@ -292,11 +292,8 @@ class ProcessManager
             $this->processExecution($taskConfiguration, $executionFlag);
 
             $this->handleState($state);
-            if ($state->isStopped()) {
-                return;
-            }
 
-            // An error feed cannot be blocked or skipped (except if the process has been stopped)
+            // An error feed cannot be blocked or skipped (even if the process has been stopped)
             if ($state->hasErrorOutput()) {
                 foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTask) {
                     $this->prepareNextProcess($taskConfiguration, $errorTask, true);
@@ -309,6 +306,17 @@ class ProcessManager
                         return;
                     }
                 }
+            }
+            if ($state->isStopped()) {
+                if ($state->getException()) {
+                    throw new \RuntimeException(
+                        "Process {$state->getProcessConfiguration()->getCode()} has failed",
+                        -1,
+                        $state->getException()
+                    );
+                }
+
+                return;
             }
 
             // Run child items only if the state is not "skipped" and task is not blocking
@@ -401,15 +409,23 @@ class ProcessManager
 
         // Manage exception catching and setting the same
         if ($exception) {
-            $this->taskLogger->log($taskConfiguration->getLogLevel(), $exception->getMessage(), $state->getErrorContext());
+            $this->taskLogger->log(
+                $taskConfiguration->getLogLevel(),
+                $exception->getMessage(),
+                $state->getErrorContext()
+            );
             $state->setException($exception);
+            if (!$state->hasErrorOutput()) {
+                $state->setErrorOutput($state->getInput());
+            }
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
-                if (!$state->hasErrorOutput()) {
-                    $state->setErrorOutput($state->getInput());
-                }
             } elseif ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
                 $state->stop($exception);
+            } else {
+                throw new \UnexpectedValueException(
+                    "Unknown error strategy '{$taskConfiguration->getErrorStrategy()}'"
+                );
             }
         }
     }
@@ -527,12 +543,6 @@ class ProcessManager
         $processHistory = $state->getProcessHistory();
         if ($state->getException() && $state->isStopped()) {
             $processHistory->setFailed();
-
-            throw new \RuntimeException(
-                "Process {$state->getProcessConfiguration()->getCode()} has failed",
-                -1,
-                $state->getException()
-            );
         }
     }
 

@@ -143,6 +143,14 @@ class ProcessHistory
     }
 
     /**
+     * @return bool
+     */
+    public function isFailed()
+    {
+        return $this->state === self::STATE_FAILED;
+    }
+
+    /**
      * Get process duration in seconds
      *
      * @return int|null
