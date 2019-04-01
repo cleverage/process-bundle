@@ -74,25 +74,12 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     {
         $this->handleProcesses($state); // Handler processes first
 
-        $options = $this->getOptions($state);
-        while (\count($this->launchedProcesses) >= $options['max_processes']) {
-            $this->handleProcesses($state);
-            sleep($options['sleep_interval']);
+        if (!$this->flushMode) {
+            $this->handleInput($state);
+            $state->setSkipped(true);
+        } else {
+            $this->flush($state);
         }
-
-        $process = $this->launchProcess($state);
-        $this->launchedProcesses[] = $process;
-
-        $logContext = [
-            'input' => $process->getProcess()->getInput(),
-        ];
-
-        $this->logger->debug("Running command: {$process->getProcess()->getCommandLine()}", $logContext);
-
-        sleep($options['sleep_interval_after_launch']);
-
-        // Never return data during exec, only during flushes
-        $state->setSkipped(true);
     }
 
     /**
@@ -117,16 +104,47 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     public function next(ProcessState $state)
     {
-        if (!$this->flushMode) {
-            return false;
+        // if there is some data waiting, handle it in priority
+        if ($this->finishedBuffers->count() > 0) {
+            $this->flushMode = true;
+            return true;
+        }
+
+        // if we are in flush mode, we should wait for process to finish
+        if ($this->flushMode) {
+            return count($this->launchedProcesses) > 0;
         }
 
         sleep($this->getOption($state, 'sleep_on_finalize_interval'));
         $this->handleProcesses($state);
 
-        return count($this->launchedProcesses) > 0 || $this->finishedBuffers->count() > 0;
+        return false;
     }
 
+    /**
+     * @param ProcessState $state
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     */
+    protected function handleInput(ProcessState $state)
+    {
+        $options = $this->getOptions($state);
+        while (\count($this->launchedProcesses) >= $options['max_processes']) {
+            $this->handleProcesses($state);
+            sleep($options['sleep_interval']);
+        }
+
+        $process = $this->launchProcess($state);
+        $this->launchedProcesses[] = $process;
+
+        $logContext = [
+            'input' => $process->getProcess()->getInput(),
+        ];
+
+        $this->logger->debug("Running command: {$process->getProcess()->getCommandLine()}", $logContext);
+
+        sleep($options['sleep_interval_after_launch']);
+    }
 
     /**
      * @param ProcessState $state
@@ -216,9 +234,9 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
                 'process_options' => [],
             ]
         );
-        $resolver->setAllowedTypes('max_processes', ['integer']);
-        $resolver->setAllowedTypes('sleep_interval', ['integer']);
-        $resolver->setAllowedTypes('sleep_interval_after_launch', ['integer']);
+        $resolver->setAllowedTypes('max_processes', ['integer', 'double']);
+        $resolver->setAllowedTypes('sleep_interval', ['integer', 'double']);
+        $resolver->setAllowedTypes('sleep_interval_after_launch', ['integer', 'double']);
         $resolver->setAllowedTypes('process_options', ['array']);
     }
 

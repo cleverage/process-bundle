@@ -94,12 +94,6 @@ class JsonStreamFile
      */
     public function writeLine($item): int
     {
-        if (!is_array($item) && !is_scalar($item)) {
-            throw new \InvalidArgumentException(
-                sprintf('%s only supports items of type scalar or array', __CLASS__)
-            );
-        }
-
         $this->file->fwrite(json_encode($item) . PHP_EOL);
         $this->currentLine++;
 
