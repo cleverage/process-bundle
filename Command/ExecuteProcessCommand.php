@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Command;
 
+use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -27,6 +28,12 @@ use Symfony\Component\Yaml\Parser;
  */
 class ExecuteProcessCommand extends Command
 {
+
+    const OUTPUT_STDOUT = '-';
+
+    const OUTPUT_FORMAT_DUMP = 'dump';
+    const OUTPUT_FORMAT_JSON = 'json-stream';
+
     /** @var ProcessManager */
     protected $processManager;
 
@@ -57,6 +64,14 @@ class ExecuteProcessCommand extends Command
         $this->addOption('input', 'i', InputOption::VALUE_REQUIRED, 'Pass input data to the first task of the process');
         $this->addOption('input-from-stdin', null, InputOption::VALUE_NONE, 'Read input data from stdin');
         $this->addOption('context', 'c', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Contextual value', []);
+        $this->addOption('output', 'o',
+            InputOption::VALUE_REQUIRED,
+            'Output path to dump data ("-" to use STDOUT with symfony dumper)',
+            self::OUTPUT_STDOUT);
+        $this->addOption('output-format', 't',
+            InputOption::VALUE_OPTIONAL,
+            'Output format',
+            null);
     }
 
     /**
@@ -84,10 +99,11 @@ class ExecuteProcessCommand extends Command
             if (!$output->isQuiet()) {
                 $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
+
+            // Execute each process
             $returnValue = $this->processManager->execute($code, $inputData, $context);
-            if ($output->isVeryVerbose() && class_exists(VarDumper::class)) {
-                VarDumper::dump($returnValue); // @todo remove this please
-            }
+            $this->handleOutputData($returnValue, $input, $output);
+
             if (!$output->isQuiet()) {
                 $output->writeln("<info>Process '{$code}' executed successfully</info>");
             }
@@ -120,5 +136,49 @@ class ExecuteProcessCommand extends Command
         }
 
         return $context;
+    }
+
+    protected function handleOutputData($data, InputInterface $input, OutputInterface $output)
+    {
+        // Skip all if undefined
+        if (!$input->getOption('output-format')) {
+            return;
+        }
+
+        $dataIsIterable = $data instanceof \iterable || \is_array($data);
+
+        // Handle printing the output
+        if ($input->getOption('output') === self::OUTPUT_STDOUT) {
+            if ($output->isVeryVerbose()) {
+                if ($input->getOption('output-format') === self::OUTPUT_FORMAT_DUMP && class_exists(VarDumper::class)) {
+                    VarDumper::dump($data); // @todo remove this please
+                } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON && $dataIsIterable) {
+                    foreach ($data as $item) {
+                        $output->writeln(json_encode($item));
+                    }
+                } else {
+                    throw new \InvalidArgumentException(sprintf(
+                        "Cannot handle data output with format '%s' (iterable=%s)",
+                        $input->getOption('output-format'),
+                        $dataIsIterable
+                    ));
+                }
+            }
+        } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON && $dataIsIterable) {
+            $outputFile = new JsonStreamFile($input->getOption('output'), 'wb');
+            foreach ($data as $item) {
+                $outputFile->writeLine($item);
+            }
+
+            if ($output->isVerbose()) {
+                $output->writeln(sprintf("Output stored in '%s'", $input->getOption('output')));
+            }
+        } else {
+            throw new \InvalidArgumentException(sprintf(
+                "Cannot handle data output with format '%s' (iterable=%s)",
+                $input->getOption('output-format'),
+                $dataIsIterable
+            ));
+        }
     }
 }
