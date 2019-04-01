@@ -10,13 +10,15 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
 /**
  * Return the first element of an array
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class ArrayFirstTransformer implements TransformerInterface
+class ArrayFirstTransformer implements ConfigurableTransformerInterface
 {
     /**
      * Must return the transformed $value
@@ -30,6 +32,14 @@ class ArrayFirstTransformer implements TransformerInterface
      */
     public function transform($value, array $options = [])
     {
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
+        $options = $resolver->resolve($options);
+
+        if ($options['allow_not_iterable'] && !is_iterable($value)) {
+            return $value;
+        }
+
         return reset($value);
     }
 
@@ -41,5 +51,19 @@ class ArrayFirstTransformer implements TransformerInterface
     public function getCode()
     {
         return 'array_first';
+    }
+
+    /**
+     * @param OptionsResolver $resolver
+     *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     */
+    public function configureOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefaults(
+            [
+                'allow_not_iterable' => false,
+            ]
+        );
     }
 }
