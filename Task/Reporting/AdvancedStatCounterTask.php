@@ -54,6 +54,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
         $now = new \DateTime();
         if (!$this->startedAt) {
             $this->startedAt = $now;
+            $this->lastUpdate = $now;
         }
         if ($this->preInitCounter < $this->getOption($state, 'skip_first')) {
             $this->preInitCounter++;
@@ -61,7 +62,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
 
             return;
         }
-        if ($this->lastUpdate && 0 === $this->counter % $this->getOption($state, 'show_every')) {
+        if ($this->counter > 0 && 0 === $this->counter % $this->getOption($state, 'show_every')) {
             $diff = $now->diff($this->lastUpdate);
             $fullText = "Last iteration {$diff->format('%H:%I:%S')} ago";
             $items = $this->getOption($state, 'num_items') * $this->counter;
@@ -73,12 +74,12 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
             $fullText .= " - {$rate} items/s - {$items} items processed";
             $fullText .= " in {$now->diff($this->startedAt)->format('%H:%I:%S')}";
 
+            $this->lastUpdate = $now;
             $this->logger->info($fullText);
         } else {
             $state->setSkipped(true);
         }
         $this->counter++;
-        $this->lastUpdate = $now;
     }
 
     /**
