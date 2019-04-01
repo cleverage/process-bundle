@@ -145,39 +145,31 @@ class ExecuteProcessCommand extends Command
             return;
         }
 
-        $dataIsIterable = $data instanceof \iterable || \is_array($data);
-
         // Handle printing the output
         if ($input->getOption('output') === self::OUTPUT_STDOUT) {
             if ($output->isVeryVerbose()) {
                 if ($input->getOption('output-format') === self::OUTPUT_FORMAT_DUMP && class_exists(VarDumper::class)) {
                     VarDumper::dump($data); // @todo remove this please
-                } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON && $dataIsIterable) {
-                    foreach ($data as $item) {
-                        $output->writeln(json_encode($item));
-                    }
+                } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
+                    $output->writeln(json_encode($data));
                 } else {
                     throw new \InvalidArgumentException(sprintf(
-                        "Cannot handle data output with format '%s' (iterable=%s)",
-                        $input->getOption('output-format'),
-                        $dataIsIterable
+                        "Cannot handle data output with format '%s'",
+                        $input->getOption('output-format')
                     ));
                 }
             }
-        } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON && $dataIsIterable) {
+        } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
             $outputFile = new JsonStreamFile($input->getOption('output'), 'wb');
-            foreach ($data as $item) {
-                $outputFile->writeLine($item);
-            }
+            $outputFile->writeLine($data);
 
             if ($output->isVerbose()) {
                 $output->writeln(sprintf("Output stored in '%s'", $input->getOption('output')));
             }
         } else {
             throw new \InvalidArgumentException(sprintf(
-                "Cannot handle data output with format '%s' (iterable=%s)",
-                $input->getOption('output-format'),
-                $dataIsIterable
+                "Cannot handle data output with format '%s'",
+                $input->getOption('output-format')
             ));
         }
     }
