@@ -26,7 +26,6 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
      * @param mixed $value
      * @param array $options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \UnexpectedValueException
      *
      * @return mixed $value
@@ -36,10 +35,6 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
         if (null === $value) {
             return $value;
         }
-
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
 
         if (!is_string($value) && !is_int($value)) { // If not a valid array index
             if (!$options['auto_cast']) {

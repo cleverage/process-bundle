@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -26,17 +27,12 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
      * @param mixed $value
      * @param array $options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     *
      * @return mixed $value
      */
     public function transform($value, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
-
-        $transliterator = \Transliterator::create($options['transliterator']);
+        /** @var \Transliterator $transliterator */
+        $transliterator = $options['transliterator'];
         $string = $transliterator->transliterate($value);
 
         return trim(
@@ -73,5 +69,9 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
                 'separator' => '_',
             ]
         );
+
+        $resolver->setNormalizer('transliterator', function(Options $options, $value) {
+            return \Transliterator::create($value);
+        });
     }
 }

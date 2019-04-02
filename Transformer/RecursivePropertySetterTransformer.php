@@ -40,7 +40,6 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
      *
      * @throws \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      * @throws \CleverAge\ProcessBundle\Exception\TransformerException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
      * @throws \Symfony\Component\PropertyAccess\Exception\AccessException
      * @throws \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
@@ -49,11 +48,6 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
      */
     public function transform($value, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-        $options = $resolver->resolve($options);
-
         if (null === $value && $options['ignore_null']) {
             return null;
         }

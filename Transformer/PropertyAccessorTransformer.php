@@ -38,7 +38,6 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
      * @param mixed $value
      * @param array $options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
      * @throws \Symfony\Component\PropertyAccess\Exception\AccessException
      * @throws \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
@@ -47,10 +46,6 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
      */
     public function transform($value, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-        $options = $resolver->resolve($options);
 
         if (null === $value && $options['ignore_null']) {
             return null;

@@ -31,6 +31,7 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
      * @param array $options
      *
      * @return mixed|string
+     * @throws \Exception
      */
     public function transform($value, array $options = [])
     {

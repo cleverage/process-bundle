@@ -39,7 +39,6 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
      * @param array $values
      * @param array $options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \UnexpectedValueException
      * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
      *
@@ -51,10 +50,6 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
             throw new \UnexpectedValueException('Input value must be an array or traversable');
         }
 
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-        $options = $resolver->resolve($options);
         /** @var array $transformers */
         $transformers = $options['transformers'];
 

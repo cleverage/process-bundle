@@ -34,10 +34,6 @@ class UnsetTransformer implements ConfigurableTransformerInterface
      */
     public function transform($value, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
-
         if (!\is_array($value)) {
             throw new \UnexpectedValueException('Given value must be an array');
         }

@@ -37,15 +37,15 @@ trait TransformerTrait
      */
     protected function applyTransformers(array $transformers, $value)
     {
+        // Quick return for better perfs
+        if (empty($transformers)) {
+            return $value;
+        }
+
         /** @noinspection ForeachSourceInspection */
-        foreach ($transformers as $transformerCode => $transformerOptions) {
+        foreach ($transformers as $transformerCode => $transformerClosure) {
             try {
-                $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
-                $transformer = $this->transformerRegistry->getTransformer($transformerCode);
-                $value = $transformer->transform(
-                    $value,
-                    $transformerOptions ?: []
-                );
+                $value = $transformerClosure($value);
             } catch (\Throwable $exception) {
                 throw new TransformerException($transformerCode, 0, $exception);
             }
@@ -96,10 +96,11 @@ trait TransformerTrait
         $resolver->setNormalizer( // This logic is duplicated from the array_map transformer @todo fix me
             $optionName,
             function (Options $options, $transformers) {
-                /** @var array $transformers */
-                foreach ($transformers as $transformerCode => &$transformerOptions) {
+                $transformerClosures = [];
+
+                foreach ($transformers as $origTransformerCode => $transformerOptions) {
                     $transformerOptionsResolver = new OptionsResolver();
-                    $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
+                    $transformerCode = $this->getCleanedTransfomerCode($origTransformerCode);
                     $transformer = $this->transformerRegistry->getTransformer($transformerCode);
                     if ($transformer instanceof ConfigurableTransformerInterface) {
                         $transformer->configureOptions($transformerOptionsResolver);
@@ -107,9 +108,13 @@ trait TransformerTrait
                             $transformerOptions ?? []
                         );
                     }
+
+                    $transformerClosures[$origTransformerCode] = function ($value) use ($transformer, $transformerOptions) {
+                        return $transformer->transform($value, $transformerOptions);
+                    };
                 }
 
-                return $transformers;
+                return $transformerClosures;
             }
         );
     }

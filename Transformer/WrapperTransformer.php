@@ -26,17 +26,12 @@ class WrapperTransformer implements ConfigurableTransformerInterface
      * @param mixed $input
      * @param array $options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Exception
      *
      * @return mixed $value
      */
     public function transform($input, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
-
         return [$options['wrapper_key'] => $input];
     }
 

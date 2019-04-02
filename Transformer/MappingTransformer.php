@@ -61,10 +61,6 @@ class MappingTransformer implements ConfigurableTransformerInterface
      */
     public function transform($input, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
-
         if (!empty($options['initial_value']) && $options['keep_input']) {
             throw new InvalidOptionsException(
                 'The options "initial_value" and "keep_input" can\'t be both enabled.'
