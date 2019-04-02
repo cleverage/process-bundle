@@ -85,23 +85,16 @@ trait TransformerTrait
     }
 
     /**
-     * @param \Symfony\Component\OptionsResolver\OptionsResolver $resolver
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @param OptionsResolver $resolver
+     * @param string          $optionName
      */
-    protected function configureTransformersOptions(OptionsResolver $resolver)
+    protected function configureTransformersOptions(OptionsResolver $resolver, $optionName = 'transformers')
     {
-        $resolver->setDefault('transformers', []);
-        $resolver->setAllowedTypes('transformers', ['array']);
+        $resolver->setDefault($optionName, []);
+        $resolver->setAllowedTypes($optionName, ['array']);
         /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer( // This logic is duplicated from the array_map transformer @todo fix me
-            'transformers',
+            $optionName,
             function (Options $options, $transformers) {
                 /** @var array $transformers */
                 foreach ($transformers as $transformerCode => &$transformerOptions) {
