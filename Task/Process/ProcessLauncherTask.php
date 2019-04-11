@@ -72,13 +72,21 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     public function execute(ProcessState $state)
     {
+        // TODO still not perfect, optimize and secure it
         $this->handleProcesses($state); // Handler processes first
 
         if (!$this->flushMode) {
             $this->handleInput($state);
             $state->setSkipped(true);
+        } elseif (!$this->finishedBuffers->isEmpty()) {
+            $state->setOutput($this->finishedBuffers->dequeue());
+
+            // After dequeue, stop flush
+            if ($this->finishedBuffers->isEmpty()) {
+                $this->flushMode = false;
+            }
         } else {
-            $this->flush($state);
+            $state->setSkipped(true);
         }
     }
 
@@ -88,11 +96,15 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     public function flush(ProcessState $state)
     {
         $this->flushMode = true;
-        if ($this->finishedBuffers->isEmpty()) {
-            $this->flushMode = false;
-            $state->setSkipped(true);
-        } else {
+        if (!$this->finishedBuffers->isEmpty()) {
             $state->setOutput($this->finishedBuffers->dequeue());
+        } else {
+            $state->setSkipped(true);
+        }
+
+        // After dequeue, stop flush
+        if ($this->finishedBuffers->isEmpty() && !count($this->launchedProcesses)) {
+            $this->flushMode = false;
         }
     }
 
@@ -104,9 +116,12 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     public function next(ProcessState $state)
     {
+        $this->handleProcesses($state);
+
         // if there is some data waiting, handle it in priority
         if ($this->finishedBuffers->count() > 0) {
             $this->flushMode = true;
+
             return true;
         }
 
@@ -116,7 +131,6 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         }
 
         sleep($this->getOption($state, 'sleep_on_finalize_interval'));
-        $this->handleProcesses($state);
 
         return false;
     }
@@ -154,13 +168,16 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     protected function launchProcess(ProcessState $state)
     {
-        // TODO options & context
-        $subprocess = new SubprocessInstance($this->kernel, $this->getOption($state, 'process'), $state->getInput(), [], [
-            SubprocessInstance::OPTION_JSON_BUFFERING => true,
-        ]);
-        $subprocess->buildProcess();
+        $subprocess = new SubprocessInstance($this->kernel,
+            $this->getOption($state, 'process'),
+            $state->getInput(),
+            $this->getOption($state, 'context'),
+            [
+                SubprocessInstance::OPTION_JSON_BUFFERING => true,
+            ]
+        );
 
-        return $subprocess->start();
+        return $subprocess->buildProcess()->start();
     }
 
     /**
@@ -232,12 +249,23 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
                 'sleep_interval_after_launch' => 1,
                 'sleep_on_finalize_interval' => 1,
                 'process_options' => [],
+                'context' => [],
             ]
         );
         $resolver->setAllowedTypes('max_processes', ['integer', 'double']);
         $resolver->setAllowedTypes('sleep_interval', ['integer', 'double']);
         $resolver->setAllowedTypes('sleep_interval_after_launch', ['integer', 'double']);
+        $resolver->setAllowedTypes('context', ['array']);
+
         $resolver->setAllowedTypes('process_options', ['array']);
+        $resolver->setNormalizer('process_options', function (Options $options, $value) {
+            if (!empty($value)) {
+                // Todo deprecation trigger
+                throw new \InvalidArgumentException("Deprecated option, please contact support for help");
+            }
+
+            return $value;
+        });
     }
 
     /**
