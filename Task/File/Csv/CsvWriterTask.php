@@ -76,14 +76,13 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         $resolver->setNormalizer(
             'file_path',
             function (Options $options, $value) {
-                $value = str_replace(
-                    ['{date}', '{date_time}', '{unique_token}'],
+                $value = strtr(
+                    $value,
                     [
-                        (new \DateTime())->format('Ymd'),
-                        (new \DateTime())->format('Ymd_His'),
-                        uniqid()
-                    ],
-                    $value
+                        '{date}' => date('Ymd'),
+                        '{date_time}' => date('Ymd_His'),
+                        '{unique_token}' => uniqid(),
+                    ]
                 );
 
                 return $value;
