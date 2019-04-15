@@ -11,7 +11,7 @@
 namespace CleverAge\ProcessBundle\Task\Process;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
+use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Psr\Log\LoggerInterface;
@@ -29,7 +29,7 @@ use Symfony\Component\Process\Process;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface
+class ProcessLauncherTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
     /** @var LoggerInterface */
     protected $logger;
@@ -89,6 +89,8 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $this->logger->debug("Running command: {$process->getCommandLine()}", $logContext);
 
         sleep($options['sleep_interval_after_launch']);
+
+        $state->setSkipped(true); // @todo is skipping necessary in case of blocking task ?
     }
 
     /**
@@ -98,14 +100,12 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \Symfony\Component\Process\Exception\RuntimeException
      */
-    public function flush(ProcessState $state)
+    public function proceed(ProcessState $state)
     {
         while (\count($this->launchedProcesses) > 0) {
             $this->handleProcesses($state);
             sleep($this->getOption($state, 'sleep_on_finalize_interval'));
         }
-
-        $state->setSkipped(true);
     }
 
     /**
@@ -163,10 +163,15 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     protected function handleProcesses(ProcessState $state)
     {
+        $options = $this->getOptions($state);
         foreach ($this->launchedProcesses as $key => $process) {
-            if (!$process->isTerminated()) {
-                // @todo handle incremental error output properly, specially for terminal where logs are lost
+            if ($options['echo_output']) {
+                echo $process->getIncrementalOutput();
+            }
+            if ($options['echo_error_output']) {
                 echo $process->getIncrementalErrorOutput();
+            }
+            if (!$process->isTerminated()) {
                 continue;
             }
 
@@ -220,12 +225,16 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
                 'sleep_interval_after_launch' => 1,
                 'sleep_on_finalize_interval' => 1,
                 'process_options' => [],
+                'echo_output' => false,
+                'echo_error_output' => true,
             ]
         );
         $resolver->setAllowedTypes('max_processes', ['integer']);
         $resolver->setAllowedTypes('sleep_interval', ['integer']);
         $resolver->setAllowedTypes('sleep_interval_after_launch', ['integer']);
         $resolver->setAllowedTypes('process_options', ['array']);
+        $resolver->setAllowedTypes('echo_output', ['bool']);
+        $resolver->setAllowedTypes('echo_error_output', ['bool']);
     }
 
     /**
