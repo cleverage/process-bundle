@@ -10,20 +10,17 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Trait TransformerTrait
- *
- * @package CleverAge\ProcessBundle\Transformer
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 trait TransformerTrait
 {
-
     /** @var TransformerRegistry */
     protected $transformerRegistry;
 
@@ -31,7 +28,7 @@ trait TransformerTrait
      * @param array $transformers
      * @param mixed $value
      *
-     * @throws \CleverAge\ProcessBundle\Exception\TransformerException
+     * @throws TransformerException
      *
      * @return mixed
      */
@@ -59,19 +56,20 @@ trait TransformerTrait
      * keys This way you can chain multiple times the same transformer. Without this, it would silently call only the
      * 1st one.
      *
+     * @param string $transformerCode
+     *
+     * @throws MissingTransformerException
+     *
+     * @return string
+     *
      * @example
-     * transformers:
-     *     callback#1:
+     *         transformers:
+     *         callback#1:
      *         callback: array_filter
-     *     callback#2:
+     *         callback#2:
      *         callback: array_reverse
      *
      *
-     * @param string $transformerCode
-     *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
-     *
-     * @return string
      */
     protected function getCleanedTransfomerCode(string $transformerCode)
     {
@@ -92,10 +90,12 @@ trait TransformerTrait
     {
         $resolver->setDefault($optionName, []);
         $resolver->setAllowedTypes($optionName, ['array']);
-        /** @noinspection PhpUnusedParameterInspection */
-        $resolver->setNormalizer( // This logic is duplicated from the array_map transformer @todo fix me
+        $resolver->setNormalizer(
             $optionName,
-            function (Options $options, $transformers) {
+            function (/** @noinspection PhpUnusedParameterInspection */
+                Options $options,
+                $transformers
+            ) {
                 $transformerClosures = [];
 
                 foreach ($transformers as $origTransformerCode => $transformerOptions) {
@@ -109,14 +109,14 @@ trait TransformerTrait
                         );
                     }
 
-                    $transformerClosures[$origTransformerCode] = function ($value) use ($transformer, $transformerOptions) {
+                    $closure = static function ($value) use ($transformer, $transformerOptions) {
                         return $transformer->transform($value, $transformerOptions);
                     };
+                    $transformerClosures[$origTransformerCode] = $closure;
                 }
 
                 return $transformerClosures;
             }
         );
     }
-
 }
