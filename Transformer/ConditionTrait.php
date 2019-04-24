@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (C) 2017-2018 Clever-Age
+ * Copyright (C) 2017-2019 Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,6 +11,9 @@
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -81,12 +84,15 @@ trait ConditionTrait
     {
         $resolver->setDefault($wrapperKey, []);
         $resolver->setAllowedTypes($wrapperKey, ['array']);
-        $resolver->setNormalizer($wrapperKey, function (OptionsResolver $options, $value) {
-            $conditionResolver = new OptionsResolver();
-            $this->configureConditionOptions($conditionResolver);
+        $resolver->setNormalizer(
+            $wrapperKey,
+            function (OptionsResolver $options, $value) {
+                $conditionResolver = new OptionsResolver();
+                $this->configureConditionOptions($conditionResolver);
 
-            return $conditionResolver->resolve($value);
-        });
+                return $conditionResolver->resolve($value);
+            }
+        );
     }
 
     /**
@@ -117,9 +123,9 @@ trait ConditionTrait
      * @param bool         $shouldMatch
      * @param bool         $regexpMode
      *
-     * @throws \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
-     * @throws \Symfony\Component\PropertyAccess\Exception\AccessException
-     * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
+     * @throws UnexpectedTypeException
+     * @throws AccessException
+     * @throws InvalidArgumentException
      *
      * @return bool
      */

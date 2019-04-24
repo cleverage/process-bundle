@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (C) 2017-2018 Clever-Age
+ * Copyright (C) 2017-2019 Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,7 +10,11 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -38,9 +42,9 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
      * @param mixed $value
      * @param array $options
      *
-     * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\PropertyAccess\Exception\AccessException
-     * @throws \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @throws InvalidArgumentException
+     * @throws AccessException
+     * @throws UnexpectedTypeException
      *
      * @return mixed $value
      */
@@ -71,7 +75,7 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {

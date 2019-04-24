@@ -1,12 +1,20 @@
-<?php
-
+<?php declare(strict_types=1);
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2019 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Filesystem;
 
-
-class JsonStreamFile
+/**
+ * Wrapper around JSON files to read them in a stream
+ */
+class JsonStreamFile implements FileStreamInterface, WritableFileInterface
 {
-
     /** @var \SplFileObject */
     protected $file;
 
@@ -73,9 +81,11 @@ class JsonStreamFile
     /**
      * Return an array containing current data and moving the file pointer
      *
+     * @param null $length
+     *
      * @return array|null
      */
-    public function readLine()
+    public function readLine($length = null): ?array
     {
         if ($this->isEndOfFile()) {
             return null;
@@ -88,13 +98,13 @@ class JsonStreamFile
     }
 
     /**
-     * @param $item
+     * @param array $item
      *
      * @return int
      */
     public function writeLine($item): int
     {
-        $this->file->fwrite(json_encode($item) . PHP_EOL);
+        $this->file->fwrite(json_encode($item).PHP_EOL);
         $this->currentLine++;
 
         return $this->currentLine;

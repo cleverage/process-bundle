@@ -120,7 +120,7 @@ Validate data from the input and pass it to the output
 ### Creating the class
 
 ```php
-<?php
+<?php declare(strict_types=1);
 
 namespace MyNamespace\FooBarBundle\Task;
 

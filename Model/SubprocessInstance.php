@@ -1,5 +1,12 @@
-<?php
-
+<?php declare(strict_types=1);
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2019 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Model;
 
@@ -12,8 +19,7 @@ use Symfony\Component\Process\Process;
 
 class SubprocessInstance
 {
-
-    const OPTION_JSON_BUFFERING = 'json-buffering';
+    public const OPTION_JSON_BUFFERING = 'json-buffering';
 
     /** @var Process */
     protected $process;
@@ -51,8 +57,13 @@ class SubprocessInstance
      * @param array           $context
      * @param array           $options
      */
-    public function __construct(KernelInterface $kernel, string $processCode, ?string $input, array $context = [], array $options = [])
-    {
+    public function __construct(
+        KernelInterface $kernel,
+        string $processCode,
+        ?string $input,
+        array $context = [],
+        array $options = []
+    ) {
         $this->processCode = $processCode;
         $this->input = $input;
         $this->context = $context;
@@ -61,10 +72,10 @@ class SubprocessInstance
         $this->configureOptions($resolver);
         $this->options = $resolver->resolve($options);
 
-        $this->consolePath = $kernel->getProjectDir() . '/bin/console';
+        $this->consolePath = $kernel->getProjectDir().'/bin/console';
         $this->environment = $kernel->getEnvironment();
-        $this->bufferPath = $kernel->getProjectDir() . '/var/cdm_buffer_' . uniqid() . '.json-stream'; // Todo use param ?
-        $this->logDir = $kernel->getLogDir() . '/process';
+        $this->bufferPath = $kernel->getProjectDir().'/var/cdm_buffer_'.uniqid().'.json-stream'; // Todo use param ?
+        $this->logDir = $kernel->getLogDir().'/process';
     }
 
 
@@ -81,7 +92,7 @@ class SubprocessInstance
             'nohup',
             $pathFinder->find(),
             $this->consolePath,
-            '--env=' . $this->environment,
+            '--env='.$this->environment,
             'cleverage:process:execute',
             '--input-from-stdin',
         ];
@@ -93,10 +104,13 @@ class SubprocessInstance
         }
 
         if ($this->options[self::OPTION_JSON_BUFFERING]) {
-            $arguments = array_merge($arguments, [
-                '--output=' . $this->bufferPath,
-                '--output-format=json-stream',
-            ]);
+            $arguments = array_merge(
+                $arguments,
+                [
+                    '--output='.$this->bufferPath,
+                    '--output-format=json-stream',
+                ]
+            );
         }
 
         if (!empty($this->context)) {

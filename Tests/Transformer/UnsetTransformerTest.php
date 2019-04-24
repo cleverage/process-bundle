@@ -1,7 +1,14 @@
-<?php
+<?php declare(strict_types=1);
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2019 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Tests\Transformer;
-
 
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
@@ -16,9 +23,9 @@ class UnsetTransformerTest extends AbstractProcessTest
     public function testSimpleUnset()
     {
         $input = [
-            'other'    => 1,
+            'other' => 1,
             'to_unset' => 1,
-            'to_test'  => 2,
+            'to_test' => 2,
         ];
         $result = $this->processManager->execute('test.unset_transformer.simple', $input);
         self::assertEquals(['other' => 1, 'to_test' => 2], $result);
@@ -30,9 +37,9 @@ class UnsetTransformerTest extends AbstractProcessTest
     public function testConditionalUnset()
     {
         $input = [
-            'other'    => 1,
+            'other' => 1,
             'to_unset' => 1,
-            'to_test'  => 2,
+            'to_test' => 2,
         ];
 
         // Should unset

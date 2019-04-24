@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
 * This file is part of the CleverAge/ProcessBundle package.
 *
-* Copyright (C) 2017-2018 Clever-Age
+* Copyright (C) 2017-2019 Clever-Age
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
@@ -14,6 +14,9 @@ use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -25,11 +28,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
 {
-    /** @var \Psr\Log\LoggerInterface */
+    /** @var LoggerInterface */
     protected $logger;
 
     /**
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -42,7 +45,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
      * @throws \UnexpectedValueException
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \LogicException
      */
     public function execute(ProcessState $state)
@@ -114,8 +117,8 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws UndefinedOptionsException
+     * @throws AccessException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

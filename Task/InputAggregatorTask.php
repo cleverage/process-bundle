@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (C) 2017-2018 Clever-Age
+ * Copyright (C) 2017-2019 Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,13 +12,16 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Wait for defined inputs before passing an aggregated output.
  * Should have been a BlockingTask, but due to limitations in the current model, it's a hack using skips and finalize.
  *
- * @see README.md:Known issues
+ * @see        README.md:Known issues
  * @deprecated It's way too much error prone - should be refactored as a blocking task
  */
 class InputAggregatorTask extends AbstractConfigurableTask
@@ -34,7 +37,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
      *
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
@@ -74,16 +77,18 @@ class InputAggregatorTask extends AbstractConfigurableTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired('input_codes');
-        $resolver->setDefaults([
-            'clean_input_on_override' => true,
-            'keep_inputs' => null,
-        ]);
+        $resolver->setDefaults(
+            [
+                'clean_input_on_override' => true,
+                'keep_inputs' => null,
+            ]
+        );
         $resolver->setAllowedTypes('input_codes', 'array');
         $resolver->setAllowedTypes('clean_input_on_override', 'boolean');
         $resolver->setAllowedTypes('keep_inputs', ['NULL', 'array']);
@@ -94,7 +99,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
      *
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      *
@@ -103,6 +108,9 @@ class InputAggregatorTask extends AbstractConfigurableTask
     protected function getInputCode(ProcessState $state)
     {
         $previousState = $state->getPreviousState();
+        if (!$previousState) {
+            throw new \RuntimeException('No previous state for current task');
+        }
         $previousTaskCode = $previousState->getTaskConfiguration()->getCode();
         $inputCodes = $this->getOption($state, 'input_codes');
         if (!array_key_exists($previousTaskCode, $inputCodes)) {
@@ -117,7 +125,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
      *
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \InvalidArgumentException
      *
      * @return bool

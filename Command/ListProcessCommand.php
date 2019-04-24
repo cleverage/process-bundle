@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
 * This file is part of the CleverAge/ProcessBundle package.
 *
-* Copyright (C) 2017-2018 Clever-Age
+* Copyright (C) 2017-2019 Clever-Age
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
@@ -13,6 +13,8 @@ namespace CleverAge\ProcessBundle\Command;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -31,7 +33,7 @@ class ListProcessCommand extends Command
     /**
      * @param ProcessConfigurationRegistry $processConfigRegistry
      *
-     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @throws LogicException
      */
     public function __construct(ProcessConfigurationRegistry $processConfigRegistry)
     {
@@ -41,7 +43,7 @@ class ListProcessCommand extends Command
 
     /**
      * {@inheritdoc}
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function configure()
     {
@@ -60,7 +62,9 @@ class ListProcessCommand extends Command
 
         $publicCount = \array_reduce($processConfigurations, [$this, 'publicProcessCounter'], 0);
         $privateCount = \array_reduce($processConfigurations, [$this, 'privateProcessCounter'], 0);
-        $output->writeln("<info>There are {$publicCount} process configurations defined (and {$privateCount} private) :</info>");
+        $output->writeln(
+            "<info>There are {$publicCount} process configurations defined (and {$privateCount} private) :</info>"
+        );
 
         $messages = [];
         foreach ($processConfigurations as $processConfiguration) {
@@ -69,12 +73,12 @@ class ListProcessCommand extends Command
                 $message = "<info> - </info>{$processConfiguration->getCode()}<info> with {$countTasks} tasks</info>";
 
                 if ($processConfiguration->isPrivate()) {
-                    $message .= " <comment>(private)</comment>";
+                    $message .= ' <comment>(private)</comment>';
                 }
 
                 $messages[] = [
                     'process' => $processConfiguration,
-                    'output'  => $message,
+                    'output' => $message,
                 ];
             }
         }
@@ -89,7 +93,7 @@ class ListProcessCommand extends Command
 
             if ($processConfiguration->getDescription()) {
                 $outputMessage = $this->padMessage($outputMessage, $maxMessageLength + 3);
-                $outputMessage .= "{$processConfiguration->getDescription()}";
+                $outputMessage .= $processConfiguration->getDescription();
             }
 
             $outputMessages[] = $outputMessage;
@@ -147,8 +151,8 @@ class ListProcessCommand extends Command
     /**
      * Filter callback to find max message length
      *
-     * @param ProcessConfiguration $a
-     * @param ProcessConfiguration $b
+     * @param int   $max
+     * @param array $message
      *
      * @return int
      */

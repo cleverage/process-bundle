@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
 * This file is part of the CleverAge/ProcessBundle package.
 *
-* Copyright (C) 2017-2018 Clever-Age
+* Copyright (C) 2017-2019 Clever-Age
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
@@ -13,6 +13,9 @@ namespace CleverAge\ProcessBundle\Task\File\Csv;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -33,7 +36,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
      * @throws \RuntimeException
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
@@ -59,8 +62,8 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
@@ -75,7 +78,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 
         $resolver->setNormalizer(
             'file_path',
-            function (Options $options, $value) {
+            static function (Options $options, $value) {
                 $value = strtr(
                     $value,
                     [
@@ -95,7 +98,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
      *
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      *
      * @return array
      */

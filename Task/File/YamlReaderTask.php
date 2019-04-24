@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (C) 2017-2018 Clever-Age
+ * Copyright (C) 2017-2019 Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,8 +12,12 @@ namespace CleverAge\ProcessBundle\Task\File;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Task\AbstractIterableOutputTask;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -27,8 +31,8 @@ class YamlReaderTask extends AbstractIterableOutputTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws UndefinedOptionsException
+     * @throws AccessException
      * @throws \UnexpectedValueException
      */
     protected function configureOptions(OptionsResolver $resolver)
@@ -41,7 +45,7 @@ class YamlReaderTask extends AbstractIterableOutputTask
         $resolver->setAllowedTypes('file_path', ['string']);
         $resolver->setNormalizer(
             'file_path',
-            function (Options $options, $value) {
+            static function (Options $options, $value) {
                 if (!file_exists($value)) {
                     throw new \UnexpectedValueException("File not found: {$value}");
                 }
@@ -55,8 +59,8 @@ class YamlReaderTask extends AbstractIterableOutputTask
      * @param ProcessState $state
      *
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\Yaml\Exception\ParseException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ParseException
+     * @throws ExceptionInterface
      *
      * @return \Iterator
      */

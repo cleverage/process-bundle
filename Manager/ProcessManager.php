@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (C) 2017-2018 Clever-Age
+ * Copyright (C) 2017-2019 Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,7 +13,9 @@ namespace CleverAge\ProcessBundle\Manager;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
+use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
 use CleverAge\ProcessBundle\Logger\ProcessLogger;
 use CleverAge\ProcessBundle\Logger\TaskLogger;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
@@ -26,7 +28,10 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMInvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * Execute processes
@@ -227,8 +232,8 @@ class ProcessManager
      *
      * @param TaskConfiguration $taskConfiguration
      *
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @throws ServiceNotFoundException
+     * @throws ServiceCircularReferenceException
      * @throws \UnexpectedValueException
      * @throws \RuntimeException
      */
@@ -363,6 +368,9 @@ class ProcessManager
     protected function processExecution(TaskConfiguration $taskConfiguration, int $executionFlag): void
     {
         $task = $taskConfiguration->getTask();
+        if (null === $task) {
+            throw new \RuntimeException("Missing task for configuration {$taskConfiguration->getCode()}");
+        }
         $state = $taskConfiguration->getState();
 
         try {
@@ -401,7 +409,11 @@ class ProcessManager
 
         // Manage exception catching and setting the same
         if ($exception) {
-            $this->taskLogger->log($taskConfiguration->getLogLevel(), $exception->getMessage(), $state->getErrorContext());
+            $this->taskLogger->log(
+                $taskConfiguration->getLogLevel(),
+                $exception->getMessage(),
+                $state->getErrorContext()
+            );
             $state->setException($exception);
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
@@ -472,7 +484,7 @@ class ProcessManager
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Doctrine\ORM\ORMInvalidArgumentException
+     * @throws ORMInvalidArgumentException
      *
      * @return ProcessHistory
      */
@@ -561,9 +573,9 @@ class ProcessManager
      * @param ProcessConfiguration $processConfiguration
      *
      * @throws \RuntimeException
-     * @throws \CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException
-     * @throws \CleverAge\ProcessBundle\Exception\CircularProcessException
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws InvalidProcessConfigurationException
+     * @throws CircularProcessException
+     * @throws MissingTaskConfigurationException
      */
     protected function checkProcess(ProcessConfiguration $processConfiguration): void
     {

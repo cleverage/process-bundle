@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (C) 2017-2018 Clever-Age
+ * Copyright (C) 2017-2019 Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,6 +11,9 @@
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -23,7 +26,7 @@ class InputCsvReaderTask extends CsvReaderTask
      *
      * @TODO refactor to get file path outside of options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      *
      * @return array
      */
@@ -40,8 +43,8 @@ class InputCsvReaderTask extends CsvReaderTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
@@ -64,7 +67,7 @@ class InputCsvReaderTask extends CsvReaderTask
     protected function getFilePath(array $options, string $input)
     {
         $basePath = $options['base_path'];
-        if (\strlen($basePath) > 0) {
+        if ('' !== $basePath) {
             $basePath = rtrim($options['base_path'], '/').'/';
         }
 

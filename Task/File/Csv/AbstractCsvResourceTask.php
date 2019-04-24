@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
 * This file is part of the CleverAge/ProcessBundle package.
 *
-* Copyright (C) 2017-2018 Clever-Age
+* Copyright (C) 2017-2019 Clever-Age
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
@@ -14,6 +14,9 @@ use CleverAge\ProcessBundle\Filesystem\CsvResource;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -41,7 +44,7 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
      * @param ProcessState $state
      *
      * @throws \UnexpectedValueException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \RuntimeException
      */
     protected function initFile(ProcessState $state)
@@ -63,8 +66,8 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (C) 2017-2018 Clever-Age
+ * Copyright (C) 2017-2019 Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,6 +13,8 @@ namespace CleverAge\ProcessBundle\Command;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,11 +30,10 @@ use Symfony\Component\Yaml\Parser;
  */
 class ExecuteProcessCommand extends Command
 {
+    public const OUTPUT_STDOUT = '-';
 
-    const OUTPUT_STDOUT = '-';
-
-    const OUTPUT_FORMAT_DUMP = 'dump';
-    const OUTPUT_FORMAT_JSON = 'json-stream';
+    public const OUTPUT_FORMAT_DUMP = 'dump';
+    public const OUTPUT_FORMAT_JSON = 'json-stream';
 
     /** @var ProcessManager */
     protected $processManager;
@@ -40,7 +41,7 @@ class ExecuteProcessCommand extends Command
     /**
      * @param ProcessManager $processManager
      *
-     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @throws LogicException
      */
     public function __construct(ProcessManager $processManager)
     {
@@ -51,7 +52,7 @@ class ExecuteProcessCommand extends Command
     /**
      * {@inheritdoc}
      *
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function configure()
     {
@@ -63,15 +64,21 @@ class ExecuteProcessCommand extends Command
         );
         $this->addOption('input', 'i', InputOption::VALUE_REQUIRED, 'Pass input data to the first task of the process');
         $this->addOption('input-from-stdin', null, InputOption::VALUE_NONE, 'Read input data from stdin');
-        $this->addOption('context', 'c', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Contextual value', []);
-        $this->addOption('output', 'o',
+        $this->addOption(
+            'context',
+            'c',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'Contextual value',
+            []
+        );
+        $this->addOption(
+            'output',
+            'o',
             InputOption::VALUE_REQUIRED,
             'Output path to dump data ("-" to use STDOUT with symfony dumper)',
-            self::OUTPUT_STDOUT);
-        $this->addOption('output-format', 't',
-            InputOption::VALUE_OPTIONAL,
-            'Output format',
-            null);
+            self::OUTPUT_STDOUT
+        );
+        $this->addOption('output-format', 't', InputOption::VALUE_OPTIONAL, 'Output format');
     }
 
     /**
@@ -115,7 +122,7 @@ class ExecuteProcessCommand extends Command
     /**
      * @param InputInterface $input
      *
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @return array
      */
@@ -138,6 +145,11 @@ class ExecuteProcessCommand extends Command
         return $context;
     }
 
+    /**
+     * @param mixed           $data
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     */
     protected function handleOutputData($data, InputInterface $input, OutputInterface $output)
     {
         // Skip all if undefined
@@ -153,10 +165,12 @@ class ExecuteProcessCommand extends Command
                 } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
                     $output->writeln(json_encode($data));
                 } else {
-                    throw new \InvalidArgumentException(sprintf(
-                        "Cannot handle data output with format '%s'",
-                        $input->getOption('output-format')
-                    ));
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            "Cannot handle data output with format '%s'",
+                            $input->getOption('output-format')
+                        )
+                    );
                 }
             }
         } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
@@ -167,10 +181,12 @@ class ExecuteProcessCommand extends Command
                 $output->writeln(sprintf("Output stored in '%s'", $input->getOption('output')));
             }
         } else {
-            throw new \InvalidArgumentException(sprintf(
-                "Cannot handle data output with format '%s'",
-                $input->getOption('output-format')
-            ));
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Cannot handle data output with format '%s'",
+                    $input->getOption('output-format')
+                )
+            );
         }
     }
 }

@@ -10,7 +10,7 @@
         "export"
     ],
     "homepage": "https://github.com/cleverage/process-bundle",
-    "type": "library",
+    "type": "symfony-bundle",
     "license": "MIT",
     "authors": [
         {

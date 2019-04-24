@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (C) 2017-2018 Clever-Age
+ * Copyright (C) 2017-2019 Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,9 +13,12 @@ namespace CleverAge\ProcessBundle\Task\File;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use League\Flysystem\FileNotFoundException;
 use League\Flysystem\FilesystemInterface;
+use League\Flysystem\FilesystemNotFoundException;
 use League\Flysystem\MountManager;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -53,8 +56,8 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
      * @param ProcessState $state
      *
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \League\Flysystem\FilesystemNotFoundException
+     * @throws ExceptionInterface
+     * @throws FilesystemNotFoundException
      */
     public function initialize(ProcessState $state)
     {
@@ -72,10 +75,10 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
      * @param ProcessState $state
      *
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \UnexpectedValueException
-     * @throws \League\Flysystem\FilesystemNotFoundException
-     * @throws \League\Flysystem\FileNotFoundException
+     * @throws FilesystemNotFoundException
+     * @throws FileNotFoundException
      */
     public function execute(ProcessState $state)
     {
@@ -96,7 +99,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
      * @param ProcessState $state
      *
      * @throws \UnexpectedValueException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \InvalidArgumentException
      *
      * @return bool|mixed
@@ -113,7 +116,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
      *
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     protected function findMatchingFiles(ProcessState $state)
     {
@@ -148,9 +151,9 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
      * @param string       $filename
      * @param bool         $removeSource
      *
-     * @throws \League\Flysystem\FileNotFoundException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \League\Flysystem\FilesystemNotFoundException
+     * @throws FileNotFoundException
+     * @throws ExceptionInterface
+     * @throws FilesystemNotFoundException
      * @throws \InvalidArgumentException
      *
      * @return mixed

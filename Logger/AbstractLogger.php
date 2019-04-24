@@ -1,11 +1,16 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Logger;
 
+use Psr\Log\AbstractLogger as BaseAbstractLogger;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 
-class AbstractLogger implements LoggerInterface
+/**
+ * Base logic for logger tasks, see inherited services for more information
+ *
+ * Used for simplified autowiring
+ */
+abstract class AbstractLogger extends BaseAbstractLogger
 {
     /** @var LoggerInterface */
     protected $logger;
@@ -23,73 +28,8 @@ class AbstractLogger implements LoggerInterface
     /**
      * {@inheritDoc}
      */
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         $this->logger->log($level, $message, $context);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function emergency($message, array $context = [])
-    {
-        $this->log(LogLevel::EMERGENCY, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function alert($message, array $context = [])
-    {
-        $this->log(LogLevel::ALERT, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function critical($message, array $context = [])
-    {
-        $this->log(LogLevel::CRITICAL, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function error($message, array $context = [])
-    {
-        $this->log(LogLevel::ERROR, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function warning($message, array $context = [])
-    {
-        $this->log(LogLevel::WARNING, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function notice($message, array $context = [])
-    {
-        $this->log(LogLevel::NOTICE, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function info($message, array $context = [])
-    {
-        $this->log(LogLevel::INFO, $message, $context);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function debug($message, array $context = [])
-    {
-        $this->log(LogLevel::DEBUG, $message, $context);
-    }
-
 }

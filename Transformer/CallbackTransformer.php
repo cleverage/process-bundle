@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (C) 2017-2018 Clever-Age
+ * Copyright (C) 2017-2019 Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -56,7 +57,7 @@ class CallbackTransformer implements ConfigurableTransformerInterface
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -69,7 +70,7 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'callback',
-            function (Options $options, $value) {
+            static function (Options $options, $value) {
                 if (!\is_callable($value)) {
                     throw new InvalidOptionsException(
                         'Callback option must be callable'
@@ -93,9 +94,12 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'additional_parameters',
-            function (Options $options, $value) {
+            static function (Options $options, $value) {
                 if ($value) {
-                    @trigger_error('The "additional_parameters" option is deprecated. Use "right_parameters" instead.', E_USER_DEPRECATED);
+                    @trigger_error(
+                        'The "additional_parameters" option is deprecated. Use "right_parameters" instead.',
+                        E_USER_DEPRECATED
+                    );
                 }
 
                 return $value;

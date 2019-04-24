@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
 * This file is part of the CleverAge/ProcessBundle package.
 *
-* Copyright (C) 2017-2018 Clever-Age
+* Copyright (C) 2017-2019 Clever-Age
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
@@ -11,7 +11,12 @@
 namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -38,11 +43,11 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
      * @param mixed $value
      * @param array $options
      *
-     * @throws \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @throws \CleverAge\ProcessBundle\Exception\TransformerException
-     * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\PropertyAccess\Exception\AccessException
-     * @throws \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
+     * @throws NoSuchPropertyException
+     * @throws TransformerException
+     * @throws InvalidArgumentException
+     * @throws AccessException
+     * @throws UnexpectedTypeException
      *
      * @return mixed $value
      */
@@ -58,7 +63,7 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
 
         $iterable = $this->accessor->getValue($value, $options['iterator']);
         if (!is_iterable($iterable)) {
-            throw new TransformerException($options['iterator'], 0, 'Property not an iterable');
+            throw new TransformerException($options['iterator']);
         }
 
         $protertiesToSet = [];
@@ -69,7 +74,7 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
             } else {
                 $protertiesValue = $this->accessor->getValue($value, $propertyValuePath);
                 if (null === $protertiesValue && !$options['ignore_null']) {
-                    throw new TransformerException($propertyValuePath, 0, 'Property is null');
+                    throw new TransformerException($propertyValuePath);
                 }
             }
             $protertiesToSet[$propertyName] = $protertiesValue;
@@ -79,7 +84,7 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
             foreach ($protertiesToSet as $protertyName => $propertyValue) {
                 try {
                     $this->accessor->setValue($item, $protertyName, $propertyValue);
-                } catch (\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException $e) {
+                } catch (NoSuchPropertyException $e) {
                     if ($item instanceof \stdClass) {
                         $item = (object) array_merge((array) $item, [$protertyName => $propertyValue]);
                     } else {
@@ -105,7 +110,7 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {

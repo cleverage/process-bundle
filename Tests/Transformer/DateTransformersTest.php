@@ -1,4 +1,12 @@
-<?php
+<?php declare(strict_types=1);
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (C) 2017-2019 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
 
 namespace CleverAge\ProcessBundle\Tests\Transformer;
 
@@ -39,8 +47,8 @@ class DateTransformersTest extends AbstractProcessTest
         $result = $this->processManager->execute('test.date_transformers.date_parser', '2001-01-01');
 
         // There could be a 1s difference, depending on execution time...
-        $date->setTime(0,0);
-        $result->setTime(0,0);
+        $date->setTime(0, 0);
+        $result->setTime(0, 0);
 
         self::assertInstanceOf(\DateTime::class, $result);
         if ($result instanceof \DateTime) {
@@ -50,6 +58,7 @@ class DateTransformersTest extends AbstractProcessTest
 
     /**
      * Assert that a date is not parsed if the format doesn't match
+     *
      * @expectedException \RuntimeException
      */
     public function testDateParserError()
@@ -62,7 +71,10 @@ class DateTransformersTest extends AbstractProcessTest
      */
     public function testDateParseFormat()
     {
-        $result = $this->processManager->execute('test.date_transformers.date_parse_format', '2001-01-01T00:00:00+00:00');
+        $result = $this->processManager->execute(
+            'test.date_transformers.date_parse_format',
+            '2001-01-01T00:00:00+00:00'
+        );
         self::assertEquals('2001-01-01', $result);
     }
 }

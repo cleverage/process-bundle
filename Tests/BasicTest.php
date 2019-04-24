@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (C) 2017-2018 Clever-Age
+ * Copyright (C) 2017-2019 Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -45,18 +45,20 @@ class BasicTest extends AbstractProcessTest
         $this->assertDataQueue(
             [
                 [
-                    'task'  => 'doNothing',
+                    'task' => 'doNothing',
                     'value' => 1,
                 ],
                 [
-                    'task'  => 'doNothing',
+                    'task' => 'doNothing',
                     'value' => 2,
                 ],
                 [
-                    'task'  => 'doNothing',
+                    'task' => 'doNothing',
                     'value' => 3,
                 ],
-            ], 'test.error_process');
+            ],
+            'test.error_process'
+        );
     }
 
     /**
@@ -68,21 +70,23 @@ class BasicTest extends AbstractProcessTest
         $this->assertDataQueue(
             [
                 [
-                    'task'  => 'doNothing2',
+                    'task' => 'doNothing2',
                     'value' => 1,
                 ],
                 [
-                    'task'  => 'doNothing2',
+                    'task' => 'doNothing2',
                     'value' => 2,
                 ],
                 [
-                    'task'  => 'doNothing2',
+                    'task' => 'doNothing2',
                     'value' => 3,
                 ],
                 [
-                    'task'  => 'aggregate',
+                    'task' => 'aggregate',
                     'value' => [1, 2, 3],
                 ],
-            ], 'test.error_process_with_blocking');
+            ],
+            'test.error_process_with_blocking'
+        );
     }
 }

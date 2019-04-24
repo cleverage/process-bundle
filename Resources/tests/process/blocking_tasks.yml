@@ -68,9 +68,9 @@ clever_age_process:
                     service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
                     options:
                         output:
-                        - [1, 2, 3]
-                        - [1, 2, 3]
-                        - [1, 2, 3]
+                            - [1, 2, 3]
+                            - [1, 2, 3]
+                            - [1, 2, 3]
                     outputs: [iterate]
 
                 iterate:

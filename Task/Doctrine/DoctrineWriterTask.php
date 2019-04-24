@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
 * This file is part of the CleverAge/ProcessBundle package.
 *
-* Copyright (C) 2017-2018 Clever-Age
+* Copyright (C) 2017-2019 Clever-Age
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
@@ -14,6 +14,10 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\ORMException;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -27,7 +31,7 @@ class DoctrineWriterTask extends AbstractDoctrineTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ORMException
      */
     public function execute(ProcessState $state)
     {
@@ -38,8 +42,8 @@ class DoctrineWriterTask extends AbstractDoctrineTask
      * @param OptionsResolver $resolver
      *
      * @throws \UnexpectedValueException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws UndefinedOptionsException
+     * @throws AccessException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
@@ -55,8 +59,8 @@ class DoctrineWriterTask extends AbstractDoctrineTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \Doctrine\ORM\ORMException
+     * @throws ExceptionInterface
+     * @throws ORMException
      *
      * @return mixed
      */

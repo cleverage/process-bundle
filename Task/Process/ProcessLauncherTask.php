@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
 * This file is part of the CleverAge/ProcessBundle package.
 *
-* Copyright (C) 2017-2018 Clever-Age
+* Copyright (C) 2017-2019 Clever-Age
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
@@ -19,8 +19,12 @@ use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * Launch a new process for each input received, input must be a scalar, a resource or a \Traversable
@@ -68,7 +72,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
@@ -111,8 +115,8 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     /**
      * @param ProcessState $state
      *
+     * @throws ExceptionInterface
      * @return bool
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     public function next(ProcessState $state)
     {
@@ -138,7 +142,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     protected function handleInput(ProcessState $state)
     {
@@ -163,12 +167,13 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     /**
      * @param ProcessState $state
      *
+     * @throws ExceptionInterface
      * @return SubprocessInstance
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     protected function launchProcess(ProcessState $state)
     {
-        $subprocess = new SubprocessInstance($this->kernel,
+        $subprocess = new SubprocessInstance(
+            $this->kernel,
             $this->getOption($state, 'process'),
             $state->getInput(),
             $this->getOption($state, 'context'),
@@ -183,7 +188,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws RuntimeException
      */
     protected function handleProcesses(ProcessState $state)
     {
@@ -220,9 +225,9 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
+     * @throws InvalidConfigurationException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
@@ -258,14 +263,17 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $resolver->setAllowedTypes('context', ['array']);
 
         $resolver->setAllowedTypes('process_options', ['array']);
-        $resolver->setNormalizer('process_options', function (Options $options, $value) {
-            if (!empty($value)) {
-                // Todo deprecation trigger
-                throw new \InvalidArgumentException("Deprecated option, please contact support for help");
-            }
+        $resolver->setNormalizer(
+            'process_options',
+            static function (Options $options, $value) {
+                if (!empty($value)) {
+                    // Todo deprecation trigger
+                    throw new \InvalidArgumentException('Deprecated option, please contact support for help');
+                }
 
-            return $value;
-        });
+                return $value;
+            }
+        );
     }
 
     /**

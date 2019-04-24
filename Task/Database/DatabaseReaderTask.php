@@ -1,8 +1,8 @@
-<?php
+<?php declare(strict_types=1);
 /*
 * This file is part of the CleverAge/ProcessBundle package.
 *
-* Copyright (C) 2017-2018 Clever-Age
+* Copyright (C) 2017-2019 Clever-Age
 *
 * For the full copyright and license information, please view the LICENSE
 * file that was distributed with this source code.
@@ -15,9 +15,13 @@ use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Driver\PDOStatement;
+use Doctrine\DBAL\Driver\Statement;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -76,8 +80,8 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
      * @param ProcessState $state
      *
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws ExceptionInterface
+     * @throws DBALException
      */
     public function execute(ProcessState $state)
     {
@@ -130,11 +134,11 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \InvalidArgumentException
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      *
-     * @return \Doctrine\DBAL\Driver\Statement
+     * @return Statement
      */
     protected function initializeStatement(ProcessState $state)
     {
@@ -206,9 +210,9 @@ class DatabaseReaderTask extends AbstractConfigurableTask implements IterableTas
      * @param ProcessState $state
      *
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      *
-     * @return \Doctrine\DBAL\Connection
+     * @return Connection
      */
     protected function getConnection(ProcessState $state)
     {
