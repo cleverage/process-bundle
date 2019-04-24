@@ -13,6 +13,7 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 
 /**
  * Base class to handle output iterations
@@ -29,7 +30,7 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
      * @param ProcessState $state
      *
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {

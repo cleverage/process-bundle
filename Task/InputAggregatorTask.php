@@ -12,6 +12,9 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -34,7 +37,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
      *
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
@@ -74,8 +77,8 @@ class InputAggregatorTask extends AbstractConfigurableTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
@@ -96,7 +99,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
      *
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \InvalidArgumentException
      * @throws \UnexpectedValueException
      *
@@ -105,6 +108,9 @@ class InputAggregatorTask extends AbstractConfigurableTask
     protected function getInputCode(ProcessState $state)
     {
         $previousState = $state->getPreviousState();
+        if (!$previousState) {
+            throw new \RuntimeException('No previous state for current task');
+        }
         $previousTaskCode = $previousState->getTaskConfiguration()->getCode();
         $inputCodes = $this->getOption($state, 'input_codes');
         if (!array_key_exists($previousTaskCode, $inputCodes)) {
@@ -119,7 +125,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
      *
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \InvalidArgumentException
      *
      * @return bool

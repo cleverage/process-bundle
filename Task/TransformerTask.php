@@ -10,7 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -18,6 +18,13 @@ use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use CleverAge\ProcessBundle\Transformer\TransformerTrait;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
+use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -29,6 +36,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class TransformerTask extends AbstractConfigurableTask
 {
     use TransformerTrait;
+
+    /** @var LoggerInterface */
+    protected $logger;
 
     /** @var TransformerInterface */
     protected $transformer;
@@ -47,15 +57,15 @@ class TransformerTask extends AbstractConfigurableTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
+     * @throws ExceptionInterface
+     * @throws MissingTransformerException
      * @throws \UnexpectedValueException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws InvalidOptionsException
+     * @throws MissingOptionsException
+     * @throws NoSuchOptionException
+     * @throws OptionDefinitionException
+     * @throws UndefinedOptionsException
      */
     public function execute(ProcessState $state)
     {
@@ -76,14 +86,14 @@ class TransformerTask extends AbstractConfigurableTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws UndefinedOptionsException
+     * @throws OptionDefinitionException
+     * @throws NoSuchOptionException
+     * @throws MissingOptionsException
+     * @throws InvalidOptionsException
+     * @throws AccessException
+     * @throws MissingTransformerException
+     * @throws ExceptionInterface
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

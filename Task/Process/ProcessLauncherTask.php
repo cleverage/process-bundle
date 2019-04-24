@@ -12,16 +12,19 @@ namespace CleverAge\ProcessBundle\Task\Process;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
+use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Model\SubprocessInstance;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * Launch a new process for each input received, input must be a scalar, a resource or a \Traversable
@@ -29,7 +32,7 @@ use Symfony\Component\Process\Process;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface
+class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
 {
     /** @var LoggerInterface */
     protected $logger;
@@ -40,8 +43,14 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     /** @var KernelInterface */
     protected $kernel;
 
-    /** @var Process[] */
+    /** @var SubprocessInstance[] */
     protected $launchedProcesses = [];
+
+    /** @var \SplQueue */
+    protected $finishedBuffers;
+
+    /** @var bool */
+    protected $flushMode = false;
 
     /**
      * @param LoggerInterface              $logger
@@ -56,23 +65,87 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $this->logger = $logger;
         $this->processRegistry = $processRegistry;
         $this->kernel = $kernel;
+
+        $this->finishedBuffers = new \SplQueue();
     }
 
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \Symfony\Component\Filesystem\Exception\IOException
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
+        // TODO still not perfect, optimize and secure it
         $this->handleProcesses($state); // Handler processes first
 
+        if (!$this->flushMode) {
+            $this->handleInput($state);
+            $state->setSkipped(true);
+        } elseif (!$this->finishedBuffers->isEmpty()) {
+            $state->setOutput($this->finishedBuffers->dequeue());
+
+            // After dequeue, stop flush
+            if ($this->finishedBuffers->isEmpty()) {
+                $this->flushMode = false;
+            }
+        } else {
+            $state->setSkipped(true);
+        }
+    }
+
+    /**
+     * @param ProcessState $state
+     */
+    public function flush(ProcessState $state)
+    {
+        $this->flushMode = true;
+        if (!$this->finishedBuffers->isEmpty()) {
+            $state->setOutput($this->finishedBuffers->dequeue());
+        } else {
+            $state->setSkipped(true);
+        }
+
+        // After dequeue, stop flush
+        if ($this->finishedBuffers->isEmpty() && !count($this->launchedProcesses)) {
+            $this->flushMode = false;
+        }
+    }
+
+    /**
+     * @param ProcessState $state
+     *
+     * @throws ExceptionInterface
+     * @return bool
+     */
+    public function next(ProcessState $state)
+    {
+        $this->handleProcesses($state);
+
+        // if there is some data waiting, handle it in priority
+        if ($this->finishedBuffers->count() > 0) {
+            $this->flushMode = true;
+
+            return true;
+        }
+
+        // if we are in flush mode, we should wait for process to finish
+        if ($this->flushMode) {
+            return count($this->launchedProcesses) > 0;
+        }
+
+        sleep($this->getOption($state, 'sleep_on_finalize_interval'));
+
+        return false;
+    }
+
+    /**
+     * @param ProcessState $state
+     *
+     * @throws ExceptionInterface
+     */
+    protected function handleInput(ProcessState $state)
+    {
         $options = $this->getOptions($state);
         while (\count($this->launchedProcesses) >= $options['max_processes']) {
             $this->handleProcesses($state);
@@ -83,10 +156,10 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $this->launchedProcesses[] = $process;
 
         $logContext = [
-            'input' => $process->getInput(),
+            'input' => $process->getProcess()->getInput(),
         ];
 
-        $this->logger->debug("Running command: {$process->getCommandLine()}", $logContext);
+        $this->logger->debug("Running command: {$process->getProcess()->getCommandLine()}", $logContext);
 
         sleep($options['sleep_interval_after_launch']);
     }
@@ -94,96 +167,57 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     /**
      * @param ProcessState $state
      *
-     * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     */
-    public function flush(ProcessState $state)
-    {
-        while (\count($this->launchedProcesses) > 0) {
-            $this->handleProcesses($state);
-            sleep($this->getOption($state, 'sleep_on_finalize_interval'));
-        }
-
-        $state->setSkipped(true);
-    }
-
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \Symfony\Component\Process\Exception\LogicException
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \Symfony\Component\Filesystem\Exception\IOException
-     * @throws \InvalidArgumentException
-     * @throws \RuntimeException
-     * @throws \Symfony\Component\Process\Exception\InvalidArgumentException
-     *
-     * @return \Symfony\Component\Process\Process
+     * @throws ExceptionInterface
+     * @return SubprocessInstance
      */
     protected function launchProcess(ProcessState $state)
     {
-        $pathFinder = new PhpExecutableFinder();
-        $consolePath = $this->kernel->getRootDir().'/../bin/console';
-        $logDir = $this->kernel->getLogDir().'/process';
-        $processCode = $this->getOption($state, 'process');
-        $processOptions = $this->getOption($state, 'process_options');
+        $subprocess = new SubprocessInstance(
+            $this->kernel,
+            $this->getOption($state, 'process'),
+            $state->getInput(),
+            $this->getOption($state, 'context'),
+            [
+                SubprocessInstance::OPTION_JSON_BUFFERING => true,
+            ]
+        );
 
-        $fs = new Filesystem();
-        $fs->mkdir($logDir);
-        if (!$fs->exists($consolePath)) {
-            throw new \RuntimeException("Unable to resolve path to symfony console '{$consolePath}'");
-        }
-
-        $arguments = [
-            'nohup',
-            $pathFinder->find(),
-            $consolePath,
-            '--env='.$this->kernel->getEnvironment(),
-            'cleverage:process:execute',
-            '--input-from-stdin',
-        ];
-
-        $arguments = array_merge($arguments, $processOptions);
-        $arguments[] = $processCode;
-
-        $process = new Process($arguments, null, null, $state->getInput());
-        $process->setCommandLine($process->getCommandLine());
-        $process->inheritEnvironmentVariables();
-        $process->enableOutput();
-        $process->start();
-
-        return $process;
+        return $subprocess->buildProcess()->start();
     }
 
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\Process\Exception\RuntimeException
+     * @throws RuntimeException
      */
     protected function handleProcesses(ProcessState $state)
     {
         foreach ($this->launchedProcesses as $key => $process) {
-            if (!$process->isTerminated()) {
+            if (!$process->getProcess()->isTerminated()) {
                 // @todo handle incremental error output properly, specially for terminal where logs are lost
-                echo $process->getIncrementalErrorOutput();
+                echo $process->getProcess()->getIncrementalErrorOutput();
                 continue;
             }
 
             $logContext = [
-                'cmd' => $process->getCommandLine(),
-                'input' => $process->getInput(),
-                'exit_code' => $process->getExitCode(),
-                'exit_code_text' => $process->getExitCodeText(),
+                'cmd' => $process->getProcess()->getCommandLine(),
+                'input' => $process->getProcess()->getInput(),
+                'exit_code' => $process->getProcess()->getExitCode(),
+                'exit_code_text' => $process->getProcess()->getExitCodeText(),
             ];
             $this->logger->debug('Command terminated', $logContext);
 
             unset($this->launchedProcesses[$key]);
-            if (0 !== $process->getExitCode()) {
-                $this->logger->critical($process->getErrorOutput(), $logContext);
+            if (0 !== $process->getProcess()->getExitCode()) {
+                $this->logger->critical($process->getProcess()->getErrorOutput(), $logContext);
                 $this->killProcesses();
 
-                throw new \RuntimeException("Sub-process has failed: {$process->getExitCodeText()}");
+                throw new \RuntimeException("Sub-process has failed: {$process->getProcess()->getExitCodeText()}");
+            }
+
+            $result = $process->getResult();
+            if (isset($result)) {
+                $this->finishedBuffers->enqueue($result);
             }
         }
     }
@@ -191,9 +225,9 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
+     * @throws InvalidConfigurationException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
@@ -220,12 +254,26 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
                 'sleep_interval_after_launch' => 1,
                 'sleep_on_finalize_interval' => 1,
                 'process_options' => [],
+                'context' => [],
             ]
         );
-        $resolver->setAllowedTypes('max_processes', ['integer']);
-        $resolver->setAllowedTypes('sleep_interval', ['integer']);
-        $resolver->setAllowedTypes('sleep_interval_after_launch', ['integer']);
+        $resolver->setAllowedTypes('max_processes', ['integer', 'double']);
+        $resolver->setAllowedTypes('sleep_interval', ['integer', 'double']);
+        $resolver->setAllowedTypes('sleep_interval_after_launch', ['integer', 'double']);
+        $resolver->setAllowedTypes('context', ['array']);
+
         $resolver->setAllowedTypes('process_options', ['array']);
+        $resolver->setNormalizer(
+            'process_options',
+            static function (Options $options, $value) {
+                if (!empty($value)) {
+                    // Todo deprecation trigger
+                    throw new \InvalidArgumentException('Deprecated option, please contact support for help');
+                }
+
+                return $value;
+            }
+        );
     }
 
     /**

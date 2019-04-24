@@ -13,6 +13,7 @@ namespace CleverAge\ProcessBundle\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -51,9 +52,7 @@ class RegistryCompilerPass implements CompilerPassInterface
      *
      * @throws InvalidArgumentException
      * @throws \UnexpectedValueException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @api
-     *
+     * @throws ServiceNotFoundException
      */
     public function process(ContainerBuilder $container)
     {

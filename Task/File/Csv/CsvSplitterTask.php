@@ -13,6 +13,10 @@ namespace CleverAge\ProcessBundle\Task\File\Csv;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Filesystem\CsvResource;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -23,8 +27,8 @@ class CsvSplitterTask extends InputCsvReaderTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \Symfony\Component\Filesystem\Exception\IOException
+     * @throws ExceptionInterface
+     * @throws IOException
      * @throws \LogicException
      * @throws \UnexpectedValueException
      * @throws \RuntimeException
@@ -84,7 +88,7 @@ class CsvSplitterTask extends InputCsvReaderTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\Filesystem\Exception\IOException
+     * @throws IOException
      */
     public function finalize(ProcessState $state)
     {
@@ -135,8 +139,8 @@ class CsvSplitterTask extends InputCsvReaderTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

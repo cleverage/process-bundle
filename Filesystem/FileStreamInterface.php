@@ -21,16 +21,6 @@ interface FileStreamInterface
     public function getLineCount(): int;
 
     /**
-     * @return array
-     */
-    public function getHeaders(): array;
-
-    /**
-     * @return int
-     */
-    public function getHeaderCount(): int;
-
-    /**
      * @return int
      */
     public function getCurrentLine(): int;
@@ -46,13 +36,6 @@ interface FileStreamInterface
      * @return array|null
      */
     public function readLine($length = null): ?array;
-
-    /**
-     * @param array $fields
-     *
-     * @return int
-     */
-    public function writeLine(array $fields): int;
 
     /**
      * This methods rewinds the file to the first line of data, skipping the headers.

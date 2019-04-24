@@ -10,72 +10,39 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Trait TransformerTrait
- *
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 trait TransformerTrait
 {
-    /** @var LoggerInterface */
-    private $logger;
-
-    /** @var PropertyAccessorInterface */
-    private $accessor;
-
     /** @var TransformerRegistry */
-    private $transformerRegistry;
-
-    /**
-     * @return LoggerInterface
-     */
-    public function getLogger(): LoggerInterface
-    {
-        return $this->logger;
-    }
-
-    /**
-     * @return PropertyAccessorInterface
-     */
-    public function getAccessor(): PropertyAccessorInterface
-    {
-        return $this->accessor;
-    }
-
-    /**
-     * @return TransformerRegistry
-     */
-    public function getTransformerRegistry(): TransformerRegistry
-    {
-        return $this->transformerRegistry;
-    }
+    protected $transformerRegistry;
 
     /**
      * @param array $transformers
      * @param mixed $value
      *
-     * @throws \CleverAge\ProcessBundle\Exception\TransformerException
+     * @throws TransformerException
      *
      * @return mixed
      */
     protected function applyTransformers(array $transformers, $value)
     {
+        // Quick return for better perfs
+        if (empty($transformers)) {
+            return $value;
+        }
+
         /** @noinspection ForeachSourceInspection */
-        foreach ($transformers as $transformerCode => $transformerOptions) {
+        foreach ($transformers as $transformerCode => $transformerClosure) {
             try {
-                $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
-                $transformer = $this->getTransformerRegistry()->getTransformer($transformerCode);
-                $value = $transformer->transform(
-                    $value,
-                    $transformerOptions ?: []
-                );
+                $value = $transformerClosure($value);
             } catch (\Throwable $exception) {
                 throw new TransformerException($transformerCode, 0, $exception);
             }
@@ -91,9 +58,10 @@ trait TransformerTrait
      *
      * @param string $transformerCode
      *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
+     * @throws MissingTransformerException
      *
      * @return string
+     *
      * @example
      *         transformers:
      *         callback#1:
@@ -107,7 +75,7 @@ trait TransformerTrait
     {
         $match = preg_match('/([^#]+)(#[\d]+)?/', $transformerCode, $parts);
 
-        if (1 === $match && $this->getTransformerRegistry()->hasTransformer($parts[1])) {
+        if (1 === $match && $this->transformerRegistry->hasTransformer($parts[1])) {
             return $parts[1];
         }
 
@@ -115,109 +83,41 @@ trait TransformerTrait
     }
 
     /**
-     * @param mixed $value
-     * @param array $options
-     *
-     * @return mixed
+     * @param OptionsResolver $resolver
+     * @param string          $optionName
      */
-    protected function transformValue($value, array $options = [])
+    protected function configureTransformersOptions(OptionsResolver $resolver, $optionName = 'transformers')
     {
-        $transformedValue = null;
+        $resolver->setDefault($optionName, []);
+        $resolver->setAllowedTypes($optionName, ['array']);
+        $resolver->setNormalizer(
+            $optionName,
+            function (
+                /** @noinspection PhpUnusedParameterInspection */
+                Options $options,
+                $transformers
+            ) {
+                $transformerClosures = [];
 
-        if (null !== $options['constant']) {
-            $transformedValue = $options['constant'];
-        } elseif (null !== $options['code']) {
-            $sourceProperty = $options['code'];
-            if (\is_array($sourceProperty)) {
-                $transformedValue = [];
-                /** @var array $sourceProperty */
-                foreach ($sourceProperty as $destKey => $srcKey) {
-                    try {
-                        $transformedValue[$destKey] = $this->getAccessor()->getValue($value, $srcKey);
-                    } catch (\RuntimeException $missingPropertyError) {
-                        $this->getLogger()->debug(
-                            'Mapping exception',
-                            [
-                                'srcKey' => $srcKey,
-                                'message' => $missingPropertyError->getMessage(),
-                            ]
-                        );
-                        throw $missingPropertyError;
-                    }
-                }
-            } else {
-                try {
-                    $transformedValue = $this->getAccessor()->getValue($value, $sourceProperty);
-                } catch (\RuntimeException $missingPropertyError) {
-                    $this->getLogger()->debug(
-                        'Mapping exception',
-                        [
-                            'message' => $missingPropertyError->getMessage(),
-                        ]
-                    );
-                    throw $missingPropertyError;
-                }
-            }
-        } else {
-            $transformedValue = $value;
-        }
-
-        try {
-            $transformedValue = $this->applyTransformers($options['transformers'], $transformedValue);
-        } catch (TransformerException $exception) {
-            $exception->setTargetProperty('key');
-            $this->logger->debug(
-                'Transformation exception',
-                [
-                    'message' => $exception->getPrevious()->getMessage(),
-                    'file' => $exception->getPrevious()->getFile(),
-                    'line' => $exception->getPrevious()->getLine(),
-                    'trace' => $exception->getPrevious()->getTraceAsString(),
-                ]
-            );
-
-            throw $exception;
-        }
-
-        return $transformedValue;
-    }
-
-    /**
-     * @param \Symfony\Component\OptionsResolver\OptionsResolver $resolver
-     *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     */
-    protected function configureTransformersOptions(OptionsResolver $resolver)
-    {
-        $resolver->setDefault('transformers', []);
-        $resolver->setAllowedTypes('transformers', ['array']);
-        /** @noinspection PhpUnusedParameterInspection */
-        $resolver->setNormalizer( // This logic is duplicated from the array_map transformer @todo fix me
-            'transformers',
-            function (Options $options, $transformers) {
-                /** @var array $transformers */
-                foreach ($transformers as $transformerCode => &$transformerOptions) {
+                foreach ($transformers as $origTransformerCode => $transformerOptions) {
                     $transformerOptionsResolver = new OptionsResolver();
-                    $transformerCode = $this->getCleanedTransfomerCode($transformerCode);
-                    $transformer = $this->getTransformerRegistry()->getTransformer($transformerCode);
+                    $transformerCode = $this->getCleanedTransfomerCode($origTransformerCode);
+                    $transformer = $this->transformerRegistry->getTransformer($transformerCode);
                     if ($transformer instanceof ConfigurableTransformerInterface) {
                         $transformer->configureOptions($transformerOptionsResolver);
                         $transformerOptions = $transformerOptionsResolver->resolve(
                             $transformerOptions ?? []
                         );
                     }
+
+                    $closure = static function ($value) use ($transformer, $transformerOptions) {
+                        return $transformer->transform($value, $transformerOptions);
+                    };
+                    $transformerClosures[$origTransformerCode] = $closure;
                 }
 
-                return $transformers;
+                return $transformerClosures;
             }
         );
     }
-
 }

@@ -13,6 +13,8 @@ namespace CleverAge\ProcessBundle\Command;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -31,7 +33,7 @@ class ListProcessCommand extends Command
     /**
      * @param ProcessConfigurationRegistry $processConfigRegistry
      *
-     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @throws LogicException
      */
     public function __construct(ProcessConfigurationRegistry $processConfigRegistry)
     {
@@ -41,7 +43,7 @@ class ListProcessCommand extends Command
 
     /**
      * {@inheritdoc}
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function configure()
     {
@@ -71,7 +73,7 @@ class ListProcessCommand extends Command
                 $message = "<info> - </info>{$processConfiguration->getCode()}<info> with {$countTasks} tasks</info>";
 
                 if ($processConfiguration->isPrivate()) {
-                    $message .= " <comment>(private)</comment>";
+                    $message .= ' <comment>(private)</comment>';
                 }
 
                 $messages[] = [
@@ -91,7 +93,7 @@ class ListProcessCommand extends Command
 
             if ($processConfiguration->getDescription()) {
                 $outputMessage = $this->padMessage($outputMessage, $maxMessageLength + 3);
-                $outputMessage .= "{$processConfiguration->getDescription()}";
+                $outputMessage .= $processConfiguration->getDescription();
             }
 
             $outputMessages[] = $outputMessage;
@@ -111,7 +113,7 @@ class ListProcessCommand extends Command
      *
      * @return int
      */
-    public function publicProcessCounter($sum, ProcessConfiguration $processConfiguration)
+    public function publicProcessCounter($sum, ProcessConfiguration $processConfiguration): int
     {
         return $sum + ($processConfiguration->isPublic() ? 1 : 0);
     }
@@ -124,7 +126,7 @@ class ListProcessCommand extends Command
      *
      * @return int
      */
-    public function privateProcessCounter($sum, ProcessConfiguration $processConfiguration)
+    public function privateProcessCounter($sum, ProcessConfiguration $processConfiguration): int
     {
         return $sum + ($processConfiguration->isPrivate() ? 1 : 0);
     }
@@ -137,7 +139,7 @@ class ListProcessCommand extends Command
      *
      * @return int
      */
-    public function processSorter(ProcessConfiguration $a, ProcessConfiguration $b)
+    public function processSorter(ProcessConfiguration $a, ProcessConfiguration $b): int
     {
         if ($a->getCode() === $b->getCode()) {
             return 0;
@@ -149,12 +151,12 @@ class ListProcessCommand extends Command
     /**
      * Filter callback to find max message length
      *
-     * @param ProcessConfiguration $a
-     * @param ProcessConfiguration $b
+     * @param int   $max
+     * @param array $message
      *
      * @return int
      */
-    public function maxMessageLengthFilter($max, array $message)
+    public function maxMessageLengthFilter($max, array $message): int
     {
         return \max($max, strlen($this->filterOutTags($message['output'])));
     }
@@ -167,7 +169,7 @@ class ListProcessCommand extends Command
      *
      * @return string
      */
-    protected function padMessage($message, $length = 80)
+    protected function padMessage(string $message, $length = 80): string
     {
         $currentLen = strlen($this->filterOutTags($message));
         if ($currentLen < $length) {
@@ -180,11 +182,11 @@ class ListProcessCommand extends Command
     /**
      * Filter out tags used in console outputs
      *
-     * @param $string
+     * @param string $string
      *
      * @return string
      */
-    protected function filterOutTags($string)
+    protected function filterOutTags(string $string): string
     {
         return preg_replace('/<[^<>]*>/', '', $string);
     }

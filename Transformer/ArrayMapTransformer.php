@@ -11,7 +11,6 @@
 namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -22,8 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ArrayMapTransformer implements ConfigurableTransformerInterface
 {
-    /** @var TransformerRegistry */
-    protected $transformerRegistry;
+    use TransformerTrait;
 
     /**
      * @param TransformerRegistry $transformerRegistry
@@ -39,9 +37,7 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
      * @param array $values
      * @param array $options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \UnexpectedValueException
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
      *
      * @return mixed $value
      */
@@ -51,23 +47,10 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
             throw new \UnexpectedValueException('Input value must be an array or traversable');
         }
 
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-        $options = $resolver->resolve($options);
-        /** @var array $transformers */
-        $transformers = $options['transformers'];
-
         $results = [];
         /** @noinspection ForeachSourceInspection */
         foreach ($values as $key => $item) {
-            foreach ($transformers as $transformerCode => $transformerOptions) {
-                if (null === $transformerOptions) {
-                    $transformerOptions = [];
-                }
-                $transformer = $this->transformerRegistry->getTransformer($transformerCode);
-                $item = $transformer->transform($item, $transformerOptions);
-            }
+            $item = $this->applyTransformers($options['transformers'], $item);
             if (null === $item && $options['skip_null']) {
                 continue;
             }
@@ -89,42 +72,20 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
 
     /**
      * @param OptionsResolver $resolver
-     *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
+        $this->configureTransformersOptions($resolver);
         $resolver->setRequired(
             [
                 'transformers',
             ]
         );
-        $resolver->setAllowedTypes('transformers', ['array']);
         $resolver->setDefaults(
             [
                 'skip_null' => false,
             ]
         );
         $resolver->setAllowedTypes('skip_null', ['boolean']);
-        /** @noinspection PhpUnusedParameterInspection */
-        $resolver->setNormalizer(
-            'transformers',
-            function (Options $options, $transformers) {
-                /** @var array $transformers */
-                foreach ($transformers as $transformerCode => &$transformerOptions) {
-                    $transformerOptionsResolver = new OptionsResolver();
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */// @todo remove me sometimes
-                    $transformer = $this->transformerRegistry->getTransformer($transformerCode);
-                    if ($transformer instanceof ConfigurableTransformerInterface) {
-                        $transformer->configureOptions($transformerOptionsResolver);
-                        $transformerOptions = $transformerOptionsResolver->resolve(
-                            $transformerOptions ?? []
-                        );
-                    }
-                }
-
-                return $transformers;
-            }
-        );
     }
 }

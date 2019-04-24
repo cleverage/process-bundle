@@ -12,7 +12,16 @@ namespace CleverAge\ProcessBundle\Task\Serialization;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Serializer\Exception\BadMethodCallException;
+use Symfony\Component\Serializer\Exception\ExtraAttributesException;
+use Symfony\Component\Serializer\Exception\InvalidArgumentException;
+use Symfony\Component\Serializer\Exception\LogicException;
+use Symfony\Component\Serializer\Exception\RuntimeException;
+use Symfony\Component\Serializer\Exception\UnexpectedValueException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -37,13 +46,13 @@ class DenormalizerTask extends AbstractConfigurableTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\Serializer\Exception\UnexpectedValueException
-     * @throws \Symfony\Component\Serializer\Exception\RuntimeException
-     * @throws \Symfony\Component\Serializer\Exception\LogicException
-     * @throws \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Serializer\Exception\ExtraAttributesException
-     * @throws \Symfony\Component\Serializer\Exception\BadMethodCallException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws UnexpectedValueException
+     * @throws RuntimeException
+     * @throws LogicException
+     * @throws InvalidArgumentException
+     * @throws ExtraAttributesException
+     * @throws BadMethodCallException
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
@@ -60,8 +69,8 @@ class DenormalizerTask extends AbstractConfigurableTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

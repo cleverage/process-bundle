@@ -16,8 +16,6 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Class CleverAgeProcessBundle
- *
  * @author  Valentin Clavreul <vclavreul@clever-age.com>
  * @author  Vincent Chalnot <vchalnot@clever-age.com>
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>

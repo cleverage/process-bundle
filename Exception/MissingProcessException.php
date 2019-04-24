@@ -23,7 +23,7 @@ class MissingProcessException extends \UnexpectedValueException implements Proce
      *
      * @return MissingProcessException
      */
-    public static function create($code)
+    public static function create($code): self
     {
         $errorStr = "No process with code : {$code}";
 

@@ -21,6 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ArrayMergeTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
     /** @var array */
+    protected const MERGE_FUNC = ['array_merge', 'array_merge_recursive', 'array_replace', 'array_replace_recursive'];
+
+    /** @var array */
     protected $mergedOutput = [];
 
     /**
@@ -36,17 +39,10 @@ class ArrayMergeTask extends AbstractConfigurableTask implements BlockingTaskInt
         }
 
         $mergeFunction = $this->getOption($state, 'merge_function');
-        if ($mergeFunction == 'array_merge') {
-            $this->mergedOutput = \array_merge($this->mergedOutput, $input);
-        } elseif ($mergeFunction == 'array_merge_recursive') {
-            $this->mergedOutput = \array_merge_recursive($this->mergedOutput, $input);
-        } elseif ($mergeFunction == 'array_replace') {
-            $this->mergedOutput = \array_replace($this->mergedOutput, $input);
-        } elseif ($mergeFunction == 'array_replace_recursive') {
-            $this->mergedOutput = \array_replace_recursive($this->mergedOutput, $input);
-        } else {
+        if (!\in_array($mergeFunction, self::MERGE_FUNC, true)) {
             throw new \InvalidArgumentException("Unknown merge function {$mergeFunction}");
         }
+        $this->mergedOutput = $mergeFunction($this->mergedOutput, $input);
     }
 
     /**
@@ -57,15 +53,13 @@ class ArrayMergeTask extends AbstractConfigurableTask implements BlockingTaskInt
         $state->setOutput($this->mergedOutput);
     }
 
+    /**
+     * @param OptionsResolver $resolver
+     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('merge_function', 'array_merge');
         $resolver->setAllowedTypes('merge_function', 'string');
-        $resolver->setAllowedValues(
-            'merge_function',
-            ['array_merge', 'array_merge_recursive', 'array_replace', 'array_replace_recursive']
-        );
+        $resolver->setAllowedValues('merge_function', self::MERGE_FUNC);
     }
-
-
 }

@@ -11,6 +11,14 @@
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
+use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -20,44 +28,65 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class EvaluatorTransformer implements ConfigurableTransformerInterface
 {
+
+    /** @var ExpressionLanguage */
+    protected $language;
+
+    /**
+     * EvaluatorTransformer constructor.
+     */
+    public function __construct()
+    {
+        $this->language = new ExpressionLanguage();
+    }
+
+
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     public function configureOptions(OptionsResolver $resolver)
     {
+        // Allow to cache the parsing by statically defining variables
+        $resolver->setDefault('variables', null);
+        $resolver->addAllowedTypes('variables', ['null', 'array']);
+
         $resolver->setRequired(
             [
                 'expression',
             ]
         );
-        $resolver->setAllowedTypes('expression', ['string']);
+        $resolver->setAllowedTypes('expression', ['string', ParsedExpression::class]);
+        $resolver->setNormalizer(
+            'expression',
+            function (Options $options, $expression) {
+                if (is_array($options['variables'])) {
+                    return $this->language->parse($expression, $options['variables']);
+                }
+
+                return $expression;
+            }
+        );
     }
 
     /**
      * @param mixed $value
      * @param array $options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws UndefinedOptionsException
+     * @throws OptionDefinitionException
+     * @throws NoSuchOptionException
+     * @throws MissingOptionsException
+     * @throws InvalidOptionsException
+     * @throws AccessException
      *
      * @return string
      */
     public function transform($value, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
-
-        $language = new ExpressionLanguage();
-
-        return $language->evaluate(
+        return $this->language->evaluate(
             $options['expression'],
             $value
         );

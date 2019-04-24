@@ -10,6 +10,8 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -30,6 +32,7 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
      * @param mixed $value
      * @param array $options
      *
+     * @throws \Exception
      * @return mixed|string
      */
     public function transform($value, array $options = [])
@@ -60,8 +63,8 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws UndefinedOptionsException
+     * @throws AccessException
      */
     public function configureOptions(OptionsResolver $resolver)
     {

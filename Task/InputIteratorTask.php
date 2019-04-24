@@ -12,6 +12,7 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 
 /**
  * Class InputIteratorTask
@@ -27,7 +28,7 @@ class InputIteratorTask implements IterableTaskInterface
      * @param ProcessState $state
      *
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {

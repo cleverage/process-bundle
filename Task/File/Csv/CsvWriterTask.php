@@ -13,6 +13,9 @@ namespace CleverAge\ProcessBundle\Task\File\Csv;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -33,7 +36,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
      * @throws \RuntimeException
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
@@ -59,8 +62,8 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
@@ -75,15 +78,14 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 
         $resolver->setNormalizer(
             'file_path',
-            function (Options $options, $value) {
-                $value = str_replace(
-                    ['{date}', '{date_time}', '{unique_token}'],
+            static function (Options $options, $value) {
+                $value = strtr(
+                    $value,
                     [
-                        (new \DateTime())->format('Ymd'),
-                        (new \DateTime())->format('Ymd_His'),
-                        uniqid(),
-                    ],
-                    $value
+                        '{date}' => date('Ymd'),
+                        '{date_time}' => date('Ymd_His'),
+                        '{unique_token}' => uniqid(),
+                    ]
                 );
 
                 return $value;
@@ -96,7 +98,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
      *
      * @throws \UnexpectedValueException
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      *
      * @return array
      */

@@ -23,7 +23,7 @@ class MissingTransformerException extends \UnexpectedValueException implements P
      *
      * @return MissingTransformerException
      */
-    public static function create($code)
+    public static function create($code): self
     {
         $errorStr = "No transformer with code : {$code}";
 

@@ -10,7 +10,6 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -39,7 +38,7 @@ class ArrayFilterTransformer implements ConfigurableTransformerInterface
      */
     public function transform($value, array $options = [])
     {
-        if (!(\is_array($value) || $value instanceof \Iterable)) {
+        if (!(\is_array($value) || $value instanceof \Traversable)) {
             throw new \UnexpectedValueException('Given value is not iterable');
         }
 

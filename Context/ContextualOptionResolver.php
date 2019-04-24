@@ -48,7 +48,7 @@ class ContextualOptionResolver
             // Else use a replace to insert a string value into another
             return preg_replace_callback(
                 $pattern,
-                function ($matches) use ($context) {
+                static function ($matches) use ($context) {
                     return $context[$matches[1]];
                 },
                 $value

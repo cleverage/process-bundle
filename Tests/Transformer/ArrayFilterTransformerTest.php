@@ -10,7 +10,6 @@
 
 namespace CleverAge\ProcessBundle\Tests\Transformer;
 
-
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
@@ -36,8 +35,8 @@ class ArrayFilterTransformerTest extends AbstractProcessTest
 
         $nativeResult = array_filter(
             $input,
-            function ($item) {
-                return isset($item['filter_value']) && $item['filter_value'] === 'X';
+            static function ($item) {
+                return isset($item['filter_value']) && 'X' === $item['filter_value'];
             }
         );
 

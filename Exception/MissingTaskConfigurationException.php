@@ -23,7 +23,7 @@ class MissingTaskConfigurationException extends \UnexpectedValueException implem
      *
      * @return MissingTaskConfigurationException
      */
-    public static function create($code)
+    public static function create($code): self
     {
         $errorStr = "No task configuration with code : {$code}";
 

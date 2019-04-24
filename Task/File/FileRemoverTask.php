@@ -12,6 +12,7 @@ namespace CleverAge\ProcessBundle\Task\File;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -25,7 +26,7 @@ class FileRemoverTask implements TaskInterface
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\Filesystem\Exception\IOException
+     * @throws IOException
      */
     public function execute(ProcessState $state)
     {

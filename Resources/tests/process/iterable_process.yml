@@ -29,8 +29,8 @@ clever_age_process:
                     service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
                     options:
                         output:
-                        - [1, 2]
-                        - [3, 4]
+                            - [1, 2]
+                            - [3, 4]
                     outputs: [iterate]
 
                 iterate:
@@ -49,12 +49,12 @@ clever_age_process:
                     service: CleverAge\ProcessBundle\Task\ConstantIterableOutputTask
                     options:
                         output:
-                        -   product: toto
-                            documents: a,b
-                            images: c,d
-                        -   product: tata
-                            documents: e,f
-                            images: g,h
+                            -   product: toto
+                                documents: a,b
+                                images: c,d
+                            -   product: tata
+                                documents: e,f
+                                images: g,h
                     outputs: [split]
 
                 split:

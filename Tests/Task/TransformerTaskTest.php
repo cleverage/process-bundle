@@ -17,7 +17,6 @@ use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
  */
 class TransformerTaskTest extends AbstractProcessTest
 {
-
     /**
      * Assert a simple transformation, from one array to another
      */

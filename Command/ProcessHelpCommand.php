@@ -12,6 +12,8 @@ namespace CleverAge\ProcessBundle\Command;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Exception\MissingProcessException;
+use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
@@ -19,8 +21,12 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask;
 use CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -56,7 +62,7 @@ class ProcessHelpCommand extends Command
      * @param ProcessConfigurationRegistry $processConfigRegistry
      * @param ContainerInterface           $container
      *
-     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @throws LogicException
      */
     public function __construct(ProcessConfigurationRegistry $processConfigRegistry, ContainerInterface $container)
     {
@@ -68,7 +74,7 @@ class ProcessHelpCommand extends Command
     /**
      * {@inheritdoc}
      *
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function configure()
     {
@@ -80,12 +86,12 @@ class ProcessHelpCommand extends Command
     /**
      * {@inheritdoc}
      *
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
      * @throws \UnexpectedValueException
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
-     * @throws \CleverAge\ProcessBundle\Exception\MissingProcessException
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws InvalidArgumentException
+     * @throws MissingProcessException
+     * @throws MissingTaskConfigurationException
      * @throws \InvalidArgumentException
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -95,18 +101,18 @@ class ProcessHelpCommand extends Command
         $processCode = $input->getArgument('process_code');
         $process = $this->processConfigRegistry->getProcessConfiguration($processCode);
 
-        $output->writeln("<comment>Process: </comment>");
+        $output->writeln('<comment>Process: </comment>');
         $output->writeln(str_repeat(' ', self::INDENT_SIZE).$processCode);
         $output->writeln('');
 
         if ($process->getDescription()) {
-            $output->writeln("<comment>Description:</comment>");
+            $output->writeln('<comment>Description:</comment>');
             $output->writeln(str_repeat(' ', self::INDENT_SIZE).$process->getDescription());
             $output->writeln('');
         }
 
         if ($process->getHelp()) {
-            $output->writeln("<comment>Help:</comment>");
+            $output->writeln('<comment>Help:</comment>');
             $helpLines = array_filter(explode("\n", $process->getHelp()));
             foreach ($helpLines as $helpLine) {
                 $output->writeln(str_repeat(' ', self::INDENT_SIZE).$helpLine);
@@ -114,7 +120,7 @@ class ProcessHelpCommand extends Command
             $output->writeln('');
         }
 
-        $output->writeln("<comment>Tasks tree:</comment>");
+        $output->writeln('<comment>Tasks tree:</comment>');
 
         $branches = [];
 
@@ -130,8 +136,8 @@ class ProcessHelpCommand extends Command
             // Remove the task from the remaining list
             $remainingTasks = array_filter(
                 $remainingTasks,
-                function ($task) use ($nextTaskCode) {
-                    return $task != $nextTaskCode;
+                static function ($task) use ($nextTaskCode) {
+                    return $task !== $nextTaskCode;
                 }
             );
         }
@@ -146,8 +152,8 @@ class ProcessHelpCommand extends Command
     /**
      * Try to find a best candidate for next display
      *
-     * @param                      $branches
-     * @param                      $taskList
+     * @param array                $branches
+     * @param array                $taskList
      * @param ProcessConfiguration $process
      *
      * @return int|null|string
@@ -165,8 +171,8 @@ class ProcessHelpCommand extends Command
             // Check if task has all necessary ancestors in branches
             $hasAllAncestors = array_reduce(
                 $task->getPreviousTasksConfigurations(),
-                function ($result, TaskConfiguration $prevTask) use ($branches) {
-                    return $result && \in_array($prevTask->getCode(), $branches);
+                static function ($result, TaskConfiguration $prevTask) use ($branches) {
+                    return $result && \in_array($prevTask->getCode(), $branches, true);
                 },
                 true
             );
@@ -186,7 +192,7 @@ class ProcessHelpCommand extends Command
             $weight = 0;
             $task = $process->getTaskConfiguration($taskCandidate);
             foreach ($task->getPreviousTasksConfigurations() as $prevTask) {
-                $key = array_search($prevTask->getCode(), $branches);
+                $key = array_search($prevTask->getCode(), $branches, true);
 
                 // Should never be non-numeric...
                 if (!is_numeric($key)) {
@@ -196,7 +202,7 @@ class ProcessHelpCommand extends Command
             }
 
             if (!empty($task->getPreviousTasksConfigurations())) {
-                $weight = $weight / \count($task->getPreviousTasksConfigurations());
+                $weight /= \count($task->getPreviousTasksConfigurations());
             }
 
             $taskWeights[$taskCandidate] = $weight;
@@ -208,12 +214,12 @@ class ProcessHelpCommand extends Command
 
         $equalWeights = array_filter(
             $taskWeights,
-            function ($item) use ($bestWeight) {
+            static function ($item) use ($bestWeight) {
                 return $item == $bestWeight;
             }
         );
 
-        if (count($equalWeights) == 1) {
+        if (1 === count($equalWeights)) {
             return $bestCandidate;
         }
 
@@ -254,8 +260,8 @@ class ProcessHelpCommand extends Command
     /**
      * Merge needed branches, display a task node, split following needed branches
      *
-     * @param                      $branches
-     * @param                      $taskCode
+     * @param array                $branches
+     * @param string               $taskCode
      * @param ProcessConfiguration $process
      * @param OutputInterface      $output
      */
@@ -334,12 +340,12 @@ class ProcessHelpCommand extends Command
                 $output,
                 $branches,
                 '',
-                function ($taskCode, $i) use ($branchesToMerge, $gapBranches, $origin) {
+                static function ($taskCode, $i) use ($branchesToMerge, $gapBranches, $origin) {
                     return \in_array($i, $branchesToMerge, true)
                         || \in_array($i, $gapBranches, true)
                         || $i === $origin;
                 },
-                function ($taskCode, $i) use ($gapBranches, $origin, $final, $branches) {
+                static function ($taskCode, $i) use ($gapBranches, $origin, $final, $branches) {
                     if ($i === $origin) {
                         return self::CHAR_RECEIVE;
                     }
@@ -385,7 +391,7 @@ class ProcessHelpCommand extends Command
             $output,
             $branches,
             $this->getTaskDescription($task),
-            function ($branchTask, $i) use ($taskCode) {
+            static function ($branchTask, $i) use ($taskCode) {
                 return $branchTask === $taskCode;
             },
             $nodeStr
@@ -403,7 +409,7 @@ class ProcessHelpCommand extends Command
         // Check next tasks
         $nextTasks = array_unique(
             array_map(
-                function (TaskConfiguration $task) {
+                static function (TaskConfiguration $task) {
                     return $task->getCode();
                 },
                 array_merge($task->getNextTasksConfigurations(), $task->getErrorTasksConfigurations())
@@ -443,10 +449,10 @@ class ProcessHelpCommand extends Command
                 $output,
                 $branches,
                 '',
-                function ($branchTask, $i) use ($origin, $final) {
+                static function ($branchTask, $i) use ($origin, $final) {
                     return $i >= $origin && $i <= $final;
                 },
-                function ($branchTask, $i) use ($origin, $branches, $gapBranches, $final) {
+                static function ($branchTask, $i) use ($origin, $branches, $gapBranches, $final) {
                     if ($i === $origin) {
                         return self::CHAR_RECEIVE;
                     }
@@ -526,8 +532,8 @@ class ProcessHelpCommand extends Command
     /**
      * @param TaskConfiguration $task
      *
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
      * @throws \UnexpectedValueException
      *
      * @return string
@@ -573,8 +579,8 @@ class ProcessHelpCommand extends Command
     /**
      * @param TaskConfiguration $taskConfiguration
      *
-     * @throws \Psr\Container\NotFoundExceptionInterface
-     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
      * @throws \UnexpectedValueException
      *
      * @return mixed

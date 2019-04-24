@@ -10,7 +10,6 @@
 
 namespace CleverAge\ProcessBundle\Tests\Task;
 
-
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**

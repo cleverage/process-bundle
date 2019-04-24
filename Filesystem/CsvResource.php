@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Filesystem;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class CsvResource implements FileStreamInterface
+class CsvResource implements WritableStructuredFileInterface, SeekableFileInterface
 {
     /** @var string */
     protected $delimiter;

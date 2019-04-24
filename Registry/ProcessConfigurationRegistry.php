@@ -106,7 +106,7 @@ class ProcessConfigurationRegistry
     /**
      * @param string $processCode
      *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingProcessException
+     * @throws MissingProcessException
      *
      * @return ProcessConfiguration
      */

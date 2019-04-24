@@ -10,8 +10,11 @@
 
 namespace CleverAge\ProcessBundle\Command;
 
+use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Exception\InvalidArgumentException;
+use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -27,13 +30,18 @@ use Symfony\Component\Yaml\Parser;
  */
 class ExecuteProcessCommand extends Command
 {
+    public const OUTPUT_STDOUT = '-';
+
+    public const OUTPUT_FORMAT_DUMP = 'dump';
+    public const OUTPUT_FORMAT_JSON = 'json-stream';
+
     /** @var ProcessManager */
     protected $processManager;
 
     /**
      * @param ProcessManager $processManager
      *
-     * @throws \Symfony\Component\Console\Exception\LogicException
+     * @throws LogicException
      */
     public function __construct(ProcessManager $processManager)
     {
@@ -44,7 +52,7 @@ class ExecuteProcessCommand extends Command
     /**
      * {@inheritdoc}
      *
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     protected function configure()
     {
@@ -63,10 +71,18 @@ class ExecuteProcessCommand extends Command
             'Contextual value',
             []
         );
+        $this->addOption(
+            'output',
+            'o',
+            InputOption::VALUE_REQUIRED,
+            'Output path to dump data ("-" to use STDOUT with symfony dumper)',
+            self::OUTPUT_STDOUT
+        );
+        $this->addOption('output-format', 't', InputOption::VALUE_OPTIONAL, 'Output format');
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      *
      * @throws \Exception
@@ -90,10 +106,11 @@ class ExecuteProcessCommand extends Command
             if (!$output->isQuiet()) {
                 $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
+
+            // Execute each process
             $returnValue = $this->processManager->execute($code, $inputData, $context);
-            if ($output->isVeryVerbose() && class_exists(VarDumper::class)) {
-                VarDumper::dump($returnValue); // @todo remove this please
-            }
+            $this->handleOutputData($returnValue, $input, $output);
+
             if (!$output->isQuiet()) {
                 $output->writeln("<info>Process '{$code}' executed successfully</info>");
             }
@@ -105,7 +122,7 @@ class ExecuteProcessCommand extends Command
     /**
      * @param InputInterface $input
      *
-     * @throws \Symfony\Component\Console\Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      *
      * @return array
      */
@@ -126,5 +143,50 @@ class ExecuteProcessCommand extends Command
         }
 
         return $context;
+    }
+
+    /**
+     * @param mixed           $data
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     */
+    protected function handleOutputData($data, InputInterface $input, OutputInterface $output)
+    {
+        // Skip all if undefined
+        if (!$input->getOption('output-format')) {
+            return;
+        }
+
+        // Handle printing the output
+        if ($input->getOption('output') === self::OUTPUT_STDOUT) {
+            if ($output->isVeryVerbose()) {
+                if ($input->getOption('output-format') === self::OUTPUT_FORMAT_DUMP && class_exists(VarDumper::class)) {
+                    VarDumper::dump($data); // @todo remove this please
+                } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
+                    $output->writeln(json_encode($data));
+                } else {
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            "Cannot handle data output with format '%s'",
+                            $input->getOption('output-format')
+                        )
+                    );
+                }
+            }
+        } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
+            $outputFile = new JsonStreamFile($input->getOption('output'), 'wb');
+            $outputFile->writeLine($data);
+
+            if ($output->isVerbose()) {
+                $output->writeln(sprintf("Output stored in '%s'", $input->getOption('output')));
+            }
+        } else {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    "Cannot handle data output with format '%s'",
+                    $input->getOption('output-format')
+                )
+            );
+        }
     }
 }

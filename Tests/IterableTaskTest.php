@@ -10,10 +10,8 @@
 
 namespace CleverAge\ProcessBundle\Tests;
 
-
 class IterableTaskTest extends AbstractProcessTest
 {
-
     /**
      * Check the execution order of a process containing one iterable loop and a blocking task
      */

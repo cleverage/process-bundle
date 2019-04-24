@@ -102,7 +102,7 @@ class ProcessState
      *
      * @return ProcessState
      */
-    public function duplicate()
+    public function duplicate(): ProcessState
     {
         $newState = clone $this;
         $newState->setPreviousState($this);
@@ -116,11 +116,11 @@ class ProcessState
      *
      * @param bool $cleanInput
      */
-    public function reset($cleanInput)
+    public function reset($cleanInput): void
     {
         $this->setOutput(null);
         $this->setSkipped(false);
-        $this->setException(null);
+        $this->setException();
         $this->errorOutput = null;
         $this->hasErrorOutput = false;
 
@@ -133,7 +133,7 @@ class ProcessState
     /**
      * @return ProcessConfiguration
      */
-    public function getProcessConfiguration()
+    public function getProcessConfiguration(): ProcessConfiguration
     {
         return $this->processConfiguration;
     }
@@ -141,7 +141,7 @@ class ProcessState
     /**
      * @return ProcessHistory
      */
-    public function getProcessHistory()
+    public function getProcessHistory(): ProcessHistory
     {
         return $this->processHistory;
     }
@@ -157,7 +157,7 @@ class ProcessState
     /**
      * @param TaskConfiguration $taskConfiguration
      */
-    public function setTaskConfiguration(TaskConfiguration $taskConfiguration)
+    public function setTaskConfiguration(TaskConfiguration $taskConfiguration): void
     {
         $this->taskConfiguration = $taskConfiguration;
     }
@@ -173,7 +173,7 @@ class ProcessState
     /**
      * @param mixed $input
      */
-    public function setInput($input)
+    public function setInput($input): void
     {
         $this->input = $input;
     }
@@ -189,15 +189,15 @@ class ProcessState
     /**
      * @param mixed $output
      */
-    public function setOutput($output)
+    public function setOutput($output): void
     {
         $this->output = $output;
     }
 
     /**
      * @return mixed
-     * @deprecated Use getErrorOutput instead
      *
+     * @deprecated Use getErrorOutput instead
      */
     public function getError()
     {
@@ -210,9 +210,8 @@ class ProcessState
      * @param mixed $error
      *
      * @deprecated Use setErrorOutput instead
-     *
      */
-    public function setError($error)
+    public function setError($error): void
     {
         @trigger_error('Deprecated method, use setErrorOutput instead', E_USER_DEPRECATED);
 
@@ -221,10 +220,10 @@ class ProcessState
 
     /**
      * @return bool
-     * @deprecated Use hasErrorOutput instead
      *
+     * @deprecated Use hasErrorOutput instead
      */
-    public function hasError()
+    public function hasError(): bool
     {
         @trigger_error('Deprecated method, use hasErrorOutput instead', E_USER_DEPRECATED);
 
@@ -242,7 +241,7 @@ class ProcessState
     /**
      * @param mixed $errorOutput
      */
-    public function setErrorOutput($errorOutput)
+    public function setErrorOutput($errorOutput): void
     {
         $this->hasErrorOutput = true;
         $this->errorOutput = $errorOutput;
@@ -251,7 +250,7 @@ class ProcessState
     /**
      * @return bool
      */
-    public function hasErrorOutput()
+    public function hasErrorOutput(): bool
     {
         return $this->hasErrorOutput;
     }
@@ -259,7 +258,7 @@ class ProcessState
     /**
      * @param \Throwable $e
      */
-    public function stop(\Throwable $e = null)
+    public function stop(\Throwable $e = null): void
     {
         if ($e) {
             $this->setException($e);
@@ -278,15 +277,15 @@ class ProcessState
     /**
      * @param boolean $stopped
      */
-    public function setStopped(bool $stopped)
+    public function setStopped(bool $stopped): void
     {
         $this->stopped = $stopped;
     }
 
     /**
-     * @return \Throwable
+     * @return \Throwable|null
      */
-    public function getException()
+    public function getException(): ?\Throwable
     {
         return $this->exception;
     }
@@ -294,7 +293,7 @@ class ProcessState
     /**
      * @param \Throwable|null $exception
      */
-    public function setException(\Throwable $exception = null)
+    public function setException(\Throwable $exception = null): void
     {
         $this->exception = $exception;
     }
@@ -302,7 +301,7 @@ class ProcessState
     /**
      * @return array
      */
-    public function getErrorContext()
+    public function getErrorContext(): array
     {
         return $this->errorContext;
     }
@@ -310,7 +309,7 @@ class ProcessState
     /**
      * @param array $errorContext
      */
-    public function setErrorContext(array $errorContext)
+    public function setErrorContext(array $errorContext): void
     {
         $this->errorContext = $errorContext;
     }
@@ -319,7 +318,7 @@ class ProcessState
      * @param string|int       $key
      * @param string|int|array $value
      */
-    public function addErrorContextValue($key, $value)
+    public function addErrorContextValue($key, $value): void
     {
         $this->errorContext[$key] = $value;
     }
@@ -327,7 +326,7 @@ class ProcessState
     /**
      * @param string|int $key
      */
-    public function removeErrorContext($key)
+    public function removeErrorContext($key): void
     {
         unset($this->errorContext[$key]);
     }
@@ -335,7 +334,7 @@ class ProcessState
     /**
      * @return int
      */
-    public function getReturnCode()
+    public function getReturnCode(): int
     {
         if (null !== $this->returnCode) {
             return $this->returnCode;
@@ -347,7 +346,7 @@ class ProcessState
     /**
      * @param int $returnCode
      */
-    public function setReturnCode(int $returnCode)
+    public function setReturnCode(int $returnCode): void
     {
         $this->returnCode = $returnCode;
     }
@@ -355,7 +354,7 @@ class ProcessState
     /**
      * @return bool
      */
-    public function isSkipped()
+    public function isSkipped(): bool
     {
         return $this->skipped;
     }
@@ -363,15 +362,15 @@ class ProcessState
     /**
      * @param bool $skipped
      */
-    public function setSkipped(bool $skipped)
+    public function setSkipped(bool $skipped): void
     {
         $this->skipped = $skipped;
     }
 
     /**
-     * @return ProcessState
+     * @return ProcessState|null
      */
-    public function getPreviousState()
+    public function getPreviousState(): ?ProcessState
     {
         return $this->previousState;
     }
@@ -379,7 +378,7 @@ class ProcessState
     /**
      * @param ProcessState $previousState
      */
-    public function setPreviousState($previousState)
+    public function setPreviousState($previousState): void
     {
         $this->previousState = $previousState;
     }
@@ -397,7 +396,7 @@ class ProcessState
      *
      * @throws \UnexpectedValueException
      */
-    public function setStatus(string $status)
+    public function setStatus(string $status): void
     {
         if (!\in_array($status, self::STATUS, true)) {
             throw new \UnexpectedValueException("Unknown status {$status}");
@@ -409,7 +408,7 @@ class ProcessState
     /**
      * @return bool
      */
-    public function isResolved()
+    public function isResolved(): bool
     {
         return $this->status === self::STATUS_RESOLVED;
     }
@@ -437,9 +436,9 @@ class ProcessState
     }
 
     /**
-     * @return array
+     * @return array|null
      */
-    public function getContextualizedOptions()
+    public function getContextualizedOptions(): ?array
     {
         if (!$this->contextualizedOptions) {
             $options = $this->getTaskConfiguration()->getOptions();
@@ -470,10 +469,10 @@ class ProcessState
 
     /**
      * @return array
-     * @deprecated Use monolog processors instead
      *
+     * @deprecated Use monolog processors instead
      */
-    public function getLogContext()
+    public function getLogContext(): array
     {
         @trigger_error('Deprecated method, use monolog processors instead', E_USER_DEPRECATED);
         $context = [

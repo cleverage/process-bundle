@@ -39,7 +39,6 @@
     "require": {
         "php": ">=7.1",
         "ext-json": "*",
-
         "symfony/framework-bundle": "~3.0|~4.0",
         "symfony/expression-language": "~3.0|~4.0",
         "symfony/monolog-bundle": "~3.3",
@@ -51,7 +50,6 @@
         "symfony/swiftmailer-bundle": "~3.0|~4.0",
         "symfony/validator": "~3.0|~4.0",
         "symfony/yaml": "~3.0|~4.0",
-
         "sidus/base-bundle": "~1.0"
     },
     "require-dev": {

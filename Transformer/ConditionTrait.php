@@ -11,6 +11,9 @@
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\Exception\AccessException;
+use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
+use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -120,9 +123,9 @@ trait ConditionTrait
      * @param bool         $shouldMatch
      * @param bool         $regexpMode
      *
-     * @throws \Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException
-     * @throws \Symfony\Component\PropertyAccess\Exception\AccessException
-     * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
+     * @throws UnexpectedTypeException
+     * @throws AccessException
+     * @throws InvalidArgumentException
      *
      * @return bool
      */
