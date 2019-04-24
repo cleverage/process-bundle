@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -81,12 +81,15 @@ trait ConditionTrait
     {
         $resolver->setDefault($wrapperKey, []);
         $resolver->setAllowedTypes($wrapperKey, ['array']);
-        $resolver->setNormalizer($wrapperKey, function (OptionsResolver $options, $value) {
-            $conditionResolver = new OptionsResolver();
-            $this->configureConditionOptions($conditionResolver);
+        $resolver->setNormalizer(
+            $wrapperKey,
+            function (OptionsResolver $options, $value) {
+                $conditionResolver = new OptionsResolver();
+                $this->configureConditionOptions($conditionResolver);
 
-            return $conditionResolver->resolve($value);
-        });
+                return $conditionResolver->resolve($value);
+            }
+        );
     }
 
     /**

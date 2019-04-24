@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -61,7 +61,10 @@ class ArrayMergeTask extends AbstractConfigurableTask implements BlockingTaskInt
     {
         $resolver->setDefault('merge_function', 'array_merge');
         $resolver->setAllowedTypes('merge_function', 'string');
-        $resolver->setAllowedValues('merge_function', ['array_merge', 'array_merge_recursive', 'array_replace', 'array_replace_recursive']);
+        $resolver->setAllowedValues(
+            'merge_function',
+            ['array_merge', 'array_merge_recursive', 'array_replace', 'array_replace_recursive']
+        );
     }
 
 

@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -23,15 +23,21 @@ class ExceptionManagementTest extends AbstractProcessTest
     {
         $result = $this->processManager->execute('test.exception_management.set_exception_in_the_middle');
 
-        self::assertEquals([
-            'abc',
-            'bcd',
-            'cde',
-            'def',
-        ], $result['success']);
+        self::assertEquals(
+            [
+                'abc',
+                'bcd',
+                'cde',
+                'def',
+            ],
+            $result['success']
+        );
 
-        self::assertEquals([
-            1
-        ], $result['errors']);
+        self::assertEquals(
+            [
+                1,
+            ],
+            $result['errors']
+        );
     }
 }

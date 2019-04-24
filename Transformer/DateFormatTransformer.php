@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -16,13 +16,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Transformer aiming to take a date as an input (object or string) and format it according to options.
  * In input it takes any value understood by \DateTime.
  *
- * @example in YML config
+ * @example    in YML config
  * transformers:
  *     date_format:
  *         format: Y-m-d
  *
  * @deprecated the input string value will be removed in next version, use date_parser just before
- * @TODO v1.2 : remove string input
+ * @TODO       v1.2 : remove string input
  */
 class DateFormatTransformer implements ConfigurableTransformerInterface
 {

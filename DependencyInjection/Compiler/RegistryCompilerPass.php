@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -47,13 +47,13 @@ class RegistryCompilerPass implements CompilerPassInterface
     /**
      * Inject tagged services into defined registry
      *
-     * @api
-     *
      * @param ContainerBuilder $container
      *
      * @throws InvalidArgumentException
      * @throws \UnexpectedValueException
      * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
+     * @api
+     *
      */
     public function process(ContainerBuilder $container)
     {

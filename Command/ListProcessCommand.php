@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -60,7 +60,9 @@ class ListProcessCommand extends Command
 
         $publicCount = \array_reduce($processConfigurations, [$this, 'publicProcessCounter'], 0);
         $privateCount = \array_reduce($processConfigurations, [$this, 'privateProcessCounter'], 0);
-        $output->writeln("<info>There are {$publicCount} process configurations defined (and {$privateCount} private) :</info>");
+        $output->writeln(
+            "<info>There are {$publicCount} process configurations defined (and {$privateCount} private) :</info>"
+        );
 
         $messages = [];
         foreach ($processConfigurations as $processConfiguration) {
@@ -74,7 +76,7 @@ class ListProcessCommand extends Command
 
                 $messages[] = [
                     'process' => $processConfiguration,
-                    'output'  => $message,
+                    'output' => $message,
                 ];
             }
         }

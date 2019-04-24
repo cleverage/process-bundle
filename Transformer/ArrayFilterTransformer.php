@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -16,6 +16,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Array filtering transformer, should match native array_filter behavior
+ *
  * @see https://secure.php.net/manual/fr/function.array-filter.php
  */
 class ArrayFilterTransformer implements ConfigurableTransformerInterface

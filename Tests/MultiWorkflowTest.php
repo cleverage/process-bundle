@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -19,34 +19,37 @@ class MultiWorkflowTest extends AbstractProcessTest
     {
         $this->processManager->execute('test.multi_workflow_process');
 
-        $this->assertDataQueue([
+        $this->assertDataQueue(
             [
-                'task'  => 'data',
-                'value' => 1,
-            ],
-            [
-                'task'  => 'data',
-                'value' => 2,
-            ],
-            [
-                'task'  => 'data',
-                'value' => 3,
-            ],
-            [
-                'task'  => 'aggregate',
-                'value' => [1, 2, 3],
-            ],
-            [
-                'task'  => 'aggregate2',
-                'value' => [1, 2, 3],
-            ],
-            [
-                'task'  => 'inputAggregate',
-                'value' => [
-                    'aggregate'  => [1, 2, 3],
-                    'aggregate2' => [1, 2, 3],
+                [
+                    'task' => 'data',
+                    'value' => 1,
+                ],
+                [
+                    'task' => 'data',
+                    'value' => 2,
+                ],
+                [
+                    'task' => 'data',
+                    'value' => 3,
+                ],
+                [
+                    'task' => 'aggregate',
+                    'value' => [1, 2, 3],
+                ],
+                [
+                    'task' => 'aggregate2',
+                    'value' => [1, 2, 3],
+                ],
+                [
+                    'task' => 'inputAggregate',
+                    'value' => [
+                        'aggregate' => [1, 2, 3],
+                        'aggregate2' => [1, 2, 3],
+                    ],
                 ],
             ],
-        ], 'test.multi_workflow_process');
+            'test.multi_workflow_process'
+        );
     }
 }

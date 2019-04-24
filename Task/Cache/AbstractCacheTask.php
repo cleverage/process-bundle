@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -110,9 +110,9 @@ abstract class AbstractCacheTask extends AbstractConfigurableTask
     /**
      * @param ProcessState $state
      *
+     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @return string
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      */
     protected function getKeyCache(ProcessState $state)
     {

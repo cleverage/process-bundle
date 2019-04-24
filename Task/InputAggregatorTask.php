@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Wait for defined inputs before passing an aggregated output.
  * Should have been a BlockingTask, but due to limitations in the current model, it's a hack using skips and finalize.
  *
- * @see README.md:Known issues
+ * @see        README.md:Known issues
  * @deprecated It's way too much error prone - should be refactored as a blocking task
  */
 class InputAggregatorTask extends AbstractConfigurableTask
@@ -80,10 +80,12 @@ class InputAggregatorTask extends AbstractConfigurableTask
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired('input_codes');
-        $resolver->setDefaults([
-            'clean_input_on_override' => true,
-            'keep_inputs' => null,
-        ]);
+        $resolver->setDefaults(
+            [
+                'clean_input_on_override' => true,
+                'keep_inputs' => null,
+            ]
+        );
         $resolver->setAllowedTypes('input_codes', 'array');
         $resolver->setAllowedTypes('clean_input_on_override', 'boolean');
         $resolver->setAllowedTypes('keep_inputs', ['NULL', 'array']);

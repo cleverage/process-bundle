@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -195,9 +195,9 @@ class ProcessState
     }
 
     /**
+     * @return mixed
      * @deprecated Use getErrorOutput instead
      *
-     * @return mixed
      */
     public function getError()
     {
@@ -207,9 +207,10 @@ class ProcessState
     }
 
     /**
+     * @param mixed $error
+     *
      * @deprecated Use setErrorOutput instead
      *
-     * @param mixed $error
      */
     public function setError($error)
     {
@@ -219,9 +220,9 @@ class ProcessState
     }
 
     /**
+     * @return bool
      * @deprecated Use hasErrorOutput instead
      *
-     * @return bool
      */
     public function hasError()
     {
@@ -468,9 +469,9 @@ class ProcessState
     }
 
     /**
+     * @return array
      * @deprecated Use monolog processors instead
      *
-     * @return array
      */
     public function getLogContext()
     {

@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -101,7 +101,10 @@ class CallbackTransformer implements ConfigurableTransformerInterface
             'additional_parameters',
             function (Options $options, $value) {
                 if ($value) {
-                    @trigger_error('The "additional_parameters" option is deprecated. Use "right_parameters" instead.', E_USER_DEPRECATED);
+                    @trigger_error(
+                        'The "additional_parameters" option is deprecated. Use "right_parameters" instead.',
+                        E_USER_DEPRECATED
+                    );
                 }
 
                 return $value;

@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -47,7 +47,7 @@ class NormalizerTask extends AbstractConfigurableTask
         $options = $this->getOptions($state);
 
         if (!$this->normalizer->supportsNormalization($state->getInput(), $options['format'])) {
-            throw new \UnexpectedValueException('Given value is not normalizable for format ' . $options['format']);
+            throw new \UnexpectedValueException('Given value is not normalizable for format '.$options['format']);
         }
 
         $normalizedData = $this->normalizer->normalize(

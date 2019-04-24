@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -81,7 +81,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
                     [
                         (new \DateTime())->format('Ymd'),
                         (new \DateTime())->format('Ymd_His'),
-                        uniqid()
+                        uniqid(),
                     ],
                     $value
                 );

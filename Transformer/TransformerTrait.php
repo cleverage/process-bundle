@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -89,19 +89,19 @@ trait TransformerTrait
      * keys This way you can chain multiple times the same transformer. Without this, it would silently call only the
      * 1st one.
      *
-     * @example
-     * transformers:
-     *     callback#1:
-     *         callback: array_filter
-     *     callback#2:
-     *         callback: array_reverse
-     *
-     *
      * @param string $transformerCode
      *
      * @throws \CleverAge\ProcessBundle\Exception\MissingTransformerException
      *
      * @return string
+     * @example
+     *         transformers:
+     *         callback#1:
+     *         callback: array_filter
+     *         callback#2:
+     *         callback: array_reverse
+     *
+     *
      */
     protected function getCleanedTransfomerCode(string $transformerCode)
     {

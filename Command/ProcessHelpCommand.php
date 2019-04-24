@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -96,12 +96,12 @@ class ProcessHelpCommand extends Command
         $process = $this->processConfigRegistry->getProcessConfiguration($processCode);
 
         $output->writeln("<comment>Process: </comment>");
-        $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $processCode);
+        $output->writeln(str_repeat(' ', self::INDENT_SIZE).$processCode);
         $output->writeln('');
 
         if ($process->getDescription()) {
             $output->writeln("<comment>Description:</comment>");
-            $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $process->getDescription());
+            $output->writeln(str_repeat(' ', self::INDENT_SIZE).$process->getDescription());
             $output->writeln('');
         }
 
@@ -109,7 +109,7 @@ class ProcessHelpCommand extends Command
             $output->writeln("<comment>Help:</comment>");
             $helpLines = array_filter(explode("\n", $process->getHelp()));
             foreach ($helpLines as $helpLine) {
-                $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $helpLine);
+                $output->writeln(str_repeat(' ', self::INDENT_SIZE).$helpLine);
             }
             $output->writeln('');
         }
@@ -128,14 +128,17 @@ class ProcessHelpCommand extends Command
             $this->resolveBranchOutput($branches, $nextTaskCode, $process, $output);
 
             // Remove the task from the remaining list
-            $remainingTasks = array_filter($remainingTasks, function ($task) use ($nextTaskCode) {
-                return $task != $nextTaskCode;
-            });
+            $remainingTasks = array_filter(
+                $remainingTasks,
+                function ($task) use ($nextTaskCode) {
+                    return $task != $nextTaskCode;
+                }
+            );
         }
 
         $branches = array_filter($branches);
         if (!empty($branches)) {
-            $branchStr = '[' . implode(', ', $branches) . ']';
+            $branchStr = '['.implode(', ', $branches).']';
             $output->writeln("<error>All branches are not resolved : {$branchStr}</error>");
         }
     }
@@ -160,9 +163,13 @@ class ProcessHelpCommand extends Command
             }
 
             // Check if task has all necessary ancestors in branches
-            $hasAllAncestors = array_reduce($task->getPreviousTasksConfigurations(), function ($result, TaskConfiguration $prevTask) use ($branches) {
-                return $result && \in_array($prevTask->getCode(), $branches);
-            }, true);
+            $hasAllAncestors = array_reduce(
+                $task->getPreviousTasksConfigurations(),
+                function ($result, TaskConfiguration $prevTask) use ($branches) {
+                    return $result && \in_array($prevTask->getCode(), $branches);
+                },
+                true
+            );
 
             if ($hasAllAncestors) {
                 $taskCandidates[] = $taskCode;
@@ -199,9 +206,12 @@ class ProcessHelpCommand extends Command
         $bestCandidate = key($taskWeights);
         $bestWeight = $taskWeights[$bestCandidate];
 
-        $equalWeights = array_filter($taskWeights, function ($item) use ($bestWeight) {
-            return $item == $bestWeight;
-        });
+        $equalWeights = array_filter(
+            $taskWeights,
+            function ($item) use ($bestWeight) {
+                return $item == $bestWeight;
+            }
+        );
 
         if (count($equalWeights) == 1) {
             return $bestCandidate;
@@ -249,8 +259,12 @@ class ProcessHelpCommand extends Command
      * @param ProcessConfiguration $process
      * @param OutputInterface      $output
      */
-    protected function resolveBranchOutput(&$branches, $taskCode, ProcessConfiguration $process, OutputInterface $output)
-    {
+    protected function resolveBranchOutput(
+        &$branches,
+        $taskCode,
+        ProcessConfiguration $process,
+        OutputInterface $output
+    ) {
         $task = $process->getTaskConfiguration($taskCode);
         $branchesToMerge = [];
         $gapBranches = [];
@@ -381,18 +395,20 @@ class ProcessHelpCommand extends Command
         if ($output->isVerbose() && $task->getHelp()) {
             $helpLines = array_filter(explode("\n", $task->getHelp()));
             foreach ($helpLines as $helpLine) {
-                $helpMessage = str_repeat(' ', self::INDENT_SIZE) . "<info>{$helpLine}</info>";
+                $helpMessage = str_repeat(' ', self::INDENT_SIZE)."<info>{$helpLine}</info>";
                 $this->writeBranches($output, $branches, $helpMessage);
             }
         }
 
         // Check next tasks
-        $nextTasks = array_unique(array_map(
-            function (TaskConfiguration $task) {
-                return $task->getCode();
-            },
-            array_merge($task->getNextTasksConfigurations(), $task->getErrorTasksConfigurations())
-        ));
+        $nextTasks = array_unique(
+            array_map(
+                function (TaskConfiguration $task) {
+                    return $task->getCode();
+                },
+                array_merge($task->getNextTasksConfigurations(), $task->getErrorTasksConfigurations())
+            )
+        );
         if (\count($nextTasks) > 1) {
             $this->writeBranches($output, $branches);
             array_shift($nextTasks);
@@ -540,11 +556,11 @@ class ProcessHelpCommand extends Command
         }
 
         if (\count($interfaces)) {
-            $description .= ' <info>(' . implode(', ', $interfaces) . ')</info>';
+            $description .= ' <info>('.implode(', ', $interfaces).')</info>';
         }
 
         if (\count($subprocess)) {
-            $description .= ' <fire>{' . implode(', ', $subprocess) . '}</fire>';
+            $description .= ' <fire>{'.implode(', ', $subprocess).'}</fire>';
         }
 
         if ($task->getDescription()) {

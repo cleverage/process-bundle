@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -26,9 +26,11 @@ class StopTaskTest extends AbstractProcessTest
         $this->assertDataQueue(
             [
                 [
-                    'task'  => 'data',
+                    'task' => 'data',
                     'value' => 1,
                 ],
-            ], 'test.task.stop_task.iterable_interruption');
+            ],
+            'test.task.stop_task.iterable_interruption'
+        );
     }
 }
