@@ -25,7 +25,6 @@ use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -48,9 +47,6 @@ class ProcessManager
 
     /** @var TaskLogger */
     protected $taskLogger;
-
-    /** @var EntityManagerInterface */
-    protected $entityManager;
 
     /** @var ProcessConfigurationRegistry */
     protected $processConfigurationRegistry;
@@ -77,7 +73,6 @@ class ProcessManager
      * @param ContainerInterface           $container
      * @param ProcessLogger                $processLogger
      * @param TaskLogger                   $taskLogger
-     * @param EntityManagerInterface       $entityManager
      * @param ProcessConfigurationRegistry $processConfigurationRegistry
      * @param ContextualOptionResolver     $contextualOptionResolver
      */
@@ -85,14 +80,12 @@ class ProcessManager
         ContainerInterface $container,
         ProcessLogger $processLogger,
         TaskLogger $taskLogger,
-        EntityManagerInterface $entityManager,
         ProcessConfigurationRegistry $processConfigurationRegistry,
         ContextualOptionResolver $contextualOptionResolver
     ) {
         $this->container = $container;
         $this->processLogger = $processLogger;
         $this->taskLogger = $taskLogger;
-        $this->entityManager = $entityManager;
         $this->processConfigurationRegistry = $processConfigurationRegistry;
         $this->contextualOptionResolver = $contextualOptionResolver;
     }
@@ -488,7 +481,6 @@ class ProcessManager
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Doctrine\ORM\ORMInvalidArgumentException
      *
      * @return ProcessHistory
      */

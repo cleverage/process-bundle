@@ -58,10 +58,10 @@
         "phpunit/phpunit": "~6.4"
     },
     "suggest": {
-        "ext-soap": "*",
-        "doctrine/orm": "~2.5",
-        "doctrine/doctrine-bundle": "~1.6",
-        "oneup/flysystem-bundle": "~1.13",
-        "nategood/httpful": "~0.2.20"
+        "cleverage/doctrine-process-bundle": "Dedicated bundle for Doctrine dependencies for the process bundle",
+        "cleverage/flysystem-process-bundle": "Dedicated bundle for Flysystem dependencies for the process bundle",
+        "cleverage/rest-process-bundle": "Dedicated bundle for Rest dependencies for the process bundle",
+        "cleverage/soap-process-bundle": "Dedicated bundle for Soap dependencies for the process bundle",
+        "cleverage/enqueue-process-bundle": "Manage asynchronous events within the process bundle"
     }
 }
