@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
+declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
