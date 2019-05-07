@@ -124,7 +124,7 @@ class CsvSplitterTask extends InputCsvReaderTask
         );
         $splitCsv->writeHeaders();
 
-        while ($splitCsv->getCurrentLine() < $maxLines && !$csv->isEndOfFile()) {
+        while ($splitCsv->getLineNumber() < $maxLines && !$csv->isEndOfFile()) {
             $raw = $csv->readRaw();
             if (false === $raw) {
                 continue; // This is probably an empty line, no harm to skip it

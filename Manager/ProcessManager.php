@@ -305,12 +305,12 @@ class ProcessManager
                 }
             }
             if ($state->isStopped()) {
-                if ($state->getException()) {
-                    throw new \RuntimeException(
-                        "Process {$state->getProcessConfiguration()->getCode()} has failed",
-                        -1,
-                        $state->getException()
-                    );
+                $exception = $state->getException();
+                if ($exception) {
+                    $m = "Process {$state->getProcessConfiguration()->getCode()} has failed";
+                    $m .= " during process {$state->getTaskConfiguration()->getCode()}";
+                    $m .= " with message: '{$exception->getMessage()}'.\n";
+                    throw new \RuntimeException($m, -1, $exception);
                 }
 
                 return;

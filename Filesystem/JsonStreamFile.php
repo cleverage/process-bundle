@@ -22,7 +22,7 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
     protected $lineCount;
 
     /** @var int */
-    protected $currentLine = 0;
+    protected $lineNumber = 1;
 
     /**
      * JsonStreamFile constructor.
@@ -63,11 +63,11 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
     }
 
     /**
-     * @return int
+     * {@inheritDoc}
      */
-    public function getCurrentLine(): int
+    public function getLineNumber(): int
     {
-        return $this->currentLine;
+        return $this->lineNumber;
     }
 
     /**
@@ -92,7 +92,7 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
         }
 
         $rawLine = $this->file->fgets();
-        $this->currentLine++;
+        $this->lineNumber++;
 
         return json_decode($rawLine, true);
     }
@@ -105,9 +105,9 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
     public function writeLine($item): int
     {
         $this->file->fwrite(json_encode($item).PHP_EOL);
-        $this->currentLine++;
+        $this->lineNumber++;
 
-        return $this->currentLine;
+        return $this->lineNumber;
     }
 
     /**
@@ -116,6 +116,6 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
     public function rewind(): void
     {
         $this->file->rewind();
-        $this->currentLine = 0;
+        $this->lineNumber = 1;
     }
 }

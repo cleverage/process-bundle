@@ -21,9 +21,11 @@ interface FileStreamInterface
     public function getLineCount(): int;
 
     /**
+     * Warning! This returns the line number of the pointer inside the file so you need to call it BEFORE reading a line
+     *
      * @return int
      */
-    public function getCurrentLine(): int;
+    public function getLineNumber(): int;
 
     /**
      * @return bool
