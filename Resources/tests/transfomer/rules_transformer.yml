@@ -1,0 +1,21 @@
+clever_age_process:
+    configurations:
+        test.rules_transformer.simple:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            rules:
+                                rules_set:
+                                    -   condition: 'value === "ok"'
+                                        transformers:
+                                            sprintf:
+                                                format: result1
+                                    -   condition: 'value === "ko"'
+                                        constant: result2
+                                    -   default: true
+                                        constant: result3
