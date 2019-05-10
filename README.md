@@ -50,6 +50,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
     - Transformers
         - [ArrayFilterTransformer](Documentation/reference/transformers/array_filter_transformer.md)
         - [MappingTransformer](Documentation/reference/transformers/mapping_transformer.md)
+        - [RulesTransformer](Documentation/reference/transformers/rules_transformer.md)
 - Examples
     - [Simple ETL]
 - [Roadmap and versions](Documentation/100-roadmap.md)
