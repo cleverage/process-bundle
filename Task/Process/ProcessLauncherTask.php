@@ -134,7 +134,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             return count($this->launchedProcesses) > 0;
         }
 
-        sleep($this->getOption($state, 'sleep_on_finalize_interval'));
+        usleep($this->getOption($state, 'sleep_on_finalize_interval'));
 
         return false;
     }
@@ -149,7 +149,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $options = $this->getOptions($state);
         while (\count($this->launchedProcesses) >= $options['max_processes']) {
             $this->handleProcesses($state);
-            sleep($options['sleep_interval']);
+            usleep($options['sleep_interval']);
         }
 
         $process = $this->launchProcess($state);
@@ -161,7 +161,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
 
         $this->logger->debug("Running command: {$process->getProcess()->getCommandLine()}", $logContext);
 
-        sleep($options['sleep_interval_after_launch']);
+        usleep($options['sleep_interval_after_launch']);
     }
 
     /**
@@ -260,9 +260,18 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
                 'json_buffering' => false,
             ]
         );
-        $resolver->setAllowedTypes('max_processes', ['integer', 'double']);
+        $resolver->setAllowedTypes('max_processes', ['integer']);
+
         $resolver->setAllowedTypes('sleep_interval', ['integer', 'double']);
         $resolver->setAllowedTypes('sleep_interval_after_launch', ['integer', 'double']);
+        $resolver->setAllowedTypes('sleep_on_finalize_interval', ['integer', 'double']);
+        $microsecondNormalizer = function (Options $options, $value) {
+            return (int)($value * 1000000);
+        };
+        $resolver->setNormalizer('sleep_interval', $microsecondNormalizer);
+        $resolver->setNormalizer('sleep_interval_after_launch', $microsecondNormalizer);
+        $resolver->setNormalizer('sleep_on_finalize_interval', $microsecondNormalizer);
+
         $resolver->setAllowedTypes('context', ['array']);
         $resolver->setAllowedTypes('json_buffering', ['boolean']);
 
