@@ -74,7 +74,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('use_value_as_variables', true);
+        $resolver->setDefault('use_value_as_variables', false);
         $resolver->setAllowedTypes('use_value_as_variables', 'bool');
 
         $resolver->setDefault('expression_variables', ['value']);
