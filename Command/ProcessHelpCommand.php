@@ -28,6 +28,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -80,7 +81,7 @@ class ProcessHelpCommand extends Command
     {
         $this->setName('cleverage:process:help');
         $this->setDescription('Describe the process');
-        $this->addArgument('process_code');
+        $this->addArgument('process_code', InputArgument::REQUIRED, 'The code of the process');
     }
 
     /**
