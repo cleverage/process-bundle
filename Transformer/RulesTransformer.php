@@ -34,10 +34,11 @@ class RulesTransformer implements ConfigurableTransformerInterface
      * RulesTransformer constructor.
      *
      * @param TransformerRegistry $transformerRegistry
+     * @param ExpressionLanguage  $language
      */
-    public function __construct(TransformerRegistry $transformerRegistry)
+    public function __construct(TransformerRegistry $transformerRegistry, ExpressionLanguage $language)
     {
-        $this->language = new ExpressionLanguage();
+        $this->language = $language;
         $this->transformerRegistry = $transformerRegistry;
     }
 

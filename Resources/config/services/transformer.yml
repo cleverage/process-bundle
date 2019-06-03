@@ -7,3 +7,11 @@ services:
         tags:
             - { name: cleverage.transformer }
             - { name: monolog.logger, channel: cleverage_process_transformer }
+
+    CleverAge\ProcessBundle\Transformer\RulesTransformer:
+        arguments:
+            $transformerRegistry: '@CleverAge\ProcessBundle\Registry\TransformerRegistry'
+            $language: '@cleverage_process.expression_language'
+        tags:
+            - { name: cleverage.transformer }
+            - { name: monolog.logger, channel: cleverage_process_transformer }
