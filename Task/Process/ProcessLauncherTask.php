@@ -178,7 +178,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             $state->getInput(),
             $this->getOption($state, 'context'),
             [
-                SubprocessInstance::OPTION_JSON_BUFFERING => true,
+                SubprocessInstance::OPTION_JSON_BUFFERING => $this->getOption($state, 'json_buffering'),
             ]
         );
 
@@ -255,12 +255,14 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
                 'sleep_on_finalize_interval' => 1,
                 'process_options' => [],
                 'context' => [],
+                'json_buffering' => false,
             ]
         );
         $resolver->setAllowedTypes('max_processes', ['integer', 'double']);
         $resolver->setAllowedTypes('sleep_interval', ['integer', 'double']);
         $resolver->setAllowedTypes('sleep_interval_after_launch', ['integer', 'double']);
         $resolver->setAllowedTypes('context', ['array']);
+        $resolver->setAllowedTypes('json_buffering', ['boolean']);
 
         $resolver->setAllowedTypes('process_options', ['array']);
         $resolver->setNormalizer(
