@@ -102,7 +102,7 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
      *
      * @return int
      */
-    public function writeLine($item): int
+    public function writeLine(array $item): int
     {
         $this->file->fwrite(json_encode($item).PHP_EOL);
         $this->lineNumber++;
