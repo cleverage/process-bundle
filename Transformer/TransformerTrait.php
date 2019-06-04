@@ -108,6 +108,12 @@ trait TransformerTrait
                         $transformerOptions = $transformerOptionsResolver->resolve(
                             $transformerOptions ?? []
                         );
+                    } else {
+                        if(!empty($transformerOptions)) {
+                            throw new \InvalidArgumentException("Transformer ${$origTransformerCode} should not have options");
+                        }
+                        // An array is required in transform method
+                        $transformerOptions = [];
                     }
 
                     $closure = static function ($value) use ($transformer, $transformerOptions) {
