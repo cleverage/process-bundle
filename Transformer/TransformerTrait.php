@@ -13,6 +13,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -90,40 +91,44 @@ trait TransformerTrait
     {
         $resolver->setDefault($optionName, []);
         $resolver->setAllowedTypes($optionName, ['array']);
-        $resolver->setNormalizer(
-            $optionName,
-            function (
-                /** @noinspection PhpUnusedParameterInspection */
-                Options $options,
-                $transformers
-            ) {
-                $transformerClosures = [];
+        $resolver->setNormalizer($optionName, \Closure::fromCallable([$this, 'normalizeTransformers']));
+    }
 
-                foreach ($transformers as $origTransformerCode => $transformerOptions) {
-                    $transformerOptionsResolver = new OptionsResolver();
-                    $transformerCode = $this->getCleanedTransfomerCode($origTransformerCode);
-                    $transformer = $this->transformerRegistry->getTransformer($transformerCode);
-                    if ($transformer instanceof ConfigurableTransformerInterface) {
-                        $transformer->configureOptions($transformerOptionsResolver);
-                        $transformerOptions = $transformerOptionsResolver->resolve(
-                            $transformerOptions ?? []
-                        );
-                    } else {
-                        if(!empty($transformerOptions)) {
-                            throw new \InvalidArgumentException("Transformer ${$origTransformerCode} should not have options");
-                        }
-                        // An array is required in transform method
-                        $transformerOptions = [];
-                    }
+    /**
+     * @param Options $options
+     * @param         $transformers
+     *
+     * @return array
+     *
+     * @throws ExceptionInterface
+     */
+    public function normalizeTransformers(Options $options, $transformers)
+    {
+        $transformerClosures = [];
 
-                    $closure = static function ($value) use ($transformer, $transformerOptions) {
-                        return $transformer->transform($value, $transformerOptions);
-                    };
-                    $transformerClosures[$origTransformerCode] = $closure;
+        foreach ($transformers as $origTransformerCode => $transformerOptions) {
+            $transformerOptionsResolver = new OptionsResolver();
+            $transformerCode = $this->getCleanedTransfomerCode($origTransformerCode);
+            $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+            if ($transformer instanceof ConfigurableTransformerInterface) {
+                $transformer->configureOptions($transformerOptionsResolver);
+                $transformerOptions = $transformerOptionsResolver->resolve(
+                    $transformerOptions ?? []
+                );
+            } else {
+                if (!empty($transformerOptions)) {
+                    throw new \InvalidArgumentException("Transformer ${$origTransformerCode} should not have options");
                 }
-
-                return $transformerClosures;
+                // An array is required in transform method
+                $transformerOptions = [];
             }
-        );
+
+            $closure = static function ($value) use ($transformer, $transformerOptions) {
+                return $transformer->transform($value, $transformerOptions);
+            };
+            $transformerClosures[$origTransformerCode] = $closure;
+        }
+
+        return $transformerClosures;
     }
 }
