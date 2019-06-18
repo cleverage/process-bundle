@@ -49,10 +49,63 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root($this->root);
         $definition = $rootNode->children();
 
+        // Default error strategy
+        $definition->scalarNode('default_error_strategy')->defaultValue(TaskConfiguration::STRATEGY_SKIP)->end();
+
+        $this->appendRootProcessConfigDefinition($definition);
+        $this->appendRootTransformersConfigDefinition($definition);
+
+        $definition->end();
+
+        return $treeBuilder;
+    }
+
+    /**
+     * "generic_transformers" root configuration
+     * @param NodeBuilder $definition
+     */
+    protected function appendRootTransformersConfigDefinition(NodeBuilder $definition)
+    {
+        /** @var ArrayNodeDefinition $transformersArrayDefinition */
+        $transformersArrayDefinition = $definition->arrayNode('generic_transformers')
+            ->useAttributeAsKey('code')
+            ->prototype('array');
+
+        // Process list
+        $transformerListDefinition = $transformersArrayDefinition
+            ->performNoDeepMerging()
+            ->cannotBeOverwritten()
+            ->children();
+
+        $this->appendTransformerConfigDefinition($transformerListDefinition);
+
+        $transformerListDefinition->end();
+        $transformersArrayDefinition->end();
+    }
+
+    /**
+     * Single transformer configuration
+     * @param NodeBuilder $definition
+     */
+    protected function appendTransformerConfigDefinition(NodeBuilder $definition)
+    {
+        $definition
+            ->arrayNode('contextual_options')->prototype('variable')->end()->end()
+            ->arrayNode('transformers')->prototype('variable')->end()->end();
+
+        // TODO assertions configuration
+    }
+
+    /**
+     * "configurations" root configuration
+     * @TODO rename root as "processes" ?
+     *
+     * @param NodeBuilder $definition
+     */
+    protected function appendRootProcessConfigDefinition(NodeBuilder $definition)
+    {
         /** @var ArrayNodeDefinition $configurationsArrayDefinition */
-        $configurationsArrayDefinition = $definition
-            ->scalarNode('default_error_strategy')->defaultValue(TaskConfiguration::STRATEGY_SKIP)->end()
-            ->arrayNode('configurations')
+        $configurationsArrayDefinition = $definition->arrayNode('configurations')
             ->useAttributeAsKey('code')
             ->prototype('array');
 
@@ -66,9 +119,6 @@ class Configuration implements ConfigurationInterface
 
         $processListDefinition->end();
         $configurationsArrayDefinition->end();
-        $definition->end();
-
-        return $treeBuilder;
     }
 
     /**
