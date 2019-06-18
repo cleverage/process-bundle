@@ -174,10 +174,14 @@ class ExecuteProcessCommand extends Command
                 }
             }
         } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
-            $outputFile = new JsonStreamFile($input->getOption('output'), 'wb');
-            $outputFile->writeLine($data);
+            // JsonStreamFile::writeLine only takes an array...
+            // TODO how to handle other cases ?
+            if(\is_array($data)) {
+                $outputFile = new JsonStreamFile($input->getOption('output'), 'wb');
+                $outputFile->writeLine($data);
+            }
 
-            if ($output->isVerbose()) {
+            if ($output->isVerbose() && isset($outputFile)) {
                 $output->writeln(sprintf("Output stored in '%s'", $input->getOption('output')));
             }
         } else {
