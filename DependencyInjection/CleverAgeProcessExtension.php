@@ -11,8 +11,10 @@
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Transformer\GenericTransformer;
 use Sidus\BaseBundle\DependencyInjection\SidusBaseExtension;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 
 /**
  * This is the class that loads and manages your bundle configuration.
@@ -41,5 +43,18 @@ class CleverAgeProcessExtension extends SidusBaseExtension
         $processConfigurationRegistry = $container->getDefinition(ProcessConfigurationRegistry::class);
         $processConfigurationRegistry->replaceArgument(0, $config['configurations']);
         $processConfigurationRegistry->replaceArgument(1, $config['default_error_strategy']);
+
+        // Automatic transformer creation from config
+        foreach ($config['generic_transformers'] as $transformerCode => $transformerConfig) {
+            $transformerDefinition = new Definition(GenericTransformer::class);
+            $transformerDefinition->setAutowired(true);
+            $transformerDefinition->addMethodCall('initialize',[
+                $transformerCode,
+                $transformerConfig
+            ]);
+            $transformerDefinition->addTag('cleverage.transformer');
+
+            $container->setDefinition(GenericTransformer::class . "\\" . $transformerCode, $transformerDefinition);
+        }
     }
 }
