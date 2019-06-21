@@ -65,7 +65,17 @@ class GenericTransformer implements ConfigurableTransformerInterface
     public function configureInitialOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('contextual_options', []);
-        // TODO define normalizer
+        $resolver->setAllowedTypes('contextual_options', 'array');
+        $resolver->setNormalizer('contextual_options', function (Options $options, $value) {
+            $configuration = [];
+            foreach ($value as $optionCode => $optionConfig) {
+                $resolver = new OptionsResolver();
+                $this->configureContextualOptions($resolver);
+                $configuration[$optionCode] = $resolver->resolve($optionConfig ?? []);
+            }
+
+            return $configuration;
+        });
 
         $resolver->setDefault('transformers', []);
     }
@@ -73,8 +83,13 @@ class GenericTransformer implements ConfigurableTransformerInterface
     public function configureOptions(OptionsResolver $resolver)
     {
         foreach ($this->contextualOptions as $option => $optionConfig) {
-            // TODO allow more complex usage
-            $resolver->setRequired($option);
+            if ($optionConfig['default'] !== null || $optionConfig['default_is_null']) {
+                $resolver->setDefault($option, $optionConfig['default']);
+            }
+
+            if ($optionConfig['required']) {
+                $resolver->setRequired($option);
+            }
         }
 
         // TODO we use the transformers option for internal processing here... but it's also accessible through config
@@ -109,6 +124,13 @@ class GenericTransformer implements ConfigurableTransformerInterface
         }
 
         return $this->contextualOptionResolver->contextualizeOptions($transformerOptions, $contextualizedOptionValues);
+    }
+
+    public function configureContextualOptions(OptionsResolver $resolver)
+    {
+        $resolver->setDefault('required', true);
+        $resolver->setDefault('default', null);
+        $resolver->setDefault('default_is_null', false);
     }
 
 }
