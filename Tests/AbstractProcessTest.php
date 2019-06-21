@@ -13,9 +13,13 @@ namespace CleverAge\ProcessBundle\Tests;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use CleverAge\ProcessBundle\EventListener\DataQueueEventListener;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Provide all necessary setup to test a process
@@ -28,6 +32,9 @@ abstract class AbstractProcessTest extends KernelTestCase
     /** @var ProcessConfigurationRegistry */
     protected $processConfigurationRegistry;
 
+    /** @var TransformerRegistry */
+    protected $transformerRegistry;
+
     /**
      * Initialize DI
      */
@@ -37,6 +44,7 @@ abstract class AbstractProcessTest extends KernelTestCase
 
         $this->processManager = $this->getContainer()->get(ProcessManager::class);
         $this->processConfigurationRegistry = $this->getContainer()->get(ProcessConfigurationRegistry::class);
+        $this->transformerRegistry = $this->getContainer()->get(TransformerRegistry::class);
     }
 
     /**
@@ -94,5 +102,28 @@ abstract class AbstractProcessTest extends KernelTestCase
         $container = $container->has('test.service_container') ? $container->get('test.service_container') : $container;
 
         return $container;
+    }
+
+    /**
+     * Helper method to configure options and test a transformation
+     *
+     * @param string $transformerCode
+     * @param mixed  $expected
+     * @param mixed  $actual
+     * @param array  $options
+     *
+     * @throws ExceptionInterface
+     */
+    protected function assertTransformation(string $transformerCode, $expected, $actual, array $options = [])
+    {
+        $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+
+        if ($transformer instanceof ConfigurableTransformerInterface) {
+            $resolver = new OptionsResolver();
+            $transformer->configureOptions($resolver);
+            $options = $resolver->resolve($options);
+        }
+
+        self::assertEquals($expected, $transformer->transform($actual, $options));
     }
 }

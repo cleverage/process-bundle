@@ -74,7 +74,7 @@ class GenericTransformer implements ConfigurableTransformerInterface
     {
         foreach ($this->contextualOptions as $option => $optionConfig) {
             // TODO allow more complex usage
-            $resolver->setDefault($option, null);
+            $resolver->setRequired($option);
         }
 
         // TODO we use the transformers option for internal processing here... but it's also accessible through config
