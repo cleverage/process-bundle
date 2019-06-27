@@ -172,10 +172,12 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     protected function launchProcess(ProcessState $state)
     {
+        $input = null !== $state->getInput() ? (string) $state->getInput() : null;
+
         $subprocess = new SubprocessInstance(
             $this->kernel,
             $this->getOption($state, 'process'),
-            $state->getInput(),
+            $input,
             $this->getOption($state, 'context'),
             [
                 SubprocessInstance::OPTION_JSON_BUFFERING => $this->getOption($state, 'json_buffering'),
