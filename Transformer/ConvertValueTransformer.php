@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -26,7 +27,6 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
      * @param mixed $value
      * @param array $options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
      * @throws \UnexpectedValueException
      *
      * @return mixed $value
@@ -36,10 +36,6 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
         if (null === $value) {
             return $value;
         }
-
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
 
         if (!is_string($value) && !is_int($value)) { // If not a valid array index
             if (!$options['auto_cast']) {
@@ -78,7 +74,7 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {

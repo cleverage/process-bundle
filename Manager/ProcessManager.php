@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -13,7 +13,9 @@ namespace CleverAge\ProcessBundle\Manager;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
+use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
 use CleverAge\ProcessBundle\Logger\ProcessLogger;
 use CleverAge\ProcessBundle\Logger\TaskLogger;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
@@ -25,8 +27,9 @@ use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 
 /**
  * Execute processes
@@ -48,9 +51,6 @@ class ProcessManager
 
     /** @var TaskLogger */
     protected $taskLogger;
-
-    /** @var EntityManagerInterface */
-    protected $entityManager;
 
     /** @var ProcessConfigurationRegistry */
     protected $processConfigurationRegistry;
@@ -77,7 +77,6 @@ class ProcessManager
      * @param ContainerInterface           $container
      * @param ProcessLogger                $processLogger
      * @param TaskLogger                   $taskLogger
-     * @param EntityManagerInterface       $entityManager
      * @param ProcessConfigurationRegistry $processConfigurationRegistry
      * @param ContextualOptionResolver     $contextualOptionResolver
      */
@@ -85,14 +84,12 @@ class ProcessManager
         ContainerInterface $container,
         ProcessLogger $processLogger,
         TaskLogger $taskLogger,
-        EntityManagerInterface $entityManager,
         ProcessConfigurationRegistry $processConfigurationRegistry,
         ContextualOptionResolver $contextualOptionResolver
     ) {
         $this->container = $container;
         $this->processLogger = $processLogger;
         $this->taskLogger = $taskLogger;
-        $this->entityManager = $entityManager;
         $this->processConfigurationRegistry = $processConfigurationRegistry;
         $this->contextualOptionResolver = $contextualOptionResolver;
     }
@@ -227,8 +224,8 @@ class ProcessManager
      *
      * @param TaskConfiguration $taskConfiguration
      *
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException
-     * @throws \Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException
+     * @throws ServiceNotFoundException
+     * @throws ServiceCircularReferenceException
      * @throws \UnexpectedValueException
      * @throws \RuntimeException
      */
@@ -292,11 +289,8 @@ class ProcessManager
             $this->processExecution($taskConfiguration, $executionFlag);
 
             $this->handleState($state);
-            if ($state->isStopped()) {
-                return;
-            }
 
-            // An error feed cannot be blocked or skipped (except if the process has been stopped)
+            // An error feed cannot be blocked or skipped (even if the process has been stopped)
             if ($state->hasErrorOutput()) {
                 foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTask) {
                     $this->prepareNextProcess($taskConfiguration, $errorTask, true);
@@ -309,6 +303,17 @@ class ProcessManager
                         return;
                     }
                 }
+            }
+            if ($state->isStopped()) {
+                $exception = $state->getException();
+                if ($exception) {
+                    $m = "Process {$state->getProcessConfiguration()->getCode()} has failed";
+                    $m .= " during process {$state->getTaskConfiguration()->getCode()}";
+                    $m .= " with message: '{$exception->getMessage()}'.\n";
+                    throw new \RuntimeException($m, -1, $exception);
+                }
+
+                return;
             }
 
             // Run child items only if the state is not "skipped" and task is not blocking
@@ -363,6 +368,9 @@ class ProcessManager
     protected function processExecution(TaskConfiguration $taskConfiguration, int $executionFlag): void
     {
         $task = $taskConfiguration->getTask();
+        if (null === $task) {
+            throw new \RuntimeException("Missing task for configuration {$taskConfiguration->getCode()}");
+        }
         $state = $taskConfiguration->getState();
 
         try {
@@ -401,15 +409,23 @@ class ProcessManager
 
         // Manage exception catching and setting the same
         if ($exception) {
-            $this->taskLogger->log($taskConfiguration->getLogLevel(), $exception->getMessage(), $state->getErrorContext());
+            $this->taskLogger->log(
+                $taskConfiguration->getLogLevel(),
+                $exception->getMessage(),
+                $state->getErrorContext()
+            );
             $state->setException($exception);
+            if (!$state->hasErrorOutput()) {
+                $state->setErrorOutput($state->getInput());
+            }
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
                 $state->setSkipped(true);
-                if (!$state->hasErrorOutput()) {
-                    $state->setErrorOutput($state->getInput());
-                }
             } elseif ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
                 $state->stop($exception);
+            } else {
+                throw new \UnexpectedValueException(
+                    "Unknown error strategy '{$taskConfiguration->getErrorStrategy()}'"
+                );
             }
         }
     }
@@ -472,7 +488,6 @@ class ProcessManager
      *
      * @throws \RuntimeException
      * @throws \InvalidArgumentException
-     * @throws \Doctrine\ORM\ORMInvalidArgumentException
      *
      * @return ProcessHistory
      */
@@ -527,12 +542,6 @@ class ProcessManager
         $processHistory = $state->getProcessHistory();
         if ($state->getException() && $state->isStopped()) {
             $processHistory->setFailed();
-
-            throw new \RuntimeException(
-                "Process {$state->getProcessConfiguration()->getCode()} has failed",
-                -1,
-                $state->getException()
-            );
         }
     }
 
@@ -561,9 +570,9 @@ class ProcessManager
      * @param ProcessConfiguration $processConfiguration
      *
      * @throws \RuntimeException
-     * @throws \CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException
-     * @throws \CleverAge\ProcessBundle\Exception\CircularProcessException
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws InvalidProcessConfigurationException
+     * @throws CircularProcessException
+     * @throws MissingTaskConfigurationException
      */
     protected function checkProcess(ProcessConfiguration $processConfiguration): void
     {

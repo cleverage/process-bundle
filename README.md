@@ -39,9 +39,6 @@ Basically, it will greatly ease the configuration of import and exports but can 
         - [PropertyGetterTask](Documentation/reference/tasks/property_getter_task.md)
         - [PropertySetterTask](Documentation/reference/tasks/property_setter_task.md)
         - [TransformerTask](Documentation/reference/tasks/transformer_task.md)
-      - Entities
-        - [DoctrineReaderTask](Documentation/reference/tasks/doctrine_reader_task.md)
-        - [DoctrineWriterTask](Documentation/reference/tasks/doctrine_writer_task.md)
       - File/CSV
         - [CsvReaderTask](Documentation/reference/tasks/csv_reader_task.md)
         - [CsvWriterTask](Documentation/reference/tasks/csv_writer_task.md)
@@ -161,7 +158,7 @@ clever_age_process:
             entry_point: read
             tasks:
                 read:
-                    service: '@CleverAge\ProcessBundle\Addon\Doctrine\Task\EntityManager\DoctrineReaderTask'
+                    service: '@CleverAge\DoctrineProcessBundle\Task\EntityManager\DoctrineReaderTask'
                     options:
                         class_name: MyNamespace\FooBarBundle\Entity\Data
                     outputs: [normalize]

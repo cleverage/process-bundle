@@ -18,7 +18,7 @@ The most common example is the ETL. It's a kind of application whose main purpos
 
 ## Installation
 
-This bundle requires Symfony 3 and Doctrine. You can install it using composer:
+This bundle requires Symfony 3. You can install it using composer:
 
 ```bash
 composer require cleverage/process-bundle

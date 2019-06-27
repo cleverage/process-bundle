@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -10,10 +10,11 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -66,8 +67,8 @@ class PropertyGetterTask extends AbstractConfigurableTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

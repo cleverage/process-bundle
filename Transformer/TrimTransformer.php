@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -26,16 +27,10 @@ class TrimTransformer implements ConfigurableTransformerInterface
      * @param mixed $value
      * @param array $options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     *
      * @return mixed $value
      */
     public function transform($value, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
-
         return trim($value, $options['charlist']);
     }
 
@@ -52,7 +47,7 @@ class TrimTransformer implements ConfigurableTransformerInterface
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {

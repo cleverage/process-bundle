@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -10,7 +10,6 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -34,10 +33,6 @@ class UnsetTransformer implements ConfigurableTransformerInterface
      */
     public function transform($value, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
-
         if (!\is_array($value)) {
             throw new \UnexpectedValueException('Given value must be an array');
         }

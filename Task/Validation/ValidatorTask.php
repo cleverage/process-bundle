@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -14,6 +14,7 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
 use Sidus\BaseBundle\Validator\Mapping\Loader\BaseLoader;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\ConstraintViolationInterface;
@@ -46,7 +47,7 @@ class ValidatorTask extends AbstractConfigurableTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \UnexpectedValueException
      */
     public function execute(ProcessState $state)
@@ -94,7 +95,7 @@ class ValidatorTask extends AbstractConfigurableTask
         $resolver->addAllowedTypes('constraints', ['NULL', 'array']);
         $resolver->setNormalizer(
             'constraints',
-            function (Options $options, $constraints) {
+            static function (Options $options, $constraints) {
                 if (null === $constraints) {
                     return null;
                 }

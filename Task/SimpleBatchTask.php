@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -13,6 +13,8 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -41,7 +43,7 @@ class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskI
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \InvalidArgumentException
      */
     public function execute(ProcessState $state)
@@ -60,7 +62,7 @@ class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskI
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
+     * @throws AccessException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

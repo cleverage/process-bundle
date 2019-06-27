@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -28,16 +29,10 @@ class CallbackTransformer implements ConfigurableTransformerInterface
      * @param mixed $value
      * @param array $options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     *
      * @return mixed $value
      */
     public function transform($value, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
-
         if (count($options['additional_parameters'])
             && !count($options['right_parameters'])) {
             $options['right_parameters'] = $options['additional_parameters'];
@@ -62,7 +57,7 @@ class CallbackTransformer implements ConfigurableTransformerInterface
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -75,7 +70,7 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'callback',
-            function (Options $options, $value) {
+            static function (Options $options, $value) {
                 if (!\is_callable($value)) {
                     throw new InvalidOptionsException(
                         'Callback option must be callable'
@@ -99,9 +94,12 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'additional_parameters',
-            function (Options $options, $value) {
+            static function (Options $options, $value) {
                 if ($value) {
-                    @trigger_error('The "additional_parameters" option is deprecated. Use "right_parameters" instead.', E_USER_DEPRECATED);
+                    @trigger_error(
+                        'The "additional_parameters" option is deprecated. Use "right_parameters" instead.',
+                        E_USER_DEPRECATED
+                    );
                 }
 
                 return $value;

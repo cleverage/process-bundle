@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -187,9 +187,9 @@ class TaskConfiguration
     }
 
     /**
+     * @return array
      * @deprecated Use getErrorOutputs method instead
      *
-     * @return array
      */
     public function getErrors(): array
     {
@@ -383,9 +383,9 @@ class TaskConfiguration
     }
 
     /**
+     * @return bool
      * @deprecated Use getLogLevel instead
      *
-     * @return bool
      */
     public function isLogErrors(): bool
     {

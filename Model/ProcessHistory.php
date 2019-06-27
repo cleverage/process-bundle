@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -140,6 +140,14 @@ class ProcessHistory
     public function isStarted()
     {
         return $this->state === self::STATE_STARTED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFailed()
+    {
+        return $this->state === self::STATE_FAILED;
     }
 
     /**

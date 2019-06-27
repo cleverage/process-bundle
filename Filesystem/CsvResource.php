@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Filesystem;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class CsvResource implements FileStreamInterface
+class CsvResource implements WritableStructuredFileInterface, SeekableFileInterface
 {
     /** @var string */
     protected $delimiter;
@@ -30,7 +30,7 @@ class CsvResource implements FileStreamInterface
     /** @var resource */
     protected $handler;
 
-    /** @var int */
+    /** @var int|null */
     protected $lineCount;
 
     /** @var array */
@@ -43,7 +43,7 @@ class CsvResource implements FileStreamInterface
     protected $headerCount;
 
     /** @var int */
-    protected $currentLine = 0;
+    protected $lineNumber = 1;
 
     /** @var bool */
     protected $closed;
@@ -163,17 +163,15 @@ class CsvResource implements FileStreamInterface
     }
 
     /**
-     * @throws \LogicException
-     *
-     * @return int
+     * {@inheritDoc}
      */
-    public function getCurrentLine(): int
+    public function getLineNumber(): int
     {
         if ($this->seekCalled) {
             throw new \LogicException('Cannot get current line number after calling "seek": the line number is lost');
         }
 
-        return $this->currentLine;
+        return $this->lineNumber;
     }
 
     /**
@@ -200,7 +198,7 @@ class CsvResource implements FileStreamInterface
     public function readRaw($length = null)
     {
         $this->assertOpened();
-        ++$this->currentLine;
+        ++$this->lineNumber;
 
         return fgetcsv($this->handler, $length, $this->delimiter, $this->enclosure, $this->escape);
     }
@@ -215,19 +213,24 @@ class CsvResource implements FileStreamInterface
      */
     public function readLine($length = null): ?array
     {
+        if ($this->seekCalled) {
+            $filePosition = "at position {$this->tell()}";
+        } else {
+            $filePosition = "on line {$this->getLineNumber()}";
+        }
         $values = $this->readRaw($length);
 
         if (false === $values) {
             if ($this->isEndOfFile()) {
                 return null;
             }
-            $message = "Unable to parse data on line {$this->currentLine} for {$this->getResourceName()}";
+            $message = "Unable to parse data {$filePosition} for {$this->getResourceName()}";
             throw new \UnexpectedValueException($message);
         }
 
         $count = \count($values);
         if ($count !== $this->headerCount) {
-            $message = "Number of columns not matching on line {$this->currentLine} for {$this->getResourceName()}: ";
+            $message = "Number of columns not matching {$filePosition} for {$this->getResourceName()}: ";
             $message .= "{$count} columns for {$this->headerCount} headers";
             throw new \UnexpectedValueException($message);
         }
@@ -252,7 +255,7 @@ class CsvResource implements FileStreamInterface
     public function writeRaw(array $fields): int
     {
         $this->assertOpened();
-        ++$this->currentLine;
+        ++$this->lineNumber;
 
         return fputcsv($this->handler, $fields, $this->delimiter, $this->enclosure, $this->escape);
     }
@@ -301,9 +304,9 @@ class CsvResource implements FileStreamInterface
         if (!rewind($this->handler)) {
             throw new \RuntimeException("Unable to rewind '{$this->getResourceName()}'");
         }
-        $this->currentLine = 0;
+        $this->lineNumber = 1;
         if (!$this->manualHeaders) {
-            $this->readRaw(); // skip headers
+            $this->readRaw(); // skip headers if not manual headers
         }
     }
 
@@ -393,15 +396,15 @@ class CsvResource implements FileStreamInterface
     {
         // If headers are not passed in the constructor but file is readable, try to read headers from file
         if (null === $headers) {
-            $headers = fgetcsv($this->handler, 0, $this->delimiter, $this->enclosure, $this->escape);
-            if (false === $headers || 0 === \count($headers)) {
+            $autoHeaders = $this->readRaw();
+            if (false === $autoHeaders || 0 === \count($autoHeaders)) {
                 throw new \UnexpectedValueException("Unable to read headers for {$this->getResourceName()}");
             }
             // Remove BOM if any
             $bom = pack('H*', 'EFBBBF');
-            $headers[0] = preg_replace("/^{$bom}/", '', $headers[0]);
+            $autoHeaders[0] = preg_replace("/^{$bom}/", '', $autoHeaders[0]);
 
-            return $headers;
+            return $autoHeaders;
         }
 
         $this->manualHeaders = true;

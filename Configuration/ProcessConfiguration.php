@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -39,7 +39,7 @@ class ProcessConfiguration
     /** @var string */
     protected $help;
 
-    /** @var boolean */
+    /** @var bool */
     protected $public;
 
     /** @var TaskConfiguration[] */
@@ -70,8 +70,7 @@ class ProcessConfiguration
         $description = '',
         $help = '',
         $public = true
-    )
-    {
+    ) {
         $this->code = $code;
         $this->taskConfigurations = $taskConfigurations;
         $this->options = $options;
@@ -99,11 +98,11 @@ class ProcessConfiguration
     }
 
     /**
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws MissingTaskConfigurationException
      *
      * @return TaskConfiguration|null
      */
-    public function getEntryPoint()
+    public function getEntryPoint(): ?TaskConfiguration
     {
         if (null === $this->entryPoint) {
             return null;
@@ -113,11 +112,11 @@ class ProcessConfiguration
     }
 
     /**
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws MissingTaskConfigurationException
      *
      * @return TaskConfiguration|null
      */
-    public function getEndPoint()
+    public function getEndPoint(): ?TaskConfiguration
     {
         if (null === $this->endPoint) {
             return null;
@@ -169,7 +168,7 @@ class ProcessConfiguration
     /**
      * @param string $taskCode
      *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws MissingTaskConfigurationException
      *
      * @return TaskConfiguration
      */
@@ -187,7 +186,7 @@ class ProcessConfiguration
      *
      * If one task depend from another, it should come after
      *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws MissingTaskConfigurationException
      *
      * @return array
      */
@@ -222,7 +221,7 @@ class ProcessConfiguration
      *
      * If one task depend from another, it should come after
      *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws MissingTaskConfigurationException
      *
      * @return array
      */
@@ -246,11 +245,11 @@ class ProcessConfiguration
      * Get the most important task (may be the entry or end task, or simply the first)
      * Used to check which tree should be used
      *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws MissingTaskConfigurationException
      *
      * @return TaskConfiguration
      */
-    public function getMainTask()
+    public function getMainTask(): TaskConfiguration
     {
         $entryTask = $this->getEntryPoint();
         if (!$entryTask) {
@@ -268,7 +267,7 @@ class ProcessConfiguration
      *
      * @throws CircularProcessException
      */
-    public function checkCircularDependencies()
+    public function checkCircularDependencies(): void
     {
         $taskConfigurations = $this->getTaskConfigurations();
 
@@ -292,7 +291,7 @@ class ProcessConfiguration
      *
      * @return array
      */
-    protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies = [])
+    protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies = []): array
     {
         $code = $taskConfig->getCode();
 
@@ -321,11 +320,11 @@ class ProcessConfiguration
      *
      * @param array $dependencies
      *
-     * @throws \CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException
+     * @throws MissingTaskConfigurationException
      *
      * @return array
      */
-    protected function sortDependencies(array $dependencies)
+    protected function sortDependencies(array $dependencies): array
     {
         if (\count($dependencies) <= 1) {
             return $dependencies;

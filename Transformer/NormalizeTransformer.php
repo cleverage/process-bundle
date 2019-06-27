@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -10,7 +10,10 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -35,8 +38,8 @@ class NormalizeTransformer implements ConfigurableTransformerInterface
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -54,25 +57,11 @@ class NormalizeTransformer implements ConfigurableTransformerInterface
      * @param mixed $value
      * @param array $options
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\OptionDefinitionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\NoSuchOptionException
-     * @throws \Symfony\Component\OptionsResolver\Exception\MissingOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\Serializer\Exception\LogicException
-     * @throws \Symfony\Component\Serializer\Exception\InvalidArgumentException
-     * @throws \Symfony\Component\Serializer\Exception\CircularReferenceException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
-     *
-     * @return mixed
+     * @throws ExceptionInterface
+     * @return array|bool|float|int|mixed|string
      */
     public function transform($value, array $options = [])
     {
-        $resolver = new OptionsResolver();
-        $this->configureOptions($resolver);
-        $options = $resolver->resolve($options);
-
         return $this->normalizer->normalize(
             $value,
             $options['format'],

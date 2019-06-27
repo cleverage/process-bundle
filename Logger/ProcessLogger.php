@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -11,12 +11,8 @@
 namespace CleverAge\ProcessBundle\Logger;
 
 /**
- * Class ProcessLogger
- *
- * @package CleverAge\ProcessBundle\Logger
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
+ * @author Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class ProcessLogger extends AbstractLogger
 {
-
 }

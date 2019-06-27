@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -34,6 +34,9 @@ class HashTransformerTest extends AbstractProcessTest
     public function testSha512Hash()
     {
         $result = $this->processManager->execute('test.hash_transformer.sha512', 'This is a string');
-        self::assertEquals('f4d54d32e3523357ff023903eaba2721e8c8cfc7702663782cb3e52faf2c56c002cc3096b5f2b6df870be665d0040e9963590eb02d03d166e52999cd1c430db1', $result);
+        self::assertEquals(
+            'f4d54d32e3523357ff023903eaba2721e8c8cfc7702663782cb3e52faf2c56c002cc3096b5f2b6df870be665d0040e9963590eb02d03d166e52999cd1c430db1',
+            $result
+        );
     }
 }

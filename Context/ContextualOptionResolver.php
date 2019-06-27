@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -48,7 +48,7 @@ class ContextualOptionResolver
             // Else use a replace to insert a string value into another
             return preg_replace_callback(
                 $pattern,
-                function ($matches) use ($context) {
+                static function ($matches) use ($context) {
                     return $context[$matches[1]];
                 },
                 $value

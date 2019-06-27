@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -10,17 +10,12 @@
 
 namespace CleverAge\ProcessBundle;
 
-use CleverAge\ProcessBundle\Addon\Rest\Registry as RestRegistry;
-use CleverAge\ProcessBundle\Addon\Soap\Registry as SoapRegistry;
-use CleverAge\ProcessBundle\DependencyInjection\Compiler\CachePoolPass;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
- * Class CleverAgeProcessBundle
- *
  * @author  Valentin Clavreul <vclavreul@clever-age.com>
  * @author  Vincent Chalnot <vchalnot@clever-age.com>
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
@@ -32,7 +27,7 @@ class CleverAgeProcessBundle extends Bundle
      *
      * @param ContainerBuilder $container
      */
-    public function build(ContainerBuilder $container)
+    public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(
             new RegistryCompilerPass(
@@ -41,29 +36,5 @@ class CleverAgeProcessBundle extends Bundle
                 'addTransformer'
             )
         );
-
-        if (extension_loaded('soap')) {
-            $container->addCompilerPass(
-                new RegistryCompilerPass(
-                    SoapRegistry::class,
-                    'cleverage.soap.client',
-                    'addClient'
-                )
-            );
-        }
-
-        if (class_exists('\Httpful\Request')) {
-            $container->addCompilerPass(
-                new RegistryCompilerPass(
-                    RestRegistry::class,
-                    'cleverage.rest.client',
-                    'addClient'
-                )
-            );
-        }
-
-//        $container->addCompilerPass(
-//            new CachePoolPass()
-//        );
     }
 }

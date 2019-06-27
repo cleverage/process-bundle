@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -12,6 +12,9 @@ namespace CleverAge\ProcessBundle\Task\File\Csv;
 
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -27,7 +30,7 @@ abstract class AbstractCsvTask extends AbstractCsvResourceTask
      * @param ProcessState $state
      *
      * @throws \UnexpectedValueException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \RuntimeException
      */
     protected function initFile(ProcessState $state)
@@ -50,8 +53,8 @@ abstract class AbstractCsvTask extends AbstractCsvResourceTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

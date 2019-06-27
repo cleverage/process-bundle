@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -14,6 +14,9 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -40,7 +43,7 @@ class EventDispatcherTask extends AbstractConfigurableTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
@@ -57,8 +60,8 @@ class EventDispatcherTask extends AbstractConfigurableTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -18,6 +18,9 @@ use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -45,7 +48,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
      *
      * @throws \LogicException
      * @throws \InvalidArgumentException
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
@@ -98,9 +101,9 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\Config\Definition\Exception\InvalidConfigurationException
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws InvalidConfigurationException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
@@ -113,7 +116,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
         /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'folder_path',
-            function (Options $options, $value) {
+            static function (Options $options, $value) {
                 if (!is_dir($value)) {
                     throw new InvalidConfigurationException(
                         "Folder path does not exists or is not a folder: '{$value}'"

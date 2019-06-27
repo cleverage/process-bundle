@@ -1,3 +1,0 @@
-services:
-    CleverAge\ProcessBundle\Addon\Rest\Registry:
-        public: false

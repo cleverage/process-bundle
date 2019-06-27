@@ -39,7 +39,6 @@
     "require": {
         "php": ">=7.1",
         "ext-json": "*",
-
         "symfony/framework-bundle": "~3.0|~4.0",
         "symfony/expression-language": "~3.0|~4.0",
         "symfony/monolog-bundle": "~3.3",
@@ -48,20 +47,18 @@
         "symfony/process": "~3.0|~4.0",
         "symfony/property-access": "~3.0|~4.0",
         "symfony/serializer": "~3.0|~4.0",
-        "symfony/swiftmailer-bundle": "~3.0|~4.0",
         "symfony/validator": "~3.0|~4.0",
         "symfony/yaml": "~3.0|~4.0",
-
         "sidus/base-bundle": "~1.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~6.4"
     },
     "suggest": {
-        "ext-soap": "*",
-        "doctrine/orm": "~2.5",
-        "doctrine/doctrine-bundle": "~1.6",
-        "oneup/flysystem-bundle": "~1.13",
-        "nategood/httpful": "~0.2.20"
+        "cleverage/doctrine-process-bundle": "Dedicated bundle for Doctrine dependencies for the process bundle",
+        "cleverage/flysystem-process-bundle": "Dedicated bundle for Flysystem dependencies for the process bundle",
+        "cleverage/rest-process-bundle": "Dedicated bundle for Rest dependencies for the process bundle",
+        "cleverage/soap-process-bundle": "Dedicated bundle for Soap dependencies for the process bundle",
+        "cleverage/enqueue-process-bundle": "Manage asynchronous events within the process bundle"
     }
 }

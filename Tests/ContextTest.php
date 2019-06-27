@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -44,7 +44,11 @@ class ContextTest extends AbstractProcessTest
      */
     public function testContextMultiValue()
     {
-        $result = $this->processManager->execute('test.context.multi_values', null, ['value1' => 'red', 'value2' => 'dead']);
+        $result = $this->processManager->execute(
+            'test.context.multi_values',
+            null,
+            ['value1' => 'red', 'value2' => 'dead']
+        );
 
         self::assertEquals('red is dead', $result);
     }
@@ -56,7 +60,11 @@ class ContextTest extends AbstractProcessTest
      */
     public function testContextCannotMergeValue()
     {
-        $this->processManager->execute('test.context.merged_value', null, ['value' => ['another_key' => 'another_value']]);
+        $this->processManager->execute(
+            'test.context.merged_value',
+            null,
+            ['value' => ['another_key' => 'another_value']]
+        );
     }
 
     /**
@@ -68,7 +76,11 @@ class ContextTest extends AbstractProcessTest
 
         self::assertEquals(['another_key' => 'another_value'], $result);
 
-        $result = $this->processManager->execute('test.context.sub_value', null, ['value' => ['another_key' => 'another_value']]);
+        $result = $this->processManager->execute(
+            'test.context.sub_value',
+            null,
+            ['value' => ['another_key' => 'another_value']]
+        );
 
         self::assertEquals(['key' => ['another_key' => 'another_value']], $result);
     }

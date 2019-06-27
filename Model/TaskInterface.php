@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -14,7 +14,7 @@ namespace CleverAge\ProcessBundle\Model;
  * Must be implemented by tasks services
  * The service can read the input value from ProcessState and write it's output to it
  *
- * @see ProcessState for more informations about available actions
+ * @see    ProcessState for more informations about available actions
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>

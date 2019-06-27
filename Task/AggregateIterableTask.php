@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -12,6 +12,7 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 
 /**
  * Class AggregateIterableTask
@@ -28,7 +29,7 @@ class AggregateIterableTask implements BlockingTaskInterface
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {

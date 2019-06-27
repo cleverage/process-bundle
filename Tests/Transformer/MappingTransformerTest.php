@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -43,7 +43,10 @@ class MappingTransformerTest extends AbstractProcessTest
      */
     public function testMultiSubtransformers()
     {
-        $result = $this->processManager->execute('test.mapping_transformer.multi_subtransformers', ['field' => [3, null, 4, 2]]);
+        $result = $this->processManager->execute(
+            'test.mapping_transformer.multi_subtransformers',
+            ['field' => [3, null, 4, 2]]
+        );
 
         self::assertEquals(['field2' => [2, 4, 3]], $result);
     }

@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -13,6 +13,9 @@ namespace CleverAge\ProcessBundle\Task\Reporting;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\Exception\AccessException;
+use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -20,7 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AdvancedStatCounterTask extends AbstractConfigurableTask
 {
-    /** @var \Psr\Log\LoggerInterface */
+    /** @var LoggerInterface */
     protected $logger;
 
     /** @var \DateTime */
@@ -46,7 +49,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
     /**
      * @param ProcessState $state
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\ExceptionInterface
+     * @throws ExceptionInterface
      * @throws \InvalidArgumentException
      */
     public function execute(ProcessState $state)
@@ -54,6 +57,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
         $now = new \DateTime();
         if (!$this->startedAt) {
             $this->startedAt = $now;
+            $this->lastUpdate = $now;
         }
         if ($this->preInitCounter < $this->getOption($state, 'skip_first')) {
             $this->preInitCounter++;
@@ -61,7 +65,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
 
             return;
         }
-        if ($this->lastUpdate && 0 === $this->counter % $this->getOption($state, 'show_every')) {
+        if ($this->counter > 0 && 0 === $this->counter % $this->getOption($state, 'show_every')) {
             $diff = $now->diff($this->lastUpdate);
             $fullText = "Last iteration {$diff->format('%H:%I:%S')} ago";
             $items = $this->getOption($state, 'num_items') * $this->counter;
@@ -73,19 +77,19 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
             $fullText .= " - {$rate} items/s - {$items} items processed";
             $fullText .= " in {$now->diff($this->startedAt)->format('%H:%I:%S')}";
 
+            $this->lastUpdate = $now;
             $this->logger->info($fullText);
         } else {
             $state->setSkipped(true);
         }
         $this->counter++;
-        $this->lastUpdate = $now;
     }
 
     /**
      * @param OptionsResolver $resolver
      *
-     * @throws \Symfony\Component\OptionsResolver\Exception\AccessException
-     * @throws \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
+     * @throws AccessException
+     * @throws UndefinedOptionsException
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

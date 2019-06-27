@@ -1,5 +1,5 @@
-<?php
-/**
+<?php declare(strict_types=1);
+/*
  * This file is part of the CleverAge/ProcessBundle package.
  *
  * Copyright (C) 2017-2019 Clever-Age
@@ -61,10 +61,12 @@ class BlockingTaskTest extends AbstractProcessTest
         $this->assertDataQueue(
             [
                 [
-                    'task'  => 'aggregate',
+                    'task' => 'aggregate',
                     'value' => [1, 2, 3, 1, 2, 3, 1, 2, 3],
                 ],
-            ], 'test.multiple_iteration_blocking');
+            ],
+            'test.multiple_iteration_blocking'
+        );
     }
 
     /**

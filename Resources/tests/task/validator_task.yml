@@ -9,17 +9,17 @@ clever_age_process:
                     error_strategy: stop
                     options:
                         constraints:
-                            - Collection:
-                                int_field:
-                                    - NotNull: ~
-                                    - Type: integer
-                                any_field:
-                                    - NotNull: ~
-                                choice_field:
-                                    - NotNull: ~
-                                    - Choice:
-                                        strict: true
-                                        choices:
-                                            - Some random value 1
-                                            - Some random value 2
-                                            - Some random value 3
+                            -   Collection:
+                                    int_field:
+                                        -   NotNull: ~
+                                        -   Type: integer
+                                    any_field:
+                                        -   NotNull: ~
+                                    choice_field:
+                                        -   NotNull: ~
+                                        -   Choice:
+                                                strict: true
+                                                choices:
+                                                    - Some random value 1
+                                                    - Some random value 2
+                                                    - Some random value 3
