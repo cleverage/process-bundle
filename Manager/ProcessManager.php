@@ -351,6 +351,10 @@ class ProcessManager
                     }
                     // This means we are over iterating this task so we can remove it from registry
                     $this->removeProcessedIterable($taskConfiguration);
+                    if (self::EXECUTE_FLUSH !== $executionFlag) {
+                        // This task is now finished, we may flush it to test if there is anything lasting
+                        $this->flush($taskConfiguration);
+                    }
                     if ($state->isStopped()) {
                         return;
                     }
