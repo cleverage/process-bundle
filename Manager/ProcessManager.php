@@ -237,7 +237,7 @@ class ProcessManager
             && \count($taskConfiguration->getErrorOutputs()) > 0) {
             $m = "Task configuration {$taskConfiguration->getCode()} has error outputs ";
             $m .= "but it's error strategy 'stop' implies they will never be reached.";
-            $this->taskLogger->error($m);
+            $this->taskLogger->debug($m);
         }
         // @todo Refactor this using a Registry with this feature:
         // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
