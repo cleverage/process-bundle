@@ -135,6 +135,8 @@ class ProcessManager
         // If defined, set the input of a task
         if ($processConfiguration->getEntryPoint()) {
             $processConfiguration->getEntryPoint()->getState()->setInput($input);
+        } elseif ($input !== null) {
+            $this->processLogger->warning('Process has no entry point for input');
         }
 
         // Resolve task from main branch, starting by the end
