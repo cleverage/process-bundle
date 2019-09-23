@@ -41,7 +41,7 @@ Foreach property there is the following options.
 
 | Code | Type | Required | Default | Description |
 | ---- | ---- | :------: | ------- | ----------- |
-| `code` | `string` or `array` or `null` | | `null` | A property path, or a list of property path. By default it would be the same as the destination property. Will be used as a source. |
+| `code` | `string` or `array` or `null` | | `null` | A property path, or a list of property path. By default it would be the same as the destination property. Will be used as a source. The special value '.' access the whole object. |
 | `constant` | `any` | | `null` | If not `null`, will be directly used as a source (takes precedence on `code`) |
 | `set_null` | `bool` | | `false` | If `true`, `null` will be directly used as a source (takes precedence on `code`) |
 | `ignore_missing` | `bool` | | `false` | Ignore property accessor errors for this source |

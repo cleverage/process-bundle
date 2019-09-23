@@ -88,7 +88,9 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 $transformedValue = null;
             } else {
                 $sourceProperty = $mapping['code'] ?? $targetProperty;
-                if (\is_array($sourceProperty)) {
+                if ($sourceProperty === '.') {
+                    $transformedValue = $input;
+                } elseif (\is_array($sourceProperty)) {
                     $transformedValue = [];
                     /** @var array $sourceProperty */
                     foreach ($sourceProperty as $destKey => $srcKey) {
