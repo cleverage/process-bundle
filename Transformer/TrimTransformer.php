@@ -31,6 +31,10 @@ class TrimTransformer implements ConfigurableTransformerInterface
      */
     public function transform($value, array $options = [])
     {
+        if (null === $value) {
+            return null;
+        }
+
         return trim($value, $options['charlist']);
     }
 
