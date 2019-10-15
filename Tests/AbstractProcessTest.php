@@ -22,9 +22,6 @@ use CleverAge\ProcessBundle\EventListener\DataQueueEventListener;
  */
 abstract class AbstractProcessTest extends KernelTestCase
 {
-    /** @var  ContainerInterface */
-    protected $container;
-
     /** @var ProcessManager */
     protected $processManager;
 
@@ -36,16 +33,10 @@ abstract class AbstractProcessTest extends KernelTestCase
      */
     protected function setUp()
     {
-        $kernel = static::bootKernel(
-            [
-                'environment' => 'test',
-                'debug' => true,
-            ]
-        );
+        static::bootKernel();
 
-        $this->container = $kernel->getContainer();
-        $this->processManager = $this->container->get(ProcessManager::class);
-        $this->processConfigurationRegistry = $this->container->get(ProcessConfigurationRegistry::class);
+        $this->processManager = self::$container->get(ProcessManager::class);
+        $this->processConfigurationRegistry = self::$container->get(ProcessConfigurationRegistry::class);
     }
 
     /**
@@ -58,7 +49,7 @@ abstract class AbstractProcessTest extends KernelTestCase
      */
     protected function assertDataQueue(array $expected, string $processName, bool $checkTask = true)
     {
-        $dataQueueListener = $this->container->get(DataQueueEventListener::class);
+        $dataQueueListener = self::$container->get(DataQueueEventListener::class);
         $actualQueue = $dataQueueListener->getQueue($processName);
 
         self::assertCount(\count($expected), $actualQueue, 'Event count does not match');
