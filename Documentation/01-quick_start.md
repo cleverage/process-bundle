@@ -24,7 +24,15 @@ This bundle requires Symfony 3. You can install it using composer:
 composer require cleverage/process-bundle
 ```
 
-This bundle requires the Symfony Serializer Component, but it might be disabled by default. Consider enable it with https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled.  
+Remember to update your AppKernel
+
+```php
+$bundles[] = new CleverAge\ProcessBundle\CleverAgeProcessBundle();
+```
+
+Some tasks and transformers use the main Symfony serializer service. You might need to explicitly enable it, or dependency 
+resolution might fail
+* https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled
 
 ## Process definition
 
