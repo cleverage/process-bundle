@@ -1,0 +1,10 @@
+language: php
+
+services:
+  - docker
+
+before_script:
+    - docker build -t cleverage_process:test .
+
+script:
+    - docker run -it --mount type=bind,src=$(pwd),dst=/src-cleverage_process cleverage_process:test php vendor/bin/phpunit
