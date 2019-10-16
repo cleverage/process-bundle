@@ -35,8 +35,8 @@ abstract class AbstractProcessTest extends KernelTestCase
     {
         static::bootKernel();
 
-        $this->processManager = self::$container->get(ProcessManager::class);
-        $this->processConfigurationRegistry = self::$container->get(ProcessConfigurationRegistry::class);
+        $this->processManager = $this->getContainer()->get(ProcessManager::class);
+        $this->processConfigurationRegistry = $this->getContainer()->get(ProcessConfigurationRegistry::class);
     }
 
     /**
@@ -49,7 +49,7 @@ abstract class AbstractProcessTest extends KernelTestCase
      */
     protected function assertDataQueue(array $expected, string $processName, bool $checkTask = true)
     {
-        $dataQueueListener = self::$container->get(DataQueueEventListener::class);
+        $dataQueueListener = $this->getContainer()->get(DataQueueEventListener::class);
         $actualQueue = $dataQueueListener->getQueue($processName);
 
         self::assertCount(\count($expected), $actualQueue, 'Event count does not match');
@@ -75,5 +75,24 @@ abstract class AbstractProcessTest extends KernelTestCase
                 self::assertEquals($expected[$key], $value->getInput(), "Value #{$key} does not match");
             }
         }
+    }
+
+    /**
+     * Returns the booted symfony container
+     *
+     * Compatibility backport for symfony/phpunit-bridge that should work with v3 or v4
+     *
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ContainerInterface
+    {
+        if(isset(self::$container)) {
+            return self::$container;
+        }
+
+        $container = self::$kernel->getContainer();
+        $container = $container->has('test.service_container') ? $container->get('test.service_container') : $container;
+
+        return $container;
     }
 }
