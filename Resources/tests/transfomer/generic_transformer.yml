@@ -1,0 +1,13 @@
+clever_age_process:
+    generic_transformers:
+        test.generic_transformers.simple:
+            transformers:
+                default:
+                    value: 'ok'
+
+        test.generic_transformers.contextual_options:
+            contextual_options:
+                default_value: ~
+            transformers:
+                default:
+                    value: '{{ default_value }}'
