@@ -64,10 +64,10 @@ trait TransformerTrait
      * @return string
      *
      * @example
-     *         transformers:
-     *         callback#1:
+     *     transformers:
+     *       callback#1:
      *         callback: array_filter
-     *         callback#2:
+     *       callback#2:
      *         callback: array_reverse
      *
      *
@@ -95,10 +95,12 @@ trait TransformerTrait
     }
 
     /**
+     * Transform the list of transformer codes + options into a list of Closure (better performances)
+     *
      * @param Options $options
      * @param         $transformers
      *
-     * @return array
+     * @return \Closure[]
      *
      * @throws ExceptionInterface
      */
