@@ -48,6 +48,7 @@ class CleverAgeProcessExtension extends SidusBaseExtension
         foreach ($config['generic_transformers'] as $transformerCode => $transformerConfig) {
             $transformerDefinition = new Definition(GenericTransformer::class);
             $transformerDefinition->setAutowired(true);
+            $transformerDefinition->setPrivate(true);
             $transformerDefinition->addMethodCall('initialize',[
                 $transformerCode,
                 $transformerConfig
