@@ -27,6 +27,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
 - Reference
     - [Process definition](Documentation/reference/01-process_definition.md)
     - [Task definition](Documentation/reference/02-task_definition.md)
+    - [Generic transformers definition](Documentation/reference/03-generic_transformers_definition.md)
       - Basic and debug
         - [ConstantOutputTask](Documentation/reference/tasks/constant_output_task.md)
         - [ConstantIterableOutputTask](Documentation/reference/tasks/constant_iterable_output_task.md)
