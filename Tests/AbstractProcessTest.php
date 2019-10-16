@@ -109,12 +109,12 @@ abstract class AbstractProcessTest extends KernelTestCase
      *
      * @param string $transformerCode
      * @param mixed  $expected
-     * @param mixed  $actual
+     * @param mixed  $value
      * @param array  $options
      *
      * @throws ExceptionInterface
      */
-    protected function assertTransformation(string $transformerCode, $expected, $actual, array $options = [])
+    protected function assertTransformation(string $transformerCode, $expected, $value, array $options = [])
     {
         $transformer = $this->transformerRegistry->getTransformer($transformerCode);
 
@@ -124,6 +124,6 @@ abstract class AbstractProcessTest extends KernelTestCase
             $options = $resolver->resolve($options);
         }
 
-        self::assertEquals($expected, $transformer->transform($actual, $options));
+        self::assertEquals($expected, $transformer->transform($value, $options));
     }
 }
