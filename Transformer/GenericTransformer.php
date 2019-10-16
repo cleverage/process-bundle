@@ -159,8 +159,12 @@ class GenericTransformer implements ConfigurableTransformerInterface
     public function configureContextualOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('required', true);
+        $resolver->setAllowedTypes('required', 'bool');
+
         $resolver->setDefault('default', null);
+
         $resolver->setDefault('default_is_null', false);
+        $resolver->setAllowedTypes('default_is_null', 'bool');
     }
 
 }
