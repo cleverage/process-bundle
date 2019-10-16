@@ -92,13 +92,11 @@ class Configuration implements ConfigurationInterface
         $definition
             ->arrayNode('contextual_options')->prototype('variable')->end()->end()
             ->arrayNode('transformers')->prototype('variable')->end()->end();
-
-        // TODO assertions configuration
     }
 
     /**
      * "configurations" root configuration
-     * @TODO rename root as "processes" ?
+     * @TODO rename this root as "processes"
      *
      * @param NodeBuilder $definition
      */
