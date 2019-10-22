@@ -81,9 +81,9 @@ clever_age_process:
                                         code: '[id]'
                                     slug:
                                         code:
-                                            - id
-                                            - firstname
-                                            - lastname
+                                            - '[id]'
+                                            - '[firstname]'
+                                            - '[lastname]'
                                         transformers:
                                             implode:
                                                 separator: '-'
