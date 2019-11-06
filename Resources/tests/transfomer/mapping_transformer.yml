@@ -60,3 +60,50 @@ clever_age_process:
                                 mapping:
                                     "[field1][field2][field3]":
                                         code: '[value]'
+
+        test.mapping_transformer.full_input:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            mapping:
+                                mapping:
+                                    out:
+                                        code: '.'
+
+        test.mapping_transformer.full_input_in_array:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            mapping:
+                                mapping:
+                                    out:
+                                        code:
+                                            some_field: "[field]"
+                                            full: '.'
+
+        test.mapping_transformer.multi_source_field_in_sequence:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            mapping:
+                                mapping:
+                                    out:
+                                        code:
+                                            - "[field1]"
+                                            - "[field2]"
+                                            - "[field3]"
