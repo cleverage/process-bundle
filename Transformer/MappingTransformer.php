@@ -23,6 +23,7 @@ use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
 use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -62,9 +63,9 @@ class MappingTransformer implements ConfigurableTransformerInterface
      * @param mixed $input
      * @param array $options
      *
+     * @return mixed $value
      * @throws \Exception
      *
-     * @return mixed $value
      */
     public function transform($input, array $options = [])
     {
@@ -81,57 +82,47 @@ class MappingTransformer implements ConfigurableTransformerInterface
 
         /** @noinspection ForeachSourceInspection */
         foreach ($options['mapping'] as $targetProperty => $mapping) {
-            $targetProperty = (string) $targetProperty;
+            $targetProperty = (string)$targetProperty;
+            $sourceProperty = $mapping['code'] ?? $targetProperty;
+            $ignoreMissingFlag = $mapping['ignore_missing'] || $options['ignore_missing'];
+
+            // Prepare input value
             if (null !== $mapping['constant']) {
-                $transformedValue = $mapping['constant'];
+                $inputValue = $mapping['constant'];
             } elseif ($mapping['set_null']) {
-                $transformedValue = null;
-            } else {
-                $sourceProperty = $mapping['code'] ?? $targetProperty;
-                if ($sourceProperty === '.') {
-                    $transformedValue = $input;
-                } elseif (\is_array($sourceProperty)) {
-                    $transformedValue = [];
-                    /** @var array $sourceProperty */
-                    foreach ($sourceProperty as $destKey => $srcKey) {
-                        try {
-                            $transformedValue[$destKey] = $this->accessor->getValue($input, $srcKey);
-                        } catch (\RuntimeException $missingPropertyError) {
-                            // @TODO no error if framework.property_access.throw_exception_on_invalid_index = false (default)
-                            if ($mapping['ignore_missing'] || $options['ignore_missing']) {
-                                continue;
-                            }
-                            $this->logger->debug(
-                                'Mapping exception',
-                                [
-                                    'srcKey' => $srcKey,
-                                    'message' => $missingPropertyError->getMessage(),
-                                ]
-                            );
+                $inputValue = null;
+            } elseif (\is_array($sourceProperty)) {
+                $inputValue = [];
+                /** @var array $sourceProperty */
+                foreach ($sourceProperty as $destKey => $srcKey) {
+                    try {
+                        $inputValue[$destKey] = $this->extractInputValue($input, $srcKey);
+                    } catch (RuntimeException $missingPropertyError) {
+                        $this->handleInputMissingExceptions($missingPropertyError, $srcKey);
+                        if ($ignoreMissingFlag) {
+                            continue;
+                        } else {
                             throw $missingPropertyError;
                         }
                     }
-                } else {
-                    try {
-                        $transformedValue = $this->accessor->getValue($input, $sourceProperty);
-                    } catch (\RuntimeException $missingPropertyError) {
-                        // @TODO no error if framework.property_access.throw_exception_on_invalid_index = false (default)
-                        if ($mapping['ignore_missing'] || $options['ignore_missing']) {
-                            continue;
-                        }
-                        $this->logger->debug(
-                            'Mapping exception',
-                            [
-                                'message' => $missingPropertyError->getMessage(),
-                            ]
-                        );
+                }
+            } else {
+                try {
+                    $inputValue = $this->extractInputValue($input, $sourceProperty);
+                } catch (RuntimeException $missingPropertyError) {
+                    $this->handleInputMissingExceptions($missingPropertyError, $sourceProperty);
+                    if ($ignoreMissingFlag) {
+                        continue;
+                    } else {
                         throw $missingPropertyError;
                     }
                 }
+
             }
 
+            // Transform input value
             try {
-                $transformedValue = $this->applyTransformers($mapping['transformers'], $transformedValue);
+                $transformedValue = $this->applyTransformers($mapping['transformers'], $inputValue);
             } catch (TransformerException $exception) {
                 $exception->setTargetProperty($targetProperty);
                 $this->logger->debug(
@@ -147,6 +138,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 throw $exception;
             }
 
+            // Set transformed value into result
             if (\is_callable($options['merge_callback'])) {
                 $options['merge_callback']($result, $targetProperty, $transformedValue);
             } elseif ($this->accessor->isWritable($result, $targetProperty)) {
@@ -193,10 +185,9 @@ class MappingTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('keep_input', ['boolean']);
         $resolver->setAllowedTypes('merge_callback', ['NULL', 'callable']);
 
-        /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'mapping',
-            function (Options $options, $value) {
+            function (/** @noinspection PhpUnusedParameterInspection */ Options $options, $value) {
                 $resolvedMapping = [];
                 $mappingResolver = new OptionsResolver();
                 $this->configureMappingOptions($mappingResolver);
@@ -249,5 +240,44 @@ class MappingTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
 
         $this->configureTransformersOptions($resolver);
+    }
+
+    /**
+     * Custom rules to get a value from an input object or array
+     *
+     * @param mixed  $input
+     * @param string $sourceProperty
+     *
+     * @throws RuntimeException
+     *
+     * @return mixed
+     */
+    protected function extractInputValue($input, string $sourceProperty)
+    {
+        if ($sourceProperty === '.') {
+            return $input;
+        }
+
+        return $this->accessor->getValue($input, $sourceProperty);
+    }
+
+    /**
+     * Wrap error handling when there is an property access error
+     *
+     * @TODO WARNING there is no error if framework.property_access.throw_exception_on_invalid_index is false (which is
+     *       the default)
+     *
+     * @param RuntimeException $missingPropertyError
+     * @param string           $srcKey
+     */
+    protected function handleInputMissingExceptions(RuntimeException $missingPropertyError, string $srcKey)
+    {
+        $this->logger->debug(
+            'Mapping exception',
+            [
+                'srcKey' => $srcKey,
+                'message' => $missingPropertyError->getMessage(),
+            ]
+        );
     }
 }
