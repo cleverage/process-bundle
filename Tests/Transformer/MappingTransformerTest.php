@@ -60,4 +60,41 @@ class MappingTransformerTest extends AbstractProcessTest
 
         self::assertEquals(['field1' => ['field2' => ['field3' => 'ok']]], $result);
     }
+
+    /**
+     * Test the '.' source property path
+     */
+    public function testFullInput()
+    {
+        $result = $this->processManager->execute('test.mapping_transformer.full_input', ['value' => 'ok']);
+
+        self::assertEquals(['out' => ['value' => 'ok']], $result);
+    }
+
+    /**
+     * Test the '.' source property path inside an array of source codes
+     */
+    public function testFullInputInArray()
+    {
+        $result = $this->processManager->execute('test.mapping_transformer.full_input_in_array', ['field' => 'ok']);
+
+        self::assertEquals(['out' => [
+            'some_field' => 'ok',
+            'full' => ['field' => 'ok'],
+        ]], $result);
+    }
+
+    /**
+     * Test that a source property can be an array with numeric keys (see commit e141cb61)
+     */
+    public function testMultiSourceFieldInSequence()
+    {
+        $result = $this->processManager->execute('test.mapping_transformer.multi_source_field_in_sequence', [
+            'field1' => 'a',
+            'field2' => 'b',
+            'field3' => 'c',
+        ]);
+
+        self::assertEquals(['out' => ['a', 'b', 'c']], $result);
+    }
 }
