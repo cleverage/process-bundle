@@ -228,6 +228,7 @@ class ProcessConfiguration
     public function getMainTaskGroup(): array
     {
         if (null === $this->mainTaskGroup) {
+            $this->mainTaskGroup = [];
             $mainTask = $this->getMainTask();
 
             foreach ($this->getDependencyGroups() as $branch) {
@@ -249,14 +250,23 @@ class ProcessConfiguration
      *
      * @return TaskConfiguration
      */
-    public function getMainTask(): TaskConfiguration
+    public function getMainTask(): ?TaskConfiguration
     {
         $entryTask = $this->getEntryPoint();
+
+        // If there's no entry point, we might use the end point
         if (!$entryTask) {
             $entryTask = $this->getEndPoint();
         }
+
+        // By default use the first defined task
         if (!$entryTask) {
             $entryTask = reset($this->taskConfigurations);
+        }
+
+        // May happen with an empty array
+        if($entryTask === false) {
+            return null;
         }
 
         return $entryTask;
