@@ -24,6 +24,8 @@ This bundle requires Symfony 3. You can install it using composer:
 composer require cleverage/process-bundle
 ```
 
+This bundle requires the Symfony Serializer Component, but it might be disabled by default. Consider enable it with https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled.  
+
 ## Process definition
 
 Most of the work is done through the bundle configuration. 
