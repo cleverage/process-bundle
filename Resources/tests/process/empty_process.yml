@@ -1,0 +1,4 @@
+clever_age_process:
+    configurations:
+        test.empty_process:
+            tasks: []
