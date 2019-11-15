@@ -94,7 +94,7 @@ abstract class AbstractProcessTest extends KernelTestCase
      */
     protected function getContainer(): ContainerInterface
     {
-        if(isset(self::$container)) {
+        if (isset(self::$container)) {
             return self::$container;
         }
 
@@ -116,6 +116,22 @@ abstract class AbstractProcessTest extends KernelTestCase
      */
     protected function assertTransformation(string $transformerCode, $expected, $value, array $options = [])
     {
+        $result = $this->transform($transformerCode, $value, $options);
+        self::assertEquals($expected, $result);
+    }
+
+    /**
+     * Transform some value using referenced transformer with given options
+     *
+     * @param string $transformerCode
+     * @param mixed  $value
+     * @param array  $options
+     *
+     * @return mixed
+     * @throws ExceptionInterface
+     */
+    protected function transform(string $transformerCode, $value, array $options = [])
+    {
         $transformer = $this->transformerRegistry->getTransformer($transformerCode);
 
         if ($transformer instanceof ConfigurableTransformerInterface) {
@@ -124,6 +140,6 @@ abstract class AbstractProcessTest extends KernelTestCase
             $options = $resolver->resolve($options);
         }
 
-        self::assertEquals($expected, $transformer->transform($value, $options));
+        return $transformer->transform($value, $options);
     }
 }

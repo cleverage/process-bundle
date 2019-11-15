@@ -1,13 +1,12 @@
-TransformerName
-===============
+TaskName
+========
 
-_Describe main goal an use cases of the transformer_
+_Describe main goal an use cases of the task_
 
-Transformer reference
----------------------
+Task reference
+--------------
 
 * **Service**: `ClassName`
-* **Transformer code**: `code`
 
 Accepted inputs
 ---------------
@@ -36,8 +35,10 @@ _YAML samples and explanations_
   - details
   
 ```yaml
-# Transformer options level
+# Task configuration level
 code:
-    option1: a
-    option2: b
+    service: '@service_ref'
+    options: 
+        a: 1
+        b: 2
 ```
