@@ -32,10 +32,20 @@ Options
 
 | Code | Type | Required | Default | Description |
 | ---- | ---- | :------: | ------- | ----------- |
-| `query` | `string` or `array` | **X** | | One or multiple Xpath queries, array keys are conserved |
+| `query` | `string` or `array` | **X** | | One or multiple Xpath queries. Using an array, you can either have a simple list of subqueries, or override some root-level query options |
 | `single_result` | `boolean` |  | `true` | Force the result to match a single value |
 | `ignore_missing` | `boolean` | | `true` | Only used with `single_result`, avoid errors if the query doesn't match anything |
 | `unwrap_value` | `boolean` | | `true` | Return the textual content of the node, only works if the result is a `\DOMText` (you might need to use the `text()` xpath selector) or a `\DOMAttr` |
+
+Subqueries, in their complex form, have the following options :
+
+| Code | Type | Required | Default | Description |
+| ---- | ---- | :------: | ------- | ----------- |
+| `subquery` | `string` | **X** | | An Xpath query, no additional sublevel is allowed |
+| `single_result` | `boolean` |  | _Root-level value for `single_result`_ | Force the result to match a single value |
+| `ignore_missing` | `boolean` | | _Root-level value for `ignore_missing`_ | Only used with `single_result`, avoid errors if the query doesn't match anything |
+| `unwrap_value` | `boolean` | | _Root-level value for `unwrap_value`_ | Return the textual content of the node, only works if the result is a `\DOMText` (you might need to use the `text()` xpath selector) or a `\DOMAttr` |
+
 
 Examples
 --------
@@ -89,4 +99,18 @@ xpath_evaluator:
 xpath_evaluator:
     query: '/a/b'
     unwrap_value: false
+```
+
+* Example 4 : subquery with partially overridden options
+
+```yaml
+# Transformer options level
+xpath_evaluator:
+    query: 
+        all_c_values: 
+            subquery: '/a/b/c/text()'
+            single_result: false
+        e_value: '/a/d/e/text()'
+        f_value: 
+            subquery: '/a/d/f/text()'
 ```

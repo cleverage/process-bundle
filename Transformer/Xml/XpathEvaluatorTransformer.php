@@ -11,6 +11,7 @@
 namespace CleverAge\ProcessBundle\Transformer\Xml;
 
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -26,14 +27,55 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
     {
         $resolver->setRequired('query');
         $resolver->setAllowedTypes('query', ['string', 'array']);
+        $resolver->setNormalizer('query', function(Options $options, $value) {
+            // Basic case : a single query
+            if(\is_string($value)) {
+                return $value;
+            }
 
-        $resolver->setDefault('single_result', true);
+            // Complex case : a list of subqueries, each can override root level options
+            if(\is_array($value)) {
+                $queryOptions = [];
+                $queryResolver = new OptionsResolver();
+                $this->configureQueryOptions($queryResolver, $options);
+                $queryResolver->setRequired('subquery');
+                $queryResolver->setAllowedTypes('subquery', 'string');
+
+                foreach ($value as $code => $subquery) {
+                    if(\is_string($subquery)) {
+                        $subquery = ['subquery' => $subquery];
+                    }
+
+                    $queryOptions[$code] = $queryResolver->resolve($subquery);
+                }
+
+                return $queryOptions;
+            }
+
+            // This should never be reached
+            throw new \InvalidArgumentException('Unhandled query');
+        });
+
+        // Use same options & defaults for root option level and subquery options
+        $this->configureQueryOptions($resolver);
+    }
+
+    /**
+     * Configure options about how to handle xpath query results.
+     * Available at root and subquery level.
+     *
+     * @param OptionsResolver $resolver
+     * @param Options|null    $parentOptions
+     */
+    public function configureQueryOptions(OptionsResolver $resolver, Options $parentOptions = null)
+    {
+        $resolver->setDefault('single_result', $parentOptions ? $parentOptions['single_result'] : true);
         $resolver->setAllowedTypes('single_result', 'bool');
 
-        $resolver->setDefault('ignore_missing', true);
+        $resolver->setDefault('ignore_missing', $parentOptions ? $parentOptions['ignore_missing'] : true);
         $resolver->setAllowedTypes('ignore_missing', 'bool');
 
-        $resolver->setDefault('unwrap_value', true);
+        $resolver->setDefault('unwrap_value', $parentOptions ? $parentOptions['unwrap_value'] : true);
         $resolver->setAllowedTypes('unwrap_value', 'bool');
     }
 
@@ -51,7 +93,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         $query = $options['query'];
         if (\is_array($query)) {
             $result = \array_map(function ($subquery) use ($xpath, $value, $options) {
-                return $this->query($xpath, $subquery, $value, $options);
+                return $this->query($xpath, $subquery['subquery'], $value, $subquery);
             }, $query);
         } else {
             $result = $this->query($xpath, $query, $value, $options);
