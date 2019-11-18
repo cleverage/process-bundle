@@ -31,7 +31,7 @@ Examples
 --------
 
 ```yaml
-# Transformer options level
+# Task configuration level
 my_xml_reader:
     service: '@CleverAge\ProcessBundle\Task\File\Xml\XmlReaderTask'
     options: 
