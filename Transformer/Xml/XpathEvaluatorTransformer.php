@@ -33,8 +33,8 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         $resolver->setDefault('ignore_missing', true);
         $resolver->setAllowedTypes('ignore_missing', 'bool');
 
-        $resolver->setDefault('as_text', true);
-        $resolver->setAllowedTypes('as_text', 'bool');
+        $resolver->setDefault('unwrap_value', true);
+        $resolver->setAllowedTypes('unwrap_value', 'bool');
     }
 
     /**
@@ -95,14 +95,18 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         $results = iterator_to_array($nodeList);
 
         // Convert results to text
-        if ($options['as_text']) {
-            $results = \array_map(function (\DOMNode $item) use ($options) {
-                if (!$item instanceof \DOMText) {
-                    // If you have this error maybe you need to use the "text()" xpath selector
-                    throw new \UnexpectedValueException("Xpath result is not a text node");
+        if ($options['unwrap_value']) {
+            $results = \array_map(function (\DOMNode $item) use ($query, $options) {
+                if ($item instanceof \DOMAttr) {
+                    return $item->value;
                 }
 
-                return $item->textContent;
+                if ($item instanceof \DOMText) {
+                    // If you have an error, remember that you may need to use the "text()" xpath selector
+                    return $item->textContent;
+                }
+
+                throw new \UnexpectedValueException("Xpath result cannot be unwrapped for query '{$query}'");
             }, $results);
         }
 
