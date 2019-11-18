@@ -28,7 +28,6 @@ Basically, it will greatly ease the configuration of import and exports but can 
 - Reference
     - [Process definition](Documentation/reference/01-process_definition.md)
     - [Task definition](Documentation/reference/02-task_definition.md)
-    - [Generic transformers definition](Documentation/reference/03-generic_transformers_definition.md)
       - Basic and debug
         - [ConstantOutputTask](Documentation/reference/tasks/constant_output_task.md)
         - [ConstantIterableOutputTask](Documentation/reference/tasks/constant_iterable_output_task.md)
@@ -44,6 +43,8 @@ Basically, it will greatly ease the configuration of import and exports but can 
       - File/CSV
         - [CsvReaderTask](Documentation/reference/tasks/csv_reader_task.md)
         - [CsvWriterTask](Documentation/reference/tasks/csv_writer_task.md)
+      - File/XML
+        - [XmlReaderTask](Documentation/reference/tasks/xml_reader_task.md)
       - Flow manipulation
         - [AggregateIterableTask](Documentation/reference/tasks/aggregate_iterable_task.md)
         - [InputAggregatorTask](Documentation/reference/tasks/input_aggregator_task.md)
@@ -54,6 +55,8 @@ Basically, it will greatly ease the configuration of import and exports but can 
         - [RulesTransformer](Documentation/reference/transformers/rules_transformer.md)
         - [DateFormatTransformer](Documentation/reference/transformers/date_format.md)
         - [DateParserTransformer](Documentation/reference/transformers/date_parser.md)
+        - [XpathEvaluatorTransformer](Documentation/reference/transformers/xpath_evaluator.md)
+    - [Generic transformers definition](Documentation/reference/03-generic_transformers_definition.md)
 - Examples
     - [Simple ETL]
 - [Roadmap and versions](Documentation/100-roadmap.md)
