@@ -27,6 +27,15 @@ class XpathEvaluatorTransformerTest extends AbstractProcessTest
         ]);
     }
 
+    public function testAttributeValueQuery()
+    {
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML('<node data="ok">ko</node>');
+        $this->assertTransformation('xpath_evaluator', 'ok', $domDocument, [
+            'query' => '/node/@data',
+        ]);
+    }
+
     public function testSubQuery()
     {
         $domDocument = new \DOMDocument();
@@ -60,7 +69,7 @@ class XpathEvaluatorTransformerTest extends AbstractProcessTest
         $result = $this->transform('xpath_evaluator', $node, [
             'query' => './c/text()',
             'single_result' => false,
-            'as_text' => false,
+            'unwrap_value' => false,
         ]);
 
         self::assertCount(3, $result);
