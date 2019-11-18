@@ -35,7 +35,7 @@ Options
 | `query` | `string` or `array` | **X** | | One or multiple Xpath queries, array keys are conserved |
 | `single_result` | `boolean` |  | `true` | Force the result to match a single value |
 | `ignore_missing` | `boolean` | | `true` | Only used with `single_result`, avoid errors if the query doesn't match anything |
-| `as_text` | `boolean` | | `true` | Return the textual content of the node, only if the query is a `\DOMText` (you might need to use the `text()` xpath selector) |
+| `unwrap_value` | `boolean` | | `true` | Return the textual content of the node, only works if the result is a `\DOMText` (you might need to use the `text()` xpath selector) or a `\DOMAttr` |
 
 Examples
 --------
@@ -82,11 +82,11 @@ xpath_evaluator:
         - '/a/d/g/text()'
 ```
 
-* Example 3 : get a \DOMNode
+* Example 3 : get a `\DOMNode`
 
 ```yaml
 # Transformer options level
 xpath_evaluator:
     query: '/a/b'
-    as_text: false
+    unwrap_value: false
 ```
