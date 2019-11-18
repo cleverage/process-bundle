@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php /** @noinspection PhpUnhandledExceptionInspection */
+declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -108,6 +109,45 @@ class XpathEvaluatorTransformerTest extends AbstractProcessTest
                 'c' => './c/text()',
                 'd' => './d/text()',
                 'e' => './e/text()',
+            ],
+        ]);
+    }
+
+    public function testOverridableSubqueries()
+    {
+        $xml = <<<XML
+
+<a>
+    <b>
+        <c>ok1</c>
+        <c>ok2</c>
+        <c>ok3</c>
+    </b>
+    <d>
+        <e>ok4</e>
+        <f>ok5</f>
+        <g>ok6</g>
+    </d>
+</a>
+XML;
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML($xml);
+
+        $node = $domDocument->getElementsByTagName('b')[0];
+        $this->assertTransformation('xpath_evaluator', [
+            'all_c_values' => ['ok1', 'ok2', 'ok3'],
+            'e_value' => 'ok4',
+            'f_value' => 'ok5',
+        ], $node, [
+            'query' => [
+                'all_c_values' => [
+                    'subquery' => '/a/b/c/text()',
+                    'single_result' => false,
+                ],
+                'e_value' => '/a/d/e/text()',
+                'f_value' => [
+                    'subquery' => '/a/d/f/text()',
+                ],
             ],
         ]);
     }
