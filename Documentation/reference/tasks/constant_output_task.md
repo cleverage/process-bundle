@@ -25,3 +25,20 @@ Options
 | ---- | ---- | :------: | ------- | ----------- |
 | `output` | `any` | **X** |  | Value to output |
 
+Example
+-------
+
+```yaml
+clever_age_process:
+    configurations:
+        project_prefix.process_name:
+            tasks:
+                constant_output_example:
+                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+                    options:
+                        output:
+                            id: 123
+                            firstname: Test1
+                            lastname: Test2
+                    outputs: [XXXX]
+```
