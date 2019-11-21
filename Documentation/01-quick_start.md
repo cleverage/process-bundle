@@ -50,11 +50,11 @@ Then you can add tasks in this array. They consist of a `service`, optionally co
 ```
 
 Below you can see a minimal working ETL example. It consist of 3 tasks:
-- the first *extract* some data (the [constant output task]() outputs... a constant value): it's an array with 3 
+- the first *extract* some data (the [constant output task](./reference/tasks/constant_output_task.md) outputs... a constant value): it's an array with 3 
 keys/values
-- the second *transform* the given value (the [transformer task]() is one of the most important!): the output is then an 
+- the second *transform* the given value (the [transformer task](./reference/tasks/transformer_task.md) is one of the most important!): the output is then an 
 array with 2 keys/values, created using the value from previous task
-- finally, the last will just display the result (it's a cheap *load*, using the [debug task](), only for development 
+- finally, the last will just display the result (it's a cheap *load*, using the [debug task](./reference/tasks/debug_task.md), only for development 
 purpose!)
 
 ```yaml
