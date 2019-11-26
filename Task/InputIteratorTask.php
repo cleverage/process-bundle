@@ -88,11 +88,14 @@ class InputIteratorTask implements IterableTaskInterface
             );
         }
 
+        $input = $state->getInput();
         // Create iterator
-        if ($state->getInput() instanceof \Iterator) {
-            $this->iterator = $state->getInput();
-        } elseif (\is_array($state->getInput())) {
-            $this->iterator = new \ArrayIterator($state->getInput());
+        if ($input instanceof \Iterator) {
+            $this->iterator = $input;
+        } elseif ($input instanceof \IteratorAggregate) {
+            $this->iterator = $input->getIterator();
+        } elseif (\is_array($input)) {
+            $this->iterator = new \ArrayIterator($input);
         }
 
         // Assert iterator is OK
