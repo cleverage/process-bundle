@@ -13,6 +13,7 @@ namespace CleverAge\ProcessBundle\Manager;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Event\ProcessEvent;
 use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
@@ -30,6 +31,7 @@ use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Execute processes
@@ -73,25 +75,33 @@ class ProcessManager
     /** @var TaskConfiguration */
     protected $taskConfiguration;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
+     * ProcessManager constructor.
+     *
      * @param ContainerInterface           $container
      * @param ProcessLogger                $processLogger
      * @param TaskLogger                   $taskLogger
      * @param ProcessConfigurationRegistry $processConfigurationRegistry
      * @param ContextualOptionResolver     $contextualOptionResolver
+     * @param EventDispatcherInterface     $eventDispatcher
      */
     public function __construct(
         ContainerInterface $container,
         ProcessLogger $processLogger,
         TaskLogger $taskLogger,
         ProcessConfigurationRegistry $processConfigurationRegistry,
-        ContextualOptionResolver $contextualOptionResolver
+        ContextualOptionResolver $contextualOptionResolver,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->container = $container;
         $this->processLogger = $processLogger;
         $this->taskLogger = $taskLogger;
         $this->processConfigurationRegistry = $processConfigurationRegistry;
         $this->contextualOptionResolver = $contextualOptionResolver;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -111,15 +121,51 @@ class ProcessManager
     }
 
     /**
-     * @param string $processCode
-     * @param mixed  $input
-     * @param array  $context
+     * Execute a process with a given input and context
      *
-     * @throws \Exception
+     * This method decorates the real execution to add event & error handling
+     * @see ProcessManager::doExecute
+     *
+     * @param string $processCode
+     * @param null   $input
+     * @param array  $context
      *
      * @return mixed
      */
     public function execute(string $processCode, $input = null, array $context = [])
+    {
+        try {
+            $this->eventDispatcher->dispatch(
+                ProcessEvent::EVENT_PROCESS_STARTED,
+                new ProcessEvent($processCode, $input, $context)
+            );
+            $result = $this->doExecute($processCode, $input, $context);
+            $this->eventDispatcher->dispatch(
+                ProcessEvent::EVENT_PROCESS_ENDED,
+                new ProcessEvent($processCode, $input, $context, $result)
+            );
+        } catch (\Throwable $error) {
+            $this->eventDispatcher->dispatch(
+                ProcessEvent::EVENT_PROCESS_ENDED,
+                new ProcessEvent($processCode, $input, $context, null, $error)
+            );
+
+            throw $error;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Real process execution, with a given input and context
+     *
+     * @param string $processCode
+     * @param mixed  $input
+     * @param array  $context
+     *
+     * @return mixed
+     */
+    protected function doExecute(string $processCode, $input = null, array $context = [])
     {
         $parentProcessHistory = $this->processHistory;
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
