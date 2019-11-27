@@ -139,12 +139,17 @@ class ProcessManager
                 ProcessEvent::EVENT_PROCESS_STARTED,
                 new ProcessEvent($processCode, $input, $context)
             );
+            $this->processLogger->debug('Process start');
+
             $result = $this->doExecute($processCode, $input, $context);
+
+            $this->processLogger->debug('Process end');
             $this->eventDispatcher->dispatch(
                 ProcessEvent::EVENT_PROCESS_ENDED,
                 new ProcessEvent($processCode, $input, $context, $result)
             );
         } catch (\Throwable $error) {
+            $this->processLogger->critical('Critical process failure', ['error' => $error->getMessage()]);
             $this->eventDispatcher->dispatch(
                 ProcessEvent::EVENT_PROCESS_ENDED,
                 new ProcessEvent($processCode, $input, $context, null, $error)
