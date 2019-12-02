@@ -14,7 +14,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
 - [Advanced workflow]
 - [Good practices]
 - [Testing]
-- [Contribute](Documentation/06-contribute.md)
+- [Contribute](CONTRIBUTING.md)
 - Cookbooks
     - [Common Setup](Documentation/cookbooks/01-common_setup.md)
     - [Transformations]
