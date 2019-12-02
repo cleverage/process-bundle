@@ -13,7 +13,7 @@ Task reference
 Accepted inputs
 ---------------
 
-`any`
+`any`: it should match the 1st expected input of the transform chain
 
 Possible outputs
 ----------------
@@ -25,5 +25,5 @@ Options
 
 | Code | Type | Required | Default | Description |
 | ---- | ---- | :------: | ------- | ----------- |
-| `transformers` | `array` | **X** | | List of transformer code => transformer options |
+| `transformers` | `array` | **X** | | List of transformers, see [TransformerTrait](../traits/transformer_trait.md) |
 

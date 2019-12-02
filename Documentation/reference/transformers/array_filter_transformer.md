@@ -24,4 +24,4 @@ Options
 
 | Code | Type | Required | Default | Description |
 | ---- | ---- | :------: | ------- | ----------- |
-| `condition` | `array` | | `[]` | See [ConditionTrait](TODO) |
+| `condition` | `array` | | `[]` | See [ConditionTrait](../traits/condition_trait.md) |

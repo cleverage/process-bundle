@@ -46,7 +46,7 @@ Foreach rule there is the following options.
 | ---- | ---- | :------: | ------- | ----------- |
 | `condition` | `string` or `null` | | `null` | An expression used to match a value |
 | `default` | `bool` | | `false` | Mark this rule as a default rule. The given rule must be the last, cannot have a condition, and there cannot have 2 default in the same time |
-| `transformers` | `array` | | `[]` | List of transformer code => transformer options for subsequent transformations |
+| `transformers` | `array` | | `[]` | List of sub-transformers, see [TransformerTrait](../traits/transformer_trait.md) |
 | `constant` | `any` | | `null` | If not `null`, given value will be directly output (takes precedence on `transformers`) |
 | `set_null` | `bool` | | `false` | If `true`, `null` will be directly output (takes precedence on `constant`) |
 

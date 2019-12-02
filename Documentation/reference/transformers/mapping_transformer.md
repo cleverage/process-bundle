@@ -45,7 +45,7 @@ Foreach property there is the following options.
 | `constant` | `any` | | `null` | If not `null`, will be directly used as a source (takes precedence on `code`) |
 | `set_null` | `bool` | | `false` | If `true`, `null` will be directly used as a source (takes precedence on `code`) |
 | `ignore_missing` | `bool` | | `false` | Ignore property accessor errors for this source |
-| `transformers` | `array` | | `[]` | List of transformer code => transformer options for subsequent transformations |
+| `transformers` | `array` | | `[]` | List of sub-transformers, see [TransformerTrait](../traits/transformer_trait.md) |
 
 Examples
 --------
