@@ -595,7 +595,10 @@ class ProcessManager
                 // We won't throw an error to ease development... but there must be some kind of warning
                 $state = $taskConfiguration->getState();
                 $logContext = ['main_task_list' => $mainTaskList];
-                $this->processLogger->warning("Task '{$taskConfiguration->getCode()}' is unreachable", $logContext);
+                $this->processLogger->warning(
+                    "Task '{$taskConfiguration->getCode()}' is unreachable, check that it's referenced in some other task output or in the main entry point",
+                    $logContext
+                );
                 $this->handleState($state);
             }
         }
