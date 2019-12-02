@@ -50,7 +50,12 @@ class Configuration implements ConfigurationInterface
         $definition = $rootNode->children();
 
         // Default error strategy
-        $definition->scalarNode('default_error_strategy')->defaultValue(TaskConfiguration::STRATEGY_SKIP)->end();
+        $definition->enumNode('default_error_strategy')
+            ->values([
+                TaskConfiguration::STRATEGY_SKIP,
+                TaskConfiguration::STRATEGY_STOP,
+            ])
+            ->isRequired();
 
         $this->appendRootProcessConfigDefinition($definition);
         $this->appendRootTransformersConfigDefinition($definition);
@@ -62,6 +67,7 @@ class Configuration implements ConfigurationInterface
 
     /**
      * "generic_transformers" root configuration
+     *
      * @param NodeBuilder $definition
      */
     protected function appendRootTransformersConfigDefinition(NodeBuilder $definition)
@@ -85,6 +91,7 @@ class Configuration implements ConfigurationInterface
 
     /**
      * Single transformer configuration
+     *
      * @param NodeBuilder $definition
      */
     protected function appendTransformerConfigDefinition(NodeBuilder $definition)
