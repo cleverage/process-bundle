@@ -18,13 +18,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Transformer aiming to take a date as an input (object or string) and format it according to options.
  * In input it takes any value understood by \DateTime.
  *
- * @example    in YML config
+ * @example in YML config
  * transformers:
  *     date_format:
  *         format: Y-m-d
  *
- * @deprecated the input string value will be removed in next version, use date_parser just before
- * @TODO       v1.2 : remove string input
+ * @TODO deprecated v4.0 : remove string input
+ * @TODO deprecated v4.0 : no false output
  */
 class DateFormatTransformer implements ConfigurableTransformerInterface
 {
@@ -32,8 +32,8 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
      * @param mixed $value
      * @param array $options
      *
-     * @throws \Exception
      * @return mixed|string
+     * @throws \Exception
      */
     public function transform($value, array $options = [])
     {
@@ -44,12 +44,18 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
         if ($value instanceof \DateTime) {
             $date = $value;
         } elseif (is_string($value)) {
+            @trigger_error('String input will be deprecated in v4.0', E_USER_DEPRECATED);
             $date = new \DateTime($value);
         } else {
             throw new \UnexpectedValueException('Given value cannot be parsed into a date');
         }
 
-        return $date->format($options['format']);
+        $result = $date->format($options['format']);
+        if ($result === false) {
+            @trigger_error('The date cannot be formatted, this will throw an error starting from v4.0', E_USER_DEPRECATED);
+        }
+
+        return $result;
     }
 
     /**

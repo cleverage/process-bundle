@@ -52,6 +52,8 @@ Basically, it will greatly ease the configuration of import and exports but can 
         - [ArrayFilterTransformer](Documentation/reference/transformers/array_filter_transformer.md)
         - [MappingTransformer](Documentation/reference/transformers/mapping_transformer.md)
         - [RulesTransformer](Documentation/reference/transformers/rules_transformer.md)
+        - [DateFormatTransformer](Documentation/reference/transformers/date_format.md)
+        - [DateParserTransformer](Documentation/reference/transformers/date_parser.md)
 - Examples
     - [Simple ETL]
 - [Roadmap and versions](Documentation/100-roadmap.md)
