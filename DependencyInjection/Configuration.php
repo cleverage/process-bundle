@@ -81,6 +81,7 @@ class Configuration implements ConfigurationInterface
         $transformerListDefinition = $transformersArrayDefinition
             ->performNoDeepMerging()
             ->cannotBeOverwritten()
+            ->info('Unique custom transformer code')
             ->children();
 
         $this->appendTransformerConfigDefinition($transformerListDefinition);
@@ -117,6 +118,7 @@ class Configuration implements ConfigurationInterface
         // Process list
         $processListDefinition = $configurationsArrayDefinition
             ->performNoDeepMerging()
+            ->info('Unique custom process code')
             ->cannotBeOverwritten()
             ->children();
 
@@ -149,6 +151,7 @@ class Configuration implements ConfigurationInterface
         $taskListDefinition = $tasksArrayDefinition
             ->performNoDeepMerging()
             ->cannotBeOverwritten()
+            ->info('Unique custom task code')
             ->children();
 
         $this->appendTaskConfigDefinition($taskListDefinition);
