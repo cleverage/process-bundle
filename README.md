@@ -11,7 +11,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
 - [Quick start](Documentation/01-quick_start.md)
 - [Task types](Documentation/02-task_types.md)
 - [Custom tasks and development](Documentation/03-custom_tasks.md)
-- [Advanced workflow]
+- [Advanced workflow](Documentation/04-advanced_workflow.md)
 - [Good practices]
 - [Testing]
 - [Contribute](CONTRIBUTING.md)

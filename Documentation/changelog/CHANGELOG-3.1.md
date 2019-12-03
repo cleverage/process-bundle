@@ -4,6 +4,9 @@ Changelog v3.0 => v3.1
 Features
 --------
 
+* [GITHUB-83](https://github.com/cleverage/process-bundle/issues/83): added [events](../04-advanced_workflow.md#events) 
+around process execution
+
 Fixes
 -----
 
