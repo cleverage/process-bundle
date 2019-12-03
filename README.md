@@ -45,6 +45,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
         - [CsvWriterTask](Documentation/reference/tasks/csv_writer_task.md)
       - File/XML
         - [XmlReaderTask](Documentation/reference/tasks/xml_reader_task.md)
+        - [XmlWriterTask](Documentation/reference/tasks/xml_writer_task.md)
       - Flow manipulation
         - [AggregateIterableTask](Documentation/reference/tasks/aggregate_iterable_task.md)
         - [InputAggregatorTask](Documentation/reference/tasks/input_aggregator_task.md)
