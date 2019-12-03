@@ -34,6 +34,22 @@ Some tasks and transformers use the main Symfony serializer service. You might n
 resolution might fail
 * https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled
 
+## Global configuration
+
+You can use `./bin/console config:dump-reference clever_age_process` to have a summary of current configuration.
+
+Aside from process and transformer configurations, there is the `default_error_strategy` setting that allow you to define
+behavior if a task encounter an error. Up to v3.0, the default value was to `skip` iterations with errors. Starting from v3.1, 
+the configuration should be defined by the user.
+
+We recommend to use the `stop` configuration (see bellow), and then specify task by task which one can be `skipped`.
+
+Recommended example :
+```yaml
+clever_age_process:
+    default_error_strategy: stop
+```
+
 ## Process definition
 
 Most of the work is done through the bundle configuration. 
