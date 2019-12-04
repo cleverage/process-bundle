@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -50,11 +51,16 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
         $results = [];
         /** @noinspection ForeachSourceInspection */
         foreach ($values as $key => $item) {
-            $item = $this->applyTransformers($options['transformers'], $item);
-            if (null === $item && $options['skip_null']) {
-                continue;
+            try {
+                $item = $this->applyTransformers($options['transformers'], $item);
+                if (null === $item && $options['skip_null']) {
+                    continue;
+                }
+                $results[$key] = $item;
+            } catch (TransformerException $exception) {
+                $exception->setTargetProperty((string)$key);
+                throw $exception;
             }
-            $results[$key] = $item;
         }
 
         return $results;

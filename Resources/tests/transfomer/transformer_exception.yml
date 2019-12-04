@@ -1,0 +1,22 @@
+clever_age_process:
+    configurations:
+        test.transformer_exception.deep:
+            entry_point: transform
+            end_point: transform
+            tasks:
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    error_strategy: stop
+                    options:
+                        transformers:
+                            mapping:
+                                mapping:
+                                    '[field]':
+                                        transformers:
+                                            array_map:
+                                                transformers:
+                                                    array_map:
+                                                        transformers:
+                                                            implode: ~
+                                                            default:
+                                                                value: anything

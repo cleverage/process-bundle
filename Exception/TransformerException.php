@@ -46,11 +46,11 @@ class TransformerException extends \RuntimeException implements ProcessException
 
     protected function updateMessage()
     {
-        if ($this->targetProperty) {
+        if (isset($this->targetProperty)) {
             $m = sprintf(
-                "Transformation '%s' have failed for target property '%s'",
-                $this->transformerCode,
-                $this->targetProperty
+                "For target property '%s', transformation '%s' have failed",
+                $this->targetProperty,
+                $this->transformerCode
             );
         } else {
             $m = sprintf(
