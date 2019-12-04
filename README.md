@@ -25,6 +25,8 @@ Basically, it will greatly ease the configuration of import and exports but can 
     - [Subprocess]
     - [File manipulation]
     - [Direct call (in controller)]
+    - [Performances monitoring](Documentation/cookbooks/performances_monitoring.md)
+    - [Memory usage analysis](Documentation/cookbooks/memory_usage_graph.md)
 - Reference
     - [Process definition](Documentation/reference/01-process_definition.md)
     - [Task definition](Documentation/reference/02-task_definition.md)

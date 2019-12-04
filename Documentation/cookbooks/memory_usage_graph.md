@@ -1,4 +1,5 @@
-## How to easily graph the memory usage of your app for debug purposes
+Memory usage analysis
+=====================
 
 This method is clearly not the most elegant one but it doesn't require any special tool apart from Gnuplot on your
 desktop environment.
