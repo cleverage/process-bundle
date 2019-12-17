@@ -46,7 +46,7 @@ class WrapperTransformer implements ConfigurableTransformerInterface
                 'wrapper_key',
             ]
         );
-        $resolver->setAllowedTypes('wrapper_key', ['string']);
+        $resolver->setAllowedTypes('wrapper_key', ['string', 'int']);
     }
 
     /**
