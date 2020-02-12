@@ -26,7 +26,8 @@ Process attributes
 
 **help**: optional string to describe in depth a process. Displayed in process help. Can be multiline.
 
-**entry_point**: optional task code (default is none) that will receive the process input
+**entry_point**: optional task code (default is none) that will receive the process input. The referenced task cannot have
+ancestors.
 
 **end_point**: optional task code (default is none) that will provide the process output
 

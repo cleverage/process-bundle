@@ -6,3 +6,14 @@ clever_age_process:
             tasks:
                 data:
                     service: '@CleverAge\ProcessBundle\Task\DummyTask'
+
+        test.entry_point_with_ancestor:
+            entry_point: data2
+            end_point: data2
+            tasks:
+                data1:
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'
+                    outputs: [data2]
+
+                data2:
+                    service: '@CleverAge\ProcessBundle\Task\DummyTask'

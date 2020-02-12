@@ -23,12 +23,20 @@ class InvalidProcessConfigurationException extends \UnexpectedValueException imp
      *
      * @return InvalidProcessConfigurationException
      */
-    public static function createNotInMain(
-        TaskConfiguration $taskConfig,
-        array $mainTaskList
-    ): InvalidProcessConfigurationException {
-        $taskListStr = '['.implode(', ', $mainTaskList).']';
+    public static function createNotInMain(TaskConfiguration $taskConfig, array $mainTaskList): self
+    {
+        $taskListStr = '[' . implode(', ', $mainTaskList) . ']';
 
         return new self("Task '{$taskConfig->getCode()}' is not in main task list : {$taskListStr}");
+    }
+
+    /**
+     * @param TaskConfiguration $taskConfig
+     *
+     * @return InvalidProcessConfigurationException
+     */
+    public static function createEntryPointHasAncestors(TaskConfiguration $taskConfig): self
+    {
+        return new self("The entry-point '{$taskConfig->getCode()}' cannot have an ancestor");
     }
 }

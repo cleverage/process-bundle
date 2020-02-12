@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Registry;
 
+use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use function array_key_exists;
 use function array_keys;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
@@ -47,9 +48,9 @@ class ProcessConfigurationRegistry
     /**
      * @param string $processCode
      *
+     * @return ProcessConfiguration
      * @throws MissingProcessException
      *
-     * @return ProcessConfiguration
      */
     public function getProcessConfiguration(string $processCode): ProcessConfiguration
     {
@@ -156,6 +157,11 @@ class ProcessConfigurationRegistry
             if ($task->isRoot()) {
                 $this->markErrorBranch($task, false);
             }
+        }
+
+        // #106 - entry point should not have an ancestor
+        if ($processConfig->getEntryPoint() && $processConfig->getEntryPoint()->getPreviousTasksConfigurations()) {
+            throw InvalidProcessConfigurationException::createEntryPointHasAncestors($processConfig->getEntryPoint());
         }
 
         $this->processConfigurations[$processCode] = $processConfig;

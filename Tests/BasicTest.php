@@ -90,4 +90,12 @@ class BasicTest extends AbstractProcessTest
             'test.error_process_with_blocking'
         );
     }
+
+    /**
+     * @expectedException \CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException
+     */
+    public function testFailingEntryPointWithAncestors()
+    {
+        $this->processManager->execute('test.entry_point_with_ancestor');
+    }
 }
