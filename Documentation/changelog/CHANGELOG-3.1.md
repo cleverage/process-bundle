@@ -7,6 +7,7 @@ Features
 * [GITHUB-83](https://github.com/cleverage/process-bundle/issues/83): added [events](../04-advanced_workflow.md#events) 
 around process execution
 * [GITHUB-86](https://github.com/cleverage/process-bundle/issues/86): added XML manipulation tools
+* [GITHUB-109](https://github.com/cleverage/process-bundle/issues/109): added an event during CLI process execution
 
 Fixes
 -----

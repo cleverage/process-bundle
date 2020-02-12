@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Command;
 
+use CleverAge\ProcessBundle\Event\ConsoleProcessEvent;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use Symfony\Component\Console\Command\Command;
@@ -19,6 +20,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\Yaml\Parser;
 
@@ -38,14 +40,19 @@ class ExecuteProcessCommand extends Command
     /** @var ProcessManager */
     protected $processManager;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
-     * @param ProcessManager $processManager
+     * ExecuteProcessCommand constructor.
      *
-     * @throws LogicException
+     * @param ProcessManager           $processManager
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(ProcessManager $processManager)
+    public function __construct(ProcessManager $processManager, EventDispatcherInterface $eventDispatcher)
     {
         $this->processManager = $processManager;
+        $this->eventDispatcher = $eventDispatcher;
         parent::__construct();
     }
 
@@ -100,6 +107,11 @@ class ExecuteProcessCommand extends Command
         }
 
         $context = $this->parseContextValues($input);
+
+        $this->eventDispatcher->dispatch(
+            ConsoleProcessEvent::EVENT_CLI_INIT,
+            new ConsoleProcessEvent($input, $output, $inputData, $context)
+        );
 
         /** @noinspection ForeachSourceInspection */
         foreach ($input->getArgument('processCodes') as $code) {
