@@ -87,7 +87,7 @@ class FileMoverTask extends AbstractConfigurableTask
         $fs = new Filesystem();
         $i = 1;
         while ($fs->exists($dest)) {
-            if (preg_match('/^(.*?)(-\d+)?(\.[^\.]*)$/', $dest, $matches)) {
+            if (preg_match('/^(.*?)(-\d+)?(\.[^.]*)$/', $dest, $matches)) {
                 $dest = $matches[1].'-'.$i.$matches[3];
                 ++$i;
             } else {
