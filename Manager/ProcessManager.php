@@ -151,7 +151,7 @@ class ProcessManager
         } catch (\Throwable $error) {
             $this->processLogger->critical('Critical process failure', ['error' => $error->getMessage()]);
             $this->eventDispatcher->dispatch(
-                ProcessEvent::EVENT_PROCESS_ENDED,
+                ProcessEvent::EVENT_PROCESS_FAILED,
                 new ProcessEvent($processCode, $input, $context, null, $error)
             );
 
