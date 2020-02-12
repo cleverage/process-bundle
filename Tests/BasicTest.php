@@ -98,4 +98,16 @@ class BasicTest extends AbstractProcessTest
     {
         $this->processManager->execute('test.entry_point_with_ancestor');
     }
+
+    /**
+     * Check that the use of a string in task "outputs" or "errors" is possible
+     */
+    public function testStringOutput()
+    {
+        $result = $this->processManager->execute('test.string_outputs', 'success');
+        self::assertEquals('success', $result);
+
+        $result = $this->processManager->execute('test.string_errors', 'success');
+        self::assertEquals('success', $result);
+    }
 }

@@ -175,16 +175,23 @@ class Configuration implements ConfigurationInterface
             LogLevel::INFO,
             LogLevel::DEBUG,
         ];
+
         $definition
             ->scalarNode('service')->isRequired()->end()
             ->scalarNode('description')->defaultValue('')->end()
             ->scalarNode('help')->defaultValue('')->end()
             ->arrayNode('options')->prototype('variable')->end()->end()
-            ->arrayNode('outputs')->prototype('scalar')->end()->end()
-            ->arrayNode('errors')->prototype('scalar')->end()->setDeprecated()->end()
-            ->arrayNode('error_outputs')->prototype('scalar')->end()->end()
             ->scalarNode('error_strategy')->defaultNull()->end()
             ->enumNode('log_level')->values($logLevels)->defaultValue(LogLevel::CRITICAL)->end()
             ->booleanNode('log_errors')->defaultTrue()->setDeprecated()->end();
+
+        foreach (['outputs', 'errors', 'error_outputs'] as $nodeName) {
+            $definition->arrayNode($nodeName)
+                ->beforeNormalization()
+                ->ifString()->then(function ($item) {
+                    return [$item];
+                })->end()
+                ->prototype('scalar')->end()->end();
+        }
     }
 }

@@ -28,9 +28,9 @@ Process attributes
 
 **options**: optional list of parameters to pass to a task
 
-**outputs**: optional list of following tasks
+**outputs**: optional list of following tasks, it can be a simple string
 
-**errors**: optional list of following tasks, in case of error
+**errors**: optional list of following tasks, in case of error, it can be a simple string
 
 **error_strategy**: either *skip* (default) or *stop*, defines if a task can be continued or not
 

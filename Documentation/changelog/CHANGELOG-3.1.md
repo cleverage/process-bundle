@@ -8,6 +8,8 @@ Features
 around process execution
 * [GITHUB-86](https://github.com/cleverage/process-bundle/issues/86): added XML manipulation tools
 * [GITHUB-109](https://github.com/cleverage/process-bundle/issues/109): added an event during CLI process execution
+* [GITHUB-107](https://github.com/cleverage/process-bundle/issues/107): allow to use directly a string in task `outputs`
+and `errors` configurations
 
 Fixes
 -----
