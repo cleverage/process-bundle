@@ -30,6 +30,16 @@ MappingTransformer
 
 * The option "ignore_extra" is renamed to "keep_input".
 
+Other
+-----
+
+* Fixed issues with blocking tasks
+* Removed deprecated methods
+* added input/output in process manager (may allow a start_process_task)
+
+New issues :
+* Error workflow
+
 Planned (v2+)
 ============
 

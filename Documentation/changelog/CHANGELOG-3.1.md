@@ -1,8 +1,19 @@
-Changelog v3.0 => v3.1
-======================
+Release v3.1
+============
 
-Features
---------
+v3.1-dev
+------
+
+### Features
+
+### Fixes
+
+### BC breaks
+
+v3.1.0
+------
+
+### Features
 
 * [GITHUB-83](https://github.com/cleverage/process-bundle/issues/83): added [events](../04-advanced_workflow.md#events) 
 around process execution
@@ -11,11 +22,11 @@ around process execution
 * [GITHUB-107](https://github.com/cleverage/process-bundle/issues/107): allow to use directly a string in task `outputs`
 and `errors` configurations
 
-Fixes
------
+### Fixes
 
-BC breaks
----------
+* [GITHUB-99](https://github.com/cleverage/process-bundle/issues/99): transformer exception message improvements
+
+### BC breaks
 
 * [GIHTUB-82](https://github.com/cleverage/process-bundle/issues/82): the `default_error_strategy` is now mandatory. 
 If you have any doubt, you can use `default_error_strategy: skip` to keep previous behavior. 
