@@ -44,6 +44,11 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
                     "Value of type {$type} is not a valid array index, set auto_cast to true to cast it to a string"
                 );
             }
+            if (is_array($value)) { // Array to string conversion is a simple notice so we need to catch it here
+                throw new \UnexpectedValueException(
+                    "Unexpected input of type 'array' in convert_value transformer"
+                );
+            }
             $value = (string) $value; // Let's cast it to string
         }
 

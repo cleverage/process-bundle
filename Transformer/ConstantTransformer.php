@@ -14,39 +14,38 @@ use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Class WrapperTransformer
+ * Return always the same value configured in options, redundant when used inside mapping except in certain useful
+ * circumstances
  *
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
+ * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class WrapperTransformer implements ConfigurableTransformerInterface
+class ConstantTransformer implements ConfigurableTransformerInterface
 {
-
-    /**
-     * Must return the transformed $value
-     *
-     * @param mixed $input
-     * @param array $options
-     *
-     * @return mixed $value
-     */
-    public function transform($input, array $options = [])
-    {
-        return [$options['wrapper_key'] => $input];
-    }
-
     /**
      * @param OptionsResolver $resolver
      *
      * @throws ExceptionInterface
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(
             [
-                'wrapper_key',
+                'constant',
             ]
         );
-        $resolver->setAllowedTypes('wrapper_key', ['string', 'int']);
+    }
+
+    /**
+     * Must return the transformed $value
+     *
+     * @param mixed $value
+     * @param array $options
+     *
+     * @return mixed $value
+     */
+    public function transform($value, array $options = [])
+    {
+        return $options['constant'] ?? null;
     }
 
     /**
@@ -54,8 +53,8 @@ class WrapperTransformer implements ConfigurableTransformerInterface
      *
      * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
-        return 'wrapper';
+        return 'constant';
     }
 }
