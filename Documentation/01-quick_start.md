@@ -16,6 +16,8 @@ The most common example is the ETL. It's a kind of application whose main purpos
 - *Transform* this data into something else (modify the values, change the format, compute some statistics, ...)
 - *Load* the transformed data into a destination (another database, file, API, ...)
 
+![Basic ETL](basic-etl.png)
+
 ## Installation
 
 This bundle requires Symfony 3. You can install it using composer:
