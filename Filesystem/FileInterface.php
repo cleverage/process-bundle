@@ -11,24 +11,14 @@
 namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
- * Define a common interface for all file with headers
+ * Defines the interface for basic file reading systems (not structured)
  */
-interface StructuredFileInterface extends FileStreamInterface
+interface FileInterface extends FileStreamInterface
 {
     /**
      * @param int|null $length
      *
-     * @return array|null
+     * @return string|null
      */
-    public function readLine($length = null): ?array;
-
-    /**
-     * @return array
-     */
-    public function getHeaders(): array;
-
-    /**
-     * @return int
-     */
-    public function getHeaderCount(): int;
+    public function readLine($length = null): ?string;
 }

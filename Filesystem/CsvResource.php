@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Filesystem;
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class CsvResource implements WritableStructuredFileInterface, SeekableFileInterface
+class CsvResource extends AbstractCommonResource implements WritableStructuredFileInterface, SeekableFileInterface
 {
     /** @var string */
     protected $delimiter;
@@ -27,12 +27,6 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /** @var string */
     protected $escape;
 
-    /** @var resource */
-    protected $handler;
-
-    /** @var int|null */
-    protected $lineCount;
-
     /** @var array */
     protected $headers;
 
@@ -41,15 +35,6 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
 
     /** @var int */
     protected $headerCount;
-
-    /** @var int */
-    protected $lineNumber = 1;
-
-    /** @var bool */
-    protected $closed;
-
-    /** @var bool */
-    protected $seekCalled = false;
 
     /**
      * @param resource $resource
@@ -67,15 +52,12 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         $escape = '\\',
         array $headers = null
     ) {
-        if (!\is_resource($resource)) {
-            $type = \gettype($resource);
-            throw new \UnexpectedValueException("Resource argument must be a resource, '{$type}' given");
-        }
+        parent::__construct($resource);
+
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
         $this->escape = $escape;
 
-        $this->handler = $resource;
         $this->headers = $this->parseHeaders($headers);
         $this->headerCount = \count($this->headers);
     }
@@ -105,38 +87,6 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     }
 
     /**
-     * @return resource
-     */
-    public function getHandler()
-    {
-        return $this->handler;
-    }
-
-    /**
-     * Warning! This method will rewind the file to the beginning before and after counting the lines!
-     *
-     * @throws \RuntimeException
-     *
-     * @return int
-     */
-    public function getLineCount(): int
-    {
-        if (null === $this->lineCount) {
-            $this->rewind();
-            $line = 0;
-            while (!$this->isEndOfFile()) {
-                ++$line;
-                $this->readRaw();
-            }
-            $this->rewind();
-
-            $this->lineCount = $line;
-        }
-
-        return $this->lineCount;
-    }
-
-    /**
      * @return array
      */
     public function getHeaders(): array
@@ -160,30 +110,6 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     public function writeHeaders(): void
     {
         $this->writeRaw($this->headers);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getLineNumber(): int
-    {
-        if ($this->seekCalled) {
-            throw new \LogicException('Cannot get current line number after calling "seek": the line number is lost');
-        }
-
-        return $this->lineNumber;
-    }
-
-    /**
-     * @throws \RuntimeException
-     *
-     * @return bool
-     */
-    public function isEndOfFile(): bool
-    {
-        $this->assertOpened();
-
-        return feof($this->handler);
     }
 
     /**
@@ -278,7 +204,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
 
         $parsedFields = [];
         foreach ($this->headers as $column) {
-            if (!array_key_exists($column, $fields)) {
+            if (!\array_key_exists($column, $fields)) {
                 $message = "Missing column {$column} in given fields for {$this->getResourceName()}";
                 throw new \UnexpectedValueException($message);
             }
@@ -300,55 +226,10 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
      */
     public function rewind(): void
     {
-        $this->assertOpened();
-        if (!rewind($this->handler)) {
-            throw new \RuntimeException("Unable to rewind '{$this->getResourceName()}'");
-        }
-        $this->lineNumber = 1;
+        parent::rewind();
         if (!$this->manualHeaders) {
             $this->readRaw(); // skip headers if not manual headers
         }
-    }
-
-    /**
-     * @throws \RuntimeException
-     *
-     * @return int
-     */
-    public function tell(): int
-    {
-        $this->assertOpened();
-
-        return ftell($this->handler);
-    }
-
-    /**
-     * @param int $offset
-     *
-     * @throws \RuntimeException
-     *
-     * @return int
-     */
-    public function seek($offset): int
-    {
-        $this->assertOpened();
-        $this->seekCalled = true;
-
-        return fseek($this->handler, $offset);
-    }
-
-    /**
-     * @return bool
-     */
-    public function close(): bool
-    {
-        if ($this->closed) {
-            return true;
-        }
-
-        $this->closed = fclose($this->handler);
-
-        return $this->closed;
     }
 
     /**
@@ -357,32 +238,6 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     public function isManualHeaders(): bool
     {
         return $this->manualHeaders;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isClosed(): bool
-    {
-        return $this->closed;
-    }
-
-    /**
-     * Closes the resource when the object is destroyed.
-     */
-    public function __destruct()
-    {
-        $this->close();
-    }
-
-    /**
-     * @throws \RuntimeException
-     */
-    protected function assertOpened(): void
-    {
-        if ($this->closed) {
-            throw new \RuntimeException("{$this->getResourceName()} was closed earlier");
-        }
     }
 
     /**

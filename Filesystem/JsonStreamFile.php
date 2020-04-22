@@ -13,7 +13,7 @@ namespace CleverAge\ProcessBundle\Filesystem;
 /**
  * Wrapper around JSON files to read them in a stream
  */
-class JsonStreamFile implements FileStreamInterface, WritableFileInterface
+class JsonStreamFile implements FileStreamInterface
 {
     /** @var \SplFileObject */
     protected $file;

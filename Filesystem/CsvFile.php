@@ -18,6 +18,8 @@ namespace CleverAge\ProcessBundle\Filesystem;
  */
 class CsvFile extends CsvResource
 {
+    use FileHelperTrait;
+
     /** @var string */
     protected $filePath;
 
@@ -41,18 +43,8 @@ class CsvFile extends CsvResource
         $mode = 'rb'
     ) {
         $this->filePath = $filePath;
+        $resource = $this->openResource($filePath, $mode);
 
-        if (!\in_array($filePath, ['php://stdin', 'php://stdout', 'php://stderr'])) {
-            $dirname = \dirname($this->filePath);
-            if (!@mkdir($dirname, 0755, true) && !is_dir($dirname)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $dirname));
-            }
-        }
-
-        $resource = fopen($filePath, $mode);
-        if (false === $resource) {
-            throw new \UnexpectedValueException("Unable to open file: '{$filePath}' in {$mode} mode");
-        }
         // All modes allowing file reading, binary safe modes are handled by stripping out the b during test
         $readAllowedModes = ['r', 'r+', 'w+', 'a+', 'x+', 'c+'];
         if (null === $headers && !\in_array(str_replace('b', '', $mode), $readAllowedModes, true)) {

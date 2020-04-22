@@ -13,8 +13,15 @@ namespace CleverAge\ProcessBundle\Filesystem;
 /**
  * Define a common interface for all file with headers
  */
-interface WritableStructuredFileInterface extends StructuredFileInterface, WritableFileInterface
+interface WritableStructuredFileInterface extends StructuredFileInterface
 {
+    /**
+     * @param array $fields
+     *
+     * @return int
+     */
+    public function writeLine(array $fields): int;
+
     /**
      * Write headers to the file
      *
