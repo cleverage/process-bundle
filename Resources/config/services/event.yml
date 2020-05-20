@@ -1,4 +1,8 @@
 services:
+    CleverAge\ProcessBundle\EventDispatcher\BackcompatEventDispatcher:
+        public: false
+        autowire: true
+        
     CleverAge\ProcessBundle\EventListener\DataQueueEventListener:
         public: false
         tags:
