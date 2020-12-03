@@ -13,6 +13,7 @@ namespace CleverAge\ProcessBundle\Task\Validation;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Sidus\BaseBundle\Validator\Mapping\Loader\BaseLoader;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Options;
@@ -55,7 +56,7 @@ class ValidatorTask extends AbstractConfigurableTask
         $options = $this->getOptions($state);
         $violations = $this->validator->validate(
             $state->getInput(),
-            $this->getOption($state, 'constraints'),
+            $options['constraints'],
             $options['groups']
         );
 
@@ -69,9 +70,16 @@ class ValidatorTask extends AbstractConfigurableTask
                     'violation_code' => $violation->getCode(),
                     'invalid_value' => $invalidValue,
                 ];
-                if ($this->getOption($state, 'log_errors')) {
-                    $this->logger->warning($violation->getMessage(), $logContext);
+                if ($options['log_errors']) {
+                    $this->logger->log($options['log_errors'], $violation->getMessage(), $logContext);
                 }
+            }
+
+            if ($options['error_output_violations']) {
+                $state->setErrorOutput($violations);
+                $state->setSkipped(true);
+
+                return;
             }
 
             throw new \UnexpectedValueException("{$violations->count()} constraint violations detected on validation");
@@ -85,14 +93,38 @@ class ValidatorTask extends AbstractConfigurableTask
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefault('log_errors', true);
-        $resolver->addAllowedTypes('log_errors', ['bool']);
+        $resolver->setDefault('log_errors', LogLevel::CRITICAL);
+        $resolver->setAllowedValues(
+            'log_errors',
+            [
+                LogLevel::ALERT,
+                LogLevel::CRITICAL,
+                LogLevel::DEBUG,
+                LogLevel::EMERGENCY,
+                LogLevel::ERROR,
+                LogLevel::INFO,
+                LogLevel::NOTICE,
+                LogLevel::WARNING,
+                true,
+                false,
+            ]
+        );
+        $resolver->setNormalizer(
+            'log_errors',
+            static function (Options $options, $value) {
+                if (true === $value) {
+                    return LogLevel::CRITICAL;
+                }
+
+                return $value;
+            }
+        );
 
         $resolver->setDefault('groups', null);
-        $resolver->addAllowedTypes('groups', ['NULL', 'array']);
+        $resolver->setAllowedTypes('groups', ['NULL', 'array']);
 
         $resolver->setDefault('constraints', null);
-        $resolver->addAllowedTypes('constraints', ['NULL', 'array']);
+        $resolver->setAllowedTypes('constraints', ['NULL', 'array']);
         $resolver->setNormalizer(
             'constraints',
             static function (Options $options, $constraints) {
@@ -103,5 +135,8 @@ class ValidatorTask extends AbstractConfigurableTask
                 return (new BaseLoader())->loadCustomConstraints($constraints);
             }
         );
+
+        $resolver->setDefault('error_output_violations', false);
+        $resolver->setAllowedTypes('error_output_violations', ['bool']);
     }
 }

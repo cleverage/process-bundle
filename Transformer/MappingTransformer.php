@@ -82,7 +82,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
 
         /** @noinspection ForeachSourceInspection */
         foreach ($options['mapping'] as $targetProperty => $mapping) {
-            $targetProperty = (string)$targetProperty;
+            $targetProperty = (string) $targetProperty;
             $sourceProperty = $mapping['code'] ?? $targetProperty;
             $ignoreMissingFlag = $mapping['ignore_missing'] || $options['ignore_missing'];
 
@@ -101,9 +101,8 @@ class MappingTransformer implements ConfigurableTransformerInterface
                         $this->handleInputMissingExceptions($missingPropertyError, $srcKey);
                         if ($ignoreMissingFlag) {
                             continue;
-                        } else {
-                            throw $missingPropertyError;
                         }
+                        throw $missingPropertyError;
                     }
                 }
             } else {
@@ -113,11 +112,9 @@ class MappingTransformer implements ConfigurableTransformerInterface
                     $this->handleInputMissingExceptions($missingPropertyError, $sourceProperty);
                     if ($ignoreMissingFlag) {
                         continue;
-                    } else {
-                        throw $missingPropertyError;
                     }
+                    throw $missingPropertyError;
                 }
-
             }
 
             // Transform input value

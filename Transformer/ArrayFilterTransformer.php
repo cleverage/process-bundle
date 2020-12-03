@@ -20,7 +20,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class ArrayFilterTransformer implements ConfigurableTransformerInterface
 {
-
     use ConditionTrait;
 
     /**
