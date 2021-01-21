@@ -60,32 +60,41 @@ class ValidatorTask extends AbstractConfigurableTask
             $options['groups']
         );
 
-        if (0 < $violations->count()) {
-            /** @var  $violation ConstraintViolationInterface */
-            foreach ($violations as $violation) {
-                $invalidValue = $violation->getInvalidValue();
+        if (0 === $violations->count()) {
+            $state->setOutput($state->getInput());
 
-                $logContext = [
-                    'property' => $violation->getPropertyPath(),
-                    'violation_code' => $violation->getCode(),
-                    'invalid_value' => $invalidValue,
-                ];
-                if ($options['log_errors']) {
-                    $this->logger->log($options['log_errors'], $violation->getMessage(), $logContext);
-                }
-            }
-
-            if ($options['error_output_violations']) {
-                $state->setErrorOutput($violations);
-                $state->setSkipped(true);
-
-                return;
-            }
-
-            throw new \UnexpectedValueException("{$violations->count()} constraint violations detected on validation");
+            return;
         }
 
-        $state->setOutput($state->getInput());
+        /** @var  $violation ConstraintViolationInterface */
+        foreach ($violations as $violation) {
+            $invalidValue = $violation->getInvalidValue();
+
+            $logContext = [
+                'property' => $violation->getPropertyPath(),
+                'violation_code' => $violation->getCode(),
+                'invalid_value' => $invalidValue,
+            ];
+            if ($options['log_errors']) {
+                $this->logger->log($options['log_errors'], $violation->getMessage(), $logContext);
+            }
+        }
+
+        if ($options['error_output_violations']) {
+            $state->setErrorOutput($violations);
+            $state->setSkipped(true);
+
+            return;
+        }
+
+        if ($options['throw_exception']) {
+            throw new \UnexpectedValueException(
+                "{$violations->count()} constraint violations detected on validation"
+            );
+        }
+
+        $state->setErrorOutput($state->getInput());
+        $state->setSkipped(true);
     }
 
     /**
@@ -138,5 +147,22 @@ class ValidatorTask extends AbstractConfigurableTask
 
         $resolver->setDefault('error_output_violations', false);
         $resolver->setAllowedTypes('error_output_violations', ['bool']);
+
+        $resolver->setDefault('throw_exception', null);
+        $resolver->setAllowedTypes('throw_exception', ['null', 'bool']);
+        $resolver->setNormalizer(
+            'throw_exception',
+            static function (Options $options, $value) {
+                if (null === $value) {
+                    return true;
+                }
+
+                if (false === $options['log_errors']) {
+                    return false;
+                }
+
+                return true;
+            }
+        );
     }
 }
