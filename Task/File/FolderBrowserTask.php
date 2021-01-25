@@ -135,7 +135,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
                 'empty_log_level' => LogLevel::WARNING,
             ]
         );
-        $resolver->setAllowedTypes('name_pattern', ['NULL', 'string']);
+        $resolver->setAllowedTypes('name_pattern', ['NULL', 'string', 'array']);
         $resolver->setAllowedValues(
             'empty_log_level',
             [

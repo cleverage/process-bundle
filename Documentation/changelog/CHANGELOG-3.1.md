@@ -8,6 +8,8 @@ v3.1-dev
 
 ### Fixes
 
+* FolderBrowserTask: Accept array type for `name_pattern` option
+
 ### BC breaks
 
 v3.1.0
