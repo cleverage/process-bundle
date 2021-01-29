@@ -11,14 +11,14 @@
 namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
- * Define a common interface for all file reading systems
+ * Defines the interface for basic file writing systems (not structured)
  */
 interface WritableFileInterface extends FileStreamInterface
 {
     /**
-     * @param array $fields
+     * @param string $string
      *
      * @return int
      */
-    public function writeLine(array $fields): int;
+    public function writeLine(string $string): int;
 }

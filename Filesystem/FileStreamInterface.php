@@ -33,13 +33,6 @@ interface FileStreamInterface
     public function isEndOfFile(): bool;
 
     /**
-     * @param int|null $length
-     *
-     * @return array|null
-     */
-    public function readLine($length = null): ?array;
-
-    /**
      * This methods rewinds the file to the first line of data, skipping the headers.
      */
     public function rewind(): void;
