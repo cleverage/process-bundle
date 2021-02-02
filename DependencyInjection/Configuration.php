@@ -45,9 +45,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root($this->root);
-        $definition = $rootNode->children();
+        $treeBuilder = new TreeBuilder($this->root);
+        $definition = $treeBuilder->getRootNode()->children();
 
         // Default error strategy
         $definition->enumNode('default_error_strategy')

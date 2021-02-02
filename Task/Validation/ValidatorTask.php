@@ -12,9 +12,9 @@ namespace CleverAge\ProcessBundle\Task\Validation;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Validator\ConstraintLoader;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Sidus\BaseBundle\Validator\Mapping\Loader\BaseLoader;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -121,10 +121,10 @@ class ValidatorTask extends AbstractConfigurableTask
         );
 
         $resolver->setDefault('groups', null);
-        $resolver->setAllowedTypes('groups', ['NULL', 'array']);
+        $resolver->setAllowedTypes('groups', ['null', 'array']);
 
         $resolver->setDefault('constraints', null);
-        $resolver->setAllowedTypes('constraints', ['NULL', 'array']);
+        $resolver->setAllowedTypes('constraints', ['null', 'array']);
         $resolver->setNormalizer(
             'constraints',
             static function (Options $options, $constraints) {
@@ -132,7 +132,7 @@ class ValidatorTask extends AbstractConfigurableTask
                     return null;
                 }
 
-                return (new BaseLoader())->loadCustomConstraints($constraints);
+                return (new ConstraintLoader())->buildConstraints($constraints);
             }
         );
 

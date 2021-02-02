@@ -180,7 +180,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
         );
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
         $resolver->setAllowedTypes('keep_input', ['boolean']);
-        $resolver->setAllowedTypes('merge_callback', ['NULL', 'callable']);
+        $resolver->setAllowedTypes('merge_callback', ['null', 'callable']);
 
         $resolver->setNormalizer(
             'mapping',
@@ -232,7 +232,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 'ignore_missing' => false,
             ]
         );
-        $resolver->setAllowedTypes('code', ['NULL', 'string', 'array']);
+        $resolver->setAllowedTypes('code', ['null', 'string', 'array']);
         $resolver->setAllowedTypes('set_null', ['boolean']);
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
 

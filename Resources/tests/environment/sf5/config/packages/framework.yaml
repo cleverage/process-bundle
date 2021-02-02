@@ -1,0 +1,10 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+
+    serializer:
+        enabled: true
+
+    #esi: true
+    #fragments: true
+    php_errors:
+        log: true

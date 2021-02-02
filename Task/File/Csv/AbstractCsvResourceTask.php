@@ -82,7 +82,7 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
         $resolver->setAllowedTypes('delimiter', ['string']);
         $resolver->setAllowedTypes('enclosure', ['string']);
         $resolver->setAllowedTypes('escape', ['string']);
-        $resolver->setAllowedTypes('headers', ['NULL', 'array']);
+        $resolver->setAllowedTypes('headers', ['null', 'array']);
     }
 
     /**

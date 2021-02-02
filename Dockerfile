@@ -1,8 +1,8 @@
-ARG PHP_VERSION=7.1
+ARG PHP_VERSION=7.2
 FROM php:${PHP_VERSION}-cli
 
 ARG SF_ENV=sf4
-ARG BLACKFIRE_PHP_VERSION=71
+ARG BLACKFIRE_PHP_VERSION=72
 ARG BLACKFIRE_PROBE_VERSION=1.29.1
 ARG BLACKFIRE_AGENT_VERSION=1.30.0
 
@@ -24,7 +24,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # PHP setup
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 COPY Resources/tests/environment/php/conf.ini "$PHP_INI_DIR/conf.d/"
-
 
 # Basic sample symfony app install
 RUN mkdir /app

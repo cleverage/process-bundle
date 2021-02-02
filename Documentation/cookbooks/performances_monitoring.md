@@ -8,23 +8,7 @@ to analyse call graphs with timings & memory analysis.
 
 ## Setup
 
-If you're using the official PHP docker image, you can add the Blackfire probe to your container ([Official documentation](https://blackfire.io/docs/up-and-running/installation)) :
-
-```dockerfile
-ARG BLACKFIRE_PHP_VERSION=71
-ARG BLACKFIRE_PROBE_VERSION=1.29.1
-ARG BLACKFIRE_AGENT_VERSION=1.30.0
-
-# Blackfire PHP Probe
-RUN curl -o $(php -i | grep -P "^extension_dir " | sed "s/^.* => //g")/blackfire.so -D - -L -s https://packages.blackfire.io/binaries/blackfire-php/${BLACKFIRE_PROBE_VERSION}/blackfire-php-linux_amd64-php-${BLACKFIRE_PHP_VERSION}.so
-RUN docker-php-ext-enable blackfire
-# Blackfire Agent (for HTTP calls)
-RUN curl -o /usr/bin/blackfire-agent -L https://packages.blackfire.io/binaries/blackfire-agent/${BLACKFIRE_AGENT_VERSION}/blackfire-agent-linux_amd64
-RUN chmod +x /usr/bin/blackfire-agent
-# Blackfire CLI (for console)
-RUN curl -o /usr/bin/blackfire -L https://packages.blackfire.io/binaries/blackfire-agent/${BLACKFIRE_AGENT_VERSION}/blackfire-cli-linux_amd64
-RUN chmod +x /usr/bin/blackfire
-```
+If you're using the official PHP docker image, you can add the Blackfire probe to your container ([Official documentation](https://blackfire.io/docs/integrations/docker/php-docker)).
 
 Then, with your [own credentials](https://blackfire.io/my/settings/credentials), execute inside your container
 ```shell script
