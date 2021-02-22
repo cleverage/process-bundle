@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# This script file is used by https://hub.docker.com/ for automated build
+# See https://docs.docker.com/docker-hub/builds/advanced/ for available variables
+
+docker build --build-arg SF_ENV=${DOCKER_TAG} -f ${DOCKERFILE_PATH} -t ${IMAGE_NAME} .

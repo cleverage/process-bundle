@@ -10,7 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Event;
 
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event object for process start/stop/fail

@@ -13,7 +13,7 @@ namespace CleverAge\ProcessBundle\Task\Event;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
@@ -54,7 +54,7 @@ class EventDispatcherTask extends AbstractConfigurableTask
 
         $event = new EventDispatcherTaskEvent($state);
 
-        $this->eventDispatcher->dispatch($options['event_name'], $event);
+        $this->eventDispatcher->dispatch($event, $options['event_name']);
     }
 
     /**
