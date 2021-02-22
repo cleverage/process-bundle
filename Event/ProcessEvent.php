@@ -10,14 +10,12 @@
 
 namespace CleverAge\ProcessBundle\Event;
 
-use Symfony\Contracts\EventDispatcher\Event;
-
 /**
  * Event object for process start/stop/fail
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  */
-class ProcessEvent extends Event
+class ProcessEvent extends GenericEvent
 {
 
     const EVENT_PROCESS_STARTED = 'cleverage_process.start';

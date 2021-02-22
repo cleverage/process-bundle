@@ -11,14 +11,13 @@
 namespace CleverAge\ProcessBundle\Event;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Class EventDispatcherTaskEvent
  *
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
-class EventDispatcherTaskEvent extends Event
+class EventDispatcherTaskEvent extends GenericEvent
 {
     /**
      * @var ProcessState

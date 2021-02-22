@@ -12,12 +12,11 @@ namespace CleverAge\ProcessBundle\Event;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event object used during CLI process manipulation
  */
-class ConsoleProcessEvent extends Event
+class ConsoleProcessEvent extends GenericEvent
 {
     const EVENT_CLI_INIT = 'cleverage_process.cli.init';
 

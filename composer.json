@@ -44,7 +44,7 @@
         "psr/event-dispatcher": "1.0.0",
         "symfony/framework-bundle": "~3.0|~4.0|~5.0",
         "symfony/expression-language": "~3.0|~4.0|~5.0",
-        "symfony/monolog-bundle": "~3.3|~5.0",
+        "symfony/monolog-bundle": "~3.3",
         "symfony/console": "~3.0|~4.0|~5.0",
         "symfony/options-resolver": "~3.0|~4.0|~5.0",
         "symfony/process": "~3.0|~4.0|~5.0",
