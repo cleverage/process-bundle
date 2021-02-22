@@ -14,6 +14,7 @@ use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Base class to handle output iterations
@@ -34,9 +35,8 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
      */
     public function execute(ProcessState $state)
     {
-        if (null === $this->iterator) {
-            $this->iterator = $this->initializeIterator($state);
-        }
+        $this->handleIteratorFromInput($state);
+
         $state->addErrorContextValue('iterator_key', $this->iterator->key());
 
         if ($this->iterator->valid()) {
@@ -66,6 +66,39 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
         $state->removeErrorContext('iterator_key');
 
         return $this->iterator->valid();
+    }
+    /**
+     * Create or recreate an iterator from input
+     *
+     * @param ProcessState $state
+     */
+    protected function handleIteratorFromInput(ProcessState $state)
+    {
+        if ($this->iterator instanceof \Iterator) {
+            if ($this->iterator->valid()) {
+                return; // No action needed, execution is in progress
+            }
+            // Cleanup invalid iterator => prepare for new iteration cycle
+            $this->iterator = null;
+        }
+
+        // This should never be reached
+        if (null !== $this->iterator) {
+            throw new \UnexpectedValueException(
+                "At this point iterator should have been null, maybe it's a wrong type..."
+            );
+        }
+
+        $this->iterator = $this->initializeIterator($state);
+    }
+
+    /**
+     * Allow to not implement this method, not required by most tasks, removing inheritance would break back-compat
+     *
+     * @inheritDoc
+     */
+    protected function configureOptions(OptionsResolver $resolver)
+    {
     }
 
     /**

@@ -91,7 +91,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
         );
         $resolver->setAllowedTypes('input_codes', 'array');
         $resolver->setAllowedTypes('clean_input_on_override', 'boolean');
-        $resolver->setAllowedTypes('keep_inputs', ['NULL', 'array']);
+        $resolver->setAllowedTypes('keep_inputs', ['null', 'array']);
     }
 
     /**

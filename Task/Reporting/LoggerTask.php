@@ -97,6 +97,6 @@ class LoggerTask extends AbstractConfigurableTask
         $resolver->setAllowedTypes('level', ['string']);
         $resolver->setAllowedTypes('message', ['string']);
         $resolver->setAllowedTypes('context', ['array']);
-        $resolver->setAllowedTypes('reference', ['string', 'NULL']);
+        $resolver->setAllowedTypes('reference', ['string', 'null']);
     }
 }

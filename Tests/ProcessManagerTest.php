@@ -42,11 +42,11 @@ class ProcessManagerTest extends AbstractProcessTest
         /** @var EventDispatcherInterface $eventDispatcher */
         $eventDispatcher = $edProphecy->reveal();
         $processManager = new ProcessManager(
-            self::$container,
-            self::$container->get(ProcessLogger::class),
-            self::$container->get(TaskLogger::class),
-            self::$container->get(ProcessConfigurationRegistry::class),
-            self::$container->get(ContextualOptionResolver::class),
+            $this->getContainer(),
+            $this->getContainer()->get(ProcessLogger::class),
+            $this->getContainer()->get(TaskLogger::class),
+            $this->getContainer()->get(ProcessConfigurationRegistry::class),
+            $this->getContainer()->get(ContextualOptionResolver::class),
             $eventDispatcher
         );
 

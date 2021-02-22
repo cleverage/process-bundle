@@ -82,7 +82,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
 
         /** @noinspection ForeachSourceInspection */
         foreach ($options['mapping'] as $targetProperty => $mapping) {
-            $targetProperty = (string)$targetProperty;
+            $targetProperty = (string) $targetProperty;
             $sourceProperty = $mapping['code'] ?? $targetProperty;
             $ignoreMissingFlag = $mapping['ignore_missing'] || $options['ignore_missing'];
 
@@ -101,9 +101,8 @@ class MappingTransformer implements ConfigurableTransformerInterface
                         $this->handleInputMissingExceptions($missingPropertyError, $srcKey);
                         if ($ignoreMissingFlag) {
                             continue;
-                        } else {
-                            throw $missingPropertyError;
                         }
+                        throw $missingPropertyError;
                     }
                 }
             } else {
@@ -113,11 +112,9 @@ class MappingTransformer implements ConfigurableTransformerInterface
                     $this->handleInputMissingExceptions($missingPropertyError, $sourceProperty);
                     if ($ignoreMissingFlag) {
                         continue;
-                    } else {
-                        throw $missingPropertyError;
                     }
+                    throw $missingPropertyError;
                 }
-
             }
 
             // Transform input value
@@ -183,7 +180,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
         );
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
         $resolver->setAllowedTypes('keep_input', ['boolean']);
-        $resolver->setAllowedTypes('merge_callback', ['NULL', 'callable']);
+        $resolver->setAllowedTypes('merge_callback', ['null', 'callable']);
 
         $resolver->setNormalizer(
             'mapping',
@@ -235,7 +232,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 'ignore_missing' => false,
             ]
         );
-        $resolver->setAllowedTypes('code', ['NULL', 'string', 'array']);
+        $resolver->setAllowedTypes('code', ['null', 'string', 'array']);
         $resolver->setAllowedTypes('set_null', ['boolean']);
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
 

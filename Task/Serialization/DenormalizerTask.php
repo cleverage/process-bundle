@@ -86,7 +86,7 @@ class DenormalizerTask extends AbstractConfigurableTask
                 'context' => [],
             ]
         );
-        $resolver->setAllowedTypes('format', ['NULL', 'string']);
+        $resolver->setAllowedTypes('format', ['null', 'string']);
         $resolver->setAllowedTypes('context', ['array']);
     }
 }

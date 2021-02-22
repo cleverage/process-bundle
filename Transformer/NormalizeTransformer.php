@@ -49,7 +49,7 @@ class NormalizeTransformer implements ConfigurableTransformerInterface
                 'context' => [],
             ]
         );
-        $resolver->setAllowedTypes('format', ['NULL', 'string']);
+        $resolver->setAllowedTypes('format', ['null', 'string']);
         $resolver->setAllowedTypes('context', ['array']);
     }
 

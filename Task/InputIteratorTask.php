@@ -15,92 +15,28 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 
 /**
- * Class InputIteratorTask
+ * Iterates from the input of the previous task
  *
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
-class InputIteratorTask implements IterableTaskInterface
+class InputIteratorTask extends AbstractIterableOutputTask
 {
-    /** @var \Iterator */
-    protected $iterator;
-
     /**
-     * @param ProcessState $state
-     *
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
+     * @inheritDoc
      */
-    public function execute(ProcessState $state)
+    protected function initializeIterator(ProcessState $state): \Iterator
     {
-        $this->handleIteratorFromInput($state);
-
-        $state->addErrorContextValue('iterate_on_array_key', $this->iterator->key());
-
-        // If the initial value is already null, skip right now the next steps
-        if ($this->iterator->valid()) {
-            $state->setOutput($this->iterator->current());
-        } else {
-            $state->setSkipped(true);
-            $this->iterator = null;
-        }
-    }
-
-    /**
-     * Moves the internal pointer to the next element,
-     * return true if the task has a next element
-     * return false if the task has terminated it's iteration
-     *
-     * @param ProcessState $state
-     *
-     * @return bool
-     */
-    public function next(ProcessState $state)
-    {
-        if (!$this->iterator) {
-            return false;
-        }
-        $this->iterator->next();
-        $state->removeErrorContext('iterate_on_array_key');
-
-        return $this->iterator->valid();
-    }
-
-    /**
-     * Create or recreate an iterator from input
-     *
-     * @param ProcessState $state
-     */
-    protected function handleIteratorFromInput(ProcessState $state)
-    {
-        if ($this->iterator instanceof \Iterator) {
-            if ($this->iterator->valid()) {
-                // No action needed, execution is in progress
-                return;
-            }
-            // Cleanup invalid iterator => prepare for new iteration cycle
-            $this->iterator = null;
-        }
-
-        // This should never be reached
-        if (null !== $this->iterator) {
-            throw new \UnexpectedValueException(
-                "At this point iterator should have been null, maybe it's a wrong type..."
-            );
-        }
-
         $input = $state->getInput();
-        // Create iterator
         if ($input instanceof \Iterator) {
-            $this->iterator = $input;
-        } elseif ($input instanceof \IteratorAggregate) {
-            $this->iterator = $input->getIterator();
-        } elseif (\is_array($input)) {
-            $this->iterator = new \ArrayIterator($input);
+            return $input;
+        }
+        if ($input instanceof \IteratorAggregate) {
+            return $input->getIterator();
+        }
+        if (\is_array($input)) {
+            return new \ArrayIterator($input);
         }
 
-        // Assert iterator is OK
-        if (!$this->iterator instanceof \Iterator) {
-            throw new \UnexpectedValueException('Cannot create iterator from input');
-        }
+        throw new \UnexpectedValueException('Cannot create iterator from input');
     }
 }

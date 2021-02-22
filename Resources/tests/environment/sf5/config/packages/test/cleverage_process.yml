@@ -1,0 +1,2 @@
+imports:
+    - { resource: '@CleverAgeProcessBundle/Resources/tests/config.yml' }
