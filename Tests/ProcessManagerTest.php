@@ -27,15 +27,15 @@ class ProcessManagerTest extends AbstractProcessTest
     {
         $edProphecy = $this->prophesize(EventDispatcherInterface::class);
 
-        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [ProcessEvent::EVENT_PROCESS_STARTED, new TypeToken(ProcessEvent::class)]);
+        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [new TypeToken(ProcessEvent::class), ProcessEvent::EVENT_PROCESS_STARTED]);
         $dispatchStartProphecy->shouldBeCalled();
         $edProphecy->addMethodProphecy($dispatchStartProphecy);
 
-        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [ProcessEvent::EVENT_PROCESS_ENDED, new TypeToken(ProcessEvent::class)]);
+        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [new TypeToken(ProcessEvent::class), ProcessEvent::EVENT_PROCESS_ENDED]);
         $dispatchStartProphecy->shouldBeCalled();
         $edProphecy->addMethodProphecy($dispatchStartProphecy);
 
-        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [ProcessEvent::EVENT_PROCESS_FAILED, new TypeToken(ProcessEvent::class)]);
+        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [new TypeToken(ProcessEvent::class), ProcessEvent::EVENT_PROCESS_FAILED]);
         $dispatchStartProphecy->shouldNotBeCalled();
         $edProphecy->addMethodProphecy($dispatchStartProphecy);
 

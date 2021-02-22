@@ -2,6 +2,8 @@ services:
     CleverAge\ProcessBundle\Manager\ProcessManager:
         autowire: true
         public: false
+        arguments:
+            $eventDispatcher: '@CleverAge\ProcessBundle\EventDispatcher\BackcompatEventDispatcher'
 
     CleverAge\ProcessBundle\Context\ContextualOptionResolver:
         public: false

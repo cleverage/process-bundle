@@ -31,7 +31,7 @@ use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Execute processes
@@ -136,8 +136,8 @@ class ProcessManager
     {
         try {
             $this->eventDispatcher->dispatch(
-                ProcessEvent::EVENT_PROCESS_STARTED,
-                new ProcessEvent($processCode, $input, $context)
+                new ProcessEvent($processCode, $input, $context),
+                ProcessEvent::EVENT_PROCESS_STARTED
             );
             $this->processLogger->debug('Process start');
 
@@ -145,14 +145,14 @@ class ProcessManager
 
             $this->processLogger->debug('Process end');
             $this->eventDispatcher->dispatch(
-                ProcessEvent::EVENT_PROCESS_ENDED,
-                new ProcessEvent($processCode, $input, $context, $result)
+                new ProcessEvent($processCode, $input, $context, $result),
+                ProcessEvent::EVENT_PROCESS_ENDED
             );
         } catch (\Throwable $error) {
             $this->processLogger->critical('Critical process failure', ['error' => $error->getMessage()]);
             $this->eventDispatcher->dispatch(
-                ProcessEvent::EVENT_PROCESS_FAILED,
-                new ProcessEvent($processCode, $input, $context, null, $error)
+                new ProcessEvent($processCode, $input, $context, null, $error),
+                ProcessEvent::EVENT_PROCESS_FAILED
             );
 
             throw $error;
