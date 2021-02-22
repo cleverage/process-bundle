@@ -4,7 +4,12 @@ services:
   - docker
 
 before_script:
+    - docker pull cleverage/process-bundle:sf3
     - docker pull cleverage/process-bundle:sf4
+    - docker pull cleverage/process-bundle:sf5
 
+# Tests should be done in reversed order to check most important versions first
 script:
+    - docker run -it --mount type=bind,src=$(pwd),dst=/src-cleverage_process cleverage/process-bundle:sf5 php vendor/bin/phpunit
     - docker run -it --mount type=bind,src=$(pwd),dst=/src-cleverage_process cleverage/process-bundle:sf4 php vendor/bin/phpunit
+    - docker run -it --mount type=bind,src=$(pwd),dst=/src-cleverage_process cleverage/process-bundle:sf3 php vendor/bin/phpunit
