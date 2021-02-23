@@ -3,3 +3,5 @@ services:
         resource: '../../../Command/*'
         autowire: true
         autoconfigure: true
+        bind:
+            $eventDispatcher: '@CleverAge\ProcessBundle\EventDispatcher\BackcompatEventDispatcher'

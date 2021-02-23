@@ -20,7 +20,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\Yaml\Parser;
 
@@ -109,8 +109,8 @@ class ExecuteProcessCommand extends Command
         $context = $this->parseContextValues($input);
 
         $this->eventDispatcher->dispatch(
-            ConsoleProcessEvent::EVENT_CLI_INIT,
-            new ConsoleProcessEvent($input, $output, $inputData, $context)
+            new ConsoleProcessEvent($input, $output, $inputData, $context),
+            ConsoleProcessEvent::EVENT_CLI_INIT
         );
 
         /** @noinspection ForeachSourceInspection */
