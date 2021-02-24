@@ -1,6 +1,8 @@
 /composer.lock
+/var
 /vendor
 /vendor-sf3
 /vendor-sf4
 /vendor-sf5
-.env
+/.env
+/.phpdoc/cache

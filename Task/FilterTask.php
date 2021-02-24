@@ -22,8 +22,12 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * Skip inputs under given matching conditions
- * - equality is softly checked
- * - unexisting key is the same as null
+ *
+ * Matching use the following rules
+ * * equality is softly checked
+ * * unexisting key is the same as null
+ *
+ * @example "Resources/tests/task/filter_task.yml" Some basic examples
  */
 class FilterTask extends AbstractConfigurableTask
 {

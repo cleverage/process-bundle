@@ -37,3 +37,8 @@ COPY Resources/tests/environment/${SF_ENV} /app/
 
 # Drop the process-bundle sources into this folder
 RUN mkdir /src-cleverage_process
+
+
+# PHP Documentor
+RUN curl -o /bin/phpdoc -L https://phpdoc.org/phpDocumentor.phar
+RUN chmod +x /bin/phpdoc
