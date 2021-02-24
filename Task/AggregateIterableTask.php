@@ -15,8 +15,6 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 
 /**
- * Class AggregateIterableTask
- *
  * Aggregate the result of iterable tasks in an array
  *
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
