@@ -29,32 +29,42 @@ build/local:
 	docker build -t cleverage_process:test .
 
 build/%:
-	DOCKER_TAG=$(@F) DOCKERFILE_PATH=Dockerfile IMAGE_NAME=cleverage_process:$(@F)
+	DOCKER_TAG=$(@F) DOCKERFILE_PATH=Dockerfile IMAGE_NAME=cleverage/process-bundle:$(@F) ./hooks/build
 
 shell: shell/$(SF_ENV)
 
-shell/local: build/local
+shell/local:
 	$(DOCKER_RUN) $(LOCAL_DOCKER_TAG) bash
 
-shell/%: pull/%
+shell/%:
 	$(DOCKER_RUN) cleverage/process-bundle:$(@F) bash
 
 test: test/$(SF_ENV)
 
-test/local: build/local
+test/local:
+	$(DOCKER_RUN) $(LOCAL_DOCKER_TAG) ./bin/console c:c
 	$(DOCKER_RUN) $(LOCAL_DOCKER_TAG) php vendor/bin/phpunit
 
-test/%: pull/%
+test/%:
+	$(DOCKER_RUN) cleverage/process-bundle:$(@F) ./bin/console c:c
 	$(DOCKER_RUN) cleverage/process-bundle:$(@F) php vendor/bin/phpunit
 
 bench: bench/$(SF_ENV)
 
-bench/local: build/local
+bench/local:
 	$(DOCKER_RUN) $(LOCAL_DOCKER_TAG) /bin/bash -c \
 			"./bin/console --env=test c:c; \
 			blackfire run ./bin/console --env=test c:p:e test.long_process -vvv"
 
-bench/%: pull/%
+bench/%:
 	$(DOCKER_RUN) cleverage/process-bundle:$(@F) /bin/bash -c \
 			"./bin/console --env=test c:c; \
 			blackfire run ./bin/console --env=test c:p:e test.long_process -vvv"
+
+vendor: vendor/$(SF_ENV)
+
+vendor/%:
+	rm -rf vendor-$(@F) || true
+	docker container create --name cleverage_process_bundle_tmp cleverage/process-bundle:$(@F)
+	docker cp cleverage_process_bundle_tmp:/app/vendor vendor-$(@F)
+	docker container rm cleverage_process_bundle_tmp

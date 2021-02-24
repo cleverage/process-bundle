@@ -1,3 +1,6 @@
 /composer.lock
 /vendor
+/vendor-sf3
+/vendor-sf4
+/vendor-sf5
 .env

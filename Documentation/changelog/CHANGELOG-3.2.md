@@ -16,6 +16,12 @@ _Nothing yet_
 
 _Nothing yet_
 
+v3.2.1
+------
+
+### Fixes
+
+* Fatal error while loading configuration in Symfony 3.4
 
 v3.2.0
 ------

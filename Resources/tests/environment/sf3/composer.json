@@ -9,6 +9,8 @@
 
         "symfony/event-dispatcher-contracts": "~1.0|~2.0",
         "psr/event-dispatcher": "1.0.0",
+        "symfony/config": "~3.0",
+        "symfony/dependency-injection": "~3.0",
         "symfony/expression-language": "~3.0",
         "symfony/monolog-bundle": "~3.3",
         "symfony/console": "~3.0",

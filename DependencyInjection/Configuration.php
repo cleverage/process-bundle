@@ -46,9 +46,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder($this->root);
-        $definition = $treeBuilder->getRootNode()->children();
-
+        [$treeBuilder, $rootNode] = $this->createTreeBuilder($this->root);
+        $definition = $rootNode->children();
         // Default error strategy
         $definition->enumNode('default_error_strategy')
             ->values(
@@ -61,8 +60,6 @@ class Configuration implements ConfigurationInterface
 
         $this->appendRootProcessConfigDefinition($definition);
         $this->appendRootTransformersConfigDefinition($definition);
-
-        $definition->end();
 
         return $treeBuilder;
     }
@@ -87,9 +84,6 @@ class Configuration implements ConfigurationInterface
             ->children();
 
         $this->appendTransformerConfigDefinition($transformerListDefinition);
-
-        $transformerListDefinition->end();
-        $transformersArrayDefinition->end();
     }
 
     /**
@@ -125,9 +119,6 @@ class Configuration implements ConfigurationInterface
             ->children();
 
         $this->appendProcessConfigDefinition($processListDefinition);
-
-        $processListDefinition->end();
-        $configurationsArrayDefinition->end();
     }
 
     /**
@@ -157,9 +148,6 @@ class Configuration implements ConfigurationInterface
             ->children();
 
         $this->appendTaskConfigDefinition($taskListDefinition);
-
-        $taskListDefinition->end();
-        $tasksArrayDefinition->end();
     }
 
     /**
@@ -186,7 +174,8 @@ class Configuration implements ConfigurationInterface
         $definition->enumNode('log_level')->values($logLevels)->defaultValue(LogLevel::CRITICAL);
 
         $logErrorNode = $definition->booleanNode('log_errors')->defaultTrue();
-        $this->deprecateNode($logErrorNode,
+        $this->deprecateNode(
+            $logErrorNode,
             'cleverage/process-bundle',
             '2.0',
             'The child node "%node%" at path "%path%" is deprecated in favor of "log_level".'
@@ -200,7 +189,7 @@ class Configuration implements ConfigurationInterface
                         return [$item];
                     }
                 )->end()
-                ->prototype('scalar')->end()->end();
+                ->prototype('scalar');
         }
     }
 
@@ -218,10 +207,36 @@ class Configuration implements ConfigurationInterface
     protected function deprecateNode(NodeDefinition $node, string $package, string $version, string $message)
     {
         $deprecationMethodReflection = new \ReflectionMethod(NodeDefinition::class, 'setDeprecated');
-        if($deprecationMethodReflection->getNumberOfParameters() === 1) {
+        if ($deprecationMethodReflection->getNumberOfParameters() === 1) {
             $node->setDeprecated("Since {$package} {$version}: {$message}");
         } else {
             $node->setDeprecated($package, $version, $message);
         }
+    }
+
+    /**
+     * An helper method to create a TreeBuilder and get the root node.
+     * Provides compatibility with Sf3, 4 and 5
+     *
+     * @TODO remove this once support for Symfony 3 and 4 is dropped
+     *
+     * @param string $root
+     *
+     * @return array A tuple containing [TreeBuilder, NodeDefinition]
+     */
+    protected function createTreeBuilder(string $root): array
+    {
+        $treeBuilderReflection = new \ReflectionClass(TreeBuilder::class);
+        $treeBuilderConstructReflection = $treeBuilderReflection->getConstructor();
+
+        if ($treeBuilderConstructReflection && $treeBuilderConstructReflection->getNumberOfParameters() > 0) {
+            $treeBuilder = new TreeBuilder($this->root);
+            $rootNode = $treeBuilder->getRootNode();
+        } else {
+            $treeBuilder = new TreeBuilder();
+            $rootNode = $treeBuilder->root($this->root);
+        }
+
+        return [$treeBuilder, $rootNode];
     }
 }
