@@ -1,0 +1,23 @@
+name: Rocket chat notifications
+
+# Controls when the action will run. 
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  notification:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get the tag short reference
+        id: get_tag
+        run: echo ::set-output name=TAG::${GITHUB_REF/refs\/tags\//}
+
+      - name: Rocket.Chat Notification
+        uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
+        with:
+          type: success
+          job_name: "[cleverage/process-bundle](https://github.com/cleverage/process-bundle) : ${{ steps.get_tag.outputs.TAG }} has been released"
+          url: ${{ secrets.CLEVER_AGE_ROCKET_CHAT_WEBOOK_URL }}
