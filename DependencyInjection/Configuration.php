@@ -14,6 +14,7 @@ use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -50,10 +51,12 @@ class Configuration implements ConfigurationInterface
 
         // Default error strategy
         $definition->enumNode('default_error_strategy')
-            ->values([
-                TaskConfiguration::STRATEGY_SKIP,
-                TaskConfiguration::STRATEGY_STOP,
-            ])
+            ->values(
+                [
+                    TaskConfiguration::STRATEGY_SKIP,
+                    TaskConfiguration::STRATEGY_STOP,
+                ]
+            )
             ->isRequired();
 
         $this->appendRootProcessConfigDefinition($definition);
@@ -175,22 +178,50 @@ class Configuration implements ConfigurationInterface
             LogLevel::DEBUG,
         ];
 
-        $definition
-            ->scalarNode('service')->isRequired()->end()
-            ->scalarNode('description')->defaultValue('')->end()
-            ->scalarNode('help')->defaultValue('')->end()
-            ->arrayNode('options')->prototype('variable')->end()->end()
-            ->scalarNode('error_strategy')->defaultNull()->end()
-            ->enumNode('log_level')->values($logLevels)->defaultValue(LogLevel::CRITICAL)->end()
-            ->booleanNode('log_errors')->defaultTrue()->setDeprecated()->end();
+        $definition->scalarNode('service')->isRequired();
+        $definition->scalarNode('description')->defaultValue('');
+        $definition->scalarNode('help')->defaultValue('');
+        $definition->arrayNode('options')->prototype('variable')->end();
+        $definition->scalarNode('error_strategy')->defaultNull();
+        $definition->enumNode('log_level')->values($logLevels)->defaultValue(LogLevel::CRITICAL);
+
+        $logErrorNode = $definition->booleanNode('log_errors')->defaultTrue();
+        $this->deprecateNode($logErrorNode,
+            'cleverage/process-bundle',
+            '2.0',
+            'The child node "%node%" at path "%path%" is deprecated in favor of "log_level".'
+        );
 
         foreach (['outputs', 'errors', 'error_outputs'] as $nodeName) {
             $definition->arrayNode($nodeName)
                 ->beforeNormalization()
-                ->ifString()->then(function ($item) {
-                    return [$item];
-                })->end()
+                ->ifString()->then(
+                    function ($item) {
+                        return [$item];
+                    }
+                )->end()
                 ->prototype('scalar')->end()->end();
+        }
+    }
+
+    /**
+     * An helper method to deprecate a node.
+     * Provides compatibility with Sf3, 4 and 5
+     *
+     * @TODO remove this once support for Symfony 3 and 4 is dropped
+     *
+     * @param NodeDefinition $node
+     * @param string         $package
+     * @param string         $version
+     * @param string         $message
+     */
+    protected function deprecateNode(NodeDefinition $node, string $package, string $version, string $message)
+    {
+        $deprecationMethodReflection = new \ReflectionMethod(NodeDefinition::class, 'setDeprecated');
+        if($deprecationMethodReflection->getNumberOfParameters() === 1) {
+            $node->setDeprecated("Since {$package} {$version}: {$message}");
+        } else {
+            $node->setDeprecated($package, $version, $message);
         }
     }
 }

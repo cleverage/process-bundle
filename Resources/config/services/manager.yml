@@ -4,6 +4,7 @@ services:
         public: false
         arguments:
             $eventDispatcher: '@CleverAge\ProcessBundle\EventDispatcher\BackcompatEventDispatcher'
+            $container: '@service_container'
 
     CleverAge\ProcessBundle\Context\ContextualOptionResolver:
         public: false

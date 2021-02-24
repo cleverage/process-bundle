@@ -55,7 +55,7 @@ class CleverAgeProcessExtension extends Extension
         foreach ($config['generic_transformers'] as $transformerCode => $transformerConfig) {
             $transformerDefinition = new Definition(GenericTransformer::class);
             $transformerDefinition->setAutowired(true);
-            $transformerDefinition->setPrivate(true);
+            $transformerDefinition->setPublic(false);
             $transformerDefinition->addMethodCall(
                 'initialize',
                 [

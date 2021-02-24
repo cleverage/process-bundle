@@ -5,3 +5,4 @@ services:
         autoconfigure: true
         bind:
             $eventDispatcher: '@CleverAge\ProcessBundle\EventDispatcher\BackcompatEventDispatcher'
+            $container: '@service_container'
