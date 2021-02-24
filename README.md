@@ -6,6 +6,8 @@ CleverAge/ProcessBundle
 This bundle allows to configure series of tasks to be performed on a certain order.
 Basically, it will greatly ease the configuration of import and exports but can do much more.
 
+Compatible with every [currently supported Symfony versions](https://symfony.com/releases).
+
 ## Index
 
 - [Quick start](Documentation/01-quick_start.md)
@@ -63,5 +65,6 @@ Basically, it will greatly ease the configuration of import and exports but can 
 - Examples
     - [Simple ETL]
 - Changelog
+    - [v3.2](Documentation/changelog/CHANGELOG-3.2.md)
     - [v3.1](Documentation/changelog/CHANGELOG-3.1.md)
     - [Older versions](Documentation/changelog/CHANGELOG-2.0-1.1.md)

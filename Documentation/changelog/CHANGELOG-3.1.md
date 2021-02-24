@@ -6,11 +6,63 @@ v3.1-dev
 
 ### Features
 
+_Nothing yet_
+
 ### Fixes
 
-* FolderBrowserTask: Accept array type for `name_pattern` option
+_Nothing yet_
 
 ### BC breaks
+
+_Nothing yet_
+
+v3.1.5
+------
+
+### Fixes
+
+* [GITHUB-120](https://github.com/cleverage/process-bundle/pull/120): FolderBrowserTask: Accept array type for `name_pattern` option
+
+
+v3.1.4
+------
+
+### Features
+
+* (_backport from v3.0.9_) Adding simple task to launch system commands
+
+
+v3.1.3
+------
+
+### Features
+
+* (_backport from v3.0.7_) Allowing ValidatorTask to output constraint violations with an option
+* (_backport from v3.0.6_) Adding ArrayUnsetTransformer
+* (_backport from v3.0.5_) Adding basic debug transformer
+
+### Fixes
+
+* (_backport from v3.0.8_) Fixing AbstractIterableOutputTask that was inconsistent when chained, refactoring InputIteratorTask that had the proper implementation with the AbstractIterableOutputTask as parent
+
+v3.1.2
+------
+
+### Fixes
+
+* Fixed bad static access in tests
+
+v3.1.1
+------
+
+### Features
+
+* (_backport from v3.0.4_) Adding simple file reader task and cast transformer
+* (_backport from v3.0.3_) FilterTask now outputs skipped content to error output
+
+### Fixes
+
+* Removed useless, CPU intensive, log on CsvSplitterTask
 
 v3.1.0
 ------

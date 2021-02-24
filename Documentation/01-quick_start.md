@@ -52,6 +52,25 @@ clever_age_process:
     default_error_strategy: stop
 ```
 
+When creating custom tasks and transformers, you can use Symfony automatic registration, but remember there is a few required configurations :
+```yaml
+services:
+    App\Transformer\:
+        resource: 'relative/path/to/Transformer/*'
+        autowire:      true
+        autoconfigure: true
+        public:        false
+        tags:
+            - { name: cleverage.transformer }       # Needed by the process registry to find transformers
+
+    App\Task\:
+        resource: 'relative/path/to/Task/*'
+        autowire:      true
+        autoconfigure: true
+        shared: false                               # Important to avoid shared data between task usage
+        public: true                                # Needed by the Process Manager to find tasks
+```
+
 ## Process definition
 
 Most of the work is done through the bundle configuration. 
