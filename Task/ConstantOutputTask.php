@@ -17,7 +17,19 @@ use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Always send the same output regardless of the input
+ * Outputs a static pre-defined value
+ *
+ * Simply outputs the same configured value all the time, ignores any input
+ *
+ * ##### Task reference
+ *
+ *  * **Service**: `CleverAge\ProcessBundle\Task\ConstantOutputTask`
+ *  * **Input**: _ignored_
+ *  * **Output**: `any`, value from the `output` option
+ *
+ * ##### Options
+ *
+ * * `output` (_required_): Value to output
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
@@ -25,10 +37,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ConstantOutputTask extends AbstractConfigurableTask
 {
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -36,9 +47,9 @@ class ConstantOutputTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritDoc}
      *
-     * @throws AccessException
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

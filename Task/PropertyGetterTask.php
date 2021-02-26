@@ -21,6 +21,20 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 /**
  * Get a property on the input and return it with PropertyAccessor
  *
+ * Accepts an array or an object as an input and read a value from a property path.
+ *
+ * See [PropertyAccess Component Reference](https://symfony.com/doc/current/components/property_access.html) for details on property path syntax and behavior.
+ *
+ * ##### Task reference
+ *
+ *  * **Service**: `CleverAge\ProcessBundle\Task\PropertyGetterTask`
+ *  * **Input**: `array` or `object` that can be accessed by the property accessor
+ *  * **Output**: `any`, value of the property extracted from input.
+ *
+ * ##### Options
+ *
+ * * **`property`** (`string`, _required_): Property path to read from input
+ *
  * @author Corentin Bouix <cbouix@clever-age.com>
  */
 class PropertyGetterTask extends AbstractConfigurableTask
@@ -32,8 +46,7 @@ class PropertyGetterTask extends AbstractConfigurableTask
     protected $accessor;
 
     /**
-     * @param LoggerInterface           $logger
-     * @param PropertyAccessorInterface $accessor
+     * @internal
      */
     public function __construct(LoggerInterface $logger, PropertyAccessorInterface $accessor)
     {
@@ -42,9 +55,9 @@ class PropertyGetterTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws \Exception
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -65,10 +78,9 @@ class PropertyGetterTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritDoc}
      *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

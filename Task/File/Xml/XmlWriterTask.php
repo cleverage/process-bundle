@@ -17,8 +17,22 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Write an XML file
+ * Write data to an XML file
+ * 
+ * Requires `php-xml`.
  *
+ * ##### Task reference
+ * 
+ *  * **Service**: `CleverAge\ProcessBundle\Task\File\Xml\XmlWriterTask`
+ *  * **Input**: `\DOMDocument`
+ *  * **Output**: `string`, the resulting file path.
+ *
+ * ##### Options
+ *
+ * * `file_path` (`string`, _required_): Path of the file to write into (relative to symfony root or absolute)
+ * * `mode` (`string`, _defaults to_ `rb`): File open mode (see [fopen mode parameter](https://secure.php.net/manual/en/function.fopen.php))
+ *
+ * @example "Resources/examples/task/file/xml/xml_writer_task.yaml"
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  */
 class XmlWriterTask extends AbstractConfigurableTask
@@ -27,9 +41,7 @@ class XmlWriterTask extends AbstractConfigurableTask
     protected $logger;
 
     /**
-     * XmlReaderTask constructor.
-     *
-     * @param LoggerInterface $logger
+     * @internal
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -38,6 +50,8 @@ class XmlWriterTask extends AbstractConfigurableTask
 
     /**
      * {@inheritDoc}
+     *
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
@@ -50,6 +64,8 @@ class XmlWriterTask extends AbstractConfigurableTask
 
     /**
      * {@inheritDoc}
+     *
+     * @internal
      */
     public function execute(ProcessState $state)
     {

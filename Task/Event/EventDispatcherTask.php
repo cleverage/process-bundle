@@ -21,8 +21,22 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Call the Symfony event dispatcher
+ * 
  * If defined as passive (which is the default), it automatically set the output from the input
- *
+ * 
+ * ##### Task reference
+ * 
+ *  * **Service**: `CleverAge\ProcessBundle\Task\Event\EventDispatcherTask`
+ *  * **Input**: `any`
+ *  * **Output**:
+ *     - `any` when `passive` option is set to true
+ *     - `null` in other cases
+ * 
+ * ##### Options
+ * 
+ * * `event_name` (`string`, _required_): Format for normalization ("json", "xml", ... an empty string should also work)
+ * * `passive` (`bool`, _defaults to_ `true`): Pass input to output
+ * 
  * @author  Valentin Clavreul <vclavreul@clever-age.com>
  * @author  Vincent Chalnot <vchalnot@clever-age.com>
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
@@ -33,7 +47,7 @@ class EventDispatcherTask extends AbstractConfigurableTask
     protected $eventDispatcher;
 
     /**
-     * @param EventDispatcherInterface $eventDispatcher
+     * @internal
      */
     public function __construct(EventDispatcherInterface $eventDispatcher)
     {
@@ -41,9 +55,9 @@ class EventDispatcherTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws ExceptionInterface
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -58,10 +72,9 @@ class EventDispatcherTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritDoc}
      *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

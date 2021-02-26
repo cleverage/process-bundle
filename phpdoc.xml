@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!-- See https://docs.phpdoc.org/latest/guide/references/configuration.html for documentation -->
 <phpdocumentor configVersion="3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://www.phpdoc.org">
-    <title>Process bundle</title>
+    <title>Clever Age - Process Bundle</title>
     <paths>
-        <output>var/tmp</output>
+        <output>var/doc</output>
     </paths>
     <version number="latest">
         <api>
@@ -13,13 +13,6 @@
                 <path>Transformer</path>
             </source>
             <visibility>public</visibility>
-            <include-source>true</include-source>
-            <ignore>
-                <path>Transformer/ConditionTrait.php</path>
-                <path>Task/FilesystemOptionTrait.php</path>
-                <path>Transformer/TransformerTrait.php</path>
-                <path>Task/AbstractIterableOutputTask.php</path>
-            </ignore>
         </api>
     </version>
 </phpdocumentor>

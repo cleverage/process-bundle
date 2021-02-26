@@ -99,6 +99,8 @@ trait TransformerTrait
     /**
      * Transform the list of transformer codes + options into a list of Closure (better performances)
      *
+     * @internal
+     *
      * @param Options $options
      * @param         $transformers
      *

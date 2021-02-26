@@ -71,3 +71,5 @@ vendor/%:
 
 doc:
 	$(DOCKER_RUN) -w /src-cleverage_process cleverage/process-bundle:$(SF_ENV) phpdoc
+	$(DOCKER_RUN) -w /src-cleverage_process -u root cleverage/process-bundle:$(SF_ENV) chown -R $(shell id -u) var/doc .phpdoc
+	@echo "The phpdoc has been generated, you can see it at file://$$(realpath var/doc/index.html)"

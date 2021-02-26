@@ -1,0 +1,5 @@
+# Task configuration level
+my_xml_writer:
+    service: '@CleverAge\ProcessBundle\Task\File\Xml\XmlWriterTask'
+    options:
+        file_path: '%kernel.project_dir%/var/data/file.xml'

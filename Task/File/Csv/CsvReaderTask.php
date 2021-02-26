@@ -20,8 +20,29 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Reads the file path from configuration and iterates over it
- * Ignores any input
+ * Iterates over a CSV file.
+ *
+ *
+ * Reads a CSV file and iterate on each line, returning an array of key -> values. Skips empty lines. Ignores any input.
+ *
+ * ##### Task reference
+ *
+ *  * **Service**: `CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask`
+ *  * **Iterable task**
+ *  * **Input**: _ignored_
+ *  * **Output**: `array`, foreach line, it will return a php array where key comes from headers and values are strings.
+ * Underlying method is [fgetcsv](https://secure.php.net/manual/en/function.fgetcsv.php).
+ *
+ * ##### Options
+ *
+ * * `file_path` (`string`, _required_): Path of the file to read from (relative to symfony root or absolute)
+ * * `delimiter` (`string`, _defaults to_ `;`): CSV delimiter
+ * * `enclosure` (`string`, _defaults to_ `"`): CSV enclosure character
+ * * `escape` (`string`, _defaults to_ `\\`): CSV escape character
+ * * `headers` (`array|null`, _defaults to_ `null`): Static list of CSV headers, without the option, it will be dynamically read from first input
+ * * `mode` (`string`, _defaults to_ `rb`): File open mode (see [fopen mode parameter](https://secure.php.net/manual/en/function.fopen.php))
+ * * `log_empty_lines` (`bool`, _defaults to_ `false`): Log when the output is empty
+ *
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
@@ -32,7 +53,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     protected $logger;
 
     /**
-     * @param LoggerInterface $logger
+     * @internal
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -40,13 +61,9 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
-     * @throws \LogicException
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -80,17 +97,9 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     }
 
     /**
-     * Moves the internal pointer to the next element,
-     * return true if the task has a next element
-     * return false if the task has terminated it's iteration
+     * {@inheritDoc}
      *
-     * @param ProcessState $state
-     *
-     * @throws \LogicException
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
-     *
-     * @return bool
+     * @internal
      */
     public function next(ProcessState $state)
     {

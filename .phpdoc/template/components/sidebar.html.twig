@@ -1,4 +1,4 @@
-<input class="phpdocumentor-sidebar__menu-button" type="checkbox" id="sidebar-button" name="sidebar-button" />
+<input class="phpdocumentor-sidebar__menu-button" type="checkbox" id="sidebar-button" name="sidebar-button"/>
 <label class="phpdocumentor-sidebar__menu-icon" for="sidebar-button">
     Menu
 </label>
@@ -21,13 +21,15 @@
             {% endif %}
             {% for namespace in project.namespace.children %}
                 {# Override to put the 2 first items on the same level #}
-                {% for child in namespace.children %}
-                    <h4 class="phpdocumentor-sidebar__root-namespace">{{ namespace|route('class:short') }} / {{ child|route('class:short') }}</h4>
-                    <ul class="phpdocumentor-list">
-                        {% for subchild in child.children %}
-                            <li>{{ subchild|route('class:short') }}</li>
-                        {% endfor %}
-                    </ul>
+                {% for child1 in namespace.children %}
+                    {% for child2 in child1.children %}
+                        <h4 class="phpdocumentor-sidebar__root-namespace">
+                            {{ namespace|route('class:short') }}
+                            / {{ child1|route('class:short') }}
+                            / {{ child2|route('class:short') }}
+                        </h4>
+                        {% include 'components/recursive_namespace_tree.html.twig' with {'namespace': child2} %}
+                    {% endfor %}
                 {% endfor %}
             {% endfor %}
         {% endif %}

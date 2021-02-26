@@ -40,5 +40,5 @@ RUN mkdir /src-cleverage_process
 
 
 # PHP Documentor
-RUN curl -o /bin/phpdoc -L https://phpdoc.org/phpDocumentor.phar
+RUN curl -o /bin/phpdoc -L https://github.com/phpDocumentor/phpDocumentor/releases/download/v3.0.0/phpDocumentor.phar
 RUN chmod +x /bin/phpdoc

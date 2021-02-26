@@ -19,7 +19,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Accepts an object or an array as input and sets values from configuration
+ * Set a property on the input and return it.
+ * 
+ * See [PropertyAccess Component Reference](https://symfony.com/doc/current/components/property_access.html) for details on property path syntax and behavior.
+ * 
+ * ##### Task reference
+ * 
+ *  * **Service**: `CleverAge\ProcessBundle\Task\PropertySetterTask`
+ *  * **Input**: `array` or `object` that can be accessed by the property accessor
+ *  * **Output**: Same `array` or `object`, with the property changed
+ * 
+ * ##### Options
+ *
+ * * `values` (`array`, _required_): List of property path => value to set in the input
+ * 
+ * 
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
@@ -33,8 +47,7 @@ class PropertySetterTask extends AbstractConfigurableTask
     protected $accessor;
 
     /**
-     * @param LoggerInterface           $logger
-     * @param PropertyAccessorInterface $accessor
+     * @internal
      */
     public function __construct(LoggerInterface $logger, PropertyAccessorInterface $accessor)
     {
@@ -43,9 +56,9 @@ class PropertySetterTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws \Exception
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -68,10 +81,9 @@ class PropertySetterTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritDoc}
      *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

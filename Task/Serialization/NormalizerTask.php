@@ -23,6 +23,17 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Normalize input to output with configurable format
+ * 
+ * ##### Task reference
+ * 
+ *  * **Service**: `CleverAge\ProcessBundle\Task\Serialization\NormalizerTask`
+ *  * **Input**: `object`, any normalizable object
+ *  * **Output**: `array`, a normalized value as an array
+ * 
+ * ##### Options
+ *
+ * * `format` (`string`, _required_): Format for normalization ("json", "xml", ... an empty string should also work)
+ * * `context` (`array`, _defaults to_ `[]`): Will be passed directly to the third parameter of the normalize method
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
@@ -33,7 +44,7 @@ class NormalizerTask extends AbstractConfigurableTask
     protected $normalizer;
 
     /**
-     * @param NormalizerInterface $normalizer
+     * @internal
      */
     public function __construct(NormalizerInterface $normalizer)
     {
@@ -41,12 +52,9 @@ class NormalizerTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws LogicException
-     * @throws InvalidArgumentException
-     * @throws CircularReferenceException
-     * @throws ExceptionInterface
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -65,10 +73,9 @@ class NormalizerTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritDoc}
      *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

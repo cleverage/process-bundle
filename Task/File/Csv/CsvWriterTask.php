@@ -20,23 +20,37 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Reads the file path from configuration and iterates over it
- * Ignores any input
+ * Writes all incoming data to a CSV file, outputting it's path when over
+ *
+ *
+ * ##### Task reference
+ *
+ *  * **Service**: `CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask`
+ *  * **Blocking task**
+ *  * **Input**: `array`, foreach line, it will need a php array where key match the headers and values are convertible to string.
+ * Underlying method is [fputcsv](https://secure.php.net/manual/en/function.fputcsv.php).
+ *  * **Output**: `string`, absolute path of the produced file
+ *
+ * ##### Options
+ *
+ * * `file_path` (`string`, _required_): Path of the file to write to (relative to symfony root or absolute). It can also take two placeholders (`{date}` and `{date_time}`) to insert timestamps into the filename
+ * * `delimiter` (`string`, _defaults to_ `;`): CSV delimiter
+ * * `enclosure` (`string`, _defaults to_ `"`): CSV enclosure character
+ * * `escape` (`string`, _defaults to_ `\\`): CSV escape character
+ * * `headers` (`array|null`, _defaults to_ `null`): `null` | Static list of CSV headers, without the option, it will be dynamically read from first line
+ * * `mode` (`string`, _defaults to_ `wb`): File open mode (see [fopen mode parameter](https://secure.php.net/manual/en/function.fopen.php))
+ * * `split_character` (`string`, _defaults to_ `\|`): Used to implode array values
+ * * `write_headers` (`bool`, _defaults to_ `true`): Write the headers as a first line
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
- *
- * @property CsvFile $csv
  */
 class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 {
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws \RuntimeException
-     * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -50,7 +64,9 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
+     *
+     * @internal
      */
     public function proceed(ProcessState $state)
     {
@@ -60,10 +76,9 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritDoc}
      *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
