@@ -19,6 +19,8 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Generic compiler pass to add tagged services to a registry
  *
+ * @internal
+ *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */

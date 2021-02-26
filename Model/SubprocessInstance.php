@@ -16,6 +16,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
+/**
+ * @internal
+ */
 class SubprocessInstance
 {
     public const OPTION_JSON_BUFFERING = 'json-buffering';

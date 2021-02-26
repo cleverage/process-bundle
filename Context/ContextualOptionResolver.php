@@ -13,6 +13,8 @@ namespace CleverAge\ProcessBundle\Context;
 /**
  * Class ContextualOptionResolver
  *
+ * @internal
+ *
  * @author  Valentin Clavreul <vclavreul@clever-age.com>
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */

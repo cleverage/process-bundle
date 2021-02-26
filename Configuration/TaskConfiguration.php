@@ -17,6 +17,8 @@ use Psr\Log\LogLevel;
 /**
  * Represents a task configuration inside a process
  *
+ * @internal
+ *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */

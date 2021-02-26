@@ -13,7 +13,7 @@ namespace CleverAge\ProcessBundle\Logger;
 /**
  * Class TransformerProcessor
  *
- * @package CleverAge\ProcessBundle\Logger
+ * @internal
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class TransformerProcessor extends AbstractProcessor

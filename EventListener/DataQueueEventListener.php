@@ -17,6 +17,8 @@ use CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent;
  * This is a basic queue, mainly aiming to catch data coming out of a process
  * Used mostly for testing purpose
  *
+ * @internal
+ *
  * @author  Valentin Clavreul <vclavreul@¢levere-age.com>
  */
 class DataQueueEventListener
