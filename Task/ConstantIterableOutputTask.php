@@ -17,7 +17,22 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Always send the same output regardless of the input, only accepts array for values and iterate over it
+ * Iterate over a static pre-defined set of values.
+ *
+ * Always send the same output regardless of the input, only accepts array for values and iterate over it.
+ *
+ * Same as {@see ConstantOutputTask} iterate over values.
+ *
+ * ##### Task reference
+ *
+ *  * **Service**: `CleverAge\ProcessBundle\Task\ConstantIterableOutputTask`
+ *  * **Iterable task**
+ *  * **Input**: _ignored_
+ *  * **Output**: `any`, values from the `output` option
+ *
+ * ##### Options
+ *
+ *  * **`output`** (`array`, _required_): Array of values to iterate onto
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
@@ -25,10 +40,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class ConstantIterableOutputTask extends AbstractIterableOutputTask
 {
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritDoc}
      *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

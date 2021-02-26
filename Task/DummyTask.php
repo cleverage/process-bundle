@@ -16,13 +16,23 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 /**
  * Dummy task that pass the input to the output
  *
+ * Passes the input to the output, can be used as an entry point allow multiple tasks to be run at the entry point
+ *
+ * ##### Task reference
+ *
+ *  * **Service**: `CleverAge\ProcessBundle\Task\Debug\DummyTask`
+ *  * **Input**: `any`
+ *  * **Output**: `any`, re-output given input
+ *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class DummyTask implements TaskInterface
 {
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
+     *
+     * @internal
      */
     public function execute(ProcessState $state)
     {

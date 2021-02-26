@@ -15,14 +15,21 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 
 /**
- * Iterates from the input of the previous task
+ * Iterate on every value from given input
+ *
+ * ##### Task reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\InputIteratorTask`
+ * * **Iterable task**
+ * * **Input**: `\Iterable` or `array`, an input to iterate onto
+ * * **Output**: `any`, each value from the iterable
  *
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class InputIteratorTask extends AbstractIterableOutputTask
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function initializeIterator(ProcessState $state): \Iterator
     {

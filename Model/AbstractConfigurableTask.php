@@ -27,9 +27,9 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
     /**
      * Only validate the options at initialization, ensuring that the task will not fail at runtime
      *
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws ExceptionInterface
+     * @internal
      */
     public function initialize(ProcessState $state)
     {

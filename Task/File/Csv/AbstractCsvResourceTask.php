@@ -31,7 +31,9 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
     protected $csv;
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
+     *
+     * @internal
      */
     public function finalize(ProcessState $state)
     {

@@ -18,7 +18,7 @@
             </dt>
             <dd class="phpdocumentor-tag-list__definition">
                 {% if tag.example %}
-                    <pre class="pre-scrollable"><code class="language-yaml">{{ tag.example|escape }}</code></pre>
+                    <pre class="pre-scrollable"><code class="language-{{ tag.filePath|split('.')|last }}">{{ tag.example|escape }}</code></pre>
                 {% endif %}
             </dd>
     {% endfor %}
