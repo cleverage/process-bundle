@@ -15,6 +15,8 @@ use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 /**
  * Logs information about a process
  *
+ * @deprecated not used anymore, will be removed in v4.0
+ *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */

@@ -23,6 +23,8 @@ use Symfony\Component\Finder\Finder;
 /**
  * This is the class that loads and manages your bundle configuration.
  *
+ * @internal
+ *
  * @see    http://symfony.com/doc/current/cookbook/bundles/extension.html
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>

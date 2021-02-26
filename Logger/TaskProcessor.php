@@ -13,7 +13,7 @@ namespace CleverAge\ProcessBundle\Logger;
 /**
  * Class TaskProcessor
  *
- * @package CleverAge\ProcessBundle\Logger
+ * @internal
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class TaskProcessor extends AbstractProcessor

@@ -14,6 +14,8 @@ use CleverAge\ProcessBundle\Manager\ProcessManager;
 
 /**
  * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
+ *
+ * @internal
  */
 class AbstractProcessor
 {

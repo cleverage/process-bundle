@@ -17,6 +17,8 @@ use Psr\Log\LoggerInterface;
  * Base logic for logger tasks, see inherited services for more information
  *
  * Used for simplified autowiring
+ *
+ * @internal
  */
 abstract class AbstractLogger extends BaseAbstractLogger
 {
