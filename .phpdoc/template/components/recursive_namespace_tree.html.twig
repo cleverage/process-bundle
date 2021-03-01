@@ -13,12 +13,20 @@
             <li class="sidebar-item -interface">{{ interface|route('class:short') }}</li>
         {% endfor %}
 
-        {% for class in namespace.classes %}
-            <li class="sidebar-item -class">{{ class|route('class:short') }}</li>
-        {% endfor %}
-
         {% for trait in namespace.traits %}
             <li class="sidebar-item -trait">{{ trait|route('class:short') }}</li>
+        {% endfor %}
+
+        {% for class in namespace.classes %}
+            {% if class.abstract %}
+                <li class="sidebar-item -class -abstract">{{ class|route('class:short') }}</li>
+            {% endif %}
+        {% endfor %}
+
+        {% for class in namespace.classes %}
+            {% if not class.abstract %}
+                <li class="sidebar-item -class">{{ class|route('class:short') }}</li>
+            {% endif %}
         {% endfor %}
     </ul>
 {% endif %}

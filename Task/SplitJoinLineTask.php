@@ -14,14 +14,33 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Split a single line into multiple lines based on multiple columns and split characters
+ * Split a single line into multiple lines based on multiple columns and split characters.
+ *
+ * For each input, it will take each value from columns referenced by `split_columns`, split it with `split_character`,
+ * and for each part, produce an output item that will contain all data from input + a column with the key from `join_column` containing the current part.
+ *
+ * This might produce more output than input, with semi-duplicated lines.
+ *
+ * ##### Task or Transformer reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\SplitJoinLineTask`
+ * * **Iterable task**
+ * * **Input**: `array`, description
+ * * **Output**: `type`, description
+ *
+ * ##### Options
+ *
+ * * `split_columns` (`array`, _required_): the list of properties to split
+ * * `join_column` (`string`, _required_): the name of the property that will be included in the output, containing a part of a split value
+ * * `split_character` (`string`, _defaults to_ `,`): the delimiter for split values
  *
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class SplitJoinLineTask extends AbstractIterableOutputTask
 {
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
+     * @internal
      */
     public function next(ProcessState $state): bool
     {
@@ -34,7 +53,8 @@ class SplitJoinLineTask extends AbstractIterableOutputTask
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritDoc}
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver): void
     {
@@ -54,9 +74,8 @@ class SplitJoinLineTask extends AbstractIterableOutputTask
     }
 
     /**
-     * @param ProcessState $state
-     *
-     * @return \Iterator
+     * {@inheritDoc}
+     * @internal
      */
     protected function initializeIterator(ProcessState $state): \Iterator
     {

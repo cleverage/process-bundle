@@ -15,11 +15,18 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 
 /**
  * Allows to directly stop a process, marking it as failed
+ *
+ * ##### Task reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\StopTask`
+ * * **Input**: _ignored_
+ * * **Output**: _none_
  */
 class StopTask implements TaskInterface
 {
     /**
      * {@inheritdoc}
+     * @internal
      */
     public function execute(ProcessState $state)
     {

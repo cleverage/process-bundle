@@ -12,23 +12,22 @@
             </source>
             <ignore>
                 <!-- Empty paths -->
-                <path>Configuration/*</path>
-                <path>Context/*</path>
-                <path>DependencyInjection/*</path>
-                <path>DependencyInjection/Compiler/*</path>
-                <path>EventDispatcher/*</path>
-                <path>ExpressionLanguage/*</path>
-                <path>Logger/*</path>
-                <path>Validator/*</path>
+                <path>Configuration/**/*</path>
+                <path>Context/**/*</path>
+                <path>DependencyInjection/**/*</path>
+                <path>EventDispatcher/**/*</path>
+                <path>ExpressionLanguage/**/*</path>
+                <path>Logger/**/*</path>
+                <path>Validator/**/*</path>
 
                 <!-- Always excluded paths -->
-                <path>.github/*</path>
-                <path>.phpdoc/*</path>
-                <path>hooks/*</path>
-                <path>Resources/*</path>
-                <path>Tests/*</path>
-                <path>var/*</path>
-                <path>vendor/*</path>
+                <path>.github/**/*</path>
+                <path>.phpdoc/**/*</path>
+                <path>hooks/**/*</path>
+                <path>Resources/**/*</path>
+                <path>Tests/**/*</path>
+                <path>var/**/*</path>
+                <path>vendor/**/*</path>
                 <path>CleverAgeProcessBundle.php</path>
             </ignore>
             <visibility>public</visibility>

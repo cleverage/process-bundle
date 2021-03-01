@@ -19,7 +19,47 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * @todo   @vclavreul describe this task
+ * Takes a list of item, and group them depending on a defined condition for a set of columns.
+ *
+ * This task allows to "flip" a matrix.
+ * It will create one group per given column, and for each row, add the input to the group it matches.
+ *
+ * The main use case was to invert a table like
+ * ```
+ * |code |val1|val2|
+ * |item1|  X |  X |
+ * |item2|    |  X |
+ * |item3|  X |    |
+ * ```
+ *
+ * And get a list like
+ * * `val1 => [item1, item3]`
+ * * `val2 => [item1, item2]`
+ *
+ * See {@see \CleverAge\ProcessBundle\Tests\Task\ColumnAggregatorTaskTest} for input and output values of the example
+ *
+ * ##### Task reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\ColumnAggregatorTask`
+ * * **Blocking task**
+ * * **Input**: `array`
+ * * **Output**: `array` of `array`, each one containing
+ *    - the key defined by the `reference_key` option, where the value is a column name
+ *    - the key defined by the `aggregation_key` option, where the value is the list of matching inputs
+ *
+ * ##### Options
+ *
+ * * `columns` (`array`, _required_): the list of columns that will be used to group the values
+ * * `reference_key` (`string`,  _defaults to_ `column`): the key in the output that will contain the column name
+ * * `aggregation_key` (`string`, _defaults to_ `values`): the key in the output that will contain the list of matching values
+ * * `condition` (_defaults to_ `[]`): a condition to aggregate value, see {@see \CleverAge\ProcessBundle\Transformer\ConditionTrait} for details.
+ * The item that will be tested is an array containing
+ *   - `input_column_value` : the value of the current row for one of the columns
+ *   - `input` : the full current row
+ * * `ignore_missing` (`boolean`, _defaults to_ `false`): if false, triggers an error if a column is not in the input
+ *
+ * @example "Resources/examples/task/column_aggregator_task.yaml" Simple use case
+ * @example "Resources/tests/task/column_aggregator_task.yml" Full test case
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  */

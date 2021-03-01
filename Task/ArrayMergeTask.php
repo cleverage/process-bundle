@@ -17,6 +17,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Merge every input array, and return the result
+ *
+ * By default, behaves exactly like [`array_merge`](https://www.php.net/manual/en/function.array-merge.php), but it can be changed to any other function with similar algorithm.
+ *
+ * ##### Task reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\ArrayMergeTask`
+ * * **Blocking task**
+ * * **Input**: `array`
+ * * **Output**: `array`, or any output type from the merge callback
+ *
+ * ##### Options
+ *
+ * * `merge_function` (`string`, _defaults to_ `array_merge`): must be one of the 4 PHP merge function ([`array_merge`](https://www.php.net/manual/en/function.array-merge.php), [`array_merge_recursive`](https://www.php.net/manual/en/function.array-merge-recursive.php), [`array_replace`](https://www.php.net/manual/en/function.array-replace.php), or [`array_replace_recursive`](https://www.php.net/manual/en/function.array-replace-recursive.php))
+ *
  */
 class ArrayMergeTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {

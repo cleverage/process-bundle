@@ -27,6 +27,11 @@
     background: transparent url('data:image/svg+xml;utf8,{{ include('icons/class.svg.twig')|trim|raw }}') no-repeat center center;
 }
 
+.sidebar-item.-class.-abstract:before {
+    content: 'A';
+    background: transparent url('data:image/svg+xml;utf8,{{ include('icons/abstract.svg.twig')|trim|raw }}') no-repeat center center;
+}
+
 .sidebar-item.-trait:before {
     content: 'T';
     background: transparent url('data:image/svg+xml;utf8,{{ include('icons/trait.svg.twig')|trim|raw }}') no-repeat center center;
@@ -37,6 +42,11 @@
     padding-left: 0;
 }
 
+.processbundle-task-interfaces {
+    padding-left: 1rem;
+    color: #aaaaaa;
+}
+
 /* Overrides */
 .phpdocumentor-table-of-contents .phpdocumentor-table-of-contents__entry.-interface:before {
     background: transparent url('data:image/svg+xml;utf8,{{ include('icons/interface.svg.twig')|trim|raw }}') no-repeat center center;
@@ -44,6 +54,11 @@
 
 .phpdocumentor-table-of-contents .phpdocumentor-table-of-contents__entry.-class:before {
     background: transparent url('data:image/svg+xml;utf8,{{ include('icons/class.svg.twig')|trim|raw }}') no-repeat center center;
+}
+
+.phpdocumentor-table-of-contents .phpdocumentor-table-of-contents__entry.-class.-abstract:before {
+    content: 'A';
+    background: transparent url('data:image/svg+xml;utf8,{{ include('icons/abstract.svg.twig')|trim|raw }}') no-repeat center center;
 }
 
 .phpdocumentor-table-of-contents .phpdocumentor-table-of-contents__entry.-trait:before {

@@ -20,6 +20,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Base class to handle output iterations
  *
+ * Extends this class and implement `initializeIterator()` to provide data that will be iterated upon.
+ *
+ * ##### Task reference
+ *
+ * * **Abstract task**
+ * * **Iterable task**
+ *
+ * @example "Resources/examples/task/abstract_iterable_output_task.php" A simple implementation
+ *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */

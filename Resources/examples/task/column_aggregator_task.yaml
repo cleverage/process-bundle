@@ -1,0 +1,9 @@
+# Task configuration level
+sort_item_by_familly:
+    service: '@CleverAge\ProcessBundle\Task\ColumnAggregatorTask'
+    options:
+        columns: '%family_names%'               # A big array with a list of families
+        ignore_missing: true                    # Only a warning if there is a missing column
+        condition:
+            match:
+                '[input_column_value]': 'X'     # Looks for every "X" family by family

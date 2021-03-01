@@ -1,0 +1,31 @@
+# Example input
+data_in:
+    - {code: item_1, attribute1: val1, attribute2: b}
+    - {code: item_2, attribute1: val1, attribute2: c}
+    - {code: item_3, attribute1: val1, attribute2: d}
+    - {code: item_4, attribute1: val2, attribute2: e}
+
+---
+
+# Task configuration level
+aggregate_rows:
+    service: '@CleverAge\ProcessBundle\Task\RowAggregatorTask'
+    options:
+        aggregate_by: attribute1
+        aggregation_key: values
+        aggregate_columns: [code]
+
+---
+
+# Output
+data_out:
+    val1:
+        attribute2: b       # Other values are ignored
+        values:
+            - { code: item_1 }
+            - { code: item_2 }
+            - { code: item_3 }
+    val2:
+        attribute2: e
+        values:
+            - { code: item_4 }

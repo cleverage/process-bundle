@@ -21,10 +21,30 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Wait for defined inputs before passing an aggregated output.
- * Should have been a BlockingTask, but due to limitations in the current model, it's a hack using skips and finalize.
+ * Group inputs using a given property, splitting common values and specific values.
  *
- * @see README.md:Known issues
+ * For each input this task will get the value under the property defined by the `aggregate_by` option, and try to aggregate similar inputs.
+ * The idea is to have one level of common values, and one level of specific values.
+ *
+ * ##### Task reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\RowAggregatorTask`
+ * * **Blocking task**
+ * * **Input**: `array`
+ * * **Output**: `array` of `array`
+ *    - each 1st level item has for key a value from the property defined by the `aggregate_by` option
+ *    - the 2nd level is an `array` with all the values from the FIRST match that are NOT in `aggregate_columns`
+ *          + an additional property defined by the `aggregation_key`
+ *    - under the 3rd level, defined by `aggregation_key`, there will be a list of item,
+ *          each containing values copied for the columns defined by `aggregate_columns`
+ *
+ * ##### Options
+ *
+ * * `aggregate_by` (`string`, _required_): the property that will be used for aggregation
+ * * `aggregation_key` (`string`, _required_): the key in each item of the output that will contain the list of copied input item
+ * * `aggregate_columns` (`array`, _required_): the list of properties that will be copied for each aggregated item
+ *
+ * @example "Resources/examples/task/row_aggregator_task.yaml"
  */
 class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
@@ -37,7 +57,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
     protected $result = [];
 
     /**
-     * @param LoggerInterface $logger
+     * @internal
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -45,14 +65,8 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
     }
 
     /**
-     * Store inputs and once everything has been received, pass to next task
-     * Once an output has been generated this task is reset, and may wait for another loop
-     *
-     * @param ProcessState $state
-     *
-     * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
+     * {@inheritDoc}
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -92,7 +106,8 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
+     * @internal
      */
     public function proceed(ProcessState $state)
     {
@@ -100,10 +115,8 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
     }
 
     /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
+     * {@inheritDoc}
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

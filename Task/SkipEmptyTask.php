@@ -14,13 +14,19 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 
 /**
- * Allow to skip the execution on empty input.
- * Useful when combined with an aggregator task
+ * Skip empty inputs.
+ *
+ * ##### Task reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\SkipEmptyTask`
+ * * **Input**: `any`
+ * * **Output**: `any`, same as the input, if not empty
  */
 class SkipEmptyTask implements TaskInterface
 {
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
+     * @internal
      */
     public function execute(ProcessState $state)
     {
