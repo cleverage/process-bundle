@@ -16,8 +16,24 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
+ * Outputs periodically the number of time this task is called.
+ *
  * Count the number of times the task is processed and continue every N iteration (skip the rest of the time)
- * Flush at the end with the actual count
+ * Flush at the end with the actual count.
+ *
+ * It can be useful for batch like workflow.
+ * See also {@see IterableBatchTask}.
+ *
+ * ##### Task reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\CounterTask`
+ * * **Flushable task**
+ * * **Input**: _ignored_
+ * * **Output**: `int`, the number of time this task is called
+ *
+ * ##### Options
+ *
+ * * `flush_every` (`int`, _required_): the period at which the task will produce outputs
  *
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
