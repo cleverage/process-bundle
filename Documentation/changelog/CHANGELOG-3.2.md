@@ -10,7 +10,7 @@ _Nothing yet_
 
 ### Fixes
 
-_Nothing yet_
+* Ignore empty lines in `\CleverAge\ProcessBundle\Filesystem\CsvResource::getLineCount`.
 
 ### BC breaks
 

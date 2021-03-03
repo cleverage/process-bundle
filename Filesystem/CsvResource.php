@@ -113,11 +113,15 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     }
 
     /**
-     * Warning! This method will rewind the file to the beginning before and after counting the lines!
+     * Count the number of CSV lines (with correct enclosure detection), ignoring blank lines.
      *
-     * @throws \RuntimeException
+     * Warning! This method will rewind the file to the beginning before and after counting the lines!
+     * Do not use in the middle of a process.
+     * This can be very slow.
      *
      * @return int
+     *@throws \RuntimeException
+     *
      */
     public function getLineCount(): int
     {
@@ -125,8 +129,9 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
             $this->rewind();
             $line = 0;
             while (!$this->isEndOfFile()) {
-                ++$line;
-                $this->readRaw();
+                if ($this->readRaw()) {
+                    ++$line;
+                }
             }
             $this->rewind();
 
