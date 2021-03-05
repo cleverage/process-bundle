@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -65,8 +66,16 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
 
         $state->removeErrorContext('iterator_key');
 
-        return $this->iterator->valid();
+        if (!$this->iterator->valid()) {
+            // Reset the iterator to allow the following iteration
+            $this->iterator = null;
+
+            return false;
+        }
+
+        return true;
     }
+
     /**
      * Create or recreate an iterator from input
      *

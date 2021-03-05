@@ -11,6 +11,7 @@ _Nothing yet_
 ### Fixes
 
 * Ignore empty lines in `\CleverAge\ProcessBundle\Filesystem\CsvResource::getLineCount`.
+* Fixed `\CleverAge\ProcessBundle\Task\AbstractIterableOutputTask` skipping iterations when inside another iteration loop
 
 ### BC breaks
 
