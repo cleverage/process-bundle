@@ -31,3 +31,8 @@ v3.2.0
 
 * [GITHUB-121](https://github.com/cleverage/process-bundle/issues/121): Enable compatibility with Symfony 5
 * [GITHUB-118](https://github.com/cleverage/process-bundle/pull/118): Added boilerplate code to avoid deprecations notices for event listeners
+
+### BC breaks
+
+There is no BC break for this version, but note that `sidus/base-bundle` has been removed from dependencies. 
+If you use it, it should already be inside your own composer.json.
