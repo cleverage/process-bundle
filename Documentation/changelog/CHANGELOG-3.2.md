@@ -12,6 +12,7 @@ _Nothing yet_
 
 * Ignore empty lines in `\CleverAge\ProcessBundle\Filesystem\CsvResource::getLineCount`.
 * Fixed `\CleverAge\ProcessBundle\Task\AbstractIterableOutputTask` skipping iterations when inside another iteration loop
+* `\CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException` now displays the failing process code
 
 ### BC breaks
 

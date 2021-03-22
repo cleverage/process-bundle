@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Exception;
 
+use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 
 /**
@@ -18,25 +19,36 @@ use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 class InvalidProcessConfigurationException extends \UnexpectedValueException implements ProcessExceptionInterface
 {
     /**
-     * @param TaskConfiguration $taskConfig
-     * @param array             $mainTaskList
+     * @param ProcessConfiguration $processConfiguration
+     * @param TaskConfiguration    $taskConfig
+     * @param array                $mainTaskList
      *
      * @return InvalidProcessConfigurationException
      */
-    public static function createNotInMain(TaskConfiguration $taskConfig, array $mainTaskList): self
-    {
-        $taskListStr = '[' . implode(', ', $mainTaskList) . ']';
+    public static function createNotInMain(
+        ProcessConfiguration $processConfiguration,
+        TaskConfiguration $taskConfig,
+        array $mainTaskList
+    ): self {
+        $taskListStr = '['.implode(', ', $mainTaskList).']';
 
-        return new self("Task '{$taskConfig->getCode()}' is not in main task list : {$taskListStr}");
+        return new self(
+            "Task '{$taskConfig->getCode()}' is not in main task list : {$taskListStr} (from process: {$processConfiguration->getCode()})"
+        );
     }
 
     /**
-     * @param TaskConfiguration $taskConfig
+     * @param ProcessConfiguration $processConfiguration
+     * @param TaskConfiguration    $taskConfig
      *
      * @return InvalidProcessConfigurationException
      */
-    public static function createEntryPointHasAncestors(TaskConfiguration $taskConfig): self
-    {
-        return new self("The entry-point '{$taskConfig->getCode()}' cannot have an ancestor");
+    public static function createEntryPointHasAncestors(
+        ProcessConfiguration $processConfiguration,
+        TaskConfiguration $taskConfig
+    ): self {
+        return new self(
+            "The entry-point '{$taskConfig->getCode()}' cannot have an ancestor (from process: {$processConfiguration->getCode()})"
+        );
     }
 }

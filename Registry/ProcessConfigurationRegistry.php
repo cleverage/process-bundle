@@ -161,7 +161,7 @@ class ProcessConfigurationRegistry
 
         // #106 - entry point should not have an ancestor
         if ($processConfig->getEntryPoint() && $processConfig->getEntryPoint()->getPreviousTasksConfigurations()) {
-            throw InvalidProcessConfigurationException::createEntryPointHasAncestors($processConfig->getEntryPoint());
+            throw InvalidProcessConfigurationException::createEntryPointHasAncestors($processConfig, $processConfig->getEntryPoint());
         }
 
         $this->processConfigurations[$processCode] = $processConfig;

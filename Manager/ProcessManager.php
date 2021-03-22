@@ -657,10 +657,10 @@ class ProcessManager
         // Check coherence for entry/end points
         $processConfiguration->getEndPoint();
         if ($entryPoint && !\in_array($entryPoint->getCode(), $mainTaskList, true)) {
-            throw InvalidProcessConfigurationException::createNotInMain($entryPoint, $mainTaskList);
+            throw InvalidProcessConfigurationException::createNotInMain($processConfiguration, $entryPoint, $mainTaskList);
         }
         if ($endPoint && !\in_array($endPoint->getCode(), $mainTaskList, true)) {
-            throw InvalidProcessConfigurationException::createNotInMain($endPoint, $mainTaskList);
+            throw InvalidProcessConfigurationException::createNotInMain($processConfiguration, $endPoint, $mainTaskList);
         }
     }
 
