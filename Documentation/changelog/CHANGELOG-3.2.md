@@ -13,6 +13,7 @@ _Nothing yet_
 * Ignore empty lines in `\CleverAge\ProcessBundle\Filesystem\CsvResource::getLineCount`.
 * Fixed `\CleverAge\ProcessBundle\Task\AbstractIterableOutputTask` skipping iterations when inside another iteration loop
 * `\CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException` now displays the failing process code
+* `\CleverAge\ProcessBundle\Transformer\TransformerTrait` now displays a more explicit message on wrong options type
 
 ### BC breaks
 

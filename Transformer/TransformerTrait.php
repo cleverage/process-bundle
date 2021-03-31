@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -29,9 +31,9 @@ trait TransformerTrait
      * @param array $transformers
      * @param mixed $value
      *
+     * @return mixed
      * @throws TransformerException
      *
-     * @return mixed
      */
     protected function applyTransformers(array $transformers, $value)
     {
@@ -59,9 +61,9 @@ trait TransformerTrait
      *
      * @param string $transformerCode
      *
-     * @throws MissingTransformerException
-     *
      * @return string
+     *
+     * @throws MissingTransformerException
      *
      * @example
      *     transformers:
@@ -112,17 +114,12 @@ trait TransformerTrait
             $transformerOptionsResolver = new OptionsResolver();
             $transformerCode = $this->getCleanedTransfomerCode($origTransformerCode);
             $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+            $transformerOptions = $this->checkTransformerOptions($transformerOptions, $origTransformerCode);
             if ($transformer instanceof ConfigurableTransformerInterface) {
                 $transformer->configureOptions($transformerOptionsResolver);
-                $transformerOptions = $transformerOptionsResolver->resolve(
-                    $transformerOptions ?? []
-                );
-            } else {
-                if (!empty($transformerOptions)) {
-                    throw new \InvalidArgumentException("Transformer ${$origTransformerCode} should not have options");
-                }
-                // An array is required in transform method
-                $transformerOptions = [];
+                $transformerOptions = $transformerOptionsResolver->resolve($transformerOptions);
+            } elseif (!empty($transformerOptions)) {
+                throw new \InvalidArgumentException("Transformer ${$origTransformerCode} should not have options");
             }
 
             $closure = static function ($value) use ($transformer, $transformerOptions) {
@@ -132,5 +129,29 @@ trait TransformerTrait
         }
 
         return $transformerClosures;
+    }
+
+    /**
+     * Check the options to always return an array, or fail on unexpected values
+     *
+     * @param mixed  $transformerOptions
+     * @param string $transformerCode
+     *
+     * @return array
+     */
+    private function checkTransformerOptions($transformerOptions, string $transformerCode): array
+    {
+        if (is_array($transformerOptions)) {
+            return $transformerOptions;
+        }
+        if ($transformerOptions === null) {
+            return [];
+        }
+
+        $type = is_object($transformerOptions) ? get_class($transformerOptions) : gettype($transformerOptions);
+
+        throw new \InvalidArgumentException(
+            "Options for transformer {$transformerCode} are invalid : found {$type}, expected array or null"
+        );
     }
 }
