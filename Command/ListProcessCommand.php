@@ -103,6 +103,8 @@ class ListProcessCommand extends Command
         foreach ($outputMessages as $message) {
             $output->writeln($message);
         }
+
+        return 0;
     }
 
     /**

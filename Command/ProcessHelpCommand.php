@@ -148,6 +148,8 @@ class ProcessHelpCommand extends Command
             $branchStr = '['.implode(', ', $branches).']';
             $output->writeln("<error>All branches are not resolved : {$branchStr}</error>");
         }
+
+        return 0;
     }
 
     /**

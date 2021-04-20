@@ -10,7 +10,7 @@ _Nothing yet_
 
 ### Fixes
 
-_Nothing yet_
+* Fixed return value of list and help commands (mandatory for Symfony 5)
 
 ### BC breaks
 
