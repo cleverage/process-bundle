@@ -6,7 +6,8 @@ v3.2-dev
 
 ### Features
 
-_Nothing yet_
+* Added `multi_replace` transformer
+* Added `cached` transformer
 
 ### Fixes
 
@@ -14,7 +15,8 @@ _Nothing yet_
 
 ### BC breaks
 
-_Nothing yet_
+* Added `psr/cache` as a dependency, but it shouldn't break anything
+* Added `ext-intl` as a dependency, since required by the `slugify` transformer
 
 v3.2.2
 ------
