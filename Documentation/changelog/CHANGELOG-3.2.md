@@ -6,6 +6,21 @@ v3.2-dev
 
 ### Features
 
+_Nothing yet_
+
+### Fixes
+
+_Nothing yet_
+
+### BC breaks
+
+_Nothing yet_
+
+v3.2.3
+------
+
+### Features
+
 * Added `multi_replace` transformer
 * Added `cached` transformer
 
