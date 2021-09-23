@@ -14,6 +14,7 @@ use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CachedTransformer implements ConfigurableTransformerInterface
@@ -36,8 +37,11 @@ class CachedTransformer implements ConfigurableTransformerInterface
      * @param CacheItemPoolInterface $cache
      * @param LoggerInterface        $logger
      */
-    public function __construct(TransformerRegistry $transformerRegistry, CacheItemPoolInterface $cache, LoggerInterface $logger)
-    {
+    public function __construct(
+        TransformerRegistry $transformerRegistry,
+        CacheItemPoolInterface $cache,
+        LoggerInterface $logger
+    ) {
         $this->transformerRegistry = $transformerRegistry;
         $this->cache = $cache;
         $this->logger = $logger;
@@ -47,6 +51,24 @@ class CachedTransformer implements ConfigurableTransformerInterface
     {
         $resolver->setRequired('cache_key');
         $resolver->setAllowedTypes('cache_key', 'string');
+
+        $resolver->setDefault('ttl', null);
+        $resolver->setAllowedTypes('ttl', ['null', 'string', \DateTimeInterface::class]);
+        $resolver->setNormalizer(
+            'ttl',
+            function (Options $options, $value) {
+                /**
+                 * Best use is a relative date string like "+1 hour"
+                 * @see https://www.php.net/manual/en/datetime.formats.relative.php
+                 */
+                if (is_string($value)) {
+                    $value = new \DateTime($value);
+                }
+
+                return $value;
+            }
+        );
+
         $this->configureTransformersOptions($resolver);
         $this->configureTransformersOptions($resolver, 'key_transformers');
     }
@@ -58,11 +80,13 @@ class CachedTransformer implements ConfigurableTransformerInterface
             try {
                 $cacheItem = $this->cache->getItem($cacheKey);
                 if ($cacheItem->isHit()) {
-
                     return $cacheItem->get();
                 } else {
                     $newValue = $this->applyTransformers($options['transformers'], $value);
                     $cacheItem->set($newValue);
+                    if ($options['ttl']) {
+                        $cacheItem->expiresAt($options['ttl']);
+                    }
                     $success = $this->cache->saveDeferred($cacheItem);
 
                     if (!$success) {
@@ -72,7 +96,10 @@ class CachedTransformer implements ConfigurableTransformerInterface
                     return $newValue;
                 }
             } catch (InvalidArgumentException $exception) {
-                $this->logger->warning('Cannot get cache item', ['cache_key' => $cacheKey, 'message' => $exception->getMessage()]);
+                $this->logger->warning(
+                    'Cannot get cache item',
+                    ['cache_key' => $cacheKey, 'message' => $exception->getMessage()]
+                );
             }
         }
 

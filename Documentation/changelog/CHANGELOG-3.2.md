@@ -16,6 +16,13 @@ _Nothing yet_
 
 _Nothing yet_
 
+v3.2.4
+------
+
+### Features
+
+* Added a `ttl` option in the `cached` transformer
+
 v3.2.3
 ------
 
