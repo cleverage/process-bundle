@@ -41,7 +41,7 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
             return $value;
         }
 
-        if ($value instanceof \DateTime) {
+        if ($value instanceof \DateTimeInterface) {
             $date = $value;
         } elseif (is_string($value)) {
             @trigger_error('String input will be deprecated in v4.0', E_USER_DEPRECATED);
