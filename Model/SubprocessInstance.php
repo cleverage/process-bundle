@@ -121,8 +121,14 @@ class SubprocessInstance
         $arguments[] = $this->processCode;
 
         $this->process = new Process($arguments, null, null, $this->input);
-        $this->process->setCommandLine($this->process->getCommandLine());
-        $this->process->inheritEnvironmentVariables();
+
+        if (method_exists(Process::class, 'fromShellCommandline')) {
+            $this->process = Process::fromShellCommandline($this->process->getCommandLine(), null, null, $this->input);
+        } else {
+            $this->process->setCommandLine($this->process->getCommandLine());
+            $this->process->inheritEnvironmentVariables();
+        }
+
         $this->process->enableOutput();
 
         return $this;
