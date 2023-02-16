@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
 
 class ConstraintLoader extends AbstractLoader
 {
+    /**
+     * @return bool
+     */
     public function loadClassMetadata(ClassMetadata $metadata)
     {
         return false;
