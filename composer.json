@@ -1,70 +1,80 @@
 {
-    "name": "cleverage/process-bundle",
-    "description": "Process, import/export, transform and validate data with a simple API with Symfony3",
-    "keywords": [
-        "process",
-        "task",
-        "etl",
-        "transformation",
-        "import",
-        "export"
-    ],
-    "homepage": "https://github.com/cleverage/process-bundle",
-    "type": "symfony-bundle",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Vincent Chalnot",
-            "email": "vchalnot@clever-age.com",
-            "homepage": "http://chalnot.fr",
-            "role": "Lead Developer"
-        },
-        {
-            "name": "Valentin Clavreul",
-            "email": "vclavreul@clever-age.com",
-            "role": "Developer"
-        },
-        {
-            "name": "Madeline Veyrenc",
-            "email": "mveyrenc@clever-age.com",
-            "homepage": "https://github.com/mveyrenc",
-            "role": "Developer"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "CleverAge\\ProcessBundle\\": ""
-        }
+  "name": "cleverage/process-bundle",
+  "description": "Process, import/export, transform and validate data with a simple API with Symfony3",
+  "keywords": [
+    "process",
+    "task",
+    "etl",
+    "transformation",
+    "import",
+    "export"
+  ],
+  "homepage": "https://github.com/cleverage/process-bundle",
+  "type": "symfony-bundle",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Vincent Chalnot",
+      "email": "vchalnot@clever-age.com",
+      "homepage": "http://chalnot.fr",
+      "role": "Lead Developer"
     },
-    "require": {
-        "php": ">=7.2",
-        "ext-json": "*",
-        "ext-dom": "*",
-        "ext-intl": "*",
-        "symfony/event-dispatcher-contracts": "~1.0|~2.0",
-        "psr/event-dispatcher": "1.0.0",
-        "psr/cache": "^1|^2|^3",
-        "symfony/config": "~3.0|~4.0|~5.0",
-        "symfony/dependency-injection": "~3.0|~4.0|~5.0",
-        "symfony/framework-bundle": "~3.0|~4.0|~5.0",
-        "symfony/expression-language": "~3.0|~4.0|~5.0",
-        "symfony/monolog-bundle": "~3.3",
-        "symfony/console": "~3.0|~4.0|~5.0",
-        "symfony/options-resolver": "~3.0|~4.0|~5.0",
-        "symfony/process": "~3.0|~4.0|~5.0",
-        "symfony/property-access": "~3.0|~4.0|~5.0",
-        "symfony/serializer": "~3.0|~4.0|~5.0",
-        "symfony/validator": "~3.0|~4.0|~5.0",
-        "symfony/yaml": "~3.0|~4.0|~5.0"
+    {
+      "name": "Valentin Clavreul",
+      "email": "vclavreul@clever-age.com",
+      "role": "Developer"
     },
-    "require-dev": {
-        "phpunit/phpunit": "~6.4"
-    },
-    "suggest": {
-        "cleverage/doctrine-process-bundle": "Dedicated bundle for Doctrine dependencies for the process bundle",
-        "cleverage/flysystem-process-bundle": "Dedicated bundle for Flysystem dependencies for the process bundle",
-        "cleverage/rest-process-bundle": "Dedicated bundle for Rest dependencies for the process bundle",
-        "cleverage/soap-process-bundle": "Dedicated bundle for Soap dependencies for the process bundle",
-        "cleverage/enqueue-process-bundle": "Manage asynchronous events within the process bundle"
+    {
+      "name": "Madeline Veyrenc",
+      "email": "mveyrenc@clever-age.com",
+      "homepage": "https://github.com/mveyrenc",
+      "role": "Developer"
     }
+  ],
+  "autoload": {
+    "psr-4": {
+      "CleverAge\\ProcessBundle\\": ""
+    }
+  },
+  "require": {
+    "php": ">=7.2",
+    "ext-json": "*",
+    "ext-dom": "*",
+    "ext-intl": "*",
+    "symfony/event-dispatcher-contracts": "~1.0|~2.0",
+    "psr/event-dispatcher": "1.0.0",
+    "psr/cache": "^1|^2|^3",
+    "symfony/config": "~3.0|~4.0|~5.0",
+    "symfony/dependency-injection": "~3.0|~4.0|~5.0",
+    "symfony/framework-bundle": "~3.0|~4.0|~5.0",
+    "symfony/expression-language": "~3.0|~4.0|~5.0",
+    "symfony/monolog-bundle": "~3.3",
+    "symfony/console": "~3.0|~4.0|~5.0",
+    "symfony/options-resolver": "~3.0|~4.0|~5.0",
+    "symfony/process": "~3.0|~4.0|~5.0",
+    "symfony/property-access": "~3.0|~4.0|~5.0",
+    "symfony/serializer": "~3.0|~4.0|~5.0",
+    "symfony/validator": "~3.0|~4.0|~5.0",
+    "symfony/yaml": "~3.0|~4.0|~5.0"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-latest",
+    "phpunit/phpunit": "~6.4",
+    "phpstan/phpstan": "*",
+    "phpstan/phpstan-symfony": "*",
+    "phpstan/extension-installer": "*"
+  },
+  "suggest": {
+    "cleverage/doctrine-process-bundle": "Dedicated bundle for Doctrine dependencies for the process bundle",
+    "cleverage/flysystem-process-bundle": "Dedicated bundle for Flysystem dependencies for the process bundle",
+    "cleverage/rest-process-bundle": "Dedicated bundle for Rest dependencies for the process bundle",
+    "cleverage/soap-process-bundle": "Dedicated bundle for Soap dependencies for the process bundle",
+    "cleverage/enqueue-process-bundle": "Manage asynchronous events within the process bundle"
+  },
+  "config": {
+    "allow-plugins": {
+      "phpstan/extension-installer": true,
+      "symfony/flex": true
+    }
+  }
 }

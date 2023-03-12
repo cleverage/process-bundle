@@ -22,7 +22,10 @@
     },
     "require-dev": {
         "symfony/phpunit-bridge": "^4.4|^5.0",
-        "phpunit/phpunit": "~6.4"
+        "phpunit/phpunit": "~6.4",
+        "phpstan/phpstan": "*",
+        "phpstan/phpstan-symfony": "*",
+        "phpstan/extension-installer": "*"
     },
     "autoload": {
         "psr-4": {
@@ -46,5 +49,11 @@
         "post-update-cmd": [
             "@auto-scripts"
         ]
+    },
+    "config": {
+      "allow-plugins": {
+        "phpstan/extension-installer": true,
+        "symfony/flex": true
+      }
     }
 }

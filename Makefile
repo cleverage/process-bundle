@@ -10,8 +10,6 @@ endif
 SF_ENV=sf4
 LOCAL_DOCKER_TAG=cleverage_process:test
 DOCKER_RUN=docker run -it --rm \
-	-e BLACKFIRE_CLIENT_ID=$(BLACKFIRE_CLIENT_ID) \
-	-e BLACKFIRE_CLIENT_TOKEN=$(BLACKFIRE_CLIENT_TOKEN) \
 	--mount type=bind,src=$$(pwd),dst=/src-cleverage_process
 
 pull: pull/$(SF_ENV)
