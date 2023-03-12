@@ -1,5 +1,5 @@
 services:
-    CleverAge\ProcessBundle\EventDispatcher\BackcompatEventDispatcher:
+    Symfony\Contracts\EventDispatcher\EventDispatcherInterface:
         public: false
         autowire: true
         

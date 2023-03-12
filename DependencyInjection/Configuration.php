@@ -46,7 +46,7 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        [$treeBuilder, $rootNode] = $this->createTreeBuilder($this->root);
+        [$treeBuilder, $rootNode] = $this->createTreeBuilder();
         $definition = $rootNode->children();
         // Default error strategy
         $definition->enumNode('default_error_strategy')
@@ -224,18 +224,10 @@ class Configuration implements ConfigurationInterface
      *
      * @return array A tuple containing [TreeBuilder, NodeDefinition]
      */
-    protected function createTreeBuilder(string $root): array
+    protected function createTreeBuilder(): array
     {
-        $treeBuilderReflection = new \ReflectionClass(TreeBuilder::class);
-        $treeBuilderConstructReflection = $treeBuilderReflection->getConstructor();
-
-        if ($treeBuilderConstructReflection && $treeBuilderConstructReflection->getNumberOfParameters() > 0) {
-            $treeBuilder = new TreeBuilder($this->root);
-            $rootNode = $treeBuilder->getRootNode();
-        } else {
-            $treeBuilder = new TreeBuilder();
-            $rootNode = $treeBuilder->root($this->root);
-        }
+        $treeBuilder = new TreeBuilder($this->root);
+        $rootNode = $treeBuilder->getRootNode();
 
         return [$treeBuilder, $rootNode];
     }

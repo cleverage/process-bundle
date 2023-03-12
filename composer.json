@@ -46,6 +46,7 @@
     "psr/cache": "^1|^2|^3",
     "symfony/config": "^5.4|^6.0",
     "symfony/dependency-injection": "^5.4|^6.0",
+    "symfony/form": "^5.4|^6.0",
     "symfony/framework-bundle": "^5.4|^6.0",
     "symfony/expression-language": "^5.4|^6.0",
     "symfony/monolog-bundle": "~3.3",
@@ -55,7 +56,8 @@
     "symfony/property-access": "^5.4|^6.0",
     "symfony/serializer": "^5.4|^6.0",
     "symfony/validator": "^5.4|^6.0",
-    "symfony/yaml": "^5.4|^6.0"
+    "symfony/yaml": "^5.4|^6.0",
+    "league/flysystem-bundle": "^3.1"
   },
   "require-dev": {
     "roave/security-advisories": "dev-latest",

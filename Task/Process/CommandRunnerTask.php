@@ -47,9 +47,8 @@ class CommandRunnerTask extends AbstractConfigurableTask
             $options['env'],
             $state->getInput(),
             $options['timeout'],
-            $options['options']
         );
-        $process->inheritEnvironmentVariables(true);
+        $process->setOptions($options);
         $process->mustRun();
         $state->setOutput($process->getOutput());
     }

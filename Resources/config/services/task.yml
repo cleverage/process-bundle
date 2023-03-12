@@ -7,4 +7,4 @@ services:
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }
         bind:
-            $eventDispatcher: '@CleverAge\ProcessBundle\EventDispatcher\BackcompatEventDispatcher'
+            $eventDispatcher: '@Symfony\Contracts\EventDispatcher\EventDispatcherInterface'

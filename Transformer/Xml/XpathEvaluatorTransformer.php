@@ -92,7 +92,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
 
         $query = $options['query'];
         if (\is_array($query)) {
-            $result = \array_map(function ($subquery) use ($xpath, $value, $options) {
+            $result = \array_map(function ($subquery) use ($xpath, $value) {
                 return $this->query($xpath, $subquery['subquery'], $value, $subquery);
             }, $query);
         } else {
@@ -138,7 +138,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
 
         // Convert results to text
         if ($options['unwrap_value']) {
-            $results = \array_map(function (\DOMNode $item) use ($query, $options) {
+            $results = \array_map(function (\DOMNode $item) use ($query) {
                 if ($item instanceof \DOMAttr) {
                     return $item->value;
                 }

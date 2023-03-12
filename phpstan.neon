@@ -4,4 +4,6 @@ parameters:
         - .
     excludePaths:
         - vendor/*
+        - Resources/tests/*
+        - Tests/*
         - rector.php

@@ -4,5 +4,5 @@ services:
         autowire: true
         autoconfigure: true
         bind:
-            $eventDispatcher: '@CleverAge\ProcessBundle\EventDispatcher\BackcompatEventDispatcher'
+            $eventDispatcher: '@Symfony\Contracts\EventDispatcher\EventDispatcherInterface'
             $container: '@service_container'
