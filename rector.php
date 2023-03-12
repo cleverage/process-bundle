@@ -3,8 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
-use Rector\Set\ValueObject\LevelSetList;
-use Rector\Symfony\Set\SymfonyLevelSetList;
+use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 
 return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->paths([
@@ -29,8 +28,12 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__ . '/Validator',
     ]);
 
-    $rectorConfig->sets([
+    $rectorConfig->rules([
+        ClassPropertyAssignToConstructorPromotionRector::class
+    ]);
+
+    /*$rectorConfig->sets([
         LevelSetList::UP_TO_PHP_81,
         SymfonyLevelSetList::UP_TO_SYMFONY_54
-    ]);
+    ]);*/
 };

@@ -19,18 +19,14 @@ namespace CleverAge\ProcessBundle\Exception;
 class TransformerException extends \RuntimeException implements ProcessExceptionInterface
 {
     /** @var string */
-    protected $transformerCode;
-
-    /** @var string */
     protected $targetProperty;
 
     /**
      * {@inheritDoc}
+     * @param string $transformerCode
      */
-    public function __construct($transformerCode, $code = 0, \Throwable $previous = null)
+    public function __construct(protected $transformerCode, $code = 0, \Throwable $previous = null)
     {
-        $this->transformerCode = $transformerCode;
-
         parent::__construct('', $code, $previous);
         $this->updateMessage();
     }

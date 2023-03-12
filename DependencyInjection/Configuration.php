@@ -28,15 +28,11 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    /** @var string */
-    protected $root;
-
     /**
      * @param string $root
      */
-    public function __construct($root = 'clever_age_process')
+    public function __construct(protected $root = 'clever_age_process')
     {
-        $this->root = $root;
     }
 
     /**

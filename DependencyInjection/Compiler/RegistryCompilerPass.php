@@ -24,25 +24,13 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class RegistryCompilerPass implements CompilerPassInterface
 {
-    /** @var string */
-    protected $registry;
-
-    /** @var string */
-    protected $tag;
-
-    /** @var string */
-    protected $method;
-
     /**
      * @param string $registry
      * @param string $tag
      * @param string $method
      */
-    public function __construct($registry, $tag, $method)
+    public function __construct(protected $registry, protected $tag, protected $method)
     {
-        $this->registry = $registry;
-        $this->tag = $tag;
-        $this->method = $method;
     }
 
     /**

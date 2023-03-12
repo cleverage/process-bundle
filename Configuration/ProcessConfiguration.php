@@ -21,26 +21,8 @@ use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
  */
 class ProcessConfiguration
 {
-    /** @var string */
-    protected $code;
-
     /** @var array */
     protected $options = [];
-
-    /** @var TaskConfiguration */
-    protected $entryPoint;
-
-    /** @var TaskConfiguration */
-    protected $endPoint;
-
-    /** @var string */
-    protected $description;
-
-    /** @var string */
-    protected $help;
-
-    /** @var bool */
-    protected $public;
 
     /** @var TaskConfiguration[] */
     protected $taskConfigurations;
@@ -62,23 +44,17 @@ class ProcessConfiguration
      * @param bool                $public
      */
     public function __construct(
-        $code,
+        protected $code,
         array $taskConfigurations,
         array $options = [],
-        $entryPoint = null,
-        $endPoint = null,
-        $description = '',
-        $help = '',
-        $public = true
+        protected $entryPoint = null,
+        protected $endPoint = null,
+        protected $description = '',
+        protected $help = '',
+        protected $public = true
     ) {
-        $this->code = $code;
         $this->taskConfigurations = $taskConfigurations;
         $this->options = $options;
-        $this->entryPoint = $entryPoint;
-        $this->endPoint = $endPoint;
-        $this->description = $description;
-        $this->public = $public;
-        $this->help = $help;
     }
 
     /**

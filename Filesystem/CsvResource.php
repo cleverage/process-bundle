@@ -18,15 +18,6 @@ namespace CleverAge\ProcessBundle\Filesystem;
  */
 class CsvResource implements WritableStructuredFileInterface, SeekableFileInterface
 {
-    /** @var string */
-    protected $delimiter;
-
-    /** @var string */
-    protected $enclosure;
-
-    /** @var string */
-    protected $escape;
-
     /** @var resource */
     protected $handler;
 
@@ -62,18 +53,15 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
      */
     public function __construct(
         $resource,
-        $delimiter = ',',
-        $enclosure = '"',
-        $escape = '\\',
+        protected $delimiter = ',',
+        protected $enclosure = '"',
+        protected $escape = '\\',
         array $headers = null
     ) {
         if (!\is_resource($resource)) {
             $type = \gettype($resource);
             throw new \UnexpectedValueException("Resource argument must be a resource, '{$type}' given");
         }
-        $this->delimiter = $delimiter;
-        $this->enclosure = $enclosure;
-        $this->escape = $escape;
 
         $this->handler = $resource;
         $this->headers = $this->parseHeaders($headers);

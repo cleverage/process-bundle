@@ -25,12 +25,6 @@ class TaskConfiguration
     public const STRATEGY_SKIP = 'skip';
     public const STRATEGY_STOP = 'stop';
 
-    /** @var string */
-    protected $code;
-
-    /** @var string */
-    protected $serviceReference;
-
     /** @var TaskInterface */
     protected $task;
 
@@ -85,8 +79,8 @@ class TaskConfiguration
      * @param string $logLevel
      */
     public function __construct(
-        $code,
-        $serviceReference,
+        protected $code,
+        protected $serviceReference,
         array $options,
         string $description = '',
         string $help = '',
@@ -95,8 +89,6 @@ class TaskConfiguration
         string $errorStrategy = self::STRATEGY_SKIP,
         string $logLevel = LogLevel::CRITICAL
     ) {
-        $this->code = $code;
-        $this->serviceReference = $serviceReference;
         $this->options = $options;
         $this->description = $description;
         $this->help = $help;

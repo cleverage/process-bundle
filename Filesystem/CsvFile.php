@@ -18,9 +18,6 @@ namespace CleverAge\ProcessBundle\Filesystem;
  */
 class CsvFile extends CsvResource
 {
-    /** @var string */
-    protected $filePath;
-
     /**
      * @param string $filePath  Also accept a resource
      * @param string $delimiter CSV delimiter
@@ -33,15 +30,13 @@ class CsvFile extends CsvResource
      * @throws \UnexpectedValueException
      */
     public function __construct(
-        $filePath,
+        protected $filePath,
         $delimiter = ',',
         $enclosure = '"',
         $escape = '\\',
         array $headers = null,
         $mode = 'rb'
     ) {
-        $this->filePath = $filePath;
-
         if (!\in_array($filePath, ['php://stdin', 'php://stdout', 'php://stderr'])) {
             $dirname = \dirname($this->filePath);
             if (!@mkdir($dirname, 0755, true) && !is_dir($dirname)) {
