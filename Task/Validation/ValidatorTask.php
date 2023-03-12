@@ -61,7 +61,7 @@ class ValidatorTask extends AbstractConfigurableTask
         );
 
         if (0 < $violations->count()) {
-            /** @var  $violation ConstraintViolationInterface */
+            /** @var ConstraintViolationInterface $violation */
             foreach ($violations as $violation) {
                 $invalidValue = $violation->getInvalidValue();
 
