@@ -21,5 +21,5 @@ namespace CleverAge\ProcessBundle\Model;
  */
 interface TaskInterface
 {
-    public function execute(ProcessState $state);
+    public function execute(ProcessState $state): void;
 }

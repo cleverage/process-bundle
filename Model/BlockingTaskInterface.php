@@ -18,5 +18,5 @@ namespace CleverAge\ProcessBundle\Model;
  */
 interface BlockingTaskInterface extends TaskInterface
 {
-    public function proceed(ProcessState $state);
+    public function proceed(ProcessState $state): void;
 }

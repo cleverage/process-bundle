@@ -31,9 +31,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FolderBrowserTask extends AbstractConfigurableTask implements IterableTaskInterface
 {
     /**
-     * @var Iterator|SplFileInfo[]
+     * @var Iterator|SplFileInfo[]|null
      */
-    protected $files;
+    protected Iterator|array|null $files = null;
 
     public function __construct(
         protected LoggerInterface $logger

@@ -29,7 +29,7 @@ class NormalizerTask extends AbstractConfigurableTask
     ) {
     }
 
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
 

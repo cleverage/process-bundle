@@ -94,10 +94,8 @@ class RulesTransformer implements ConfigurableTransformerInterface
 
     /**
      * Configure options for one "rule" block
-     *
-     * @param array|null      $expressionVariables
      */
-    public function configureRuleOptions(OptionsResolver $resolver, $expressionVariables = null)
+    public function configureRuleOptions(OptionsResolver $resolver, ?array $expressionVariables = null): void
     {
         $resolver->setDefaults([
             'condition' => null,

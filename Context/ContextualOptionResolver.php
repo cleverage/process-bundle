@@ -21,7 +21,7 @@ class ContextualOptionResolver
      *
      * @return mixed
      */
-    public function contextualizeOption(string|array $value, array $context)
+    public function contextualizeOption(mixed $value, array $context)
     {
         // Recursively parse options
         if (\is_array($value)) {

@@ -18,5 +18,5 @@ namespace CleverAge\ProcessBundle\Model;
  */
 interface InitializableTaskInterface extends TaskInterface
 {
-    public function initialize(ProcessState $state);
+    public function initialize(ProcessState $state): void;
 }

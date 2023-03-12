@@ -24,10 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implements FinalizableTaskInterface
 {
-    /**
-     * @var CsvResource
-     */
-    protected $csv;
+    protected ?CsvResource $csv = null;
 
     public function finalize(ProcessState $state): void
     {
@@ -36,7 +33,7 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
         }
     }
 
-    protected function initFile(ProcessState $state)
+    protected function initFile(ProcessState $state): void
     {
         if ($this->csv) {
             return;

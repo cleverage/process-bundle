@@ -21,12 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class InputCsvReaderTask extends CsvReaderTask
 {
-    /**
-     * @TODO refactor to get file path outside of options
-     *
-     * @return array
-     */
-    protected function getOptions(ProcessState $state)
+    protected function getOptions(ProcessState $state): array
     {
         $options = parent::getOptions($state);
         if ($state->getInput() !== null) {

@@ -49,10 +49,8 @@ class CsvSplitterTask extends InputCsvReaderTask
      * Moves the internal pointer to the next element,
      * return true if the task has a next element
      * return false if the task has terminated it's iteration
-     *
-     * @return bool
      */
-    public function next(ProcessState $state)
+    public function next(ProcessState $state): bool
     {
         if (! $this->csv instanceof CsvResource) {
             return false;
@@ -75,12 +73,7 @@ class CsvSplitterTask extends InputCsvReaderTask
         }
     }
 
-    /**
-     * @param int     $maxLines
-     *
-     * @return string
-     */
-    protected function splitCsv(CsvFile $csv, $maxLines)
+    protected function splitCsv(CsvFile $csv, int $maxLines): string
     {
         $tmpFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'php_' . uniqid('process', false) . '.csv';
         $tmpFile = fopen($tmpFilePath, 'wb+');

@@ -24,25 +24,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AdvancedStatCounterTask extends AbstractConfigurableTask
 {
-    /**
-     * @var DateTime
-     */
-    protected $startedAt;
+    protected ?DateTime $startedAt = null;
 
-    /**
-     * @var DateTime
-     */
-    protected $lastUpdate;
+    protected ?DateTime $lastUpdate = null;
 
-    /**
-     * @var int
-     */
-    protected $counter = 0;
+    protected int $counter = 0;
 
-    /**
-     * @var int
-     */
-    protected $preInitCounter = 0;
+    protected int $preInitCounter = 0;
 
     public function __construct(
         protected LoggerInterface $logger

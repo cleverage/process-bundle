@@ -21,10 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractConfigurableTask implements InitializableTaskInterface
 {
-    /**
-     * @var array
-     */
-    protected $options;
+    protected ?array $options;
 
     /**
      * Only validate the options at initialization, ensuring that the task will not fail at runtime
@@ -34,10 +31,7 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
         $this->getOptions($state);
     }
 
-    /**
-     * @return array
-     */
-    protected function getOptions(ProcessState $state)
+    protected function getOptions(ProcessState $state): ?array
     {
         if ($this->options === null) {
             $resolver = new OptionsResolver();
@@ -48,12 +42,7 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
         return $this->options;
     }
 
-    /**
-     * @param string       $code
-     *
-     * @return mixed
-     */
-    protected function getOption(ProcessState $state, $code)
+    protected function getOption(ProcessState $state, string $code): mixed
     {
         $options = $this->getOptions($state);
         if (! array_key_exists($code, $options)) {

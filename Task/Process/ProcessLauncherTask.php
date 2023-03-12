@@ -65,6 +65,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             $state->setOutput($this->finishedBuffers->dequeue());
 
             // After dequeue, stop flush
+            /** @phpstan-ignore-next-line */
             if ($this->finishedBuffers->isEmpty()) {
                 $this->flushMode = false;
             }
@@ -88,10 +89,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         }
     }
 
-    /**
-     * @return bool
-     */
-    public function next(ProcessState $state)
+    public function next(ProcessState $state): bool
     {
         $this->handleProcesses($state);
 
@@ -112,7 +110,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         return false;
     }
 
-    protected function handleInput(ProcessState $state)
+    protected function handleInput(ProcessState $state): void
     {
         $options = $this->getOptions($state);
         while (\count($this->launchedProcesses) >= $options['max_processes']) {
@@ -133,10 +131,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         usleep($options['sleep_interval_after_launch']);
     }
 
-    /**
-     * @return SubprocessInstance
-     */
-    protected function launchProcess(ProcessState $state)
+    protected function launchProcess(ProcessState $state): SubprocessInstance
     {
         $input = $state->getInput() !== null ? (string) $state->getInput() : null;
 
@@ -154,7 +149,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             ->start();
     }
 
-    protected function handleProcesses(ProcessState $state)
+    protected function handleProcesses(ProcessState $state): void
     {
         foreach ($this->launchedProcesses as $key => $process) {
             if (! $process->getProcess()->isTerminated()) {
@@ -246,7 +241,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     /**
      * Kill all running processes
      */
-    protected function killProcesses()
+    protected function killProcesses(): void
     {
         foreach ($this->launchedProcesses as $process) {
             $process->stop(5);

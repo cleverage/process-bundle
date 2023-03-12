@@ -18,5 +18,5 @@ namespace CleverAge\ProcessBundle\Model;
  */
 interface FlushableTaskInterface extends TaskInterface
 {
-    public function flush(ProcessState $state);
+    public function flush(ProcessState $state): void;
 }

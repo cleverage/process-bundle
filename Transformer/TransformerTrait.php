@@ -23,15 +23,12 @@ use Throwable;
 
 trait TransformerTrait
 {
-    /**
-     * @var TransformerRegistry
-     */
-    protected $transformerRegistry;
+    protected ?TransformerRegistry $transformerRegistry = null;
 
     /**
      * Transform the list of transformer codes + options into a list of Closure (better performances)
      */
-    public function normalizeTransformers(Options $options, $transformers): array
+    public function normalizeTransformers(Options $options, array $transformers): array
     {
         $transformerClosures = [];
 
@@ -101,11 +98,10 @@ trait TransformerTrait
         return $transformerCode;
     }
 
-    /**
-     * @param string          $optionName
-     */
-    protected function configureTransformersOptions(OptionsResolver $resolver, $optionName = 'transformers')
-    {
+    protected function configureTransformersOptions(
+        OptionsResolver $resolver,
+        string $optionName = 'transformers'
+    ): void {
         $resolver->setDefault($optionName, []);
         $resolver->setAllowedTypes($optionName, ['array']);
         $resolver->setNormalizer($optionName, Closure::fromCallable([$this, 'normalizeTransformers']));

@@ -31,7 +31,7 @@ class XmlWriterTask extends AbstractConfigurableTask
     ) {
     }
 
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $input = $state->getInput();
         if (! $input instanceof DOMDocument) {

@@ -23,7 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractCsvTask extends AbstractCsvResourceTask
 {
-    protected function initFile(ProcessState $state)
+    protected function initFile(ProcessState $state): void
     {
         if ($this->csv) {
             return;

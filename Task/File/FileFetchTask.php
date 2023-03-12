@@ -17,6 +17,7 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemException;
 use League\Flysystem\MountManager;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -53,8 +54,8 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
         // Configure options
         parent::initialize($state);
 
-        $this->sourceFS = $this->mountManager->get($this->getOption($state, 'source_filesystem'));
-        $this->destinationFS = $this->mountManager->getFilesystem($this->getOption($state, 'destination_filesystem'));
+        $this->sourceFS = new Filesystem($this->getOption($state, 'source_filesystem'));
+        $this->destinationFS = new Filesystem($this->getOption($state, 'destination_filesystem'));
     }
 
     public function execute(ProcessState $state): void
@@ -113,24 +114,22 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
     protected function doFileCopy(ProcessState $state, string $filename, bool $removeSource): string|bool|null
     {
         $prefixFrom = $this->getOption($state, 'source_filesystem');
-        $prefixTo = $this->getOption($state, 'destination_filesystem');
 
-        $buffer = $this->mountManager->getFilesystem($prefixFrom)
-            ->readStream($filename);
+        $buffer = $this->sourceFS->readStream($filename);
 
-        if ($buffer === false) {
-            return false;
+        try {
+            $this->destinationFS->writeStream($filename, $buffer);
+            $result = true;
+        } catch (FilesystemException) {
+            $result = false;
         }
-
-        $result = $this->mountManager->getFilesystem($prefixTo)
-            ->putStream($filename, $buffer);
 
         if (is_resource($buffer)) {
             fclose($buffer);
         }
 
         if ($removeSource) {
-            $this->mountManager->delete(sprintf('%s://%s', $prefixFrom, $filename));
+            $this->sourceFS->delete(sprintf('%s://%s', $prefixFrom, $filename));
         }
 
         return $result ? $filename : null;

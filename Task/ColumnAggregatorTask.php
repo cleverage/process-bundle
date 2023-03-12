@@ -29,10 +29,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
 {
     use ConditionTrait;
 
-    /**
-     * @var array
-     */
-    protected $result = [];
+    protected array $result = [];
 
     public function __construct(
         PropertyAccessorInterface $accessor,
@@ -41,7 +38,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         $this->accessor = $accessor;
     }
 
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $input = $state->getInput();
         $columns = $this->getOption($state, 'columns');
@@ -84,13 +81,12 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         $state->setOutput($this->result);
     }
 
-    /**
-     * @param string $column
-     * @param string $referenceKey
-     * @param string $aggregationKey
-     */
-    protected function addValueToAggregationGroup($column, mixed $input, $referenceKey, $aggregationKey)
-    {
+    protected function addValueToAggregationGroup(
+        mixed $column,
+        mixed $input,
+        string $referenceKey,
+        string $aggregationKey
+    ): void {
         if (! isset($this->result[$column])) {
             $this->result[$column] = [
                 $referenceKey => $column,

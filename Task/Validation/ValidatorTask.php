@@ -35,7 +35,7 @@ class ValidatorTask extends AbstractConfigurableTask
     ) {
     }
 
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
         $violations = $this->validator->validate($state->getInput(), $options['constraints'], $options['groups']);

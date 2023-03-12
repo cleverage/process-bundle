@@ -41,9 +41,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 
     public function proceed(ProcessState $state): void
     {
-        if ($this->csv) {
-            $state->setOutput($this->csv->getFilePath());
-        }
+        $state->setOutput($this->csv->getFilePath());
     }
 
     protected function configureOptions(OptionsResolver $resolver)
@@ -57,25 +55,18 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 
         $resolver->setNormalizer(
             'file_path',
-            static function (Options $options, $value): string {
-                $value = strtr(
-                    $value,
-                    [
-                        '{date}' => date('Ymd'),
-                        '{date_time}' => date('Ymd_His'),
-                        '{unique_token}' => uniqid(),
-                    ]
-                );
-
-                return $value;
-            }
+            static fn (Options $options, $value): string => strtr(
+                $value,
+                [
+                    '{date}' => date('Ymd'),
+                    '{date_time}' => date('Ymd_His'),
+                    '{unique_token}' => uniqid('', true),
+                ]
+            )
         );
     }
 
-    /**
-     * @return array
-     */
-    protected function getInput(ProcessState $state)
+    protected function getInput(ProcessState $state): array
     {
         $input = $state->getInput();
         if (! \is_array($input)) {
@@ -83,8 +74,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         }
         $splitCharacter = $this->getOption($state, 'split_character');
 
-        /** @var array $input */
-        foreach ($input as $key => &$item) {
+        foreach ($input as &$item) {
             if (\is_array($item)) {
                 $item = implode($splitCharacter, $item);
             }
@@ -93,10 +83,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         return $input;
     }
 
-    /**
-     * @return array
-     */
-    protected function getHeaders(ProcessState $state, array $options)
+    protected function getHeaders(ProcessState $state, array $options): array
     {
         $headers = $options['headers'];
         if ($headers === null) {

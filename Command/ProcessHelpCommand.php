@@ -179,9 +179,7 @@ class ProcessHelpCommand extends Command
             }
 
             if (! empty($task->getPreviousTasksConfigurations())) {
-                $weight /= is_countable($task->getPreviousTasksConfigurations()) ? \count(
-                    $task->getPreviousTasksConfigurations()
-                ) : 0;
+                $weight /= \count($task->getPreviousTasksConfigurations());
             }
 
             $taskWeights[$taskCandidate] = $weight;
@@ -230,16 +228,13 @@ class ProcessHelpCommand extends Command
 
     /**
      * Merge needed branches, display a task node, split following needed branches
-     *
-     * @param array                $branches
-     * @param string               $taskCode
      */
     protected function resolveBranchOutput(
-        &$branches,
-        $taskCode,
+        array &$branches,
+        string $taskCode,
         ProcessConfiguration $process,
         OutputInterface $output
-    ) {
+    ): void {
         $task = $process->getTaskConfiguration($taskCode);
         $branchesToMerge = [];
         $gapBranches = [];
@@ -453,18 +448,13 @@ class ProcessHelpCommand extends Command
         $this->writeBranches($output, $branches);
     }
 
-    /**
-     * @param array           $branches
-     * @param string          $comment
-     * @param callable        $match
-     */
     protected function writeBranches(
         OutputInterface $output,
-        $branches,
+        array $branches,
         string|iterable $comment = '',
-        $match = null,
+        ?callable $match = null,
         string|callable $char = null
-    ) {
+    ): void {
         $output->write(str_repeat(' ', self::INDENT_SIZE));
 
         // Merge lines
@@ -492,10 +482,7 @@ class ProcessHelpCommand extends Command
         $output->writeln($comment);
     }
 
-    /**
-     * @return string
-     */
-    protected function getTaskDescription(TaskConfiguration $task)
+    protected function getTaskDescription(TaskConfiguration $task): string
     {
         $description = $task->getCode();
         $interfaces = [];
@@ -533,10 +520,7 @@ class ProcessHelpCommand extends Command
         return $description;
     }
 
-    /**
-     * @return mixed
-     */
-    protected function getTaskService(TaskConfiguration $taskConfiguration)
+    protected function getTaskService(TaskConfiguration $taskConfiguration): mixed
     {
         // Duplicate code from \CleverAge\ProcessBundle\Manager\ProcessManager::initialize
         // @todo Refactor this using a Registry with this feature:

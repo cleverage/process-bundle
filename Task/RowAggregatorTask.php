@@ -42,7 +42,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
      * Store inputs and once everything has been received, pass to next task
      * Once an output has been generated this task is reset, and may wait for another loop
      */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $input = $state->getInput();
 

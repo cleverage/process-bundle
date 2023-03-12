@@ -25,10 +25,7 @@ use UnexpectedValueException;
  */
 abstract class AbstractIterableOutputTask extends AbstractConfigurableTask implements IterableTaskInterface
 {
-    /**
-     * @var Iterator
-     */
-    protected $iterator;
+    protected ?Iterator $iterator = null;
 
     public function execute(ProcessState $state): void
     {
@@ -48,10 +45,8 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
      * Moves the internal pointer to the next element,
      * return true if the task has a next element
      * return false if the task has terminated it's iteration
-     *
-     * @return bool
      */
-    public function next(ProcessState $state)
+    public function next(ProcessState $state): bool
     {
         if (! $this->iterator) {
             return false;
@@ -73,7 +68,7 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
     /**
      * Create or recreate an iterator from input
      */
-    protected function handleIteratorFromInput(ProcessState $state)
+    protected function handleIteratorFromInput(ProcessState $state): void
     {
         if ($this->iterator instanceof Iterator) {
             if ($this->iterator->valid()) {
@@ -84,6 +79,7 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
         }
 
         // This should never be reached
+        /** @phpstan-ignore-next-line */
         if ($this->iterator !== null) {
             throw new UnexpectedValueException(
                 "At this point iterator should have been null, maybe it's a wrong type..."

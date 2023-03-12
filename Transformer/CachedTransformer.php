@@ -104,7 +104,7 @@ class CachedTransformer implements ConfigurableTransformerInterface
         return 'cached';
     }
 
-    protected function generateCacheKey($cacheKeyRoot, $value, $options): bool|string
+    protected function generateCacheKey(string $cacheKeyRoot, string $value, array $options): bool|string
     {
         $value = $this->applyTransformers($options['key_transformers'], $value);
 

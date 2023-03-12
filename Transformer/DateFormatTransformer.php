@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use DateTime;
 use DateTimeInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use UnexpectedValueException;
@@ -26,18 +25,13 @@ use UnexpectedValueException;
  * transformers:
  *     date_format:
  *         format: Y-m-d
- *
- * @TODO deprecated v4.0 : remove string input
- * @TODO deprecated v4.0 : no false output
  */
 class DateFormatTransformer implements ConfigurableTransformerInterface
 {
     /**
      * @param mixed $value
-     *
-     * @return mixed|string
      */
-    public function transform($value, array $options = [])
+    public function transform($value, array $options = []): mixed
     {
         if (! $value) {
             return $value;
@@ -45,22 +39,11 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
 
         if ($value instanceof DateTimeInterface) {
             $date = $value;
-        } elseif (is_string($value)) {
-            @trigger_error('String input will be deprecated in v4.0', E_USER_DEPRECATED);
-            $date = new DateTime($value);
         } else {
             throw new UnexpectedValueException('Given value cannot be parsed into a date');
         }
 
-        $result = $date->format($options['format']);
-        if ($result === false) {
-            @trigger_error(
-                'The date cannot be formatted, this will throw an error starting from v4.0',
-                E_USER_DEPRECATED
-            );
-        }
-
-        return $result;
+        return $date->format($options['format']);
     }
 
     public function getCode(): string

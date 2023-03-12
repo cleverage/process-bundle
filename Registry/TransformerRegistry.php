@@ -25,9 +25,9 @@ class TransformerRegistry
     /**
      * @var TransformerInterface[]
      */
-    protected $transformers = [];
+    protected array $transformers = [];
 
-    public function addTransformer(TransformerInterface $transformer)
+    public function addTransformer(TransformerInterface $transformer): void
     {
         if (array_key_exists($transformer->getCode(), $this->transformers)) {
             throw new UnexpectedValueException("Transformer {$transformer->getCode()} is already defined");
@@ -38,17 +38,12 @@ class TransformerRegistry
     /**
      * @return TransformerInterface[]
      */
-    public function getTransformers()
+    public function getTransformers(): array
     {
         return $this->transformers;
     }
 
-    /**
-     * @param string $code
-     *
-     * @return TransformerInterface
-     */
-    public function getTransformer($code)
+    public function getTransformer(string $code): TransformerInterface
     {
         if (! $this->hasTransformer($code)) {
             throw MissingTransformerException::create($code);
@@ -57,10 +52,7 @@ class TransformerRegistry
         return $this->transformers[$code];
     }
 
-    /**
-     * @param string $code
-     */
-    public function hasTransformer($code): bool
+    public function hasTransformer(string $code): bool
     {
         return array_key_exists($code, $this->transformers);
     }

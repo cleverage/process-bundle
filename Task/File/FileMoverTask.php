@@ -24,7 +24,7 @@ use UnexpectedValueException;
  */
 class FileMoverTask extends AbstractConfigurableTask
 {
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
         $fs = new Filesystem();
@@ -55,12 +55,7 @@ class FileMoverTask extends AbstractConfigurableTask
         $resolver->setAllowedTypes('autoincrement', ['boolean']);
     }
 
-    /**
-     * @param string $dest
-     *
-     * @return string
-     */
-    protected function makeFilenameUnique($dest)
+    protected function makeFilenameUnique(string $dest): string
     {
         $fs = new Filesystem();
         $i = 1;

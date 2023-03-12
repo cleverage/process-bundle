@@ -28,11 +28,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
-    /**
-     * @param string $root
-     */
     public function __construct(
-        protected $root = 'clever_age_process'
+        protected string $root = 'clever_age_process'
     ) {
     }
 
@@ -54,7 +51,7 @@ class Configuration implements ConfigurationInterface
     /**
      * "generic_transformers" root configuration
      */
-    protected function appendRootTransformersConfigDefinition(NodeBuilder $definition)
+    protected function appendRootTransformersConfigDefinition(NodeBuilder $definition): void
     {
         /** @var ArrayNodeDefinition $transformersArrayDefinition */
         $transformersArrayDefinition = $definition->arrayNode('generic_transformers')
@@ -74,7 +71,7 @@ class Configuration implements ConfigurationInterface
     /**
      * Single transformer configuration
      */
-    protected function appendTransformerConfigDefinition(NodeBuilder $definition)
+    protected function appendTransformerConfigDefinition(NodeBuilder $definition): void
     {
         $definition
             ->arrayNode('contextual_options')
@@ -91,7 +88,7 @@ class Configuration implements ConfigurationInterface
      * "configurations" root configuration
      * @TODO rename this root as "processes"
      */
-    protected function appendRootProcessConfigDefinition(NodeBuilder $definition)
+    protected function appendRootProcessConfigDefinition(NodeBuilder $definition): void
     {
         /** @var ArrayNodeDefinition $configurationsArrayDefinition */
         $configurationsArrayDefinition = $definition->arrayNode('configurations')
@@ -108,7 +105,7 @@ class Configuration implements ConfigurationInterface
         $this->appendProcessConfigDefinition($processListDefinition);
     }
 
-    protected function appendProcessConfigDefinition(NodeBuilder $definition)
+    protected function appendProcessConfigDefinition(NodeBuilder $definition): void
     {
         $definition
             ->scalarNode('entry_point')
@@ -147,7 +144,7 @@ class Configuration implements ConfigurationInterface
         $this->appendTaskConfigDefinition($taskListDefinition);
     }
 
-    protected function appendTaskConfigDefinition(NodeBuilder $definition)
+    protected function appendTaskConfigDefinition(NodeBuilder $definition): void
     {
         $logLevels = [
             LogLevel::EMERGENCY,
@@ -199,7 +196,7 @@ class Configuration implements ConfigurationInterface
      *
      * @TODO remove this once support for Symfony 3 and 4 is dropped
      */
-    protected function deprecateNode(NodeDefinition $node, string $package, string $version, string $message)
+    protected function deprecateNode(NodeDefinition $node, string $package, string $version, string $message): void
     {
         $node->setDeprecated($package, $version, $message);
     }

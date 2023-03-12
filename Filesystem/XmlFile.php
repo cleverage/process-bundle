@@ -41,12 +41,12 @@ class XmlFile
         return $dom;
     }
 
-    public function write(DOMDocument $dom)
+    public function write(DOMDocument $dom): void
     {
         $content = $dom->saveXML();
         $result = $this->file->fwrite($content);
 
-        if ($result === null) {
+        if ($result === false) {
             throw new RuntimeException('Could not write content to file');
         }
     }

@@ -34,9 +34,7 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
     /**
      * Must return the transformed $value
      *
-     * @param array $values
-     *
-     * @return mixed[] $value
+     * @param mixed $values
      */
     public function transform($values, array $options = []): array
     {
@@ -45,7 +43,6 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
         }
 
         $results = [];
-        /** @noinspection ForeachSourceInspection */
         foreach ($values as $key => $item) {
             try {
                 $item = $this->applyTransformers($options['transformers'], $item);

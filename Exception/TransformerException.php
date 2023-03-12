@@ -21,17 +21,11 @@ use Throwable;
  */
 class TransformerException extends RuntimeException implements ProcessExceptionInterface
 {
-    /**
-     * @var string
-     */
-    protected $targetProperty;
+    protected string $targetProperty;
 
-    /**
-     * @param string $transformerCode
-     */
     public function __construct(
-        protected $transformerCode,
-        $code = 0,
+        protected string $transformerCode,
+        int $code = 0,
         Throwable $previous = null
     ) {
         parent::__construct('', $code, $previous);
@@ -44,7 +38,7 @@ class TransformerException extends RuntimeException implements ProcessExceptionI
         $this->updateMessage();
     }
 
-    protected function updateMessage()
+    protected function updateMessage(): void
     {
         if (isset($this->targetProperty)) {
             $m = sprintf(

@@ -21,10 +21,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 trait ConditionTrait
 {
-    /**
-     * @var PropertyAccessorInterface
-     */
-    protected $accessor;
+    protected ?PropertyAccessorInterface $accessor = null;
 
     /**
      * Test the input with the given set of conditions
@@ -76,7 +73,7 @@ trait ConditionTrait
     /**
      * Configure available condition rules in a wrapper option
      */
-    protected function configureWrappedConditionOptions(string $wrapperKey, OptionsResolver $resolver)
+    protected function configureWrappedConditionOptions(string $wrapperKey, OptionsResolver $resolver): void
     {
         $resolver->setDefault($wrapperKey, []);
         $resolver->setAllowedTypes($wrapperKey, ['array']);
@@ -94,7 +91,7 @@ trait ConditionTrait
     /**
      * Configure available condition rules
      */
-    protected function configureConditionOptions(OptionsResolver $resolver)
+    protected function configureConditionOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('not_match', []);
         $resolver->setDefault('match', []);
@@ -166,7 +163,7 @@ trait ConditionTrait
      *
      * @return mixed|null
      */
-    protected function getValue($input, $key)
+    protected function getValue($input, $key): mixed
     {
         if ($key === '') {
             $currentValue = $input;

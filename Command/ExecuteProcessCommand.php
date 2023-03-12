@@ -124,7 +124,7 @@ class ExecuteProcessCommand extends Command
         return $context;
     }
 
-    protected function handleOutputData(mixed $data, InputInterface $input, OutputInterface $output)
+    protected function handleOutputData(mixed $data, InputInterface $input, OutputInterface $output): void
     {
         // Skip all if undefined
         if (! $input->getOption('output-format')) {

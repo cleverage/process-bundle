@@ -229,9 +229,7 @@ class ProcessManager
         $this->taskConfiguration = $taskConfiguration;
 
         if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP
-            && (is_countable($taskConfiguration->getErrorOutputs()) ? \count(
-                $taskConfiguration->getErrorOutputs()
-            ) : 0) > 0) {
+            && (\count($taskConfiguration->getErrorOutputs())) > 0) {
             $m = "Task configuration {$taskConfiguration->getCode()} has error outputs ";
             $m .= "but it's error strategy 'stop' implies they will never be reached.";
             $this->taskLogger->debug($m);

@@ -25,17 +25,11 @@ use UnexpectedValueException;
  */
 class ArrayMergeTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
-    /**
-     * @var array
-     */
     protected const MERGE_FUNC = ['array_merge', 'array_merge_recursive', 'array_replace', 'array_replace_recursive'];
 
-    /**
-     * @var array
-     */
-    protected $mergedOutput = [];
+    protected array $mergedOutput = [];
 
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $input = $state->getInput();
         if (! \is_array($input)) {

@@ -19,10 +19,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 
 class JsonStreamReaderTask implements IterableTaskInterface
 {
-    /**
-     * @var JsonStreamFile
-     */
-    protected $file;
+    protected ?JsonStreamFile $file = null;
 
     public function execute(ProcessState $state): void
     {
@@ -38,7 +35,7 @@ class JsonStreamReaderTask implements IterableTaskInterface
         }
     }
 
-    public function next(ProcessState $state)
+    public function next(ProcessState $state): bool
     {
         $eof = $this->file->isEndOfFile();
         if ($eof) {
@@ -48,7 +45,7 @@ class JsonStreamReaderTask implements IterableTaskInterface
         return ! $eof;
     }
 
-    protected function getFilePath(ProcessState $state)
+    protected function getFilePath(ProcessState $state): string
     {
         return $state->getInput();
     }

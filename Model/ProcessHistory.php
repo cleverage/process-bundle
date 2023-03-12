@@ -32,17 +32,11 @@ class ProcessHistory implements Stringable
 
     protected string $processCode;
 
-    protected DateTime $startDate;
+    protected ?DateTime $startDate;
 
-    /**
-     * @var DateTime
-     */
-    protected $endDate;
+    protected ?DateTime $endDate = null;
 
-    /**
-     * @var string
-     */
-    protected $state = self::STATE_STARTED;
+    protected string $state = self::STATE_STARTED;
 
     public function __construct(
         ProcessConfiguration $processConfiguration,
@@ -82,10 +76,7 @@ class ProcessHistory implements Stringable
         return $this->startDate;
     }
 
-    /**
-     * @return DateTime
-     */
-    public function getEndDate()
+    public function getEndDate(): ?DateTime
     {
         return $this->endDate;
     }
@@ -128,10 +119,8 @@ class ProcessHistory implements Stringable
 
     /**
      * Get process duration in seconds
-     *
-     * @return int|null
      */
-    public function getDuration()
+    public function getDuration(): ?int
     {
         if ($this->getEndDate()) {
             return $this->getEndDate()

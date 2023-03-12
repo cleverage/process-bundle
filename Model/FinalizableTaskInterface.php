@@ -18,5 +18,5 @@ namespace CleverAge\ProcessBundle\Model;
  */
 interface FinalizableTaskInterface extends TaskInterface
 {
-    public function finalize(ProcessState $state);
+    public function finalize(ProcessState $state): void;
 }

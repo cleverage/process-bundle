@@ -43,10 +43,8 @@ class MappingTransformer implements ConfigurableTransformerInterface
      * Must return the transformed $value
      *
      * @param mixed $input
-     *
-     * @return mixed
      */
-    public function transform($input, array $options = [])
+    public function transform($input, array $options = []): mixed
     {
         if (! empty($options['initial_value']) && $options['keep_input']) {
             throw new InvalidOptionsException(
@@ -173,7 +171,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
         return 'mapping';
     }
 
-    protected function configureMappingOptions(OptionsResolver $resolver)
+    protected function configureMappingOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -192,10 +190,8 @@ class MappingTransformer implements ConfigurableTransformerInterface
 
     /**
      * Custom rules to get a value from an input object or array
-     *
-     * @return mixed
      */
-    protected function extractInputValue(mixed $input, string $sourceProperty)
+    protected function extractInputValue(mixed $input, string $sourceProperty): mixed
     {
         if ($sourceProperty === '.') {
             return $input;
@@ -210,7 +206,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
      * @TODO WARNING there is no error if framework.property_access.throw_exception_on_invalid_index is false (which is
      *       the default)
      */
-    protected function handleInputMissingExceptions(RuntimeException $missingPropertyError, string $srcKey)
+    protected function handleInputMissingExceptions(RuntimeException $missingPropertyError, string $srcKey): void
     {
         $this->logger->debug(
             'Mapping exception',
