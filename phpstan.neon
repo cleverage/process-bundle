@@ -1,7 +1,7 @@
 parameters:
     level: 6
     paths:
-        - .
+        - src
     excludePaths:
         - ecs.php
         - vendor/*

@@ -33,7 +33,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "CleverAge\\ProcessBundle\\": ""
+      "CleverAge\\ProcessBundle\\": "src"
     }
   },
   "require": {
