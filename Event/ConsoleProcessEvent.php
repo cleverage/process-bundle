@@ -20,32 +20,16 @@ class ConsoleProcessEvent extends GenericEvent
 {
     const EVENT_CLI_INIT = 'cleverage_process.cli.init';
 
-    /** @var InputInterface */
-    private $consoleInput;
-
-    /** @var OutputInterface */
-    private $consoleOutput;
-
-    /** @var mixed */
-    private $processInput;
-
-    /** @var array */
-    private $processContext;
-
     /**
      * ConsoleProcessEvent constructor.
      *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
+     * @param InputInterface $consoleInput
+     * @param OutputInterface $consoleOutput
      * @param mixed           $processInput
      * @param array           $processContext
      */
-    public function __construct(InputInterface $input, OutputInterface $output, $processInput, array $processContext)
+    public function __construct(private InputInterface $consoleInput, private OutputInterface $consoleOutput, private $processInput, private array $processContext)
     {
-        $this->consoleInput = $input;
-        $this->consoleOutput = $output;
-        $this->processInput = $processInput;
-        $this->processContext = $processContext;
     }
 
 
