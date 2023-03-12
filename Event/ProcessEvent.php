@@ -25,12 +25,6 @@ class ProcessEvent extends GenericEvent
     /** @var string */
     protected $processCode;
 
-    /** @var mixed */
-    protected $processInput;
-
-    /** @var mixed */
-    protected $processOutput;
-
     /** @var array */
     protected $processContext;
 
@@ -48,14 +42,12 @@ class ProcessEvent extends GenericEvent
      */
     public function __construct(
         string $processCode,
-        $processInput = null,
+        protected $processInput = null,
         array $processContext = [],
-        $processOutput = null,
+        protected $processOutput = null,
         \Throwable $processError = null
     ) {
         $this->processCode = $processCode;
-        $this->processInput = $processInput;
-        $this->processOutput = $processOutput;
         $this->processContext = $processContext;
         $this->processError = $processError;
     }
