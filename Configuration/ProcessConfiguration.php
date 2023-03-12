@@ -36,7 +36,6 @@ class ProcessConfiguration
     /**
      * @param string              $code
      * @param TaskConfiguration[] $taskConfigurations
-     * @param array               $options
      * @param string              $entryPoint
      * @param string              $endPoint
      * @param string              $description
@@ -57,17 +56,11 @@ class ProcessConfiguration
         $this->options = $options;
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return array
-     */
     public function getOptions(): array
     {
         return $this->options;
@@ -75,8 +68,6 @@ class ProcessConfiguration
 
     /**
      * @throws MissingTaskConfigurationException
-     *
-     * @return TaskConfiguration|null
      */
     public function getEntryPoint(): ?TaskConfiguration
     {
@@ -89,8 +80,6 @@ class ProcessConfiguration
 
     /**
      * @throws MissingTaskConfigurationException
-     *
-     * @return TaskConfiguration|null
      */
     public function getEndPoint(): ?TaskConfiguration
     {
@@ -101,33 +90,21 @@ class ProcessConfiguration
         return $this->getTaskConfiguration($this->endPoint);
     }
 
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @return string
-     */
     public function getHelp(): string
     {
         return $this->help;
     }
 
-    /**
-     * @return bool
-     */
     public function isPublic(): bool
     {
         return $this->public;
     }
 
-    /**
-     * @return bool
-     */
     public function isPrivate(): bool
     {
         return !$this->public;
@@ -142,11 +119,9 @@ class ProcessConfiguration
     }
 
     /**
-     * @param string $taskCode
      *
      * @throws MissingTaskConfigurationException
      *
-     * @return TaskConfiguration
      */
     public function getTaskConfiguration(string $taskCode): TaskConfiguration
     {
@@ -163,8 +138,6 @@ class ProcessConfiguration
      * If one task depend from another, it should come after
      *
      * @throws MissingTaskConfigurationException
-     *
-     * @return array
      */
     public function getDependencyGroups(): array
     {
@@ -198,8 +171,6 @@ class ProcessConfiguration
      * If one task depend from another, it should come after
      *
      * @throws MissingTaskConfigurationException
-     *
-     * @return array
      */
     public function getMainTaskGroup(): array
     {
@@ -272,10 +243,7 @@ class ProcessConfiguration
     /**
      * Cross all relations of a task to find all dependencies, and append them to the given array
      *
-     * @param TaskConfiguration $taskConfig
-     * @param array             $dependencies
      *
-     * @return array
      */
     protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies = []): array
     {
@@ -304,11 +272,9 @@ class ProcessConfiguration
     /**
      * Sort the tasks by dependencies
      *
-     * @param array $dependencies
      *
      * @throws MissingTaskConfigurationException
      *
-     * @return array
      */
     protected function sortDependencies(array $dependencies): array
     {
@@ -318,7 +284,7 @@ class ProcessConfiguration
 
         try {
             $this->checkCircularDependencies();
-        } catch (CircularProcessException $e) {
+        } catch (CircularProcessException) {
             // Skipping the sort phase, it will throw later, on runtime
             return $dependencies;
         }

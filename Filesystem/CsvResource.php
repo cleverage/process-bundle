@@ -10,6 +10,9 @@
 
 namespace CleverAge\ProcessBundle\Filesystem;
 
+use UnexpectedValueException;
+use RuntimeException;
+use LogicException;
 /**
  * Read and write CSV resources through a simple API.
  *
@@ -49,7 +52,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
      * @param string   $escape
      * @param array    $headers   Leave null to read the headers from the file
      *
-     * @throws \UnexpectedValueException
+     * @throws UnexpectedValueException
      */
     public function __construct(
         $resource,
@@ -60,7 +63,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     ) {
         if (!\is_resource($resource)) {
             $type = \gettype($resource);
-            throw new \UnexpectedValueException("Resource argument must be a resource, '{$type}' given");
+            throw new UnexpectedValueException("Resource argument must be a resource, '{$type}' given");
         }
 
         $this->handler = $resource;
@@ -68,25 +71,16 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         $this->headerCount = \count($this->headers);
     }
 
-    /**
-     * @return string
-     */
     public function getDelimiter(): string
     {
         return $this->delimiter;
     }
 
-    /**
-     * @return string
-     */
     public function getEnclosure(): string
     {
         return $this->enclosure;
     }
 
-    /**
-     * @return string
-     */
     public function getEscape(): string
     {
         return $this->escape;
@@ -108,8 +102,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
      * This can be very slow.
      *
      * @return int
-     *@throws \RuntimeException
-     *
+     * @throws RuntimeException
      */
     public function getLineCount(): int
     {
@@ -148,7 +141,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /**
      * Write headers to the file
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function writeHeaders(): void
     {
@@ -161,14 +154,14 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     public function getLineNumber(): int
     {
         if ($this->seekCalled) {
-            throw new \LogicException('Cannot get current line number after calling "seek": the line number is lost');
+            throw new LogicException('Cannot get current line number after calling "seek": the line number is lost');
         }
 
         return $this->lineNumber;
     }
 
     /**
-     * @throws \RuntimeException
+     * @throws RuntimeException
      *
      * @return bool
      */
@@ -184,11 +177,9 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
      *
      * @param null|int $length
      *
-     * @throws \RuntimeException
-     *
-     * @return array|false
+     * @throws RuntimeException
      */
-    public function readRaw($length = null)
+    public function readRaw($length = null): array|false
     {
         $this->assertOpened();
         ++$this->lineNumber;
@@ -199,8 +190,8 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /**
      * @param int|null $length
      *
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
+     * @throws UnexpectedValueException
+     * @throws RuntimeException
      *
      * @return array
      */
@@ -218,19 +209,19 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
                 return null;
             }
             $message = "Unable to parse data {$filePosition} for {$this->getResourceName()}";
-            throw new \UnexpectedValueException($message);
+            throw new UnexpectedValueException($message);
         }
 
         $count = \count($values);
         if ($count !== $this->headerCount) {
             $message = "Number of columns not matching {$filePosition} for {$this->getResourceName()}: ";
             $message .= "{$count} columns for {$this->headerCount} headers";
-            throw new \UnexpectedValueException($message);
+            throw new UnexpectedValueException($message);
         }
 
         $combined = array_combine($this->headers, $values);
         if (false === $combined) {
-            throw new \RuntimeException('Cannot combine headers with values');
+            throw new RuntimeException('Cannot combine headers with values');
         }
 
         return $combined;
@@ -239,11 +230,8 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /**
      * Warning, this function will return exactly the same value as the fgetcsv() function.
      *
-     * @param array $fields
      *
-     * @throws \RuntimeException
-     *
-     * @return int
+     * @throws RuntimeException
      */
     public function writeRaw(array $fields): int
     {
@@ -256,7 +244,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /**
      * @param array $fields
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      *
      * @return int
      */
@@ -266,21 +254,21 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         if ($count !== $this->headerCount) {
             $message = "Trying to write an invalid number of columns for {$this->getResourceName()}: ";
             $message .= "{$count} columns for {$this->headerCount} headers";
-            throw new \UnexpectedValueException($message);
+            throw new UnexpectedValueException($message);
         }
 
         $parsedFields = [];
         foreach ($this->headers as $column) {
             if (!array_key_exists($column, $fields)) {
                 $message = "Missing column {$column} in given fields for {$this->getResourceName()}";
-                throw new \UnexpectedValueException($message);
+                throw new UnexpectedValueException($message);
             }
             $parsedFields[$column] = $fields[$column];
         }
 
         $length = $this->writeRaw($parsedFields);
         if (false === $length) {
-            throw new \RuntimeException("Unable to write data to {$this->getResourceName()}");
+            throw new RuntimeException("Unable to write data to {$this->getResourceName()}");
         }
 
         return $length;
@@ -289,13 +277,13 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /**
      * This methods rewinds the file to the first line of data, skipping the headers.
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function rewind(): void
     {
         $this->assertOpened();
         if (!rewind($this->handler)) {
-            throw new \RuntimeException("Unable to rewind '{$this->getResourceName()}'");
+            throw new RuntimeException("Unable to rewind '{$this->getResourceName()}'");
         }
         $this->lineNumber = 1;
         if (!$this->manualHeaders) {
@@ -304,7 +292,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     }
 
     /**
-     * @throws \RuntimeException
+     * @throws RuntimeException
      *
      * @return int
      */
@@ -318,7 +306,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /**
      * @param int $offset
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      *
      * @return int
      */
@@ -330,9 +318,6 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         return fseek($this->handler, $offset);
     }
 
-    /**
-     * @return bool
-     */
     public function close(): bool
     {
         if ($this->closed) {
@@ -344,17 +329,11 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         return $this->closed;
     }
 
-    /**
-     * @return bool
-     */
     public function isManualHeaders(): bool
     {
         return $this->manualHeaders;
     }
 
-    /**
-     * @return bool
-     */
     public function isClosed(): bool
     {
         return $this->closed;
@@ -369,21 +348,18 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     }
 
     /**
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     protected function assertOpened(): void
     {
         if ($this->closed) {
-            throw new \RuntimeException("{$this->getResourceName()} was closed earlier");
+            throw new RuntimeException("{$this->getResourceName()} was closed earlier");
         }
     }
 
     /**
-     * @param array $headers
      *
-     * @throws \UnexpectedValueException
-     *
-     * @return array
+     * @throws UnexpectedValueException
      */
     protected function parseHeaders(array $headers = null): array
     {
@@ -391,23 +367,23 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         if (null === $headers) {
             $autoHeaders = $this->readRaw();
             if (false === $autoHeaders || 0 === \count($autoHeaders)) {
-                throw new \UnexpectedValueException("Unable to read headers for {$this->getResourceName()}");
+                throw new UnexpectedValueException("Unable to read headers for {$this->getResourceName()}");
             }
             // Remove BOM if any
             $bom = pack('H*', 'EFBBBF');
-            $autoHeaders[0] = preg_replace("/^{$bom}/", '', $autoHeaders[0]);
+            $autoHeaders[0] = preg_replace("/^{$bom}/", '', (string) $autoHeaders[0]);
 
             return $autoHeaders;
         }
 
         $this->manualHeaders = true;
         if (null === $headers || !\is_array($headers)) {
-            throw new \UnexpectedValueException(
+            throw new UnexpectedValueException(
                 "Invalid headers for {$this->getResourceName()}, you need to pass the headers manually"
             );
         }
         if (0 === \count($headers)) {
-            throw new \UnexpectedValueException(
+            throw new UnexpectedValueException(
                 "Empty headers for {$this->getResourceName()}, you need to pass the headers manually"
             );
         }
@@ -415,9 +391,6 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         return $headers;
     }
 
-    /**
-     * @return string
-     */
     protected function getResourceName(): string
     {
         return "CSV resource '{$this->handler}'";

@@ -22,8 +22,8 @@ use Psr\Log\LogLevel;
  */
 class TaskConfiguration
 {
-    public const STRATEGY_SKIP = 'skip';
-    public const STRATEGY_STOP = 'stop';
+    final public const STRATEGY_SKIP = 'skip';
+    final public const STRATEGY_STOP = 'stop';
 
     /** @var TaskInterface */
     protected $task;
@@ -70,13 +70,6 @@ class TaskConfiguration
     /**
      * @param string $code
      * @param string $serviceReference
-     * @param array  $options
-     * @param string $description
-     * @param string $help
-     * @param array  $outputs
-     * @param array  $errorOutputs
-     * @param string $errorStrategy
-     * @param string $logLevel
      */
     public function __construct(
         protected $code,
@@ -99,17 +92,11 @@ class TaskConfiguration
         $this->logErrors = $logLevel !== LogLevel::DEBUG; // @deprecated, remove me in next version
     }
 
-    /**
-     * @return string
-     */
     public function getCode(): string
     {
         return $this->code;
     }
 
-    /**
-     * @return string
-     */
     public function getServiceReference(): string
     {
         return $this->serviceReference;
@@ -123,33 +110,21 @@ class TaskConfiguration
         return $this->task;
     }
 
-    /**
-     * @param TaskInterface $task
-     */
     public function setTask(TaskInterface $task)
     {
         $this->task = $task;
     }
 
-    /**
-     * @return string
-     */
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    /**
-     * @return string
-     */
     public function getHelp(): string
     {
         return $this->help;
     }
 
-    /**
-     * @return array
-     */
     public function getOptions(): array
     {
         return $this->options;
@@ -157,11 +132,10 @@ class TaskConfiguration
 
     /**
      * @param string $code
-     * @param mixed  $default
      *
      * @return mixed
      */
-    public function getOption($code, $default = null)
+    public function getOption($code, mixed $default = null)
     {
         if (array_key_exists($code, $this->options)) {
             return $this->options[$code];
@@ -170,16 +144,12 @@ class TaskConfiguration
         return $default;
     }
 
-    /**
-     * @return array
-     */
     public function getOutputs(): array
     {
         return $this->outputs;
     }
 
     /**
-     * @return array
      * @deprecated Use getErrorOutputs method instead
      *
      */
@@ -190,25 +160,16 @@ class TaskConfiguration
         return $this->getErrorOutputs();
     }
 
-    /**
-     * @return array
-     */
     public function getErrorOutputs(): array
     {
         return $this->errorOutputs;
     }
 
-    /**
-     * @return ProcessState
-     */
     public function getState(): ProcessState
     {
         return $this->state;
     }
 
-    /**
-     * @param ProcessState $state
-     */
     public function setState(ProcessState $state)
     {
         $this->state = $state;
@@ -222,9 +183,6 @@ class TaskConfiguration
         return $this->nextTasksConfigurations;
     }
 
-    /**
-     * @param TaskConfiguration $nextTaskConfiguration
-     */
     public function addNextTaskConfiguration(TaskConfiguration $nextTaskConfiguration)
     {
         $this->nextTasksConfigurations[] = $nextTaskConfiguration;
@@ -238,9 +196,6 @@ class TaskConfiguration
         return $this->previousTasksConfigurations;
     }
 
-    /**
-     * @param TaskConfiguration $previousTaskConfiguration
-     */
     public function addPreviousTaskConfiguration(TaskConfiguration $previousTaskConfiguration)
     {
         $this->previousTasksConfigurations[] = $previousTaskConfiguration;
@@ -254,33 +209,21 @@ class TaskConfiguration
         return $this->errorTasksConfigurations;
     }
 
-    /**
-     * @param TaskConfiguration $errorTaskConfiguration
-     */
     public function addErrorTaskConfiguration(TaskConfiguration $errorTaskConfiguration)
     {
         $this->errorTasksConfigurations[] = $errorTaskConfiguration;
     }
 
-    /**
-     * @return bool
-     */
     public function isInErrorBranch(): bool
     {
         return $this->inErrorBranch;
     }
 
-    /**
-     * @param bool $inErrorBranch
-     */
     public function setInErrorBranch(bool $inErrorBranch)
     {
         $this->inErrorBranch = $inErrorBranch;
     }
 
-    /**
-     * @return bool
-     */
     public function isRoot(): bool
     {
         return empty($this->getPreviousTasksConfigurations()) && !$this->isInErrorBranch();
@@ -289,7 +232,6 @@ class TaskConfiguration
     /**
      * Check task ancestors to find if it have a given task as parent
      *
-     * @param TaskConfiguration $taskConfig
      *
      * @return bool
      */
@@ -316,9 +258,7 @@ class TaskConfiguration
     /**
      * Check task ancestors to find if it have a given task as child
      *
-     * @param TaskConfiguration $taskConfig
      * @param bool              $checkErrors
-     *
      * @return bool
      */
     public function hasDescendant(TaskConfiguration $taskConfig, $checkErrors = true)
@@ -358,24 +298,17 @@ class TaskConfiguration
         return false;
     }
 
-    /**
-     * @return string
-     */
     public function getErrorStrategy(): string
     {
         return $this->errorStrategy;
     }
 
-    /**
-     * @return string
-     */
     public function getLogLevel(): string
     {
         return $this->logLevel;
     }
 
     /**
-     * @return bool
      * @deprecated Use getLogLevel instead
      *
      */

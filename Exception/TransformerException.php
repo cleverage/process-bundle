@@ -10,13 +10,15 @@
 
 namespace CleverAge\ProcessBundle\Exception;
 
+use RuntimeException;
+use Throwable;
 /**
  * Runtime error that should wrap any Transformation error
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class TransformerException extends \RuntimeException implements ProcessExceptionInterface
+class TransformerException extends RuntimeException implements ProcessExceptionInterface
 {
     /** @var string */
     protected $targetProperty;
@@ -25,15 +27,12 @@ class TransformerException extends \RuntimeException implements ProcessException
      * {@inheritDoc}
      * @param string $transformerCode
      */
-    public function __construct(protected $transformerCode, $code = 0, \Throwable $previous = null)
+    public function __construct(protected $transformerCode, $code = 0, Throwable $previous = null)
     {
         parent::__construct('', $code, $previous);
         $this->updateMessage();
     }
 
-    /**
-     * @param string $targetProperty
-     */
     public function setTargetProperty(string $targetProperty): void
     {
         $this->targetProperty = $targetProperty;

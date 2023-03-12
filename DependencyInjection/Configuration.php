@@ -10,6 +10,8 @@
 
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
+use RuntimeException;
+use ReflectionMethod;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -38,7 +40,7 @@ class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      */
     public function getConfigTreeBuilder()
     {
@@ -62,8 +64,6 @@ class Configuration implements ConfigurationInterface
 
     /**
      * "generic_transformers" root configuration
-     *
-     * @param NodeBuilder $definition
      */
     protected function appendRootTransformersConfigDefinition(NodeBuilder $definition)
     {
@@ -84,8 +84,6 @@ class Configuration implements ConfigurationInterface
 
     /**
      * Single transformer configuration
-     *
-     * @param NodeBuilder $definition
      */
     protected function appendTransformerConfigDefinition(NodeBuilder $definition)
     {
@@ -97,8 +95,6 @@ class Configuration implements ConfigurationInterface
     /**
      * "configurations" root configuration
      * @TODO rename this root as "processes"
-     *
-     * @param NodeBuilder $definition
      */
     protected function appendRootProcessConfigDefinition(NodeBuilder $definition)
     {
@@ -117,9 +113,6 @@ class Configuration implements ConfigurationInterface
         $this->appendProcessConfigDefinition($processListDefinition);
     }
 
-    /**
-     * @param NodeBuilder $definition
-     */
     protected function appendProcessConfigDefinition(NodeBuilder $definition)
     {
         $definition
@@ -146,9 +139,6 @@ class Configuration implements ConfigurationInterface
         $this->appendTaskConfigDefinition($taskListDefinition);
     }
 
-    /**
-     * @param NodeBuilder $definition
-     */
     protected function appendTaskConfigDefinition(NodeBuilder $definition)
     {
         $logLevels = [
@@ -181,9 +171,7 @@ class Configuration implements ConfigurationInterface
             $definition->arrayNode($nodeName)
                 ->beforeNormalization()
                 ->ifString()->then(
-                    function ($item) {
-                        return [$item];
-                    }
+                    fn($item) => [$item]
                 )->end()
                 ->prototype('scalar');
         }
@@ -194,15 +182,10 @@ class Configuration implements ConfigurationInterface
      * Provides compatibility with Sf3, 4 and 5
      *
      * @TODO remove this once support for Symfony 3 and 4 is dropped
-     *
-     * @param NodeDefinition $node
-     * @param string         $package
-     * @param string         $version
-     * @param string         $message
      */
     protected function deprecateNode(NodeDefinition $node, string $package, string $version, string $message)
     {
-        $deprecationMethodReflection = new \ReflectionMethod(NodeDefinition::class, 'setDeprecated');
+        $deprecationMethodReflection = new ReflectionMethod(NodeDefinition::class, 'setDeprecated');
         if ($deprecationMethodReflection->getNumberOfParameters() === 1) {
             $node->setDeprecated("Since {$package} {$version}: {$message}");
         } else {
