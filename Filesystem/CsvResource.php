@@ -27,20 +27,17 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /** @var int|null */
     protected $lineCount;
 
-    /** @var array */
-    protected $headers;
+    protected array $headers;
 
     /** @var bool */
     protected $manualHeaders = false;
 
-    /** @var int */
-    protected $headerCount;
+    protected int $headerCount;
 
     /** @var int */
     protected $lineNumber = 1;
 
-    /** @var bool */
-    protected $closed;
+    protected bool $closed;
 
     /** @var bool */
     protected $seekCalled = false;
@@ -50,7 +47,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
      * @param string   $delimiter CSV delimiter
      * @param string   $enclosure
      * @param string   $escape
-     * @param array    $headers   Leave null to read the headers from the file
+     * @param mixed[]|null $headers Leave null to read the headers from the file
      *
      * @throws UnexpectedValueException
      */

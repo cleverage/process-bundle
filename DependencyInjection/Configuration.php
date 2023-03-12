@@ -171,7 +171,7 @@ class Configuration implements ConfigurationInterface
             $definition->arrayNode($nodeName)
                 ->beforeNormalization()
                 ->ifString()->then(
-                    fn($item) => [$item]
+                    fn($item): array => [$item]
                 )->end()
                 ->prototype('scalar');
         }

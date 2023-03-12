@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Rector\Config\RectorConfig;
 use Rector\Core\ValueObject\PhpVersion;
 use Rector\Set\ValueObject\LevelSetList;
+use Rector\Set\ValueObject\SetList;
 
 return static function (RectorConfig $rectorConfig): void {
 
@@ -35,6 +36,7 @@ return static function (RectorConfig $rectorConfig): void {
     ]);
 
     $rectorConfig->sets([
+        SetList::TYPE_DECLARATION,
         LevelSetList::UP_TO_PHP_81,
         //SymfonyLevelSetList::UP_TO_SYMFONY_54
     ]);

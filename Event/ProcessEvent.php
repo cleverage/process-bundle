@@ -10,6 +10,7 @@
 
 namespace CleverAge\ProcessBundle\Event;
 
+use Throwable;
 /**
  * Event object for process start/stop/fail
  *
@@ -18,43 +19,17 @@ namespace CleverAge\ProcessBundle\Event;
 class ProcessEvent extends GenericEvent
 {
 
-    const EVENT_PROCESS_STARTED = 'cleverage_process.start';
-    const EVENT_PROCESS_ENDED = 'cleverage_process.end';
-    const EVENT_PROCESS_FAILED = 'cleverage_process.fail';
-
-    /** @var string */
-    protected $processCode;
-
-    /** @var array */
-    protected $processContext;
-
-    /** @var \Throwable|null */
-    protected $processError;
+    final public const EVENT_PROCESS_STARTED = 'cleverage_process.start';
+    final public const EVENT_PROCESS_ENDED = 'cleverage_process.end';
+    final public const EVENT_PROCESS_FAILED = 'cleverage_process.fail';
 
     /**
      * ProcessEvent constructor.
-     *
-     * @param string          $processCode
-     * @param mixed           $processInput
-     * @param array           $processContext
-     * @param mixed           $processOutput
-     * @param \Throwable|null $processError
      */
-    public function __construct(
-        string $processCode,
-        protected $processInput = null,
-        array $processContext = [],
-        protected $processOutput = null,
-        \Throwable $processError = null
-    ) {
-        $this->processCode = $processCode;
-        $this->processContext = $processContext;
-        $this->processError = $processError;
+    public function __construct(protected string $processCode, protected mixed $processInput = null, protected array $processContext = [], protected mixed $processOutput = null, protected ?Throwable $processError = null)
+    {
     }
 
-    /**
-     * @return string
-     */
     public function getProcessCode(): string
     {
         return $this->processCode;
@@ -76,18 +51,12 @@ class ProcessEvent extends GenericEvent
         return $this->processOutput;
     }
 
-    /**
-     * @return array
-     */
     public function getProcessContext(): array
     {
         return $this->processContext;
     }
 
-    /**
-     * @return \Throwable|null
-     */
-    public function getProcessError(): ?\Throwable
+    public function getProcessError(): ?Throwable
     {
         return $this->processError;
     }

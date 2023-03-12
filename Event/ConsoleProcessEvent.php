@@ -18,32 +18,21 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ConsoleProcessEvent extends GenericEvent
 {
-    const EVENT_CLI_INIT = 'cleverage_process.cli.init';
+    final public const EVENT_CLI_INIT = 'cleverage_process.cli.init';
 
     /**
      * ConsoleProcessEvent constructor.
-     *
-     * @param InputInterface $consoleInput
-     * @param OutputInterface $consoleOutput
-     * @param mixed           $processInput
-     * @param array           $processContext
      */
-    public function __construct(private InputInterface $consoleInput, private OutputInterface $consoleOutput, private $processInput, private array $processContext)
+    public function __construct(private readonly InputInterface $consoleInput, private readonly OutputInterface $consoleOutput, private readonly mixed $processInput, private readonly array $processContext)
     {
     }
 
 
-    /**
-     * @return InputInterface
-     */
     public function getConsoleInput(): InputInterface
     {
         return $this->consoleInput;
     }
 
-    /**
-     * @return OutputInterface
-     */
     public function getConsoleOutput(): OutputInterface
     {
         return $this->consoleOutput;
@@ -57,9 +46,6 @@ class ConsoleProcessEvent extends GenericEvent
         return $this->processInput;
     }
 
-    /**
-     * @return array
-     */
     public function getProcessContext(): array
     {
         return $this->processContext;

@@ -10,12 +10,12 @@
 
 namespace CleverAge\ProcessBundle\Command;
 
+use Exception;
 use CleverAge\ProcessBundle\Event\ConsoleProcessEvent;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -32,27 +32,13 @@ use Symfony\Component\Yaml\Parser;
  */
 class ExecuteProcessCommand extends Command
 {
-    public const OUTPUT_STDOUT = '-';
+    final public const OUTPUT_STDOUT = '-';
 
-    public const OUTPUT_FORMAT_DUMP = 'dump';
-    public const OUTPUT_FORMAT_JSON = 'json-stream';
+    final public const OUTPUT_FORMAT_DUMP = 'dump';
+    final public const OUTPUT_FORMAT_JSON = 'json-stream';
 
-    /** @var ProcessManager */
-    protected $processManager;
-
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /**
-     * ExecuteProcessCommand constructor.
-     *
-     * @param ProcessManager           $processManager
-     * @param EventDispatcherInterface $eventDispatcher
-     */
-    public function __construct(ProcessManager $processManager, EventDispatcherInterface $eventDispatcher)
+    public function __construct(protected ProcessManager $processManager, protected EventDispatcherInterface $eventDispatcher)
     {
-        $this->processManager = $processManager;
-        $this->eventDispatcher = $eventDispatcher;
         parent::__construct();
     }
 
@@ -92,7 +78,7 @@ class ExecuteProcessCommand extends Command
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return int|null
      */
@@ -132,13 +118,11 @@ class ExecuteProcessCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
      *
      * @throws InvalidArgumentException
-     *
-     * @return array
+     * @return array<string, mixed>
      */
-    protected function parseContextValues(InputInterface $input)
+    protected function parseContextValues(InputInterface $input): array
     {
         $parser = new Parser();
 
@@ -146,7 +130,7 @@ class ExecuteProcessCommand extends Command
         $contextValues = $input->getOption('context');
         $context = [];
         foreach ($contextValues as $contextValue) {
-            preg_match($pattern, $contextValue, $parts);
+            preg_match($pattern, (string) $contextValue, $parts);
             if (3 !== \count($parts)
                 || $parts[0] !== $contextValue) {
                 throw new \InvalidArgumentException(sprintf('Invalid context %s', $contextValue));
@@ -157,12 +141,7 @@ class ExecuteProcessCommand extends Command
         return $context;
     }
 
-    /**
-     * @param mixed           $data
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     */
-    protected function handleOutputData($data, InputInterface $input, OutputInterface $output)
+    protected function handleOutputData(mixed $data, InputInterface $input, OutputInterface $output)
     {
         // Skip all if undefined
         if (!$input->getOption('output-format')) {
@@ -175,7 +154,7 @@ class ExecuteProcessCommand extends Command
                 if ($input->getOption('output-format') === self::OUTPUT_FORMAT_DUMP && class_exists(VarDumper::class)) {
                     VarDumper::dump($data); // @todo remove this please
                 } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
-                    $output->writeln(json_encode($data));
+                    $output->writeln(json_encode($data, JSON_THROW_ON_ERROR));
                 } else {
                     throw new \InvalidArgumentException(
                         sprintf(
