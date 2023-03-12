@@ -7,18 +7,12 @@ include .env
 endif
 
 # Default image to use for tests
-SF_ENV=sf4
+SF_ENV=sf5
 LOCAL_DOCKER_TAG=cleverage_process:test
 DOCKER_RUN=docker run -it --rm \
 	--mount type=bind,src=$$(pwd),dst=/src-cleverage_process
 
 pull: pull/$(SF_ENV)
-
-pull/sf3:
-	docker pull cleverage/process-bundle:sf3
-
-pull/sf4:
-	docker pull cleverage/process-bundle:sf4
 
 pull/sf5:
 	docker pull cleverage/process-bundle:sf5
@@ -66,3 +60,6 @@ vendor/%:
 	docker container create --name cleverage_process_bundle_tmp cleverage/process-bundle:$(@F)
 	docker cp cleverage_process_bundle_tmp:/app/vendor vendor-$(@F)
 	docker container rm cleverage_process_bundle_tmp
+
+linter:
+	$(DOCKER_RUN) $(LOCAL_DOCKER_TAG) /bin/bash -c "vendor/bin/phpstan"

@@ -65,7 +65,9 @@
     "phpstan/phpstan": "*",
     "phpstan/phpstan-symfony": "*",
     "phpstan/extension-installer": "*",
-    "rector/rector": "*"
+    "rector/rector": "*",
+    "symplify/easy-coding-standard": "*",
+    "symplify/phpstan-rules": "*"
   },
   "suggest": {
     "cleverage/doctrine-process-bundle": "Dedicated bundle for Doctrine dependencies for the process bundle",

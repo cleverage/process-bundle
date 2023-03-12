@@ -7,3 +7,4 @@ parameters:
         - Resources/tests/*
         - Tests/*
         - rector.php
+        - var/*
