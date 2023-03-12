@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,22 +18,17 @@ use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
 
 /**
  * Holds the processes configuration to launch a task
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ProcessConfiguration
 {
-    /** @var array */
-    protected $options = [];
-
-    /** @var TaskConfiguration[] */
-    protected $taskConfigurations;
-
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $dependencyGroups;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $mainTaskGroup;
 
     /**
@@ -44,16 +42,14 @@ class ProcessConfiguration
      */
     public function __construct(
         protected $code,
-        array $taskConfigurations,
-        array $options = [],
+        protected array $taskConfigurations,
+        protected array $options = [],
         protected $entryPoint = null,
         protected $endPoint = null,
         protected $description = '',
         protected $help = '',
         protected $public = true
     ) {
-        $this->taskConfigurations = $taskConfigurations;
-        $this->options = $options;
     }
 
     public function getCode(): string
@@ -66,24 +62,18 @@ class ProcessConfiguration
         return $this->options;
     }
 
-    /**
-     * @throws MissingTaskConfigurationException
-     */
     public function getEntryPoint(): ?TaskConfiguration
     {
-        if (null === $this->entryPoint) {
+        if ($this->entryPoint === null) {
             return null;
         }
 
         return $this->getTaskConfiguration($this->entryPoint);
     }
 
-    /**
-     * @throws MissingTaskConfigurationException
-     */
     public function getEndPoint(): ?TaskConfiguration
     {
-        if (null === $this->endPoint) {
+        if ($this->endPoint === null) {
             return null;
         }
 
@@ -107,7 +97,7 @@ class ProcessConfiguration
 
     public function isPrivate(): bool
     {
-        return !$this->public;
+        return ! $this->public;
     }
 
     /**
@@ -118,14 +108,9 @@ class ProcessConfiguration
         return $this->taskConfigurations;
     }
 
-    /**
-     *
-     * @throws MissingTaskConfigurationException
-     *
-     */
     public function getTaskConfiguration(string $taskCode): TaskConfiguration
     {
-        if (!array_key_exists($taskCode, $this->taskConfigurations)) {
+        if (! array_key_exists($taskCode, $this->taskConfigurations)) {
             throw MissingTaskConfigurationException::create($taskCode);
         }
 
@@ -136,12 +121,10 @@ class ProcessConfiguration
      * Group all task by dependencies
      *
      * If one task depend from another, it should come after
-     *
-     * @throws MissingTaskConfigurationException
      */
     public function getDependencyGroups(): array
     {
-        if (null === $this->dependencyGroups) {
+        if ($this->dependencyGroups === null) {
             $this->dependencyGroups = [];
             foreach ($this->getTaskConfigurations() as $taskConfiguration) {
                 $isInBranch = false;
@@ -152,7 +135,7 @@ class ProcessConfiguration
                     }
                 }
 
-                if (!$isInBranch) {
+                if (! $isInBranch) {
                     $dependencies = $this->buildDependencies($taskConfiguration);
                     $dependencies = $this->sortDependencies($dependencies);
 
@@ -169,12 +152,10 @@ class ProcessConfiguration
      * It may be defined by the entry_point, or the end_point or simply the first task
      *
      * If one task depend from another, it should come after
-     *
-     * @throws MissingTaskConfigurationException
      */
     public function getMainTaskGroup(): array
     {
-        if (null === $this->mainTaskGroup) {
+        if ($this->mainTaskGroup === null) {
             $this->mainTaskGroup = [];
             $mainTask = $this->getMainTask();
 
@@ -192,27 +173,23 @@ class ProcessConfiguration
     /**
      * Get the most important task (may be the entry or end task, or simply the first)
      * Used to check which tree should be used
-     *
-     * @throws MissingTaskConfigurationException
-     *
-     * @return TaskConfiguration
      */
     public function getMainTask(): ?TaskConfiguration
     {
         $entryTask = $this->getEntryPoint();
 
         // If there's no entry point, we might use the end point
-        if (!$entryTask) {
+        if (! $entryTask) {
             $entryTask = $this->getEndPoint();
         }
 
         // By default use the first defined task
-        if (!$entryTask) {
+        if (! $entryTask) {
             $entryTask = reset($this->taskConfigurations);
         }
 
         // May happen with an empty array
-        if($entryTask === false) {
+        if ($entryTask === false) {
             return null;
         }
 
@@ -221,8 +198,6 @@ class ProcessConfiguration
 
     /**
      * Assert the process does not contain circular dependencies
-     *
-     * @throws CircularProcessException
      */
     public function checkCircularDependencies(): void
     {
@@ -242,15 +217,13 @@ class ProcessConfiguration
 
     /**
      * Cross all relations of a task to find all dependencies, and append them to the given array
-     *
-     *
      */
     protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies = []): array
     {
         $code = $taskConfig->getCode();
 
         // May have been added by previous task
-        if (!\in_array($code, $dependencies, true)) {
+        if (! \in_array($code, $dependencies, true)) {
             $dependencies[] = $code;
 
             foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
@@ -271,10 +244,6 @@ class ProcessConfiguration
 
     /**
      * Sort the tasks by dependencies
-     *
-     *
-     * @throws MissingTaskConfigurationException
-     *
      */
     protected function sortDependencies(array $dependencies): array
     {

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,18 +13,15 @@
 
 namespace CleverAge\ProcessBundle\Exception;
 
+use UnexpectedValueException;
+
 /**
  * Exception thrown when trying to fetch a missing task configuration
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class MissingTaskConfigurationException extends \UnexpectedValueException implements ProcessExceptionInterface
+class MissingTaskConfigurationException extends UnexpectedValueException implements ProcessExceptionInterface
 {
     /**
      * @param string $code
-     *
-     * @return MissingTaskConfigurationException
      */
     public static function create($code): self
     {

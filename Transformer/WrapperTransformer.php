@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,51 +13,30 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class WrapperTransformer
- *
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
- */
 class WrapperTransformer implements ConfigurableTransformerInterface
 {
-
     /**
      * Must return the transformed $value
-     *
-     * @param mixed $input
-     * @param array $options
-     *
-     * @return mixed $value
      */
-    public function transform($input, array $options = [])
+    public function transform(mixed $input, array $options = []): array
     {
-        return [$options['wrapper_key'] => $input];
+        return [
+            $options['wrapper_key'] => $input,
+        ];
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws ExceptionInterface
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(
-            [
-                'wrapper_key',
-            ]
-        );
+        $resolver->setRequired(['wrapper_key']);
         $resolver->setAllowedTypes('wrapper_key', ['string', 'int']);
     }
 
     /**
      * Returns the unique code to identify the transformer
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return 'wrapper';
     }

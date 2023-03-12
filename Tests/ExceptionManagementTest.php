@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,29 +18,15 @@ namespace CleverAge\ProcessBundle\Tests;
  */
 class ExceptionManagementTest extends AbstractProcessTest
 {
-
     /**
      * Assert errors in the middle of an iteration does not skip subsequent loops and does not spam "error" flow
      */
-    public function testSetExceptionInTheMiddle()
+    public function testSetExceptionInTheMiddle(): void
     {
         $result = $this->processManager->execute('test.exception_management.set_exception_in_the_middle');
 
-        self::assertEquals(
-            [
-                'abc',
-                'bcd',
-                'cde',
-                'def',
-            ],
-            $result['success']
-        );
+        self::assertEquals(['abc', 'bcd', 'cde', 'def'], $result['success']);
 
-        self::assertEquals(
-            [
-                1,
-            ],
-            $result['errors']
-        );
+        self::assertEquals([1], $result['errors']);
     }
 }

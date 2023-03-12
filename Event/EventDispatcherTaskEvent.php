@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,38 +15,19 @@ namespace CleverAge\ProcessBundle\Event;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
 
-/**
- * Class EventDispatcherTaskEvent
- *
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
- */
 class EventDispatcherTaskEvent extends GenericEvent
 {
-    /**
-     * @var ProcessState
-     */
-    protected $state;
-
-    /**
-     * @param ProcessState $state
-     */
-    public function __construct(ProcessState $state)
-    {
-        $this->state = $state;
+    public function __construct(
+        protected ProcessState $state
+    ) {
     }
 
-    /**
-     * @return ProcessState
-     */
-    public function getState()
+    public function getState(): ProcessState
     {
         return $this->state;
     }
 
-    /**
-     * @param ProcessState $state
-     */
-    public function setState($state)
+    public function setState(ProcessState $state): void
     {
         $this->state = $state;
     }

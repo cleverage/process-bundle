@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,44 +13,24 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
+use ArrayIterator;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
+use Iterator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Always send the same output regardless of the input, only accepts array for values and iterate over it
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ConstantIterableOutputTask extends AbstractIterableOutputTask
 {
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(
-            [
-                'output',
-            ]
-        );
+        $resolver->setRequired(['output']);
         $resolver->setAllowedTypes('output', ['array']);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws ExceptionInterface
-     * @throws \InvalidArgumentException
-     */
-    protected function initializeIterator(ProcessState $state): \Iterator
+    protected function initializeIterator(ProcessState $state): Iterator
     {
-        return new \ArrayIterator($this->getOption($state, 'output'));
+        return new ArrayIterator($this->getOption($state, 'output'));
     }
 }

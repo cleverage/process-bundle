@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,22 +18,12 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 /**
  * Allow to inject a set of PHP function into an ExpressionLanguage instance
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
  */
 class PhpFunctionProvider implements ExpressionFunctionProviderInterface
 {
-    /** @var array */
-    protected $functions;
-
-    /**
-     * PhpFunctionProvider constructor.
-     *
-     * @param array $functions
-     */
-    public function __construct(array $functions)
-    {
-        $this->functions = $functions;
+    public function __construct(
+        protected array $functions
+    ) {
     }
 
     /**
@@ -38,8 +31,6 @@ class PhpFunctionProvider implements ExpressionFunctionProviderInterface
      */
     public function getFunctions()
     {
-        return array_map(function ($func) {
-            return ExpressionFunction::fromPhp($func);
-        }, $this->functions);
+        return array_map(fn ($func): ExpressionFunction => ExpressionFunction::fromPhp($func), $this->functions);
     }
 }

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,66 +13,42 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use Exception;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
-use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
-use Symfony\Component\OptionsResolver\Exception\NoSuchOptionException;
-use Symfony\Component\OptionsResolver\Exception\OptionDefinitionException;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use UnexpectedValueException;
 
 /**
  * Maps properties of an array/object to an other array/object
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class MappingTransformer implements ConfigurableTransformerInterface
 {
     use TransformerTrait;
 
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /** @var PropertyAccessorInterface */
-    protected $accessor;
-
-    /**
-     * @param TransformerRegistry       $transformerRegistry
-     * @param LoggerInterface           $logger
-     * @param PropertyAccessorInterface $accessor
-     */
     public function __construct(
         TransformerRegistry $transformerRegistry,
-        LoggerInterface $logger,
-        PropertyAccessorInterface $accessor
+        protected LoggerInterface $logger,
+        protected PropertyAccessorInterface $accessor
     ) {
         $this->transformerRegistry = $transformerRegistry;
-        $this->logger = $logger;
-        $this->accessor = $accessor;
     }
 
     /**
      * Must return the transformed $value
      *
      * @param mixed $input
-     * @param array $options
      *
-     * @return mixed $value
-     * @throws \Exception
-     *
+     * @return mixed
      */
     public function transform($input, array $options = [])
     {
-        if (!empty($options['initial_value']) && $options['keep_input']) {
+        if (! empty($options['initial_value']) && $options['keep_input']) {
             throw new InvalidOptionsException(
                 'The options "initial_value" and "keep_input" can\'t be both enabled.'
             );
@@ -87,7 +66,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
             $ignoreMissingFlag = $mapping['ignore_missing'] || $options['ignore_missing'];
 
             // Prepare input value
-            if (null !== $mapping['constant']) {
+            if ($mapping['constant'] !== null) {
                 $inputValue = $mapping['constant'];
             } elseif ($mapping['set_null']) {
                 $inputValue = null;
@@ -125,10 +104,14 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 $this->logger->debug(
                     'Transformation exception',
                     [
-                        'message' => $exception->getPrevious()->getMessage(),
-                        'file' => $exception->getPrevious()->getFile(),
-                        'line' => $exception->getPrevious()->getLine(),
-                        'trace' => $exception->getPrevious()->getTraceAsString(),
+                        'message' => $exception->getPrevious()
+                            ->getMessage(),
+                        'file' => $exception->getPrevious()
+                            ->getFile(),
+                        'line' => $exception->getPrevious()
+                            ->getLine(),
+                        'trace' => $exception->getPrevious()
+                            ->getTraceAsString(),
                     ]
                 );
 
@@ -143,32 +126,16 @@ class MappingTransformer implements ConfigurableTransformerInterface
             } elseif (\is_array($result)) {
                 $result[$targetProperty] = $transformedValue;
             } else {
-                throw new \UnexpectedValueException("Property '{$targetProperty}' is not writable");
+                throw new UnexpectedValueException("Property '{$targetProperty}' is not writable");
             }
         }
 
         return $result;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws OptionDefinitionException
-     * @throws NoSuchOptionException
-     * @throws MissingOptionsException
-     * @throws InvalidOptionsException
-     * @throws UndefinedOptionsException
-     * @throws AccessException
-     * @throws MissingTransformerException
-     * @throws ExceptionInterface
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(
-            [
-                'mapping',
-            ]
-        );
+        $resolver->setRequired(['mapping']);
         $resolver->setAllowedTypes('mapping', ['array']);
         $resolver->setDefaults(
             [
@@ -184,15 +151,13 @@ class MappingTransformer implements ConfigurableTransformerInterface
 
         $resolver->setNormalizer(
             'mapping',
-            function (/** @noinspection PhpUnusedParameterInspection */ Options $options, $value) {
+            function (/** @noinspection PhpUnusedParameterInspection */ Options $options, $value): array {
                 $resolvedMapping = [];
                 $mappingResolver = new OptionsResolver();
                 $this->configureMappingOptions($mappingResolver);
                 /** @var array $value */
                 foreach ($value as $property => $mappingConfig) {
-                    $resolvedMapping[$property] = $mappingResolver->resolve(
-                        $mappingConfig ?? []
-                    );
+                    $resolvedMapping[$property] = $mappingResolver->resolve($mappingConfig ?? []);
                 }
 
                 return $resolvedMapping;
@@ -202,26 +167,12 @@ class MappingTransformer implements ConfigurableTransformerInterface
 
     /**
      * Returns the unique code to identify the transformer
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return 'mapping';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws OptionDefinitionException
-     * @throws NoSuchOptionException
-     * @throws MissingOptionsException
-     * @throws InvalidOptionsException
-     * @throws UndefinedOptionsException
-     * @throws AccessException
-     * @throws MissingTransformerException
-     * @throws ExceptionInterface
-     */
     protected function configureMappingOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
@@ -242,14 +193,9 @@ class MappingTransformer implements ConfigurableTransformerInterface
     /**
      * Custom rules to get a value from an input object or array
      *
-     * @param mixed  $input
-     * @param string $sourceProperty
-     *
-     * @throws RuntimeException
-     *
      * @return mixed
      */
-    protected function extractInputValue($input, string $sourceProperty)
+    protected function extractInputValue(mixed $input, string $sourceProperty)
     {
         if ($sourceProperty === '.') {
             return $input;
@@ -263,9 +209,6 @@ class MappingTransformer implements ConfigurableTransformerInterface
      *
      * @TODO WARNING there is no error if framework.property_access.throw_exception_on_invalid_index is false (which is
      *       the default)
-     *
-     * @param RuntimeException $missingPropertyError
-     * @param string           $srcKey
      */
     protected function handleInputMissingExceptions(RuntimeException $missingPropertyError, string $srcKey)
     {

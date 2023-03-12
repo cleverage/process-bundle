@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -11,6 +14,8 @@
 namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use DateTime;
+use DateTimeInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -19,41 +24,25 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class CachedTransformer implements ConfigurableTransformerInterface
 {
-
-    const CACHE_SEPARATOR = '|';
-
     use TransformerTrait;
 
-    /** @var CacheItemPoolInterface */
-    protected $cache;
+    final public const CACHE_SEPARATOR = '|';
 
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /**
-     * CachedTransformer constructor.
-     *
-     * @param TransformerRegistry    $transformerRegistry
-     * @param CacheItemPoolInterface $cache
-     * @param LoggerInterface        $logger
-     */
     public function __construct(
         TransformerRegistry $transformerRegistry,
-        CacheItemPoolInterface $cache,
-        LoggerInterface $logger
+        protected CacheItemPoolInterface $cache,
+        protected LoggerInterface $logger
     ) {
         $this->transformerRegistry = $transformerRegistry;
-        $this->cache = $cache;
-        $this->logger = $logger;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('cache_key');
         $resolver->setAllowedTypes('cache_key', 'string');
 
         $resolver->setDefault('ttl', null);
-        $resolver->setAllowedTypes('ttl', ['null', 'string', \DateTimeInterface::class]);
+        $resolver->setAllowedTypes('ttl', ['null', 'string', DateTimeInterface::class]);
         $resolver->setNormalizer(
             'ttl',
             function (Options $options, $value) {
@@ -62,7 +51,7 @@ class CachedTransformer implements ConfigurableTransformerInterface
                  * @see https://www.php.net/manual/en/datetime.formats.relative.php
                  */
                 if (is_string($value)) {
-                    $value = new \DateTime($value);
+                    $value = new DateTime($value);
                 }
 
                 return $value;
@@ -81,24 +70,28 @@ class CachedTransformer implements ConfigurableTransformerInterface
                 $cacheItem = $this->cache->getItem($cacheKey);
                 if ($cacheItem->isHit()) {
                     return $cacheItem->get();
-                } else {
-                    $newValue = $this->applyTransformers($options['transformers'], $value);
-                    $cacheItem->set($newValue);
-                    if ($options['ttl']) {
-                        $cacheItem->expiresAt($options['ttl']);
-                    }
-                    $success = $this->cache->saveDeferred($cacheItem);
-
-                    if (!$success) {
-                        $this->logger->warning('Cannot save cache item', ['cache_key' => $cacheKey]);
-                    }
-
-                    return $newValue;
                 }
+                $newValue = $this->applyTransformers($options['transformers'], $value);
+                $cacheItem->set($newValue);
+                if ($options['ttl']) {
+                    $cacheItem->expiresAt($options['ttl']);
+                }
+                $success = $this->cache->saveDeferred($cacheItem);
+
+                if (! $success) {
+                    $this->logger->warning('Cannot save cache item', [
+                        'cache_key' => $cacheKey,
+                    ]);
+                }
+
+                return $newValue;
             } catch (InvalidArgumentException $exception) {
                 $this->logger->warning(
                     'Cannot get cache item',
-                    ['cache_key' => $cacheKey, 'message' => $exception->getMessage()]
+                    [
+                        'cache_key' => $cacheKey,
+                        'message' => $exception->getMessage(),
+                    ]
                 );
             }
         }
@@ -106,20 +99,19 @@ class CachedTransformer implements ConfigurableTransformerInterface
         return $this->applyTransformers($options['transformers'], $value);
     }
 
-    public function getCode()
+    public function getCode(): string
     {
         return 'cached';
     }
 
-    protected function generateCacheKey($cacheKeyRoot, $value, $options)
+    protected function generateCacheKey($cacheKeyRoot, $value, $options): bool|string
     {
         $value = $this->applyTransformers($options['key_transformers'], $value);
 
-        if (!\is_string($value)) {
+        if (! \is_string($value)) {
             return false;
         }
 
         return \implode(self::CACHE_SEPARATOR, [$cacheKeyRoot, \rawurlencode($value)]);
     }
-
 }

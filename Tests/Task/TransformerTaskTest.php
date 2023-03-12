@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -20,11 +23,13 @@ class TransformerTaskTest extends AbstractProcessTest
     /**
      * Assert a simple transformation, from one array to another
      */
-    public function testSimpleMapping()
+    public function testSimpleMapping(): void
     {
         $result = $this->processManager->execute('test.transformer_task.simple', 'value');
 
-        self::assertEquals(['field' => 'value'], $result);
+        self::assertEquals([
+            'field' => 'value',
+        ], $result);
     }
 
     /**
@@ -32,7 +37,7 @@ class TransformerTaskTest extends AbstractProcessTest
      *
      * @expectedException \RuntimeException
      */
-    public function testMissingMapping()
+    public function testMissingMapping(): void
     {
         $this->processManager->execute('test.transformer_task.error', 'value');
     }
@@ -40,10 +45,12 @@ class TransformerTaskTest extends AbstractProcessTest
     /**
      * Assert we can use multiple times the same sub-transformer using # suffixes
      */
-    public function testMultiSubtransformers()
+    public function testMultiSubtransformers(): void
     {
         $result = $this->processManager->execute('test.transformer_task.multi_subtransformers', [3, null, 4, 2]);
 
-        self::assertEquals(['field' => [2, 4, 3]], $result);
+        self::assertEquals([
+            'field' => [2, 4, 3],
+        ], $result);
     }
 }

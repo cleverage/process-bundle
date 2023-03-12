@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,6 +15,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use InvalidArgumentException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -22,37 +26,32 @@ class GenericTransformer implements ConfigurableTransformerInterface
 {
     use TransformerTrait;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $transformerCode;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $preconfiguredTransformerOptions;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $contextualOptions;
 
-    /** @var ContextualOptionResolver */
-    protected $contextualOptionResolver;
-
-    /**
-     * GenericTransformer constructor.
-     *
-     * @param ContextualOptionResolver $contextualOptionResolver
-     * @param TransformerRegistry      $transformerRegistry
-     */
-    public function __construct(ContextualOptionResolver $contextualOptionResolver, TransformerRegistry $transformerRegistry)
-    {
-        $this->contextualOptionResolver = $contextualOptionResolver;
+    public function __construct(
+        protected ContextualOptionResolver $contextualOptionResolver,
+        TransformerRegistry $transformerRegistry
+    ) {
         $this->transformerRegistry = $transformerRegistry;
     }
 
     /**
      * Register the generic options, and load the transformer list
-     *
-     * @param string $code
-     * @param array  $options
      */
-    public function initialize(string $code, array $options = [])
+    public function initialize(string $code, array $options = []): void
     {
         $this->transformerCode = $code;
         $resolver = new OptionsResolver();
@@ -65,14 +64,12 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
     /**
      * Called on instance creation
-     *
-     * @param OptionsResolver $resolver
      */
-    public function configureInitialOptions(OptionsResolver $resolver)
+    public function configureInitialOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('contextual_options', []);
         $resolver->setAllowedTypes('contextual_options', 'array');
-        $resolver->setNormalizer('contextual_options', function (Options $options, $value) {
+        $resolver->setNormalizer('contextual_options', function (Options $options, $value): array {
             $configuration = [];
             foreach ($value as $optionCode => $optionConfig) {
                 $resolver = new OptionsResolver();
@@ -88,8 +85,6 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
     /**
      * Called on process startup, prepare the real transformers
-     *
-     * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver)
     {
@@ -105,9 +100,9 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
         // Get the transformer list + apply transformer option resolution by context
         $this->configureTransformersOptions($resolver);
-        $resolver->setNormalizer('transformers', function (Options $options, $transformerOptions) {
+        $resolver->setNormalizer('transformers', function (Options $options, $transformerOptions): array {
             if ($transformerOptions !== []) {
-                throw new \InvalidArgumentException('Transformers option should not be used at this point');
+                throw new InvalidArgumentException('Transformers option should not be used at this point');
             }
 
             $transformerOptions = $this->normalizeTransformerOptions($options, $this->preconfiguredTransformerOptions);
@@ -117,17 +112,11 @@ class GenericTransformer implements ConfigurableTransformerInterface
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function transform($value, array $options = [])
     {
         return $this->applyTransformers($options['transformers'], $value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function getCode()
     {
         return $this->transformerCode;
@@ -135,13 +124,8 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
     /**
      * Get the real transformer from contextual options + generic definitions
-     *
-     * @param Options $options
-     * @param array   $transformerOptions
-     *
-     * @return array
      */
-    public function normalizeTransformerOptions(Options $options, $transformerOptions)
+    public function normalizeTransformerOptions(Options $options, array $transformerOptions): array
     {
         $contextualizedOptionValues = [];
         foreach ($this->contextualOptions as $contextualOption => $contextualOptionConfig) {
@@ -153,10 +137,8 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
     /**
      * Available options for contextual_options
-     *
-     * @param OptionsResolver $resolver
      */
-    public function configureContextualOptions(OptionsResolver $resolver)
+    public function configureContextualOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('required', true);
         $resolver->setAllowedTypes('required', 'bool');
@@ -166,5 +148,4 @@ class GenericTransformer implements ConfigurableTransformerInterface
         $resolver->setDefault('default_is_null', false);
         $resolver->setAllowedTypes('default_is_null', 'bool');
     }
-
 }

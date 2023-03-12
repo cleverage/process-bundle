@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,7 +18,7 @@ namespace CleverAge\ProcessBundle\Tests;
  */
 class MultiWorkflowTest extends AbstractProcessTest
 {
-    public function testMultiWorkflow()
+    public function testMultiWorkflow(): void
     {
         $this->processManager->execute('test.multi_workflow_process');
 

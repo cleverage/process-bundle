@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,17 +13,9 @@
 
 namespace CleverAge\ProcessBundle\Logger;
 
-/**
- * Class TaskProcessor
- *
- * @package CleverAge\ProcessBundle\Logger
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
- */
 class TaskProcessor extends AbstractProcessor
 {
     /**
-     * @param array $record
-     *
      * @return array
      */
     public function __invoke(array $record)

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,55 +13,38 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
+use ArrayIterator;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Iterator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use UnexpectedValueException;
 
 /**
  * Split a single line into multiple lines based on multiple columns and split characters
- *
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class SplitJoinLineTask extends AbstractIterableOutputTask
 {
-    /**
-     * {@inheritdoc}
-     */
     public function next(ProcessState $state): bool
     {
         $valid = parent::next($state);
-        if (!$valid) {
+        if (! $valid) {
             $this->iterator = null;
         }
 
         return $valid;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     protected function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(
-            [
-                'split_columns',
-                'join_column',
-            ]
-        );
+        $resolver->setRequired(['split_columns', 'join_column']);
         $resolver->setAllowedTypes('split_columns', ['array']);
         $resolver->setAllowedTypes('join_column', ['string']);
-        $resolver->setDefaults(
-            [
-                'split_character' => ',',
-            ]
-        );
+        $resolver->setDefaults([
+            'split_character' => ',',
+        ]);
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @return \Iterator
-     */
-    protected function initializeIterator(ProcessState $state): \Iterator
+    protected function initializeIterator(ProcessState $state): Iterator
     {
         $originalLine = $state->getInput();
         $options = $this->getOptions($state);
@@ -70,10 +56,10 @@ class SplitJoinLineTask extends AbstractIterableOutputTask
 
         $outputLines = [];
         foreach ($options['split_columns'] as $column) {
-            if (!array_key_exists($column, $originalLine)) {
-                throw new \UnexpectedValueException("Missing column {$column}");
+            if (! array_key_exists($column, $originalLine)) {
+                throw new UnexpectedValueException("Missing column {$column}");
             }
-            $columnValues = explode($options['split_character'], $originalLine[$column]);
+            $columnValues = explode($options['split_character'], (string) $originalLine[$column]);
             foreach ($columnValues as $columnValue) {
                 $outputLine = $lineCopy;
                 $outputLine[$options['join_column']] = $columnValue;
@@ -81,6 +67,6 @@ class SplitJoinLineTask extends AbstractIterableOutputTask
             }
         }
 
-        return new \ArrayIterator($outputLines);
+        return new ArrayIterator($outputLines);
     }
 }

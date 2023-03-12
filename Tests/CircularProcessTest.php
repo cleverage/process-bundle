@@ -1,5 +1,8 @@
-<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
+<?php
+
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -19,7 +22,7 @@ class CircularProcessTest extends AbstractProcessTest
     /**
      * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
      */
-    public function testCircularProcess()
+    public function testCircularProcess(): void
     {
         $this->processManager->execute('test.circular_process');
     }
@@ -27,7 +30,7 @@ class CircularProcessTest extends AbstractProcessTest
     /**
      * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
      */
-    public function testReversedCircularProcess()
+    public function testReversedCircularProcess(): void
     {
         $this->processManager->execute('test.circular_process.reversed');
     }
@@ -35,7 +38,7 @@ class CircularProcessTest extends AbstractProcessTest
     /**
      * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
      */
-    public function testSelfCircularProcess()
+    public function testSelfCircularProcess(): void
     {
         $this->processManager->execute('test.circular_process.self');
     }
@@ -45,7 +48,7 @@ class CircularProcessTest extends AbstractProcessTest
      *
      * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
      */
-    public function testLongCircularProcess()
+    public function testLongCircularProcess(): void
     {
         $this->processManager->execute('test.circular_process.long');
     }

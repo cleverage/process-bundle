@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -13,56 +16,30 @@ namespace CleverAge\ProcessBundle\Transformer;
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class TypeSetterTransformer
- *
- * @author Madeline Veyrenc <mveyrenc@clever-age.com>
- */
 class TypeSetterTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('type');
         $resolver->setAllowedValues(
             'type',
-            [
-                'boolean',
-                'bool',
-                'integer',
-                'int',
-                'float',
-                'double',
-                'string',
-                'array',
-                'object',
-                'null',
-            ]
+            ['boolean', 'bool', 'integer', 'int', 'float', 'double', 'string', 'array', 'object', 'null']
         );
         $resolver->setAllowedTypes('type', 'string');
     }
 
-    /**
-     * {@inheritDoc}
-     * @throws \UnexpectedValueException
-     */
     public function transform($value, array $options = [])
     {
         $return = settype($value, $options['type']);
 
-        if (true === $return) {
+        if ($return === true) {
             return $value;
         }
 
         throw new TransformerException("Failed to change value type in {$options['type']}");
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'type_setter';
     }

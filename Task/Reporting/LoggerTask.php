@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -13,57 +16,26 @@ namespace CleverAge\ProcessBundle\Task\Reporting;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Serializer\Exception\CircularReferenceException;
-use Symfony\Component\Serializer\Exception\InvalidArgumentException;
-use Symfony\Component\Serializer\Exception\LogicException;
 
 /**
  * Class LoggerTask
  *
  * Add custom log in state
- *
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class LoggerTask extends AbstractConfigurableTask
 {
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /** @var PropertyAccessorInterface */
-    protected $accessor;
-
     /**
-     * @param LoggerInterface           $logger
-     * @param PropertyAccessorInterface $accessor
-     *
      * @internal param LoggerInterface $logger
      */
     public function __construct(
-        LoggerInterface $logger,
-        PropertyAccessorInterface $accessor
+        protected LoggerInterface $logger,
+        protected PropertyAccessorInterface $accessor
     ) {
-        $this->logger = $logger;
-        $this->accessor = $accessor;
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
-     * @throws \Symfony\Component\PropertyAccess\Exception\AccessException
-     * @throws \Symfony\Component\PropertyAccess\Exception\InvalidArgumentException
-     * @throws UnexpectedTypeException
-     * @throws CircularReferenceException
-     * @throws InvalidArgumentException
-     * @throws LogicException
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
         $context = [];
@@ -78,12 +50,6 @@ class LoggerTask extends AbstractConfigurableTask
         $state->setOutput($state->getInput());
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(

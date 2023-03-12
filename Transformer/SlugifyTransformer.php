@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,15 +13,12 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Transliterator;
 
 /**
  * Slugify a value
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class SlugifyTransformer implements ConfigurableTransformerInterface
 {
@@ -26,20 +26,17 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
      * Must return the transformed $value
      *
      * @param mixed $value
-     * @param array $options
-     *
-     * @return mixed $value
      */
-    public function transform($value, array $options = [])
+    public function transform($value, array $options = []): string
     {
-        /** @var \Transliterator $transliterator */
+        /** @var Transliterator $transliterator */
         $transliterator = $options['transliterator'];
         $string = $transliterator->transliterate($value);
 
         return trim(
             preg_replace(
                 $options['replace'],
-                $options['separator'],
+                (string) $options['separator'],
                 strtolower(trim(strip_tags($string)))
             ),
             $options['separator']
@@ -48,20 +45,13 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
 
     /**
      * Returns the unique code to identify the transformer
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return 'slugify';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws ExceptionInterface
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [
@@ -73,9 +63,7 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
 
         $resolver->setNormalizer(
             'transliterator',
-            static function (Options $options, $value) {
-                return \Transliterator::create($value);
-            }
+            static fn (Options $options, $value): ?Transliterator => Transliterator::create($value)
         );
     }
 }

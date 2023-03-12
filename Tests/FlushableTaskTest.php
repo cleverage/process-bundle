@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,10 +18,7 @@ namespace CleverAge\ProcessBundle\Tests;
  */
 class FlushableTaskTest extends AbstractProcessTest
 {
-    /**
-     * @throws \Exception
-     */
-    public function testSimpleFlushable()
+    public function testSimpleFlushable(): void
     {
         $result = $this->processManager->execute('test.simple_flushable');
 
@@ -27,10 +27,7 @@ class FlushableTaskTest extends AbstractProcessTest
         self::assertEquals([3], $result[1]);
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function testSingleFlushable()
+    public function testSingleFlushable(): void
     {
         $result = $this->processManager->execute('test.single_flushable');
 
@@ -38,10 +35,7 @@ class FlushableTaskTest extends AbstractProcessTest
         self::assertEquals([1], $result[0]);
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function testSimpleFlushableNoIterable()
+    public function testSimpleFlushableNoIterable(): void
     {
         $result = $this->processManager->execute('test.simple_flushable_no_iterable');
 
@@ -49,10 +43,7 @@ class FlushableTaskTest extends AbstractProcessTest
         self::assertEquals([1], $result[0]);
     }
 
-    /**
-     * @throws \Exception
-     */
-    public function testIterableFlushable()
+    public function testIterableFlushable(): void
     {
         $result = $this->processManager->execute('test.iterable_flushable');
 

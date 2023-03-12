@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -18,12 +21,10 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
  */
 class StopTask implements TaskInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $state->setStopped(true);
-        $state->getProcessHistory()->setFailed();
+        $state->getProcessHistory()
+            ->setFailed();
     }
 }

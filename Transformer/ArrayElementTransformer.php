@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,44 +13,26 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Return the nth element of an array
- *
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ArrayElementTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function transform($value, array $options = [])
     {
         return array_values(array_slice($value, $options['index'], 1))[0];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'array_element';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws ExceptionInterface
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(
-            [
-                'index',
-            ]
-        );
+        $resolver->setRequired(['index']);
         $resolver->setAllowedTypes('index', ['integer']);
     }
 }

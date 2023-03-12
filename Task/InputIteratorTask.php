@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,33 +13,30 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Model\IterableTaskInterface;
+use ArrayIterator;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Iterator;
+use IteratorAggregate;
+use UnexpectedValueException;
 
 /**
  * Iterates from the input of the previous task
- *
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class InputIteratorTask extends AbstractIterableOutputTask
 {
-    /**
-     * @inheritDoc
-     */
-    protected function initializeIterator(ProcessState $state): \Iterator
+    protected function initializeIterator(ProcessState $state): Iterator
     {
         $input = $state->getInput();
-        if ($input instanceof \Iterator) {
+        if ($input instanceof Iterator) {
             return $input;
         }
-        if ($input instanceof \IteratorAggregate) {
+        if ($input instanceof IteratorAggregate) {
             return $input->getIterator();
         }
         if (\is_array($input)) {
-            return new \ArrayIterator($input);
+            return new ArrayIterator($input);
         }
 
-        throw new \UnexpectedValueException('Cannot create iterator from input');
+        throw new UnexpectedValueException('Cannot create iterator from input');
     }
 }

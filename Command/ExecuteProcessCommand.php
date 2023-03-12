@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,43 +13,37 @@
 
 namespace CleverAge\ProcessBundle\Command;
 
-use Exception;
 use CleverAge\ProcessBundle\Event\ConsoleProcessEvent;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
+use InvalidArgumentException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\Yaml\Parser;
 
 /**
  * Run a process from the command line interface
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ExecuteProcessCommand extends Command
 {
     final public const OUTPUT_STDOUT = '-';
 
     final public const OUTPUT_FORMAT_DUMP = 'dump';
+
     final public const OUTPUT_FORMAT_JSON = 'json-stream';
 
-    public function __construct(protected ProcessManager $processManager, protected EventDispatcherInterface $eventDispatcher)
-    {
+    public function __construct(
+        protected ProcessManager $processManager,
+        protected EventDispatcherInterface $eventDispatcher
+    ) {
         parent::__construct();
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws InvalidArgumentException
-     */
     protected function configure()
     {
         $this->setName('cleverage:process:execute');
@@ -74,34 +71,22 @@ class ExecuteProcessCommand extends Command
         $this->addOption('output-format', 't', InputOption::VALUE_OPTIONAL, 'Output format');
     }
 
-    /**
-     * @param InputInterface  $input
-     * @param OutputInterface $output
-     *
-     * @throws Exception
-     *
-     * @return int|null
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $inputData = $input->getOption('input');
         if ($input->getOption('input-from-stdin')) {
             $inputData = '';
-            while (!feof(STDIN)) {
+            while (! feof(STDIN)) {
                 $inputData .= fread(STDIN, 8192);
             }
         }
 
         $context = $this->parseContextValues($input);
 
-        $this->eventDispatcher->dispatch(
-            new ConsoleProcessEvent($input, $output, $inputData, $context),
-            ConsoleProcessEvent::EVENT_CLI_INIT
-        );
+        $this->eventDispatcher->dispatch(new ConsoleProcessEvent($input, $output, $inputData, $context));
 
-        /** @noinspection ForeachSourceInspection */
         foreach ($input->getArgument('processCodes') as $code) {
-            if (!$output->isQuiet()) {
+            if (! $output->isQuiet()) {
                 $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
 
@@ -109,17 +94,15 @@ class ExecuteProcessCommand extends Command
             $returnValue = $this->processManager->execute($code, $inputData, $context);
             $this->handleOutputData($returnValue, $input, $output);
 
-            if (!$output->isQuiet()) {
+            if (! $output->isQuiet()) {
                 $output->writeln("<info>Process '{$code}' executed successfully</info>");
             }
         }
 
-        return 0;
+        return Command::SUCCESS;
     }
 
     /**
-     *
-     * @throws InvalidArgumentException
      * @return array<string, mixed>
      */
     protected function parseContextValues(InputInterface $input): array
@@ -131,9 +114,9 @@ class ExecuteProcessCommand extends Command
         $context = [];
         foreach ($contextValues as $contextValue) {
             preg_match($pattern, (string) $contextValue, $parts);
-            if (3 !== \count($parts)
+            if (\count($parts) !== 3
                 || $parts[0] !== $contextValue) {
-                throw new \InvalidArgumentException(sprintf('Invalid context %s', $contextValue));
+                throw new InvalidArgumentException(sprintf('Invalid context %s', $contextValue));
             }
             $context[$parts[1]] = $parser->parse($parts[2]);
         }
@@ -144,7 +127,7 @@ class ExecuteProcessCommand extends Command
     protected function handleOutputData(mixed $data, InputInterface $input, OutputInterface $output)
     {
         // Skip all if undefined
-        if (!$input->getOption('output-format')) {
+        if (! $input->getOption('output-format')) {
             return;
         }
 
@@ -156,18 +139,15 @@ class ExecuteProcessCommand extends Command
                 } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
                     $output->writeln(json_encode($data, JSON_THROW_ON_ERROR));
                 } else {
-                    throw new \InvalidArgumentException(
-                        sprintf(
-                            "Cannot handle data output with format '%s'",
-                            $input->getOption('output-format')
-                        )
+                    throw new InvalidArgumentException(
+                        sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format'))
                     );
                 }
             }
         } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
             // JsonStreamFile::writeLine only takes an array...
             // TODO how to handle other cases ?
-            if(\is_array($data)) {
+            if (\is_array($data)) {
                 $outputFile = new JsonStreamFile($input->getOption('output'), 'wb');
                 $outputFile->writeLine($data);
             }
@@ -176,11 +156,8 @@ class ExecuteProcessCommand extends Command
                 $output->writeln(sprintf("Output stored in '%s'", $input->getOption('output')));
             }
         } else {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    "Cannot handle data output with format '%s'",
-                    $input->getOption('output-format')
-                )
+            throw new InvalidArgumentException(
+                sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format'))
             );
         }
     }

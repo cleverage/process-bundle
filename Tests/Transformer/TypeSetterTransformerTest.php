@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -17,11 +20,10 @@ use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
  */
 class TypeSetterTransformerTest extends AbstractProcessTest
 {
-
     /**
      * Assert int to int convertion
      */
-    public function testIntToInt()
+    public function testIntToInt(): void
     {
         $result = $this->processManager->execute('test.type_setter_transformer.int_to_int', 1);
         self::assertSame(1, $result);
@@ -30,7 +32,7 @@ class TypeSetterTransformerTest extends AbstractProcessTest
     /**
      * Assert string to int convertion
      */
-    public function testStringToInt()
+    public function testStringToInt(): void
     {
         $result = $this->processManager->execute('test.type_setter_transformer.string_to_int', '1');
         self::assertSame(1, $result);
@@ -39,10 +41,9 @@ class TypeSetterTransformerTest extends AbstractProcessTest
     /**
      * Assert int to string convertion
      */
-    public function testIntToString()
+    public function testIntToString(): void
     {
         $result = $this->processManager->execute('test.type_setter_transformer.int_to_string', 1);
         self::assertSame('1', $result);
     }
-
 }

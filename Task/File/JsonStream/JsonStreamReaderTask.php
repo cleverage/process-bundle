@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -14,19 +17,16 @@ use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 
-/**
- */
 class JsonStreamReaderTask implements IterableTaskInterface
 {
-    /** @var JsonStreamFile */
+    /**
+     * @var JsonStreamFile
+     */
     protected $file;
 
-    /**
-     * @param ProcessState $state
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
-        if (null === $this->file) {
+        if ($this->file === null) {
             $this->file = new JsonStreamFile($this->getFilePath($state), 'rb');
         }
 
@@ -36,7 +36,6 @@ class JsonStreamReaderTask implements IterableTaskInterface
         } else {
             $state->setSkipped(true);
         }
-
     }
 
     public function next(ProcessState $state)
@@ -46,13 +45,11 @@ class JsonStreamReaderTask implements IterableTaskInterface
             $this->file = null;
         }
 
-        return !$eof;
+        return ! $eof;
     }
 
     protected function getFilePath(ProcessState $state)
     {
         return $state->getInput();
     }
-
-
 }

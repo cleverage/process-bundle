@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,9 +13,10 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
+use DateTime;
+use DateTimeInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use UnexpectedValueException;
 
 /**
  * Transformer aiming to take a date as an input (object or string) and format it according to options.
@@ -30,49 +34,41 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
 {
     /**
      * @param mixed $value
-     * @param array $options
      *
      * @return mixed|string
-     * @throws \Exception
      */
     public function transform($value, array $options = [])
     {
-        if (!$value) {
+        if (! $value) {
             return $value;
         }
 
-        if ($value instanceof \DateTimeInterface) {
+        if ($value instanceof DateTimeInterface) {
             $date = $value;
         } elseif (is_string($value)) {
             @trigger_error('String input will be deprecated in v4.0', E_USER_DEPRECATED);
-            $date = new \DateTime($value);
+            $date = new DateTime($value);
         } else {
-            throw new \UnexpectedValueException('Given value cannot be parsed into a date');
+            throw new UnexpectedValueException('Given value cannot be parsed into a date');
         }
 
         $result = $date->format($options['format']);
         if ($result === false) {
-            @trigger_error('The date cannot be formatted, this will throw an error starting from v4.0', E_USER_DEPRECATED);
+            @trigger_error(
+                'The date cannot be formatted, this will throw an error starting from v4.0',
+                E_USER_DEPRECATED
+            );
         }
 
         return $result;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'date_format';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws UndefinedOptionsException
-     * @throws AccessException
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('format');
         $resolver->setAllowedTypes('format', 'string');

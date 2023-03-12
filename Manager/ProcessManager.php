@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -14,9 +17,7 @@ use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Event\ProcessEvent;
-use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
-use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
 use CleverAge\ProcessBundle\Logger\ProcessLogger;
 use CleverAge\ProcessBundle\Logger\TaskLogger;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
@@ -28,93 +29,57 @@ use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Exception\ServiceCircularReferenceException;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use RuntimeException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Throwable;
+use UnexpectedValueException;
 
 /**
  * Execute processes
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ProcessManager
 {
     protected const EXECUTE_PROCESS = 1;
+
     protected const EXECUTE_PROCEED = 2;
+
     protected const EXECUTE_FLUSH = 4;
 
-    /** @var ContainerInterface */
-    protected $container;
-
-    /** @var ProcessLogger */
-    protected $processLogger;
-
-    /** @var TaskLogger */
-    protected $taskLogger;
-
-    /** @var ProcessConfigurationRegistry */
-    protected $processConfigurationRegistry;
-
-    /** @var TaskConfiguration */
+    /**
+     * @var TaskConfiguration
+     */
     protected $blockingTaskConfiguration;
 
-    /** @var ContextualOptionResolver */
-    protected $contextualOptionResolver;
-
-    /** @var TaskConfiguration[] */
+    /**
+     * @var TaskConfiguration[]
+     */
     protected $processedIterables = [];
 
-    /** @var TaskConfiguration[] */
+    /**
+     * @var TaskConfiguration[]
+     */
     protected $processedBlockings = [];
 
-    /** @var ProcessHistory */
-    protected $processHistory;
+    protected ?ProcessHistory $processHistory = null;
 
-    /** @var TaskConfiguration */
-    protected $taskConfiguration;
+    protected ?TaskConfiguration $taskConfiguration = null;
 
-    /** @var EventDispatcherInterface */
-    protected $eventDispatcher;
-
-    /**
-     * ProcessManager constructor.
-     *
-     * @param ContainerInterface           $container
-     * @param ProcessLogger                $processLogger
-     * @param TaskLogger                   $taskLogger
-     * @param ProcessConfigurationRegistry $processConfigurationRegistry
-     * @param ContextualOptionResolver     $contextualOptionResolver
-     * @param EventDispatcherInterface     $eventDispatcher
-     */
     public function __construct(
-        ContainerInterface $container,
-        ProcessLogger $processLogger,
-        TaskLogger $taskLogger,
-        ProcessConfigurationRegistry $processConfigurationRegistry,
-        ContextualOptionResolver $contextualOptionResolver,
-        EventDispatcherInterface $eventDispatcher
+        protected ContainerInterface $container,
+        protected ProcessLogger $processLogger,
+        protected TaskLogger $taskLogger,
+        protected ProcessConfigurationRegistry $processConfigurationRegistry,
+        protected ContextualOptionResolver $contextualOptionResolver,
+        protected EventDispatcherInterface $eventDispatcher
     ) {
-        $this->container = $container;
-        $this->processLogger = $processLogger;
-        $this->taskLogger = $taskLogger;
-        $this->processConfigurationRegistry = $processConfigurationRegistry;
-        $this->contextualOptionResolver = $contextualOptionResolver;
-        $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * @return ProcessHistory|null
-     */
     public function getProcessHistory(): ?ProcessHistory
     {
         return $this->processHistory;
     }
 
-    /**
-     * @return TaskConfiguration|null
-     */
     public function getTaskConfiguration(): ?TaskConfiguration
     {
         return $this->taskConfiguration;
@@ -126,34 +91,25 @@ class ProcessManager
      * This method decorates the real execution to add event & error handling
      * @see ProcessManager::doExecute
      *
-     * @param string $processCode
-     * @param null   $input
-     * @param array  $context
+     * @param null $input
      *
      * @return mixed
      */
-    public function execute(string $processCode, $input = null, array $context = [])
+    public function execute(string $processCode, mixed $input = null, array $context = [])
     {
         try {
-            $this->eventDispatcher->dispatch(
-                new ProcessEvent($processCode, $input, $context),
-                ProcessEvent::EVENT_PROCESS_STARTED
-            );
+            $this->eventDispatcher->dispatch(new ProcessEvent($processCode, $input, $context));
             $this->processLogger->debug('Process start');
 
             $result = $this->doExecute($processCode, $input, $context);
 
             $this->processLogger->debug('Process end');
-            $this->eventDispatcher->dispatch(
-                new ProcessEvent($processCode, $input, $context, $result),
-                ProcessEvent::EVENT_PROCESS_ENDED
-            );
-        } catch (\Throwable $error) {
-            $this->processLogger->critical('Critical process failure', ['error' => $error->getMessage()]);
-            $this->eventDispatcher->dispatch(
-                new ProcessEvent($processCode, $input, $context, null, $error),
-                ProcessEvent::EVENT_PROCESS_FAILED
-            );
+            $this->eventDispatcher->dispatch(new ProcessEvent($processCode, $input, $context, $result));
+        } catch (Throwable $error) {
+            $this->processLogger->critical('Critical process failure', [
+                'error' => $error->getMessage(),
+            ]);
+            $this->eventDispatcher->dispatch(new ProcessEvent($processCode, $input, $context, null, $error));
 
             throw $error;
         }
@@ -164,13 +120,9 @@ class ProcessManager
     /**
      * Real process execution, with a given input and context
      *
-     * @param string $processCode
-     * @param mixed  $input
-     * @param array  $context
-     *
      * @return mixed
      */
-    protected function doExecute(string $processCode, $input = null, array $context = [])
+    protected function doExecute(string $processCode, mixed $input = null, array $context = [])
     {
         $parentProcessHistory = $this->processHistory;
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
@@ -185,7 +137,9 @@ class ProcessManager
 
         // If defined, set the input of a task
         if ($processConfiguration->getEntryPoint()) {
-            $processConfiguration->getEntryPoint()->getState()->setInput($input);
+            $processConfiguration->getEntryPoint()
+                ->getState()
+                ->setInput($input);
         } elseif ($input !== null) {
             $this->processLogger->warning('Process has no entry point for input');
         }
@@ -210,7 +164,9 @@ class ProcessManager
         // If defined, return the output of a task
         $returnValue = null;
         if ($processConfiguration->getEndPoint()) {
-            $returnValue = $processConfiguration->getEndPoint()->getState()->getOutput();
+            $returnValue = $processConfiguration->getEndPoint()
+                ->getState()
+                ->getOutput();
         }
 
         $this->processHistory = $parentProcessHistory;
@@ -220,13 +176,6 @@ class ProcessManager
 
     /**
      * Resolve a task, by checking if parents are resolved and processing roots and BlockingTasks
-     *
-     * @param TaskConfiguration $taskConfiguration
-     *
-     * @throws \RuntimeException
-     * @throws \UnexpectedValueException
-     *
-     * @return bool
      */
     protected function resolve(TaskConfiguration $taskConfiguration): bool
     {
@@ -240,14 +189,14 @@ class ProcessManager
         // Resolve parents first
         $allParentsResolved = true;
         foreach ($taskConfiguration->getPreviousTasksConfigurations() as $previousTasksConfiguration) {
-            if (!$previousTasksConfiguration->getState()->isResolved()) {
+            if (! $previousTasksConfiguration->getState()->isResolved()) {
                 $isResolved = $this->resolve($previousTasksConfiguration);
                 $allParentsResolved = $allParentsResolved && $isResolved;
             }
         }
 
-        if (!$allParentsResolved) {
-            throw new \UnexpectedValueException('Cannot resolve all parents');
+        if (! $allParentsResolved) {
+            throw new UnexpectedValueException('Cannot resolve all parents');
         }
 
         $state->setStatus(ProcessState::STATUS_PROCESSING);
@@ -274,20 +223,15 @@ class ProcessManager
 
     /**
      * Fetch task service and run additional setup for InitializableTasks
-     *
-     * @param TaskConfiguration $taskConfiguration
-     *
-     * @throws ServiceNotFoundException
-     * @throws ServiceCircularReferenceException
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
      */
     protected function initialize(TaskConfiguration $taskConfiguration): void
     {
         $this->taskConfiguration = $taskConfiguration;
 
         if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP
-            && \count($taskConfiguration->getErrorOutputs()) > 0) {
+            && (is_countable($taskConfiguration->getErrorOutputs()) ? \count(
+                $taskConfiguration->getErrorOutputs()
+            ) : 0) > 0) {
             $m = "Task configuration {$taskConfiguration->getCode()} has error outputs ";
             $m .= "but it's error strategy 'stop' implies they will never be reached.";
             $this->taskLogger->debug($m);
@@ -295,17 +239,17 @@ class ProcessManager
         // @todo Refactor this using a Registry with this feature:
         // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
         $serviceReference = $taskConfiguration->getServiceReference();
-        if (0 === strpos($serviceReference, '@')) {
-            $task = $this->container->get(ltrim($serviceReference, '@'));
+        if (str_starts_with((string) $serviceReference, '@')) {
+            $task = $this->container->get(ltrim((string) $serviceReference, '@'));
         } elseif ($this->container->has($serviceReference)) {
             $task = $this->container->get($serviceReference);
         } else {
-            throw new \UnexpectedValueException(
+            throw new UnexpectedValueException(
                 "Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'"
             );
         }
-        if (!$task instanceof TaskInterface) {
-            throw new \UnexpectedValueException(
+        if (! $task instanceof TaskInterface) {
+            throw new UnexpectedValueException(
                 "Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface"
             );
         }
@@ -315,8 +259,10 @@ class ProcessManager
             $state = $taskConfiguration->getState();
             try {
                 $task->initialize($state);
-            } catch (\Throwable $e) {
-                $logContext = ['exception' => $e];
+            } catch (Throwable $e) {
+                $logContext = [
+                    'exception' => $e,
+                ];
                 $this->taskLogger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
             }
@@ -326,12 +272,6 @@ class ProcessManager
         $this->taskConfiguration = null;
     }
 
-    /**
-     * @param TaskConfiguration $taskConfiguration
-     * @param int               $executionFlag
-     *
-     * @throws \RuntimeException
-     */
     protected function process(TaskConfiguration $taskConfiguration, int $executionFlag = self::EXECUTE_PROCESS): void
     {
         $this->taskConfiguration = $taskConfiguration;
@@ -360,10 +300,12 @@ class ProcessManager
             if ($state->isStopped()) {
                 $exception = $state->getException();
                 if ($exception) {
-                    $m = "Process {$state->getProcessConfiguration()->getCode()} has failed";
-                    $m .= " during process {$state->getTaskConfiguration()->getCode()}";
+                    $m = "Process {$state->getProcessConfiguration()
+                        ->getCode()} has failed";
+                    $m .= " during process {$state->getTaskConfiguration()
+                        ->getCode()}";
                     $m .= " with message: '{$exception->getMessage()}'.\n";
-                    throw new \RuntimeException($m, -1, $exception);
+                    throw new RuntimeException($m, -1, $exception);
                 }
 
                 return;
@@ -372,8 +314,8 @@ class ProcessManager
             // Run child items only if the state is not "skipped" and task is not blocking
             $task = $taskConfiguration->getTask();
             $shouldContinue =
-                (!$task instanceof BlockingTaskInterface || self::EXECUTE_PROCEED === $executionFlag)
-                && !$state->isSkipped();
+                (! $task instanceof BlockingTaskInterface || $executionFlag === self::EXECUTE_PROCEED)
+                && ! $state->isSkipped();
 
             if ($shouldContinue) {
                 if ($task instanceof IterableTaskInterface) {
@@ -398,13 +340,13 @@ class ProcessManager
             if ($task instanceof IterableTaskInterface) {
                 // Check if task has more items
                 $hasMoreItem = $task->next($state);
-                if (!$hasMoreItem) {
-                    if (!$this->hasProcessedIterable($taskConfiguration)) {
+                if (! $hasMoreItem) {
+                    if (! $this->hasProcessedIterable($taskConfiguration)) {
                         return; // This means the task is empty
                     }
                     // This means we are over iterating this task so we can remove it from registry
                     $this->removeProcessedIterable($taskConfiguration);
-                    if (self::EXECUTE_FLUSH !== $executionFlag) {
+                    if ($executionFlag !== self::EXECUTE_FLUSH) {
                         // This task is now finished, we may flush it to test if there is anything lasting
                         $this->flush($taskConfiguration);
                     }
@@ -418,49 +360,45 @@ class ProcessManager
         $this->taskConfiguration = null;
     }
 
-    /**
-     * @param TaskConfiguration $taskConfiguration
-     * @param int               $executionFlag
-     */
     protected function processExecution(TaskConfiguration $taskConfiguration, int $executionFlag): void
     {
         $task = $taskConfiguration->getTask();
-        if (null === $task) {
-            throw new \RuntimeException("Missing task for configuration {$taskConfiguration->getCode()}");
+        if ($task === null) {
+            throw new RuntimeException("Missing task for configuration {$taskConfiguration->getCode()}");
         }
         $state = $taskConfiguration->getState();
 
         try {
-            if (self::EXECUTE_PROCESS === $executionFlag) {
+            if ($executionFlag === self::EXECUTE_PROCESS) {
                 $state->reset(false);
                 $this->processLogger->debug("Processing task {$taskConfiguration->getCode()}");
                 $task->execute($state);
                 if ($task instanceof BlockingTaskInterface) {
                     $this->addProcessedBlocking($taskConfiguration);
                 }
-            } elseif (self::EXECUTE_PROCEED === $executionFlag) {
+            } elseif ($executionFlag === self::EXECUTE_PROCEED) {
                 $state->reset(true);
-                if (!$task instanceof BlockingTaskInterface) {
+                if (! $task instanceof BlockingTaskInterface) {
                     // This exception should never be thrown
-                    throw new \UnexpectedValueException("Task {$taskConfiguration->getCode()} is not blocking");
+                    throw new UnexpectedValueException("Task {$taskConfiguration->getCode()} is not blocking");
                 }
                 $this->processLogger->debug("Proceeding task {$taskConfiguration->getCode()}");
                 $task->proceed($state);
                 $this->removeProcessedBlocking($taskConfiguration);
-            } elseif (self::EXECUTE_FLUSH === $executionFlag) {
+            } elseif ($executionFlag === self::EXECUTE_FLUSH) {
                 $state->reset(true);
-                if (!$task instanceof FlushableTaskInterface) {
+                if (! $task instanceof FlushableTaskInterface) {
                     // This exception should never be thrown
-                    throw new \UnexpectedValueException("Task {$taskConfiguration->getCode()} is not flushable");
+                    throw new UnexpectedValueException("Task {$taskConfiguration->getCode()} is not flushable");
                 }
                 $this->processLogger->debug("Flushing task {$taskConfiguration->getCode()}");
                 $task->flush($state);
             } else {
-                throw new \UnexpectedValueException("Unknown execution flag: {$executionFlag}");
+                throw new UnexpectedValueException("Unknown execution flag: {$executionFlag}");
             }
 
             $exception = $state->getException();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $exception = $e;
         }
 
@@ -472,7 +410,7 @@ class ProcessManager
                 $state->getErrorContext()
             );
             $state->setException($exception);
-            if (!$state->hasErrorOutput()) {
+            if (! $state->hasErrorOutput()) {
                 $state->setErrorOutput($state->getInput());
             }
             if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_SKIP) {
@@ -480,7 +418,7 @@ class ProcessManager
             } elseif ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP) {
                 $state->stop($exception);
             } else {
-                throw new \UnexpectedValueException(
+                throw new UnexpectedValueException(
                     "Unknown error strategy '{$taskConfiguration->getErrorStrategy()}'"
                 );
             }
@@ -489,10 +427,6 @@ class ProcessManager
 
     /**
      * Browse all children for FlushableTask until a BlockingTask is found
-     *
-     * @param TaskConfiguration $taskConfiguration
-     *
-     * @throws \RuntimeException
      */
     protected function flush(TaskConfiguration $taskConfiguration): void
     {
@@ -516,11 +450,6 @@ class ProcessManager
         }
     }
 
-    /**
-     * @param TaskConfiguration $taskConfiguration
-     *
-     * @throws \RuntimeException
-     */
     protected function finalize(TaskConfiguration $taskConfiguration): void
     {
         $task = $taskConfiguration->getTask();
@@ -529,8 +458,10 @@ class ProcessManager
             $state = $taskConfiguration->getState();
             try {
                 $task->finalize($taskConfiguration->getState());
-            } catch (\Throwable $e) {
-                $logContext = ['exception' => $e];
+            } catch (Throwable $e) {
+                $logContext = [
+                    'exception' => $e,
+                ];
                 $this->taskLogger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
             }
@@ -539,15 +470,6 @@ class ProcessManager
         }
     }
 
-    /**
-     * @param ProcessConfiguration $processConfiguration
-     * @param array                $context
-     *
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     *
-     * @return ProcessHistory
-     */
     protected function initializeStates(
         ProcessConfiguration $processConfiguration,
         array $context = []
@@ -566,20 +488,17 @@ class ProcessManager
         return $processHistory;
     }
 
-    /**
-     * @param TaskConfiguration $previousTaskConfiguration
-     * @param TaskConfiguration $nextTaskConfiguration
-     * @param bool              $isError
-     */
     protected function prepareNextProcess(
         TaskConfiguration $previousTaskConfiguration,
         TaskConfiguration $nextTaskConfiguration,
-        $isError = false
+        bool $isError = false
     ): void {
         if ($isError) {
-            $input = $previousTaskConfiguration->getState()->getErrorOutput();
+            $input = $previousTaskConfiguration->getState()
+                ->getErrorOutput();
         } else {
-            $input = $previousTaskConfiguration->getState()->getOutput();
+            $input = $previousTaskConfiguration->getState()
+                ->getOutput();
         }
 
         $nextState = $nextTaskConfiguration->getState();
@@ -589,10 +508,6 @@ class ProcessManager
 
     /**
      * Save the state of the import process
-     *
-     * @param ProcessState $state
-     *
-     * @throws \RuntimeException
      */
     protected function handleState(ProcessState $state): void
     {
@@ -602,10 +517,6 @@ class ProcessManager
         }
     }
 
-    /**
-     * @param ProcessHistory $history
-     *
-     */
     protected function endProcess(ProcessHistory $history): void
     {
         // Do not change state if already set
@@ -623,13 +534,6 @@ class ProcessManager
 
     /**
      * Validate a process
-     *
-     * @param ProcessConfiguration $processConfiguration
-     *
-     * @throws \RuntimeException
-     * @throws InvalidProcessConfigurationException
-     * @throws CircularProcessException
-     * @throws MissingTaskConfigurationException
      */
     protected function checkProcess(ProcessConfiguration $processConfiguration): void
     {
@@ -642,10 +546,12 @@ class ProcessManager
 
         // Check multi-branch processes
         foreach ($taskConfigurations as $taskConfiguration) {
-            if (!\in_array($taskConfiguration->getCode(), $mainTaskList, true)) {
+            if (! \in_array($taskConfiguration->getCode(), $mainTaskList, true)) {
                 // We won't throw an error to ease development... but there must be some kind of warning
                 $state = $taskConfiguration->getState();
-                $logContext = ['main_task_list' => $mainTaskList];
+                $logContext = [
+                    'main_task_list' => $mainTaskList,
+                ];
                 $this->processLogger->warning(
                     "Task '{$taskConfiguration->getCode()}' is unreachable, check that it's referenced in some other task output or in the main entry point",
                     $logContext
@@ -656,18 +562,24 @@ class ProcessManager
 
         // Check coherence for entry/end points
         $processConfiguration->getEndPoint();
-        if ($entryPoint && !\in_array($entryPoint->getCode(), $mainTaskList, true)) {
-            throw InvalidProcessConfigurationException::createNotInMain($processConfiguration, $entryPoint, $mainTaskList);
+        if ($entryPoint && ! \in_array($entryPoint->getCode(), $mainTaskList, true)) {
+            throw InvalidProcessConfigurationException::createNotInMain(
+                $processConfiguration,
+                $entryPoint,
+                $mainTaskList
+            );
         }
-        if ($endPoint && !\in_array($endPoint->getCode(), $mainTaskList, true)) {
-            throw InvalidProcessConfigurationException::createNotInMain($processConfiguration, $endPoint, $mainTaskList);
+        if ($endPoint && ! \in_array($endPoint->getCode(), $mainTaskList, true)) {
+            throw InvalidProcessConfigurationException::createNotInMain(
+                $processConfiguration,
+                $endPoint,
+                $mainTaskList
+            );
         }
     }
 
     /**
      * When an iterable task returns at least one element, it gets added here
-     *
-     * @param TaskConfiguration $taskConfiguration
      */
     protected function addProcessedIterable(TaskConfiguration $taskConfiguration): void
     {
@@ -676,10 +588,6 @@ class ProcessManager
 
     /**
      * If true this means that the tasks returned an element at least once
-     *
-     * @param TaskConfiguration $taskConfiguration
-     *
-     * @return bool
      */
     protected function hasProcessedIterable(TaskConfiguration $taskConfiguration): bool
     {
@@ -688,8 +596,6 @@ class ProcessManager
 
     /**
      * Once everything was flushed, the task is resolved and can be removed from the stack
-     *
-     * @param TaskConfiguration $taskConfiguration
      */
     protected function removeProcessedIterable(TaskConfiguration $taskConfiguration): void
     {
@@ -698,8 +604,6 @@ class ProcessManager
 
     /**
      * Add blocking tasks that were just processed
-     *
-     * @param TaskConfiguration $taskConfiguration
      */
     protected function addProcessedBlocking(TaskConfiguration $taskConfiguration): void
     {
@@ -708,10 +612,6 @@ class ProcessManager
 
     /**
      * If true this means the task was processed normally but was never run with proceed
-     *
-     * @param TaskConfiguration $taskConfiguration
-     *
-     * @return bool
      */
     protected function hasProcessedBlocking(TaskConfiguration $taskConfiguration): bool
     {
@@ -720,8 +620,6 @@ class ProcessManager
 
     /**
      * Once a blocking task has been proceeded, we can remove it from the stack
-     *
-     * @param TaskConfiguration $taskConfiguration
      */
     protected function removeProcessedBlocking(TaskConfiguration $taskConfiguration): void
     {

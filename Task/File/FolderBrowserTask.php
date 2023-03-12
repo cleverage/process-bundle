@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -13,14 +16,12 @@ namespace CleverAge\ProcessBundle\Task\File;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Iterator;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -29,31 +30,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class FolderBrowserTask extends AbstractConfigurableTask implements IterableTaskInterface
 {
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /** @var \Iterator|SplFileInfo[] */
+    /**
+     * @var Iterator|SplFileInfo[]
+     */
     protected $files;
 
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        protected LoggerInterface $logger
+    ) {
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \LogicException
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
-        if (null === $this->files) {
+        if ($this->files === null) {
             $finder = new Finder();
             $finder->files();
             if ($options['name_pattern']) {
@@ -63,7 +53,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
             $this->files->rewind();
         }
 
-        if (!$this->files->valid()) {
+        if (! $this->files->valid()) {
             $this->logger->log($options['empty_log_level'], "No item found in path {$options['folder_path']}");
             $state->setSkipped(true);
             $state->setErrorOutput($options['folder_path']);
@@ -83,13 +73,11 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
      * return true if the task has a next element
      * return false if the task has terminated it's iteration
      *
-     * @param ProcessState $state
-     *
      * @return bool
      */
     public function next(ProcessState $state)
     {
-        if (!$this->files) {
+        if (! $this->files) {
             return false;
         }
         $this->files->next();
@@ -98,43 +86,30 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
         return $this->files->valid();
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws InvalidConfigurationException
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(
-            [
-                'folder_path',
-            ]
-        );
+        $resolver->setRequired(['folder_path']);
         $resolver->setAllowedTypes('folder_path', ['string']);
         /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'folder_path',
             static function (Options $options, $value) {
-                if (!is_dir($value)) {
+                if (! is_dir($value)) {
                     throw new InvalidConfigurationException(
                         "Folder path does not exists or is not a folder: '{$value}'"
                     );
                 }
-                if (!is_readable($value)) {
+                if (! is_readable($value)) {
                     throw new InvalidConfigurationException("Folder path is not readable: '{$value}'");
                 }
 
                 return $value;
             }
         );
-        $resolver->setDefaults(
-            [
-                'name_pattern' => null,
-                'empty_log_level' => LogLevel::WARNING,
-            ]
-        );
+        $resolver->setDefaults([
+            'name_pattern' => null,
+            'empty_log_level' => LogLevel::WARNING,
+        ]);
         $resolver->setAllowedTypes('name_pattern', ['null', 'string', 'array']);
         $resolver->setAllowedValues(
             'empty_log_level',

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -20,7 +23,7 @@ class ValidatorTaskTest extends AbstractProcessTest
     /**
      * Assert the input is Valid and no error is thrown
      */
-    public function testSimpleValidation()
+    public function testSimpleValidation(): void
     {
         $input = [
             'int_field' => 42,
@@ -30,5 +33,4 @@ class ValidatorTaskTest extends AbstractProcessTest
         $result = $this->processManager->execute('test.validator_task', $input);
         self::assertEquals($input, $result);
     }
-
 }

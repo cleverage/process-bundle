@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,7 +13,6 @@
 
 namespace CleverAge\ProcessBundle\Tests\Transformer;
 
-
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
@@ -18,11 +20,10 @@ use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
  */
 class HashTransformerTest extends AbstractProcessTest
 {
-
     /**
      * Assert a string can be hash in md5
      */
-    public function testMd5Hash()
+    public function testMd5Hash(): void
     {
         $result = $this->processManager->execute('test.hash_transformer.md5', 'This is a string');
         self::assertEquals('41fb5b5ae4d57c5ee528adb00e5e8e74', $result);
@@ -31,7 +32,7 @@ class HashTransformerTest extends AbstractProcessTest
     /**
      * Assert a string can be hash in sha512
      */
-    public function testSha512Hash()
+    public function testSha512Hash(): void
     {
         $result = $this->processManager->execute('test.hash_transformer.sha512', 'This is a string');
         self::assertEquals(

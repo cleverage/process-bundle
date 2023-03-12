@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -17,7 +20,7 @@ class StopTaskTest extends AbstractProcessTest
     /**
      * Assert the iteration is stopped at the right time
      */
-    public function testIterableInterruption()
+    public function testIterableInterruption(): void
     {
         $this->processManager->execute('test.task.stop_task.iterable_interruption');
 

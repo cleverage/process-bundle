@@ -61,5 +61,7 @@ vendor/%:
 	docker cp cleverage_process_bundle_tmp:/app/vendor vendor-$(@F)
 	docker container rm cleverage_process_bundle_tmp
 
-linter:
-	$(DOCKER_RUN) $(LOCAL_DOCKER_TAG) /bin/bash -c "vendor/bin/phpstan"
+linter/local:
+	vendor/bin/rector process
+	vendor/bin/ecs check --fix
+	vendor/bin/phpstan

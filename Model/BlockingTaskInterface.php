@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,14 +15,8 @@ namespace CleverAge\ProcessBundle\Model;
 
 /**
  * Allow the task to block the flow of the process and proceed with child tasks only when all iterations are over.
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 interface BlockingTaskInterface extends TaskInterface
 {
-    /**
-     * @param ProcessState $state
-     */
     public function proceed(ProcessState $state);
 }

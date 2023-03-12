@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,14 +13,10 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Trim an input based on specific characters
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class TrimTransformer implements ConfigurableTransformerInterface
 {
@@ -25,41 +24,29 @@ class TrimTransformer implements ConfigurableTransformerInterface
      * Must return the transformed $value
      *
      * @param mixed $value
-     * @param array $options
-     *
-     * @return mixed $value
      */
-    public function transform($value, array $options = [])
+    public function transform($value, array $options = []): ?string
     {
-        if (null === $value) {
+        if ($value === null) {
             return null;
         }
 
-        return trim($value, $options['charlist']);
+        return trim((string) $value, $options['charlist']);
     }
 
     /**
      * Returns the unique code to identify the transformer
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return 'trim';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws ExceptionInterface
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(
-            [
-                'charlist' => " \t\n\r\0\x0B",
-            ]
-        );
+        $resolver->setDefaults([
+            'charlist' => " \t\n\r\0\x0B",
+        ]);
         $resolver->setAllowedTypes('charlist', ['string']);
     }
 }

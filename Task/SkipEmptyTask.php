@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -19,10 +22,7 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
  */
 class SkipEmptyTask implements TaskInterface
 {
-    /**
-     * @param ProcessState $state
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $state->setOutput($state->getInput());
         if (empty($state->getInput())) {

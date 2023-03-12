@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -16,56 +19,38 @@ use Psr\Log\LogLevel;
 
 /**
  * Represents a task configuration inside a process
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class TaskConfiguration
 {
     final public const STRATEGY_SKIP = 'skip';
+
     final public const STRATEGY_STOP = 'stop';
 
-    /** @var TaskInterface */
-    protected $task;
+    protected ?TaskInterface $task = null;
 
-    /** @var array */
-    protected $options = [];
+    protected ProcessState $state;
 
-    /** @var string */
-    protected $description = '';
-
-    /** @var string */
-    protected $help = '';
-
-    /** @var array */
-    protected $outputs = [];
-
-    /** @var array */
-    protected $errorOutputs = [];
-
-    /** @var ProcessState */
-    protected $state;
-
-    /** @var TaskConfiguration[] */
+    /**
+     * @var TaskConfiguration[]
+     */
     protected $nextTasksConfigurations = [];
 
-    /** @var TaskConfiguration[] */
+    /**
+     * @var TaskConfiguration[]
+     */
     protected $previousTasksConfigurations = [];
 
-    /** @var TaskConfiguration[] */
+    /**
+     * @var TaskConfiguration[]
+     */
     protected $errorTasksConfigurations = [];
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $inErrorBranch = false;
 
-    /** @var string */
-    protected $errorStrategy;
-
-    /** @var string */
-    protected $logLevel;
-
-    /** @var bool */
-    protected $logErrors;
+    protected bool $logErrors;
 
     /**
      * @param string $code
@@ -74,21 +59,14 @@ class TaskConfiguration
     public function __construct(
         protected $code,
         protected $serviceReference,
-        array $options,
-        string $description = '',
-        string $help = '',
-        array $outputs = [],
-        array $errorOutputs = [],
-        string $errorStrategy = self::STRATEGY_SKIP,
-        string $logLevel = LogLevel::CRITICAL
+        protected array $options,
+        protected string $description = '',
+        protected string $help = '',
+        protected array $outputs = [],
+        protected array $errorOutputs = [],
+        protected string $errorStrategy = self::STRATEGY_SKIP,
+        protected string $logLevel = LogLevel::CRITICAL
     ) {
-        $this->options = $options;
-        $this->description = $description;
-        $this->help = $help;
-        $this->outputs = $outputs;
-        $this->errorOutputs = $errorOutputs;
-        $this->errorStrategy = $errorStrategy;
-        $this->logLevel = $logLevel;
         $this->logErrors = $logLevel !== LogLevel::DEBUG; // @deprecated, remove me in next version
     }
 
@@ -102,15 +80,12 @@ class TaskConfiguration
         return $this->serviceReference;
     }
 
-    /**
-     * @return TaskInterface
-     */
     public function getTask(): ?TaskInterface
     {
         return $this->task;
     }
 
-    public function setTask(TaskInterface $task)
+    public function setTask(TaskInterface $task): void
     {
         $this->task = $task;
     }
@@ -151,7 +126,6 @@ class TaskConfiguration
 
     /**
      * @deprecated Use getErrorOutputs method instead
-     *
      */
     public function getErrors(): array
     {
@@ -170,7 +144,7 @@ class TaskConfiguration
         return $this->state;
     }
 
-    public function setState(ProcessState $state)
+    public function setState(ProcessState $state): void
     {
         $this->state = $state;
     }
@@ -183,7 +157,7 @@ class TaskConfiguration
         return $this->nextTasksConfigurations;
     }
 
-    public function addNextTaskConfiguration(TaskConfiguration $nextTaskConfiguration)
+    public function addNextTaskConfiguration(self $nextTaskConfiguration): void
     {
         $this->nextTasksConfigurations[] = $nextTaskConfiguration;
     }
@@ -196,7 +170,7 @@ class TaskConfiguration
         return $this->previousTasksConfigurations;
     }
 
-    public function addPreviousTaskConfiguration(TaskConfiguration $previousTaskConfiguration)
+    public function addPreviousTaskConfiguration(self $previousTaskConfiguration): void
     {
         $this->previousTasksConfigurations[] = $previousTaskConfiguration;
     }
@@ -209,7 +183,7 @@ class TaskConfiguration
         return $this->errorTasksConfigurations;
     }
 
-    public function addErrorTaskConfiguration(TaskConfiguration $errorTaskConfiguration)
+    public function addErrorTaskConfiguration(self $errorTaskConfiguration): void
     {
         $this->errorTasksConfigurations[] = $errorTaskConfiguration;
     }
@@ -219,23 +193,20 @@ class TaskConfiguration
         return $this->inErrorBranch;
     }
 
-    public function setInErrorBranch(bool $inErrorBranch)
+    public function setInErrorBranch(bool $inErrorBranch): void
     {
         $this->inErrorBranch = $inErrorBranch;
     }
 
     public function isRoot(): bool
     {
-        return empty($this->getPreviousTasksConfigurations()) && !$this->isInErrorBranch();
+        return empty($this->getPreviousTasksConfigurations()) && ! $this->isInErrorBranch();
     }
 
     /**
      * Check task ancestors to find if it have a given task as parent
-     *
-     *
-     * @return bool
      */
-    public function hasAncestor(TaskConfiguration $taskConfig)
+    public function hasAncestor(self $taskConfig): bool
     {
         foreach ($this->getPreviousTasksConfigurations() as $previousTaskConfig) {
             // Avoid errors for direct ancestors
@@ -259,9 +230,8 @@ class TaskConfiguration
      * Check task ancestors to find if it have a given task as child
      *
      * @param bool              $checkErrors
-     * @return bool
      */
-    public function hasDescendant(TaskConfiguration $taskConfig, $checkErrors = true)
+    public function hasDescendant(self $taskConfig, $checkErrors = true): bool
     {
         foreach ($this->getNextTasksConfigurations() as $nextTaskConfig) {
             // Avoid errors for direct descendant
@@ -310,7 +280,6 @@ class TaskConfiguration
 
     /**
      * @deprecated Use getLogLevel instead
-     *
      */
     public function isLogErrors(): bool
     {

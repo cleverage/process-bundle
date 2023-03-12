@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -16,73 +19,49 @@ use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\SubprocessInstance;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use RuntimeException;
+use SplQueue;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Process\Exception\RuntimeException;
 
 /**
  * Launch a new process for each input received, input must be a scalar, a resource or a \Traversable
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
 {
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /** @var ProcessConfigurationRegistry */
-    protected $processRegistry;
-
-    /** @var KernelInterface */
-    protected $kernel;
-
-    /** @var SubprocessInstance[] */
+    /**
+     * @var SubprocessInstance[]
+     */
     protected $launchedProcesses = [];
 
-    /** @var \SplQueue */
-    protected $finishedBuffers;
+    protected SplQueue $finishedBuffers;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $flushMode = false;
 
-    /**
-     * @param LoggerInterface              $logger
-     * @param ProcessConfigurationRegistry $processRegistry
-     * @param KernelInterface              $kernel
-     */
     public function __construct(
-        LoggerInterface $logger,
-        ProcessConfigurationRegistry $processRegistry,
-        KernelInterface $kernel
+        protected LoggerInterface $logger,
+        protected ProcessConfigurationRegistry $processRegistry,
+        protected KernelInterface $kernel
     ) {
-        $this->logger = $logger;
-        $this->processRegistry = $processRegistry;
-        $this->kernel = $kernel;
-
-        $this->finishedBuffers = new \SplQueue();
+        $this->finishedBuffers = new SplQueue();
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         // TODO still not perfect, optimize and secure it
         $this->handleProcesses($state); // Handler processes first
 
-        if (!$this->flushMode) {
+        if (! $this->flushMode) {
             $this->handleInput($state);
             $state->setSkipped(true);
-        } elseif (!$this->finishedBuffers->isEmpty()) {
+        } elseif (! $this->finishedBuffers->isEmpty()) {
             $state->setOutput($this->finishedBuffers->dequeue());
 
             // After dequeue, stop flush
@@ -94,28 +73,22 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         }
     }
 
-    /**
-     * @param ProcessState $state
-     */
-    public function flush(ProcessState $state)
+    public function flush(ProcessState $state): void
     {
         $this->flushMode = true;
-        if (!$this->finishedBuffers->isEmpty()) {
+        if (! $this->finishedBuffers->isEmpty()) {
             $state->setOutput($this->finishedBuffers->dequeue());
         } else {
             $state->setSkipped(true);
         }
 
         // After dequeue, stop flush
-        if ($this->finishedBuffers->isEmpty() && !count($this->launchedProcesses)) {
+        if ($this->finishedBuffers->isEmpty() && ! count($this->launchedProcesses)) {
             $this->flushMode = false;
         }
     }
 
     /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
      * @return bool
      */
     public function next(ProcessState $state)
@@ -139,11 +112,6 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         return false;
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
-     */
     protected function handleInput(ProcessState $state)
     {
         $options = $this->getOptions($state);
@@ -156,7 +124,8 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $this->launchedProcesses[] = $process;
 
         $logContext = [
-            'input' => $process->getProcess()->getInput(),
+            'input' => $process->getProcess()
+                ->getInput(),
         ];
 
         $this->logger->debug("Running command: {$process->getProcess()->getCommandLine()}", $logContext);
@@ -165,14 +134,11 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     }
 
     /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
      * @return SubprocessInstance
      */
     protected function launchProcess(ProcessState $state)
     {
-        $input = null !== $state->getInput() ? (string) $state->getInput() : null;
+        $input = $state->getInput() !== null ? (string) $state->getInput() : null;
 
         $subprocess = new SubprocessInstance(
             $this->kernel,
@@ -184,37 +150,38 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             ]
         );
 
-        return $subprocess->buildProcess()->start();
+        return $subprocess->buildProcess()
+            ->start();
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws RuntimeException
-     */
     protected function handleProcesses(ProcessState $state)
     {
         foreach ($this->launchedProcesses as $key => $process) {
-            if (!$process->getProcess()->isTerminated()) {
+            if (! $process->getProcess()->isTerminated()) {
                 // @todo handle incremental error output properly, specially for terminal where logs are lost
-                echo $process->getProcess()->getIncrementalErrorOutput();
+                echo $process->getProcess()
+                    ->getIncrementalErrorOutput();
                 continue;
             }
 
             $logContext = [
-                'cmd' => $process->getProcess()->getCommandLine(),
-                'input' => $process->getProcess()->getInput(),
-                'exit_code' => $process->getProcess()->getExitCode(),
-                'exit_code_text' => $process->getProcess()->getExitCodeText(),
+                'cmd' => $process->getProcess()
+                    ->getCommandLine(),
+                'input' => $process->getProcess()
+                    ->getInput(),
+                'exit_code' => $process->getProcess()
+                    ->getExitCode(),
+                'exit_code_text' => $process->getProcess()
+                    ->getExitCodeText(),
             ];
             $this->logger->debug('Command terminated', $logContext);
 
             unset($this->launchedProcesses[$key]);
-            if (0 !== $process->getProcess()->getExitCode()) {
+            if ($process->getProcess()->getExitCode() !== 0) {
                 $this->logger->critical($process->getProcess()->getErrorOutput(), $logContext);
                 $this->killProcesses();
 
-                throw new \RuntimeException("Sub-process has failed: {$process->getProcess()->getExitCodeText()}");
+                throw new RuntimeException("Sub-process has failed: {$process->getProcess()->getExitCodeText()}");
             }
 
             $result = $process->getResult();
@@ -224,25 +191,14 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     * @throws InvalidConfigurationException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(
-            [
-                'process',
-            ]
-        );
+        $resolver->setRequired(['process']);
         /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'process',
             function (Options $options, $value) {
-                if (!$this->processRegistry->hasProcessConfiguration($value)) {
+                if (! $this->processRegistry->hasProcessConfiguration($value)) {
                     throw new InvalidConfigurationException("Unknown process {$value}");
                 }
 
@@ -265,9 +221,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $resolver->setAllowedTypes('sleep_interval', ['integer', 'double']);
         $resolver->setAllowedTypes('sleep_interval_after_launch', ['integer', 'double']);
         $resolver->setAllowedTypes('sleep_on_finalize_interval', ['integer', 'double']);
-        $microsecondNormalizer = function (Options $options, $value) {
-            return (int)($value * 1000000);
-        };
+        $microsecondNormalizer = fn (Options $options, $value): int => (int) ($value * 1_000_000);
         $resolver->setNormalizer('sleep_interval', $microsecondNormalizer);
         $resolver->setNormalizer('sleep_interval_after_launch', $microsecondNormalizer);
         $resolver->setNormalizer('sleep_on_finalize_interval', $microsecondNormalizer);
@@ -278,10 +232,10 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $resolver->setAllowedTypes('process_options', ['array']);
         $resolver->setNormalizer(
             'process_options',
-            static function (Options $options, $value) {
-                if (!empty($value)) {
+            static function (Options $options, $value): int|float|string|bool|null {
+                if (! empty($value)) {
                     // Todo deprecation trigger
-                    throw new \InvalidArgumentException('Deprecated option, please contact support for help');
+                    throw new InvalidArgumentException('Deprecated option, please contact support for help');
                 }
 
                 return $value;

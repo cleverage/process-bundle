@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,27 +18,17 @@ namespace CleverAge\ProcessBundle\Filesystem;
  */
 interface FileStreamInterface
 {
-    /**
-     * @return int
-     */
     public function getLineCount(): int;
 
     /**
      * Warning! This returns the line number of the pointer inside the file so you need to call it BEFORE reading a line
-     *
-     * @return int
      */
     public function getLineNumber(): int;
 
-    /**
-     * @return bool
-     */
     public function isEndOfFile(): bool;
 
     /**
      * @param int|null $length
-     *
-     * @return array|null
      */
     public function readLine($length = null): ?array;
 

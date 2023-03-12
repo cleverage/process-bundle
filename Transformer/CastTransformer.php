@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,20 +13,13 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Cast a value to a different PHP type
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class CastTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function transform($value, array $options = [])
     {
         settype($value, $options['type']);
@@ -31,26 +27,14 @@ class CastTransformer implements ConfigurableTransformerInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'cast';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws ExceptionInterface
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(
-            [
-                'type',
-            ]
-        );
+        $resolver->setRequired(['type']);
         $resolver->setAllowedTypes('type', ['string']);
     }
 }

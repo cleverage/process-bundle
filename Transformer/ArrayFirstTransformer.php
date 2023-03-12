@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,14 +13,10 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Return the first element of an array
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ArrayFirstTransformer implements ConfigurableTransformerInterface
 {
@@ -25,15 +24,12 @@ class ArrayFirstTransformer implements ConfigurableTransformerInterface
      * Must return the transformed $value
      *
      * @param mixed $value
-     * @param array $options
      *
-     * @throws ExceptionInterface
-     *
-     * @return mixed $value
+     * @return mixed
      */
     public function transform($value, array $options = [])
     {
-        if ($options['allow_not_iterable'] && !is_iterable($value)) {
+        if ($options['allow_not_iterable'] && ! is_iterable($value)) {
             return $value;
         }
 
@@ -42,25 +38,16 @@ class ArrayFirstTransformer implements ConfigurableTransformerInterface
 
     /**
      * Returns the unique code to identify the transformer
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return 'array_first';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws ExceptionInterface
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(
-            [
-                'allow_not_iterable' => false,
-            ]
-        );
+        $resolver->setDefaults([
+            'allow_not_iterable' => false,
+        ]);
     }
 }

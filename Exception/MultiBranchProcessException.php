@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,27 +13,26 @@
 
 namespace CleverAge\ProcessBundle\Exception;
 
+use UnexpectedValueException;
+
 /**
  * Thrown when multiple independent branches are found in a process
  *
  * @deprecated, we won't send an error for now
  */
-class MultiBranchProcessException extends \UnexpectedValueException implements ProcessExceptionInterface
+class MultiBranchProcessException extends UnexpectedValueException implements ProcessExceptionInterface
 {
     /**
      * @param string $processCode
-     * @param array  $branches
-     *
-     * @return MultiBranchProcessException
      */
-    public static function create($processCode, array $branches)
+    public static function create($processCode, array $branches): self
     {
         $branchesStr = [];
         foreach ($branches as $branch) {
-            $branchesStr[] = '['.implode(', ', $branch).']';
+            $branchesStr[] = '[' . implode(', ', $branch) . ']';
         }
 
-        $errorStr = '['.implode(', ', $branchesStr).']';
+        $errorStr = '[' . implode(', ', $branchesStr) . ']';
         $errorStr = "Process {$processCode} contains multiple independent branches : {$errorStr}, ";
         $errorStr .= 'which is not allowed. Please create a process for each branch';
 

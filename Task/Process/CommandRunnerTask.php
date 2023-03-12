@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -18,26 +21,14 @@ use Symfony\Component\Process\Process;
 
 /**
  * Launch a system command for each input, passing input to command
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class CommandRunnerTask extends AbstractConfigurableTask
 {
-    /** @var KernelInterface */
-    protected $kernel;
-
-    /**
-     * @param KernelInterface $kernel
-     */
-    public function __construct(KernelInterface $kernel)
-    {
-        $this->kernel = $kernel;
+    public function __construct(
+        protected KernelInterface $kernel
+    ) {
     }
 
-    /**
-     * @inheritDoc
-     */
     public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
@@ -53,16 +44,9 @@ class CommandRunnerTask extends AbstractConfigurableTask
         $state->setOutput($process->getOutput());
     }
 
-    /**
-     * @inheritDoc
-     */
     protected function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(
-            [
-                'commandline',
-            ]
-        );
+        $resolver->setRequired(['commandline']);
         $resolver->setAllowedTypes('commandline', ['string', 'array']);
         $resolver->setDefaults(
             [

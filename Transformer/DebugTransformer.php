@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -14,14 +17,9 @@ use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Simple dump in a transformer, passthrough for value
- *
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class DebugTransformer implements TransformerInterface
 {
-    /**
-     * @inheritDoc
-     */
     public function transform($value, array $options = [])
     {
         if (class_exists(VarDumper::class)) {
@@ -31,10 +29,7 @@ class DebugTransformer implements TransformerInterface
         return $value;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'dump';
     }

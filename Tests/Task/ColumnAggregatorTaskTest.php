@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -14,12 +17,24 @@ use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 class ColumnAggregatorTaskTest extends AbstractProcessTest
 {
-    public function testSimpleColumnAggregation()
+    public function testSimpleColumnAggregation(): void
     {
-        $input1 = ['col1' => 'A', 'col2' => 'val1'];
-        $input2 = ['col1' => 'B', 'col2' => 'val2'];
-        $input3 = ['col1' => 'A', 'col2' => 'val3'];
-        $input4 = ['col1' => 'B', 'col2' => 'val4'];
+        $input1 = [
+            'col1' => 'A',
+            'col2' => 'val1',
+        ];
+        $input2 = [
+            'col1' => 'B',
+            'col2' => 'val2',
+        ];
+        $input3 = [
+            'col1' => 'A',
+            'col2' => 'val3',
+        ];
+        $input4 = [
+            'col1' => 'B',
+            'col2' => 'val4',
+        ];
         $input = [$input1, $input2, $input3, $input4];
 
         self::assertEquals(
@@ -45,6 +60,5 @@ class ColumnAggregatorTaskTest extends AbstractProcessTest
             ],
             $this->processManager->execute('test.column_aggregator_task.simple', $input)
         );
-
     }
 }

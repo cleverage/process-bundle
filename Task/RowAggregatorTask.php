@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,9 +18,6 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -28,31 +28,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
-    /** @var LoggerInterface */
-    protected $logger;
-
     /**
      * @var array
      */
     protected $result = [];
 
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        protected LoggerInterface $logger
+    ) {
     }
 
     /**
      * Store inputs and once everything has been received, pass to next task
      * Once an output has been generated this task is reset, and may wait for another loop
-     *
-     * @param ProcessState $state
-     *
-     * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
      */
     public function execute(ProcessState $state)
     {
@@ -62,7 +50,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         $aggregateColumns = $this->getOption($state, 'aggregate_columns');
         $aggregationKey = $this->getOption($state, 'aggregation_key');
 
-        if (!array_key_exists($aggregateBy, $input)) {
+        if (! array_key_exists($aggregateBy, $input)) {
             throw new InvalidProcessConfigurationException(
                 "Array aggregator exception: missing column '{$aggregateBy}'"
             );
@@ -70,7 +58,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
 
         $inputAggregateBy = $input[$aggregateBy];
 
-        if (!array_key_exists($inputAggregateBy, $this->result)) {
+        if (! array_key_exists($inputAggregateBy, $this->result)) {
             $this->result[$inputAggregateBy] = $input;
             foreach ($aggregateColumns as $aggregateColumn) {
                 if (array_key_exists($aggregateColumn, $this->result[$inputAggregateBy])) {
@@ -81,7 +69,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
 
         $inputAggregateColumns = [];
         foreach ($aggregateColumns as $aggregateColumn) {
-            if (!array_key_exists($aggregateColumn, $input)) {
+            if (! array_key_exists($aggregateColumn, $input)) {
                 throw new InvalidProcessConfigurationException(
                     "Array aggregator exception: missing column {$aggregateColumn}"
                 );
@@ -91,20 +79,11 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         $this->result[$inputAggregateBy][$aggregationKey][] = $inputAggregateColumns;
     }
 
-    /**
-     * @param ProcessState $state
-     */
-    public function proceed(ProcessState $state)
+    public function proceed(ProcessState $state): void
     {
         $state->setOutput(array_values($this->result));
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired('aggregate_by');

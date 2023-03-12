@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,15 +15,10 @@ namespace CleverAge\ProcessBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
-use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Generic compiler pass to add tagged services to a registry
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class RegistryCompilerPass implements CompilerPassInterface
 {
@@ -29,22 +27,19 @@ class RegistryCompilerPass implements CompilerPassInterface
      * @param string $tag
      * @param string $method
      */
-    public function __construct(protected $registry, protected $tag, protected $method)
-    {
+    public function __construct(
+        protected $registry,
+        protected $tag,
+        protected $method
+    ) {
     }
 
     /**
      * Inject tagged services into defined registry
-     *
-     * @param ContainerBuilder $container
-     *
-     * @throws InvalidArgumentException
-     * @throws \UnexpectedValueException
-     * @throws ServiceNotFoundException
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        if (!$container->has($this->registry)) {
+        if (! $container->has($this->registry)) {
             return;
         }
 
@@ -52,10 +47,7 @@ class RegistryCompilerPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds($this->tag);
 
         foreach ($taggedServices as $id => $tags) {
-            $definition->addMethodCall(
-                $this->method,
-                [new Reference($id)]
-            );
+            $definition->addMethodCall($this->method, [new Reference($id)]);
         }
     }
 }

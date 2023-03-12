@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -13,85 +16,99 @@ namespace CleverAge\ProcessBundle\Model;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use RuntimeException;
+use Throwable;
+use UnexpectedValueException;
 
 /**
  * Used to pass information between tasks
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ProcessState
 {
-    public const STATUS = [self::STATUS_NEW, self::STATUS_PENDING, self::STATUS_PROCESSING, self::STATUS_RESOLVED];
-    public const STATUS_NEW = 'new';
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_PROCESSING = 'processing';
-    public const STATUS_RESOLVED = 'resolved';
+    final public const STATUS = [
+        self::STATUS_NEW,
+        self::STATUS_PENDING,
+        self::STATUS_PROCESSING,
+        self::STATUS_RESOLVED,
+    ];
 
-    /** @var ProcessConfiguration */
-    protected $processConfiguration;
+    final public const STATUS_NEW = 'new';
 
-    /** @var ProcessHistory */
-    protected $processHistory;
+    final public const STATUS_PENDING = 'pending';
 
-    /** @var TaskConfiguration */
-    protected $taskConfiguration;
+    final public const STATUS_PROCESSING = 'processing';
 
-    /** @var mixed */
+    final public const STATUS_RESOLVED = 'resolved';
+
+    protected TaskConfiguration $taskConfiguration;
+
+    /**
+     * @var mixed
+     */
     protected $input;
 
-    /** @var mixed */
+    /**
+     * @var mixed
+     */
     protected $output;
 
-    /** @var mixed */
+    /**
+     * @var mixed
+     */
     protected $errorOutput;
 
-    /** @var boolean */
+    /**
+     * @var boolean
+     */
     protected $hasErrorOutput = false;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $stopped = false;
 
-    /** @var \Throwable */
-    protected $exception;
+    protected ?Throwable $exception = null;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $errorContext = [];
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $returnCode;
 
-    /** @var bool */
-    protected $skipped;
+    protected bool $skipped;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $context;
 
-    /** @var ContextualOptionResolver */
+    /**
+     * @var ContextualOptionResolver
+     */
     protected $contextualOptionResolver;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $contextualizedOptions;
 
-    /** @var ProcessState|null */
-    protected $previousState;
+    protected ?\CleverAge\ProcessBundle\Model\ProcessState $previousState = null;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $status = self::STATUS_NEW;
 
-    /**
-     * @param ProcessConfiguration $processConfiguration
-     * @param ProcessHistory       $processHistory
-     */
-    public function __construct(ProcessConfiguration $processConfiguration, ProcessHistory $processHistory)
-    {
-        $this->processConfiguration = $processConfiguration;
-        $this->processHistory = $processHistory;
+    public function __construct(
+        protected ProcessConfiguration $processConfiguration,
+        protected ProcessHistory $processHistory
+    ) {
     }
 
-    /**
-     * @param ContextualOptionResolver $contextualOptionResolver
-     */
     public function setContextualOptionResolver(ContextualOptionResolver $contextualOptionResolver): void
     {
         $this->contextualOptionResolver = $contextualOptionResolver;
@@ -99,10 +116,8 @@ class ProcessState
 
     /**
      * Clone the current object and keep a back reference
-     *
-     * @return ProcessState
      */
-    public function duplicate(): ProcessState
+    public function duplicate(): self
     {
         $newState = clone $this;
         $newState->setPreviousState($this);
@@ -130,33 +145,21 @@ class ProcessState
         }
     }
 
-    /**
-     * @return ProcessConfiguration
-     */
     public function getProcessConfiguration(): ProcessConfiguration
     {
         return $this->processConfiguration;
     }
 
-    /**
-     * @return ProcessHistory
-     */
     public function getProcessHistory(): ProcessHistory
     {
         return $this->processHistory;
     }
 
-    /**
-     * @return TaskConfiguration
-     */
     public function getTaskConfiguration(): TaskConfiguration
     {
         return $this->taskConfiguration;
     }
 
-    /**
-     * @param TaskConfiguration $taskConfiguration
-     */
     public function setTaskConfiguration(TaskConfiguration $taskConfiguration): void
     {
         $this->taskConfiguration = $taskConfiguration;
@@ -170,10 +173,7 @@ class ProcessState
         return $this->input;
     }
 
-    /**
-     * @param mixed $input
-     */
-    public function setInput($input): void
+    public function setInput(mixed $input): void
     {
         $this->input = $input;
     }
@@ -186,10 +186,7 @@ class ProcessState
         return $this->output;
     }
 
-    /**
-     * @param mixed $output
-     */
-    public function setOutput($output): void
+    public function setOutput(mixed $output): void
     {
         $this->output = $output;
     }
@@ -207,11 +204,9 @@ class ProcessState
     }
 
     /**
-     * @param mixed $error
-     *
      * @deprecated Use setErrorOutput instead
      */
-    public function setError($error): void
+    public function setError(mixed $error): void
     {
         @trigger_error('Deprecated method, use setErrorOutput instead', E_USER_DEPRECATED);
 
@@ -219,8 +214,6 @@ class ProcessState
     }
 
     /**
-     * @return bool
-     *
      * @deprecated Use hasErrorOutput instead
      */
     public function hasError(): bool
@@ -238,27 +231,18 @@ class ProcessState
         return $this->errorOutput;
     }
 
-    /**
-     * @param mixed $errorOutput
-     */
-    public function setErrorOutput($errorOutput): void
+    public function setErrorOutput(mixed $errorOutput): void
     {
         $this->hasErrorOutput = true;
         $this->errorOutput = $errorOutput;
     }
 
-    /**
-     * @return bool
-     */
     public function hasErrorOutput(): bool
     {
         return $this->hasErrorOutput;
     }
 
-    /**
-     * @param \Throwable $e
-     */
-    public function stop(\Throwable $e = null): void
+    public function stop(Throwable $e = null): void
     {
         if ($e) {
             $this->setException($e);
@@ -266,182 +250,118 @@ class ProcessState
         $this->setStopped(true);
     }
 
-    /**
-     * @return boolean
-     */
     public function isStopped(): bool
     {
         return $this->stopped;
     }
 
-    /**
-     * @param boolean $stopped
-     */
     public function setStopped(bool $stopped): void
     {
         $this->stopped = $stopped;
     }
 
-    /**
-     * @return \Throwable|null
-     */
-    public function getException(): ?\Throwable
+    public function getException(): ?Throwable
     {
         return $this->exception;
     }
 
-    /**
-     * @param \Throwable|null $exception
-     */
-    public function setException(\Throwable $exception = null): void
+    public function setException(Throwable $exception = null): void
     {
         $this->exception = $exception;
     }
 
-    /**
-     * @return array
-     */
     public function getErrorContext(): array
     {
         return $this->errorContext;
     }
 
-    /**
-     * @param array $errorContext
-     */
     public function setErrorContext(array $errorContext): void
     {
         $this->errorContext = $errorContext;
     }
 
-    /**
-     * @param string|int       $key
-     * @param string|int|array $value
-     */
-    public function addErrorContextValue($key, $value): void
+    public function addErrorContextValue(string|int $key, string|int|array $value): void
     {
         $this->errorContext[$key] = $value;
     }
 
-    /**
-     * @param string|int $key
-     */
-    public function removeErrorContext($key): void
+    public function removeErrorContext(string|int $key): void
     {
         unset($this->errorContext[$key]);
     }
 
-    /**
-     * @return int
-     */
     public function getReturnCode(): int
     {
-        if (null !== $this->returnCode) {
+        if ($this->returnCode !== null) {
             return $this->returnCode;
         }
 
         return 0;
     }
 
-    /**
-     * @param int $returnCode
-     */
     public function setReturnCode(int $returnCode): void
     {
         $this->returnCode = $returnCode;
     }
 
-    /**
-     * @return bool
-     */
     public function isSkipped(): bool
     {
         return $this->skipped;
     }
 
-    /**
-     * @param bool $skipped
-     */
     public function setSkipped(bool $skipped): void
     {
         $this->skipped = $skipped;
     }
 
-    /**
-     * @return ProcessState|null
-     */
-    public function getPreviousState(): ?ProcessState
+    public function getPreviousState(): ?self
     {
         return $this->previousState;
     }
 
-    /**
-     * @param ProcessState $previousState
-     */
-    public function setPreviousState($previousState): void
+    public function setPreviousState(?self $previousState): void
     {
         $this->previousState = $previousState;
     }
 
-    /**
-     * @return string
-     */
     public function getStatus(): string
     {
         return $this->status;
     }
 
-    /**
-     * @param string $status
-     *
-     * @throws \UnexpectedValueException
-     */
     public function setStatus(string $status): void
     {
-        if (!\in_array($status, self::STATUS, true)) {
-            throw new \UnexpectedValueException("Unknown status {$status}");
+        if (! \in_array($status, self::STATUS, true)) {
+            throw new UnexpectedValueException("Unknown status {$status}");
         }
 
         $this->status = $status;
     }
 
-    /**
-     * @return bool
-     */
     public function isResolved(): bool
     {
         return $this->status === self::STATUS_RESOLVED;
     }
 
-    /**
-     * @return array
-     */
     public function getContext(): array
     {
         return $this->context;
     }
 
-    /**
-     * @param array $context
-     *
-     * @throws \RuntimeException
-     */
     public function setContext(array $context): void
     {
         if ($this->context) {
-            throw new \RuntimeException('Once defined, context is immutable');
+            throw new RuntimeException('Once defined, context is immutable');
         }
 
         $this->context = $context;
     }
 
-    /**
-     * @return array|null
-     */
     public function getContextualizedOptions(): ?array
     {
-        if (!$this->contextualizedOptions) {
-            $options = $this->getTaskConfiguration()->getOptions();
+        if (! $this->contextualizedOptions) {
+            $options = $this->getTaskConfiguration()
+                ->getOptions();
             $this->contextualizedOptions = $this->contextualOptionResolver->contextualizeOptions(
                 $options,
                 $this->context
@@ -453,11 +373,10 @@ class ProcessState
 
     /**
      * @param string $code
-     * @param mixed  $default
      *
      * @return mixed
      */
-    public function getContextualizedOption($code, $default = null)
+    public function getContextualizedOption($code, mixed $default = null)
     {
         $contextualizedOptions = $this->getContextualizedOptions();
         if (array_key_exists($code, $contextualizedOptions)) {
@@ -468,8 +387,6 @@ class ProcessState
     }
 
     /**
-     * @return array
-     *
      * @deprecated Use monolog processors instead
      */
     public function getLogContext(): array

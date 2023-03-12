@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,7 +18,7 @@ class IterableTaskTest extends AbstractProcessTest
     /**
      * Check the execution order of a process containing one iterable loop and a blocking task
      */
-    public function testIterableProcess()
+    public function testIterableProcess(): void
     {
         $this->processManager->execute('test.iterable_process');
 
@@ -66,7 +69,7 @@ class IterableTaskTest extends AbstractProcessTest
      * Assert 2 iterators can run alone, without a subsequent blocking task
      * Assert \CleverAge\ProcessBundle\Task\InputIteratorTask can correctly reset
      */
-    public function testDoubleIterableAlone()
+    public function testDoubleIterableAlone(): void
     {
         $this->processManager->execute('test.double_iterable_alone');
 
@@ -93,11 +96,10 @@ class IterableTaskTest extends AbstractProcessTest
         );
     }
 
-
     /**
      * Assert the SplitJoinLineTask works the way it's supposed to
      */
-    public function testSplitJoinLine()
+    public function testSplitJoinLine(): void
     {
         $this->processManager->execute('test.split_join_iterable');
 

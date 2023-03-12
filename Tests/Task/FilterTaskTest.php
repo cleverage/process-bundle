@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -17,11 +20,10 @@ use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
  */
 class FilterTaskTest extends AbstractProcessTest
 {
-
     /**
      * Assert simple matching/empty filters
      */
-    public function testFilterMatch()
+    public function testFilterMatch(): void
     {
         $input = [
             [

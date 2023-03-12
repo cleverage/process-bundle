@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -11,30 +13,24 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Iterator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use UnexpectedValueException;
 
 /**
  * Base class to handle output iterations
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 abstract class AbstractIterableOutputTask extends AbstractConfigurableTask implements IterableTaskInterface
 {
-    /** @var \Iterator */
+    /**
+     * @var Iterator
+     */
     protected $iterator;
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $this->handleIteratorFromInput($state);
 
@@ -53,20 +49,18 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
      * return true if the task has a next element
      * return false if the task has terminated it's iteration
      *
-     * @param ProcessState $state
-     *
      * @return bool
      */
     public function next(ProcessState $state)
     {
-        if (!$this->iterator) {
+        if (! $this->iterator) {
             return false;
         }
         $this->iterator->next();
 
         $state->removeErrorContext('iterator_key');
 
-        if (!$this->iterator->valid()) {
+        if (! $this->iterator->valid()) {
             // Reset the iterator to allow the following iteration
             $this->iterator = null;
 
@@ -78,12 +72,10 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
 
     /**
      * Create or recreate an iterator from input
-     *
-     * @param ProcessState $state
      */
     protected function handleIteratorFromInput(ProcessState $state)
     {
-        if ($this->iterator instanceof \Iterator) {
+        if ($this->iterator instanceof Iterator) {
             if ($this->iterator->valid()) {
                 return; // No action needed, execution is in progress
             }
@@ -92,8 +84,8 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
         }
 
         // This should never be reached
-        if (null !== $this->iterator) {
-            throw new \UnexpectedValueException(
+        if ($this->iterator !== null) {
+            throw new UnexpectedValueException(
                 "At this point iterator should have been null, maybe it's a wrong type..."
             );
         }
@@ -110,10 +102,5 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
     {
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @return \Iterator
-     */
-    abstract protected function initializeIterator(ProcessState $state): \Iterator;
+    abstract protected function initializeIterator(ProcessState $state): Iterator;
 }

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,7 +13,6 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\AccessException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -18,35 +20,26 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DefaultTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('value');
     }
 
     /**
      * @param mixed $value
-     * @param array $options
      *
      * @return mixed
      */
     public function transform($value, array $options = [])
     {
-        if (!$value) {
+        if (! $value) {
             return $options['value'];
         }
 
         return $value;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'default';
     }

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,16 +18,10 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 
 /**
  * Dummy task that pass the input to the output
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class DummyTask implements TaskInterface
 {
-    /**
-     * @param ProcessState $state
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $state->setOutput($state->getInput());
     }

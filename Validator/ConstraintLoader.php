@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -23,17 +26,13 @@ class ConstraintLoader extends AbstractLoader
     /**
      * Build constraints from textual data
      * @see \Symfony\Component\Validator\Mapping\Loader\YamlFileLoader::parseNodes
-     *
-     * @param array $nodes
-     *
-     * @return array
      */
     public function buildConstraints(array $nodes): array
     {
         $values = [];
 
         foreach ($nodes as $name => $childNodes) {
-            if (is_numeric($name) && \is_array($childNodes) && 1 === \count($childNodes)) {
+            if (is_numeric($name) && \is_array($childNodes) && \count($childNodes) === 1) {
                 $options = current($childNodes);
 
                 if (\is_array($options)) {

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -11,23 +14,25 @@
 namespace CleverAge\ProcessBundle\Event;
 
 use Throwable;
+
 /**
  * Event object for process start/stop/fail
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
  */
 class ProcessEvent extends GenericEvent
 {
-
     final public const EVENT_PROCESS_STARTED = 'cleverage_process.start';
+
     final public const EVENT_PROCESS_ENDED = 'cleverage_process.end';
+
     final public const EVENT_PROCESS_FAILED = 'cleverage_process.fail';
 
-    /**
-     * ProcessEvent constructor.
-     */
-    public function __construct(protected string $processCode, protected mixed $processInput = null, protected array $processContext = [], protected mixed $processOutput = null, protected ?Throwable $processError = null)
-    {
+    public function __construct(
+        protected string $processCode,
+        protected mixed $processInput = null,
+        protected array $processContext = [],
+        protected mixed $processOutput = null,
+        protected ?Throwable $processError = null
+    ) {
     }
 
     public function getProcessCode(): string
@@ -60,5 +65,4 @@ class ProcessEvent extends GenericEvent
     {
         return $this->processError;
     }
-
 }

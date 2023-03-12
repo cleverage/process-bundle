@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,6 +13,7 @@
 
 namespace CleverAge\ProcessBundle\Model;
 
+use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,65 +22,36 @@ use Symfony\Component\Process\Process;
 
 class SubprocessInstance
 {
-    public const OPTION_JSON_BUFFERING = 'json-buffering';
+    final public const OPTION_JSON_BUFFERING = 'json-buffering';
 
-    /** @var Process */
-    protected $process;
+    protected Process $process;
 
-    /** @var string */
-    protected $bufferPath;
+    protected string $bufferPath;
 
-    /** @var string */
-    protected $processCode;
+    protected array $options;
 
-    /** @var string|null */
-    protected $input;
+    protected string $consolePath;
 
-    /** @var array */
-    protected $options;
+    protected string $environment;
 
-    /** @var array */
-    protected $context;
+    protected string $logDir;
 
-    /** @var string */
-    protected $consolePath;
-
-    /** @var string */
-    protected $environment;
-
-    /** @var string */
-    protected $logDir;
-
-    /**
-     * SubprocessInstance constructor.
-     *
-     * @param KernelInterface $kernel
-     * @param string          $processCode
-     * @param string|null     $input
-     * @param array           $context
-     * @param array           $options
-     */
     public function __construct(
         KernelInterface $kernel,
-        string $processCode,
-        ?string $input,
-        array $context = [],
+        protected string $processCode,
+        protected ?string $input,
+        protected array $context = [],
         array $options = []
     ) {
-        $this->processCode = $processCode;
-        $this->input = $input;
-        $this->context = $context;
-
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
         $this->options = $resolver->resolve($options);
 
-        $this->consolePath = $kernel->getProjectDir().'/bin/console';
+        $this->consolePath = $kernel->getProjectDir() . '/bin/console';
         $this->environment = $kernel->getEnvironment();
-        $this->bufferPath = $kernel->getProjectDir().'/var/cdm_buffer_'.uniqid().'.json-stream'; // Todo use param ?
-        $this->logDir = $kernel->getLogDir().'/process';
+        $this->bufferPath = $kernel->getProjectDir() . '/var/cdm_buffer_' . uniqid() . '.json-stream'; // Todo use param ?
+        $this->logDir = $kernel->getLogDir() . '/process';
     }
-
 
     /**
      * Prepare the process before start
@@ -91,28 +66,22 @@ class SubprocessInstance
             'nohup',
             $pathFinder->find(),
             $this->consolePath,
-            '--env='.$this->environment,
+            '--env=' . $this->environment,
             'cleverage:process:execute',
             '--input-from-stdin',
         ];
 
         $fs = new Filesystem();
         $fs->mkdir($this->logDir);
-        if (!$fs->exists($this->consolePath)) {
-            throw new \RuntimeException("Unable to resolve path to symfony console '{$this->consolePath}'");
+        if (! $fs->exists($this->consolePath)) {
+            throw new RuntimeException("Unable to resolve path to symfony console '{$this->consolePath}'");
         }
 
         if ($this->options[self::OPTION_JSON_BUFFERING]) {
-            $arguments = array_merge(
-                $arguments,
-                [
-                    '--output='.$this->bufferPath,
-                    '--output-format=json-stream',
-                ]
-            );
+            $arguments = array_merge($arguments, ['--output=' . $this->bufferPath, '--output-format=json-stream']);
         }
 
-        if (!empty($this->context)) {
+        if (! empty($this->context)) {
             foreach ($this->context as $key => $value) {
                 $arguments[] = sprintf('--context=%s:%s', $key, $value);
             }
@@ -120,15 +89,7 @@ class SubprocessInstance
 
         $arguments[] = $this->processCode;
 
-        $this->process = new Process($arguments, null, null, $this->input);
-
-        if (method_exists(Process::class, 'fromShellCommandline')) {
-            $this->process = Process::fromShellCommandline($this->process->getCommandLine(), null, null, $this->input);
-        } else {
-            $this->process->setCommandLine($this->process->getCommandLine());
-            $this->process->inheritEnvironmentVariables();
-        }
-
+        $this->process = Process::fromShellCommandline($this->process->getCommandLine(), null, null, $this->input);
         $this->process->enableOutput();
 
         return $this;
@@ -139,7 +100,7 @@ class SubprocessInstance
      *
      * @return $this
      */
-    public function start()
+    public function start(): static
     {
         $this->process->start();
 
@@ -149,60 +110,40 @@ class SubprocessInstance
     /**
      * Stop the process
      *
-     * @param int $timeout
-     *
      * @return $this
      */
-    public function stop($timeout = 10)
+    public function stop(float $timeout = 10): static
     {
         $this->process->stop($timeout);
 
         return $this;
     }
 
-    /**
-     * @return Process
-     */
     public function getProcess(): Process
     {
         return $this->process;
     }
 
-    /**
-     * @return string
-     */
     public function getProcessCode(): string
     {
         return $this->processCode;
     }
 
-    /**
-     * @return string|null
-     */
     public function getInput(): ?string
     {
         return $this->input;
     }
 
-    /**
-     * @return array
-     */
     public function getOptions(): array
     {
         return $this->options;
     }
 
-    /**
-     * @return array
-     */
     public function getContext(): array
     {
         return $this->context;
     }
 
-    /**
-     * @return string|null
-     */
     public function getResult(): ?string
     {
         $fs = new Filesystem();
@@ -215,10 +156,8 @@ class SubprocessInstance
 
     /**
      * Available options for process launcher
-     *
-     * @param OptionsResolver $resolver
      */
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault(self::OPTION_JSON_BUFFERING, false);
         $resolver->setAllowedTypes(self::OPTION_JSON_BUFFERING, 'bool');

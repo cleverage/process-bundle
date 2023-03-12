@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,7 +13,6 @@
 
 namespace CleverAge\ProcessBundle\Tests\Transformer;
 
-
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
@@ -21,7 +23,7 @@ class UnsetTransformerTest extends AbstractProcessTest
     /**
      * Assert the transformer can do a simple unset
      */
-    public function testSimpleUnset()
+    public function testSimpleUnset(): void
     {
         $input = [
             'other' => 1,
@@ -29,13 +31,16 @@ class UnsetTransformerTest extends AbstractProcessTest
             'to_test' => 2,
         ];
         $result = $this->processManager->execute('test.unset_transformer.simple', $input);
-        self::assertEquals(['other' => 1, 'to_test' => 2], $result);
+        self::assertEquals([
+            'other' => 1,
+            'to_test' => 2,
+        ], $result);
     }
 
     /**
      * Assert a few simple condition can trigger unset (or not)
      */
-    public function testConditionalUnset()
+    public function testConditionalUnset(): void
     {
         $input = [
             'other' => 1,
@@ -45,21 +50,35 @@ class UnsetTransformerTest extends AbstractProcessTest
 
         // Should unset
         $result = $this->processManager->execute('test.unset_transformer.condition', $input);
-        self::assertEquals(['other' => 1, 'to_test' => 2], $result);
+        self::assertEquals([
+            'other' => 1,
+            'to_test' => 2,
+        ], $result);
 
         // No unset
         $input['to_test'] = 3;
         $result = $this->processManager->execute('test.unset_transformer.condition', $input);
-        self::assertEquals(['other' => 1, 'to_unset' => 1, 'to_test' => 3], $result);
+        self::assertEquals([
+            'other' => 1,
+            'to_unset' => 1,
+            'to_test' => 3,
+        ], $result);
 
         // Checking null, no unset
         $result = $this->processManager->execute('test.unset_transformer.condition_null', $input);
-        self::assertEquals(['other' => 1, 'to_unset' => 1, 'to_test' => 3], $result);
+        self::assertEquals([
+            'other' => 1,
+            'to_unset' => 1,
+            'to_test' => 3,
+        ], $result);
 
         // Should unset
         $input['to_test'] = null;
         $result = $this->processManager->execute('test.unset_transformer.condition_null', $input);
-        self::assertEquals(['other' => 1, 'to_test' => null], $result);
+        self::assertEquals([
+            'other' => 1,
+            'to_test' => null,
+        ], $result);
     }
 
     /**
@@ -67,7 +86,7 @@ class UnsetTransformerTest extends AbstractProcessTest
      *
      * @expectedException \RuntimeException
      */
-    public function testWrongUnsetString()
+    public function testWrongUnsetString(): void
     {
         $this->processManager->execute('test.unset_transformer.simple', 'not an array');
     }
@@ -77,9 +96,8 @@ class UnsetTransformerTest extends AbstractProcessTest
      *
      * @expectedException \RuntimeException
      */
-    public function testWrongUnsetMissingProperty()
+    public function testWrongUnsetMissingProperty(): void
     {
         $this->processManager->execute('test.unset_transformer.simple', ['no property found']);
     }
-
 }

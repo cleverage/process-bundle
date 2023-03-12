@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,8 +13,6 @@
 
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
-use RuntimeException;
-use ReflectionMethod;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -24,36 +25,24 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * This is the class that validates and merges configuration from your app/config files.
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/configuration.html}
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class Configuration implements ConfigurationInterface
 {
     /**
      * @param string $root
      */
-    public function __construct(protected $root = 'clever_age_process')
-    {
+    public function __construct(
+        protected $root = 'clever_age_process'
+    ) {
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * @throws RuntimeException
-     */
     public function getConfigTreeBuilder()
     {
         [$treeBuilder, $rootNode] = $this->createTreeBuilder();
         $definition = $rootNode->children();
         // Default error strategy
         $definition->enumNode('default_error_strategy')
-            ->values(
-                [
-                    TaskConfiguration::STRATEGY_SKIP,
-                    TaskConfiguration::STRATEGY_STOP,
-                ]
-            )
+            ->values([TaskConfiguration::STRATEGY_SKIP, TaskConfiguration::STRATEGY_STOP])
             ->isRequired();
 
         $this->appendRootProcessConfigDefinition($definition);
@@ -88,8 +77,14 @@ class Configuration implements ConfigurationInterface
     protected function appendTransformerConfigDefinition(NodeBuilder $definition)
     {
         $definition
-            ->arrayNode('contextual_options')->prototype('variable')->end()->end()
-            ->arrayNode('transformers')->prototype('variable')->end()->end();
+            ->arrayNode('contextual_options')
+            ->prototype('variable')
+            ->end()
+            ->end()
+            ->arrayNode('transformers')
+            ->prototype('variable')
+            ->end()
+            ->end();
     }
 
     /**
@@ -116,12 +111,25 @@ class Configuration implements ConfigurationInterface
     protected function appendProcessConfigDefinition(NodeBuilder $definition)
     {
         $definition
-            ->scalarNode('entry_point')->defaultNull()->end()
-            ->scalarNode('end_point')->defaultNull()->end()
-            ->scalarNode('description')->defaultValue('')->end()
-            ->scalarNode('help')->defaultValue('')->end()
-            ->scalarNode('public')->defaultTrue()->end()
-            ->arrayNode('options')->prototype('variable')->end()->end();
+            ->scalarNode('entry_point')
+            ->defaultNull()
+            ->end()
+            ->scalarNode('end_point')
+            ->defaultNull()
+            ->end()
+            ->scalarNode('description')
+            ->defaultValue('')
+            ->end()
+            ->scalarNode('help')
+            ->defaultValue('')
+            ->end()
+            ->scalarNode('public')
+            ->defaultTrue()
+            ->end()
+            ->arrayNode('options')
+            ->prototype('variable')
+            ->end()
+            ->end();
 
         /** @var ArrayNodeDefinition $tasksArrayDefinition */
         $tasksArrayDefinition = $definition
@@ -152,14 +160,23 @@ class Configuration implements ConfigurationInterface
             LogLevel::DEBUG,
         ];
 
-        $definition->scalarNode('service')->isRequired();
-        $definition->scalarNode('description')->defaultValue('');
-        $definition->scalarNode('help')->defaultValue('');
-        $definition->arrayNode('options')->prototype('variable')->end();
-        $definition->scalarNode('error_strategy')->defaultNull();
-        $definition->enumNode('log_level')->values($logLevels)->defaultValue(LogLevel::CRITICAL);
+        $definition->scalarNode('service')
+            ->isRequired();
+        $definition->scalarNode('description')
+            ->defaultValue('');
+        $definition->scalarNode('help')
+            ->defaultValue('');
+        $definition->arrayNode('options')
+            ->prototype('variable')
+            ->end();
+        $definition->scalarNode('error_strategy')
+            ->defaultNull();
+        $definition->enumNode('log_level')
+            ->values($logLevels)
+            ->defaultValue(LogLevel::CRITICAL);
 
-        $logErrorNode = $definition->booleanNode('log_errors')->defaultTrue();
+        $logErrorNode = $definition->booleanNode('log_errors')
+            ->defaultTrue();
         $this->deprecateNode(
             $logErrorNode,
             'cleverage/process-bundle',
@@ -170,9 +187,8 @@ class Configuration implements ConfigurationInterface
         foreach (['outputs', 'errors', 'error_outputs'] as $nodeName) {
             $definition->arrayNode($nodeName)
                 ->beforeNormalization()
-                ->ifString()->then(
-                    fn($item): array => [$item]
-                )->end()
+                ->ifString()
+                ->then(fn ($item): array => [$item])->end()
                 ->prototype('scalar');
         }
     }
@@ -185,12 +201,7 @@ class Configuration implements ConfigurationInterface
      */
     protected function deprecateNode(NodeDefinition $node, string $package, string $version, string $message)
     {
-        $deprecationMethodReflection = new ReflectionMethod(NodeDefinition::class, 'setDeprecated');
-        if ($deprecationMethodReflection->getNumberOfParameters() === 1) {
-            $node->setDeprecated("Since {$package} {$version}: {$message}");
-        } else {
-            $node->setDeprecated($package, $version, $message);
-        }
+        $node->setDeprecated($package, $version, $message);
     }
 
     /**
@@ -198,8 +209,6 @@ class Configuration implements ConfigurationInterface
      * Provides compatibility with Sf3, 4 and 5
      *
      * @TODO remove this once support for Symfony 3 and 4 is dropped
-     *
-     * @param string $root
      *
      * @return array A tuple containing [TreeBuilder, NodeDefinition]
      */

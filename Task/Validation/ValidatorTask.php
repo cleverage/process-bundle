@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,52 +18,29 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Validator\ConstraintLoader;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use UnexpectedValueException;
 
 /**
  * Validate the input and pass it to the output
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ValidatorTask extends AbstractConfigurableTask
 {
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /** @var ValidatorInterface */
-    protected $validator;
-
-    /**
-     * @param LoggerInterface    $logger
-     * @param ValidatorInterface $validator
-     */
-    public function __construct(LoggerInterface $logger, ValidatorInterface $validator)
-    {
-        $this->logger = $logger;
-        $this->validator = $validator;
+    public function __construct(
+        protected LoggerInterface $logger,
+        protected ValidatorInterface $validator
+    ) {
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
-     * @throws \UnexpectedValueException
-     */
     public function execute(ProcessState $state)
     {
         $options = $this->getOptions($state);
-        $violations = $this->validator->validate(
-            $state->getInput(),
-            $options['constraints'],
-            $options['groups']
-        );
+        $violations = $this->validator->validate($state->getInput(), $options['constraints'], $options['groups']);
 
-        if (0 < $violations->count()) {
+        if ($violations->count() > 0) {
             /** @var ConstraintViolationInterface $violation */
             foreach ($violations as $violation) {
                 $invalidValue = $violation->getInvalidValue();
@@ -82,15 +62,12 @@ class ValidatorTask extends AbstractConfigurableTask
                 return;
             }
 
-            throw new \UnexpectedValueException("{$violations->count()} constraint violations detected on validation");
+            throw new UnexpectedValueException("{$violations->count()} constraint violations detected on validation");
         }
 
         $state->setOutput($state->getInput());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefault('log_errors', LogLevel::CRITICAL);
@@ -112,7 +89,7 @@ class ValidatorTask extends AbstractConfigurableTask
         $resolver->setNormalizer(
             'log_errors',
             static function (Options $options, $value) {
-                if (true === $value) {
+                if ($value === true) {
                     return LogLevel::CRITICAL;
                 }
 
@@ -127,8 +104,8 @@ class ValidatorTask extends AbstractConfigurableTask
         $resolver->setAllowedTypes('constraints', ['null', 'array']);
         $resolver->setNormalizer(
             'constraints',
-            static function (Options $options, $constraints) {
-                if (null === $constraints) {
+            static function (Options $options, $constraints): ?array {
+                if ($constraints === null) {
                     return null;
                 }
 

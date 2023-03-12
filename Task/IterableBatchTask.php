@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,52 +18,37 @@ use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use SplQueue;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * A Batch task that iterate on flush
  * It's mainly an example task since it's not useful as-is, but the processInput method may allow custom overrides
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
  */
 class IterableBatchTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
 {
-
-    /** @var \SplQueue */
+    /**
+     * @var SplQueue
+     */
     protected $outputQueue;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $flushMode = false;
 
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /**
-     * IterableBatchTask constructor.
-     *
-     * @param LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        protected LoggerInterface $logger
+    ) {
     }
 
-    /**
-     * @param ProcessState $state
-     */
-    public function initialize(ProcessState $state)
+    public function initialize(ProcessState $state): void
     {
         parent::initialize($state);
-        $this->outputQueue = new \SplQueue();
+        $this->outputQueue = new SplQueue();
     }
 
-
-    /**
-     * @param ProcessState $state
-     */
-    public function flush(ProcessState $state)
+    public function flush(ProcessState $state): void
     {
         $this->flushMode = true;
         if ($this->outputQueue->isEmpty()) {
@@ -70,23 +58,17 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
         }
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
-     * @throws \InvalidArgumentException
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $batchCount = $this->getOption($state, 'batch_count');
 
         // Register new input
-        if (!$this->flushMode) {
+        if (! $this->flushMode) {
             $this->outputQueue->enqueue($this->processInput($state));
         }
 
         // Detect flushing
-        if (null !== $batchCount && \count($this->outputQueue) >= $batchCount) {
+        if ($batchCount !== null && \count($this->outputQueue) >= $batchCount) {
             $this->flushMode = true;
         }
 
@@ -99,40 +81,29 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     }
 
     /**
-     * @param ProcessState $state
-     *
      * @return bool
      */
     public function next(ProcessState $state)
     {
         // Stop flushing once over
-        if (!\count($this->outputQueue)) {
+        if (! \count($this->outputQueue)) {
             $this->flushMode = false;
         }
 
         return $this->flushMode;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'batch_count' => 10,
-            ]
-        );
+        $resolver->setDefaults([
+            'batch_count' => 10,
+        ]);
 
         $resolver->setAllowedTypes('batch_count', 'integer');
     }
 
     /**
      * Override this method to add a custom processing behavior
-     *
-     * @param ProcessState $state
      *
      * @return mixed
      */

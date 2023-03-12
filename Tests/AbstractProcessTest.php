@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,6 +13,7 @@
 
 namespace CleverAge\ProcessBundle\Tests;
 
+use CleverAge\ProcessBundle\EventListener\DataQueueEventListener;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
@@ -17,8 +21,6 @@ use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use CleverAge\ProcessBundle\EventListener\DataQueueEventListener;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -26,38 +28,44 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractProcessTest extends KernelTestCase
 {
-    /** @var ProcessManager */
+    /**
+     * @var ProcessManager
+     */
     protected $processManager;
 
-    /** @var ProcessConfigurationRegistry */
+    /**
+     * @var ProcessConfigurationRegistry
+     */
     protected $processConfigurationRegistry;
 
-    /** @var TransformerRegistry */
+    /**
+     * @var TransformerRegistry
+     */
     protected $transformerRegistry;
 
     /**
      * Initialize DI
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         static::bootKernel();
 
-        $this->processManager = $this->getContainer()->get(ProcessManager::class);
-        $this->processConfigurationRegistry = $this->getContainer()->get(ProcessConfigurationRegistry::class);
-        $this->transformerRegistry = $this->getContainer()->get(TransformerRegistry::class);
+        $this->processManager = $this->getContainer()
+            ->get(ProcessManager::class);
+        $this->processConfigurationRegistry = $this->getContainer()
+            ->get(ProcessConfigurationRegistry::class);
+        $this->transformerRegistry = $this->getContainer()
+            ->get(TransformerRegistry::class);
     }
 
     /**
      * Assert that an array of values match what's been registered in the standard queue
      * It can also match task codes using the checkTask flag
-     *
-     * @param array  $expected
-     * @param string $processName
-     * @param bool   $checkTask
      */
     protected function assertDataQueue(array $expected, string $processName, bool $checkTask = true)
     {
-        $dataQueueListener = $this->getContainer()->get(DataQueueEventListener::class);
+        $dataQueueListener = $this->getContainer()
+            ->get(DataQueueEventListener::class);
         $actualQueue = $dataQueueListener->getQueue($processName);
 
         self::assertCount(\count($expected), $actualQueue, 'Event count does not match');
@@ -72,7 +80,9 @@ abstract class AbstractProcessTest extends KernelTestCase
                 if (array_key_exists('task', $expected[$key])) {
                     self::assertEquals(
                         $expected[$key]['task'],
-                        $value->getPreviousState()->getTaskConfiguration()->getCode(),
+                        $value->getPreviousState()
+                            ->getTaskConfiguration()
+                            ->getCode(),
                         "Task #{$key} does not match"
                     );
                 }
@@ -89,13 +99,11 @@ abstract class AbstractProcessTest extends KernelTestCase
      * Returns the booted symfony container
      *
      * Compatibility backport for symfony/phpunit-bridge that should work with v3 or v4
-     *
-     * @return ContainerInterface
      */
     protected function getContainer(): ContainerInterface
     {
-        if (isset(self::$container)) {
-            return self::$container;
+        if (isset(self::getContainer())) {
+            return self::getContainer();
         }
 
         $container = self::$kernel->getContainer();
@@ -106,15 +114,8 @@ abstract class AbstractProcessTest extends KernelTestCase
 
     /**
      * Helper method to configure options and test a transformation
-     *
-     * @param string $transformerCode
-     * @param mixed  $expected
-     * @param mixed  $value
-     * @param array  $options
-     *
-     * @throws ExceptionInterface
      */
-    protected function assertTransformation(string $transformerCode, $expected, $value, array $options = [])
+    protected function assertTransformation(string $transformerCode, mixed $expected, mixed $value, array $options = [])
     {
         $result = $this->transform($transformerCode, $value, $options);
         self::assertEquals($expected, $result);
@@ -123,14 +124,9 @@ abstract class AbstractProcessTest extends KernelTestCase
     /**
      * Transform some value using referenced transformer with given options
      *
-     * @param string $transformerCode
-     * @param mixed  $value
-     * @param array  $options
-     *
      * @return mixed
-     * @throws ExceptionInterface
      */
-    protected function transform(string $transformerCode, $value, array $options = [])
+    protected function transform(string $transformerCode, mixed $value, array $options = [])
     {
         $transformer = $this->transformerRegistry->getTransformer($transformerCode);
 

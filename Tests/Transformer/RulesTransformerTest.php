@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -14,13 +17,10 @@ use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 class RulesTransformerTest extends AbstractProcessTest
 {
-
     /**
      * Assert basic rules types
-     *
-     * @throws \Exception
      */
-    public function testSimpleRule()
+    public function testSimpleRule(): void
     {
         $result1 = $this->processManager->execute('test.rules_transformer.simple', 'ok');
         self::assertEquals('result1', $result1);
@@ -31,5 +31,4 @@ class RulesTransformerTest extends AbstractProcessTest
         $result3 = $this->processManager->execute('test.rules_transformer.simple', 'any');
         self::assertEquals('result3', $result3);
     }
-
 }

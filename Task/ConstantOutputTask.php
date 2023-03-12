@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,42 +13,22 @@
 
 namespace CleverAge\ProcessBundle\Task;
 
-use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Always send the same output regardless of the input
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ConstantOutputTask extends AbstractConfigurableTask
 {
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $state->setOutput($this->getOption($state, 'output'));
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(
-            [
-                'output',
-            ]
-        );
+        $resolver->setRequired(['output']);
     }
 }

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -11,9 +14,6 @@
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -22,30 +22,20 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class InputCsvReaderTask extends CsvReaderTask
 {
     /**
-     * @param ProcessState $state
-     *
      * @TODO refactor to get file path outside of options
-     *
-     * @throws ExceptionInterface
      *
      * @return array
      */
     protected function getOptions(ProcessState $state)
     {
         $options = parent::getOptions($state);
-        if (null !== $state->getInput()) {
+        if ($state->getInput() !== null) {
             $options['file_path'] = $this->getFilePath($options, $state->getInput());
         }
 
         return $options;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
@@ -58,19 +48,14 @@ class InputCsvReaderTask extends CsvReaderTask
 
     /**
      * If there is no base_path, then the given path from input should be absolute
-     *
-     * @param array  $options
-     * @param string $input
-     *
-     * @return string
      */
-    protected function getFilePath(array $options, string $input)
+    protected function getFilePath(array $options, string $input): string
     {
         $basePath = $options['base_path'];
-        if ('' !== $basePath) {
-            $basePath = rtrim($options['base_path'], '/').'/';
+        if ($basePath !== '') {
+            $basePath = rtrim((string) $options['base_path'], '/') . '/';
         }
 
-        return $basePath.$input;
+        return $basePath . $input;
     }
 }

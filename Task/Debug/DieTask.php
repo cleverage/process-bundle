@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -17,15 +20,10 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
  * Class DieTask
  *
  * Stops the process brutally
- *
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class DieTask implements TaskInterface
 {
-    /**
-     * @param ProcessState $state
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): never
     {
         die();
     }

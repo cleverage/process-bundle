@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,27 +15,12 @@ namespace CleverAge\ProcessBundle\Task\File;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class FileWriterTask
- *
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
- */
 class FileWriterTask extends AbstractConfigurableTask
 {
-    /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
-     * @throws IOException
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
 
@@ -42,19 +30,9 @@ class FileWriterTask extends AbstractConfigurableTask
         $state->setOutput($options['filename']);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(
-            [
-                'filename',
-            ]
-        );
+        $resolver->setRequired(['filename']);
         $resolver->setAllowedTypes('filename', ['string']);
     }
 }

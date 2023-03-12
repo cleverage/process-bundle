@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,55 +13,34 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * Class PregFilterTransformer
- *
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
- */
 class PregFilterTransformer implements ConfigurableTransformerInterface
 {
     /**
      * Must return the transformed $value
      *
      * @param mixed $value
-     * @param array $options
-     *
-     * @return mixed $value
      */
-    public function transform($value, array $options = [])
+    public function transform($value, array $options = []): array|string|null
     {
         $pattern = $options['pattern'];
         $replacement = $options['replacement'];
 
-        return preg_filter($pattern, $replacement, $value);
+        return preg_filter($pattern, (string) $replacement, (string) $value);
     }
 
     /**
      * Returns the unique code to identify the transformer
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return 'preg_filter';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws ExceptionInterface
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(
-            [
-                'pattern',
-                'replacement',
-            ]
-        );
+        $resolver->setRequired(['pattern', 'replacement']);
         $resolver->setAllowedTypes('pattern', ['string', 'array']);
         $resolver->setAllowedTypes('replacement', ['string', 'array']);
     }

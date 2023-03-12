@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -13,10 +16,7 @@ namespace CleverAge\ProcessBundle\Task\File\Csv;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Filesystem\CsvResource;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Symfony\Component\Filesystem\Exception\IOException;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
+use RuntimeException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -24,19 +24,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CsvSplitterTask extends InputCsvReaderTask
 {
-    /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
-     * @throws IOException
-     * @throws \LogicException
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
-        if (null === $this->csv) {
+        if ($this->csv === null) {
             $headers = $this->getHeaders($state, $options);
             $csv = new CsvFile(
                 $options['file_path'],
@@ -59,17 +50,11 @@ class CsvSplitterTask extends InputCsvReaderTask
      * return true if the task has a next element
      * return false if the task has terminated it's iteration
      *
-     * @param ProcessState $state
-     *
-     * @throws \LogicException
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
-     *
      * @return bool
      */
     public function next(ProcessState $state)
     {
-        if (!$this->csv instanceof CsvResource) {
+        if (! $this->csv instanceof CsvResource) {
             return false;
         }
 
@@ -79,15 +64,10 @@ class CsvSplitterTask extends InputCsvReaderTask
             $this->csv = null;
         }
 
-        return !$endOfFile;
+        return ! $endOfFile;
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws IOException
-     */
-    public function finalize(ProcessState $state)
+    public function finalize(ProcessState $state): void
     {
         if ($this->csv instanceof CsvResource) {
             $this->csv->close();
@@ -96,21 +76,16 @@ class CsvSplitterTask extends InputCsvReaderTask
     }
 
     /**
-     * @param CsvFile $csv
      * @param int     $maxLines
-     *
-     * @throws \RuntimeException
-     * @throws \LogicException
-     * @throws \UnexpectedValueException
      *
      * @return string
      */
     protected function splitCsv(CsvFile $csv, $maxLines)
     {
-        $tmpFilePath = sys_get_temp_dir().DIRECTORY_SEPARATOR.'php_'.uniqid('process', false).'.csv';
+        $tmpFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'php_' . uniqid('process', false) . '.csv';
         $tmpFile = fopen($tmpFilePath, 'wb+');
-        if (false === $tmpFile) {
-            throw new \RuntimeException("Unable to open temporary file {$tmpFilePath}");
+        if ($tmpFile === false) {
+            throw new RuntimeException("Unable to open temporary file {$tmpFilePath}");
         }
         $splitCsv = new CsvResource(
             $tmpFile,
@@ -121,9 +96,9 @@ class CsvSplitterTask extends InputCsvReaderTask
         );
         $splitCsv->writeHeaders();
 
-        while ($splitCsv->getLineNumber() < $maxLines && !$csv->isEndOfFile()) {
+        while ($splitCsv->getLineNumber() < $maxLines && ! $csv->isEndOfFile()) {
             $raw = $csv->readRaw();
-            if (false === $raw) {
+            if ($raw === false) {
                 continue; // This is probably an empty line, no harm to skip it
             }
             $splitCsv->writeRaw($raw);
@@ -133,19 +108,11 @@ class CsvSplitterTask extends InputCsvReaderTask
         return $tmpFilePath;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
-        $resolver->setDefaults(
-            [
-                'max_lines' => 1000,
-            ]
-        );
+        $resolver->setDefaults([
+            'max_lines' => 1000,
+        ]);
     }
 }

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -18,23 +21,31 @@ class ContextTest extends AbstractProcessTest
     /**
      * Assert a value can correctly passed through context
      */
-    public function testSimpleContext()
+    public function testSimpleContext(): void
     {
-        $result = $this->processManager->execute('test.context', 'ko', ['value' => 'ok']);
+        $result = $this->processManager->execute('test.context', 'ko', [
+            'value' => 'ok',
+        ]);
 
         self::assertEquals('ok', $result);
 
-        $result = $this->processManager->execute('test.context.sub_value', null, ['value' => 'ok']);
+        $result = $this->processManager->execute('test.context.sub_value', null, [
+            'value' => 'ok',
+        ]);
 
-        self::assertEquals(['key' => 'ok'], $result);
+        self::assertEquals([
+            'key' => 'ok',
+        ], $result);
     }
 
     /**
      * Assert a value can correctly passed and merged into a string, through context
      */
-    public function testContextMergedValue()
+    public function testContextMergedValue(): void
     {
-        $result = $this->processManager->execute('test.context.merged_value', null, ['value' => 'ok']);
+        $result = $this->processManager->execute('test.context.merged_value', null, [
+            'value' => 'ok',
+        ]);
 
         self::assertEquals('value is ok', $result);
     }
@@ -42,12 +53,15 @@ class ContextTest extends AbstractProcessTest
     /**
      * Assert 2 values can correctly passed and merged into a string, through context
      */
-    public function testContextMultiValue()
+    public function testContextMultiValue(): void
     {
         $result = $this->processManager->execute(
             'test.context.multi_values',
             null,
-            ['value1' => 'red', 'value2' => 'dead']
+            [
+                'value1' => 'red',
+                'value2' => 'dead',
+            ]
         );
 
         self::assertEquals('red is dead', $result);
@@ -58,30 +72,48 @@ class ContextTest extends AbstractProcessTest
      *
      * @expectedException \RuntimeException
      */
-    public function testContextCannotMergeValue()
+    public function testContextCannotMergeValue(): void
     {
         $this->processManager->execute(
             'test.context.merged_value',
             null,
-            ['value' => ['another_key' => 'another_value']]
+            [
+                'value' => [
+                    'another_key' => 'another_value',
+                ],
+            ]
         );
     }
 
     /**
      * Assert a complex value can correctly passed through context
      */
-    public function testComplexContext()
+    public function testComplexContext(): void
     {
-        $result = $this->processManager->execute('test.context', null, ['value' => ['another_key' => 'another_value']]);
+        $result = $this->processManager->execute('test.context', null, [
+            'value' => [
+                'another_key' => 'another_value',
+            ],
+        ]);
 
-        self::assertEquals(['another_key' => 'another_value'], $result);
+        self::assertEquals([
+            'another_key' => 'another_value',
+        ], $result);
 
         $result = $this->processManager->execute(
             'test.context.sub_value',
             null,
-            ['value' => ['another_key' => 'another_value']]
+            [
+                'value' => [
+                    'another_key' => 'another_value',
+                ],
+            ]
         );
 
-        self::assertEquals(['key' => ['another_key' => 'another_value']], $result);
+        self::assertEquals([
+            'key' => [
+                'another_key' => 'another_value',
+            ],
+        ], $result);
     }
 }

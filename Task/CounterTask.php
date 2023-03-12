@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -18,22 +21,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Count the number of times the task is processed and continue every N iteration (skip the rest of the time)
  * Flush at the end with the actual count
- *
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class CounterTask extends AbstractConfigurableTask implements FlushableTaskInterface
 {
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $counter = 0;
 
-    /**
-     * @param ProcessState $state
-     */
     public function execute(ProcessState $state): void
     {
         $this->counter++;
         $modulo = $this->getOption($state, 'flush_every');
-        if (0 === $this->counter % $modulo) {
+        if ($this->counter % $modulo === 0) {
             $state->setOutput($this->counter);
         } else {
             $state->setSkipped(true);
@@ -42,29 +42,20 @@ class CounterTask extends AbstractConfigurableTask implements FlushableTaskInter
 
     /**
      * Condition is inversed during flush
-     *
-     * @param ProcessState $state
      */
     public function flush(ProcessState $state): void
     {
         $modulo = $this->getOption($state, 'flush_every');
-        if (0 === $this->counter % $modulo) {
+        if ($this->counter % $modulo === 0) {
             $state->setSkipped(true);
         } else {
             $state->setOutput($this->counter);
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     protected function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(
-            [
-                'flush_every',
-            ]
-        );
+        $resolver->setRequired(['flush_every']);
         $resolver->setAllowedTypes('flush_every', ['int']);
     }
 }

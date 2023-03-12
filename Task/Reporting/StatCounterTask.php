@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -16,38 +19,25 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Count the number of times the task was executed
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class StatCounterTask implements FinalizableTaskInterface
 {
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $counter = 0;
 
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        protected LoggerInterface $logger
+    ) {
     }
 
-    /**
-     * @param ProcessState $state
-     */
-    public function finalize(ProcessState $state)
+    public function finalize(ProcessState $state): void
     {
         $this->logger->info("Processed item count: {$this->counter}");
     }
 
-    /**
-     * @param ProcessState $state
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $this->counter++;
     }

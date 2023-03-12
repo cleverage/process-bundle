@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,27 +15,14 @@ namespace CleverAge\ProcessBundle\Task\File\Csv;
 
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Reads the file path from configuration and iterates over it
  * Ignores any input
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 abstract class AbstractCsvTask extends AbstractCsvResourceTask
 {
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \UnexpectedValueException
-     * @throws ExceptionInterface
-     * @throws \RuntimeException
-     */
     protected function initFile(ProcessState $state)
     {
         if ($this->csv) {
@@ -50,26 +40,14 @@ abstract class AbstractCsvTask extends AbstractCsvResourceTask
         );
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
-        $resolver->setRequired(
-            [
-                'file_path',
-            ]
-        );
+        $resolver->setRequired(['file_path']);
         $resolver->setAllowedTypes('file_path', ['string']);
-        $resolver->setDefaults(
-            [
-                'mode' => 'rb',
-            ]
-        );
+        $resolver->setDefaults([
+            'mode' => 'rb',
+        ]);
         $resolver->setAllowedTypes('mode', ['string']);
     }
 }

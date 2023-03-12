@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -13,55 +16,74 @@ namespace CleverAge\ProcessBundle\Command;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Exception\InvalidArgumentException;
-use Symfony\Component\Console\Exception\LogicException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * List all configured processes
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ListProcessCommand extends Command
 {
-    /** @var ProcessConfigurationRegistry */
-    protected $processConfigRegistry;
+    protected static $defaultDescription = 'List defined process';
 
-    /**
-     * @param ProcessConfigurationRegistry $processConfigRegistry
-     *
-     * @throws LogicException
-     */
-    public function __construct(ProcessConfigurationRegistry $processConfigRegistry)
-    {
-        $this->processConfigRegistry = $processConfigRegistry;
+    public function __construct(
+        protected ProcessConfigurationRegistry $processConfigRegistry
+    ) {
         parent::__construct();
     }
 
     /**
-     * {@inheritdoc}
-     * @throws InvalidArgumentException
+     * Counter callback for public processes
+     *
+     * @param int                  $sum
      */
-    protected function configure()
+    public function publicProcessCounter($sum, ProcessConfiguration $processConfiguration): int
     {
-        $this->setName('cleverage:process:list');
-        $this->setDescription('List defined process');
-        $this->addOption('all', 'a', InputOption::VALUE_NONE, 'Shows all processes (including hidden ones)');
+        return $sum + ($processConfiguration->isPublic() ? 1 : 0);
     }
 
     /**
-     * {@inheritdoc}
+     * Counter callback for private processes
+     *
+     * @param int                  $sum
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function privateProcessCounter($sum, ProcessConfiguration $processConfiguration): int
+    {
+        return $sum + ($processConfiguration->isPrivate() ? 1 : 0);
+    }
+
+    /**
+     * Sorter callback for process codes
+     */
+    public function processSorter(ProcessConfiguration $a, ProcessConfiguration $b): int
+    {
+        return $a->getCode() <=> $b->getCode();
+    }
+
+    /**
+     * Filter callback to find max message length
+     *
+     * @param int   $max
+     */
+    public function maxMessageLengthFilter($max, array $message): int
+    {
+        return \max($max, strlen($this->filterOutTags($message['output'])));
+    }
+
+    protected function configure()
+    {
+        $this->setName('cleverage:process:list');
+        $this->addOption('all', 'a', InputOption::VALUE_NONE, 'Shows all processes (including hidden ones)');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $processConfigurations = $this->processConfigRegistry->getProcessConfigurations();
-        \usort($processConfigurations, [$this, 'processSorter']);
+        \usort($processConfigurations, $this->processSorter(...));
 
-        $publicCount = \array_reduce($processConfigurations, [$this, 'publicProcessCounter'], 0);
-        $privateCount = \array_reduce($processConfigurations, [$this, 'privateProcessCounter'], 0);
+        $publicCount = \array_reduce($processConfigurations, $this->publicProcessCounter(...), 0);
+        $privateCount = \array_reduce($processConfigurations, $this->privateProcessCounter(...), 0);
         $output->writeln(
             "<info>There are {$publicCount} process configurations defined (and {$privateCount} private) :</info>"
         );
@@ -84,7 +106,7 @@ class ListProcessCommand extends Command
         }
 
         // Add process descriptions at a fixed position
-        $maxMessageLength = \array_reduce($messages, [$this, 'maxMessageLengthFilter'], 0);
+        $maxMessageLength = \array_reduce($messages, $this->maxMessageLengthFilter(...), 0);
         $outputMessages = [];
         foreach ($messages as $message) {
             /** @var ProcessConfiguration $processConfiguration */
@@ -104,72 +126,13 @@ class ListProcessCommand extends Command
             $output->writeln($message);
         }
 
-        return 0;
-    }
-
-    /**
-     * Counter callback for public processes
-     *
-     * @param int                  $sum
-     * @param ProcessConfiguration $processConfiguration
-     *
-     * @return int
-     */
-    public function publicProcessCounter($sum, ProcessConfiguration $processConfiguration): int
-    {
-        return $sum + ($processConfiguration->isPublic() ? 1 : 0);
-    }
-
-    /**
-     * Counter callback for private processes
-     *
-     * @param int                  $sum
-     * @param ProcessConfiguration $processConfiguration
-     *
-     * @return int
-     */
-    public function privateProcessCounter($sum, ProcessConfiguration $processConfiguration): int
-    {
-        return $sum + ($processConfiguration->isPrivate() ? 1 : 0);
-    }
-
-    /**
-     * Sorter callback for process codes
-     *
-     * @param ProcessConfiguration $a
-     * @param ProcessConfiguration $b
-     *
-     * @return int
-     */
-    public function processSorter(ProcessConfiguration $a, ProcessConfiguration $b): int
-    {
-        if ($a->getCode() === $b->getCode()) {
-            return 0;
-        }
-
-        return ($a->getCode() < $b->getCode()) ? -1 : 1;
-    }
-
-    /**
-     * Filter callback to find max message length
-     *
-     * @param int   $max
-     * @param array $message
-     *
-     * @return int
-     */
-    public function maxMessageLengthFilter($max, array $message): int
-    {
-        return \max($max, strlen($this->filterOutTags($message['output'])));
+        return Command::SUCCESS;
     }
 
     /**
      * Returns a padded message (without counting metadata)
      *
-     * @param string $message
      * @param int    $length
-     *
-     * @return string
      */
     protected function padMessage(string $message, $length = 80): string
     {
@@ -183,10 +146,6 @@ class ListProcessCommand extends Command
 
     /**
      * Filter out tags used in console outputs
-     *
-     * @param string $string
-     *
-     * @return string
      */
     protected function filterOutTags(string $string): string
     {

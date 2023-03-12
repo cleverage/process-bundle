@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -18,7 +21,7 @@ class EmptyProcessTest extends AbstractProcessTest
     /**
      * Assert an empty process do not fail
      */
-    public function testEmptyProcess()
+    public function testEmptyProcess(): void
     {
         $this->processManager->execute('test.empty_process');
         self::assertTrue(true, 'There was an exception');

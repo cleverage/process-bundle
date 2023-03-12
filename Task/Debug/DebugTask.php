@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -16,16 +19,10 @@ use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Dump the content of the input
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class DebugTask implements TaskInterface
 {
-    /**
-     * @param ProcessState $state
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         if (class_exists(VarDumper::class)) {
             VarDumper::dump($state->getInput());

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,24 +13,15 @@
 
 namespace CleverAge\ProcessBundle\Context;
 
-/**
- * Class ContextualOptionResolver
- *
- * @author  Valentin Clavreul <vclavreul@clever-age.com>
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
- */
 class ContextualOptionResolver
 {
     /**
      * Basic value inference
      * Replaces "{{ key }}" by context[key]
      *
-     * @param string|array $value
-     * @param array        $context
-     *
      * @return mixed
      */
-    public function contextualizeOption($value, array $context)
+    public function contextualizeOption(string|array $value, array $context)
     {
         // Recursively parse options
         if (\is_array($value)) {
@@ -46,13 +40,7 @@ class ContextualOptionResolver
             }
 
             // Else use a replace to insert a string value into another
-            return preg_replace_callback(
-                $pattern,
-                static function ($matches) use ($context) {
-                    return $context[$matches[1]];
-                },
-                $value
-            );
+            return preg_replace_callback($pattern, static fn ($matches) => $context[$matches[1]], $value);
         }
 
         return $value;
@@ -60,11 +48,6 @@ class ContextualOptionResolver
 
     /**
      * Replace all contextualized values from options
-     *
-     * @param array $options
-     * @param array $context
-     *
-     * @return array
      */
     public function contextualizeOptions(array $options, array $context): array
     {

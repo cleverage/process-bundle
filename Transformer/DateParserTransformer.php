@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,9 +13,9 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
+use DateTime;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use UnexpectedValueException;
 
 /**
  * Transformer aiming to take a date as an input (object or a format defined string) to strictly output aa \DateTime
@@ -24,43 +27,32 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DateParserTransformer implements ConfigurableTransformerInterface
 {
-
     /**
      * @param mixed $value
-     * @param array $options
      *
      * @return mixed|string
      */
     public function transform($value, array $options = [])
     {
-        if (!$value || $value instanceof \DateTime) {
+        if (! $value || $value instanceof DateTime) {
             return $value;
         }
 
-        $date = \DateTime::createFromFormat($options['format'], $value);
+        $date = DateTime::createFromFormat($options['format'], $value);
 
-        if (!$date) {
-            throw new \UnexpectedValueException('Given value cannot be parsed into a date');
+        if (! $date) {
+            throw new UnexpectedValueException('Given value cannot be parsed into a date');
         }
 
         return $date;
     }
 
-    /**
-     * @return string
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'date_parser';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws UndefinedOptionsException
-     * @throws AccessException
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('format');
         $resolver->setAllowedTypes('format', 'string');

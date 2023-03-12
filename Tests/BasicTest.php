@@ -1,5 +1,8 @@
-<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
+<?php
+
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -16,13 +19,12 @@ namespace CleverAge\ProcessBundle\Tests;
  */
 class BasicTest extends AbstractProcessTest
 {
-
     /**
      * Check that an unknown process produce the right error
      *
      * @expectedException \CleverAge\ProcessBundle\Exception\MissingProcessException
      */
-    public function testUnknownProcess()
+    public function testUnknownProcess(): void
     {
         $this->processManager->execute('test.unknown_test');
     }
@@ -30,7 +32,7 @@ class BasicTest extends AbstractProcessTest
     /**
      * Check that a known process can be executed and return defined output
      */
-    public function testSimpleProcess()
+    public function testSimpleProcess(): void
     {
         $result = $this->processManager->execute('test.simple_process', 'success');
 
@@ -40,7 +42,7 @@ class BasicTest extends AbstractProcessTest
     /**
      * Assert that the error branch is not called
      */
-    public function testErrorProcess()
+    public function testErrorProcess(): void
     {
         $this->processManager->execute('test.error_process');
         $this->assertDataQueue(
@@ -65,7 +67,7 @@ class BasicTest extends AbstractProcessTest
     /**
      * Assert that the error branch is called, and blocking task are correctly working
      */
-    public function testErrorProcessBlocking()
+    public function testErrorProcessBlocking(): void
     {
         $this->processManager->execute('test.error_process_with_blocking');
         $this->assertDataQueue(
@@ -94,7 +96,7 @@ class BasicTest extends AbstractProcessTest
     /**
      * @expectedException \CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException
      */
-    public function testFailingEntryPointWithAncestors()
+    public function testFailingEntryPointWithAncestors(): void
     {
         $this->processManager->execute('test.entry_point_with_ancestor');
     }
@@ -102,7 +104,7 @@ class BasicTest extends AbstractProcessTest
     /**
      * Check that the use of a string in task "outputs" or "errors" is possible
      */
-    public function testStringOutput()
+    public function testStringOutput(): void
     {
         $result = $this->processManager->execute('test.string_outputs', 'success');
         self::assertEquals('success', $result);

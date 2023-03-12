@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -11,43 +14,30 @@
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use UnexpectedValueException;
 
 /**
  * Implode multiple array values to a string, based on a split character
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
- * @author Corentin Bouix <cbouix@clever-age.com>
  */
 class ImplodeTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('separator');
         $resolver->setDefault('separator', '|');
         $resolver->setAllowedTypes('separator', 'string');
     }
 
-    /**
-     * {@inheritDoc}
-     * @throws \UnexpectedValueException
-     */
-    public function transform($value, array $options = [])
+    public function transform($value, array $options = []): string
     {
-        if (!\is_array($value)) {
-            throw new \UnexpectedValueException('Given value is not an array');
+        if (! \is_array($value)) {
+            throw new UnexpectedValueException('Given value is not an array');
         }
 
         return implode($options['separator'], $value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'implode';
     }

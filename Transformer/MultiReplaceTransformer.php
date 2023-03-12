@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -23,22 +26,21 @@ class MultiReplaceTransformer implements ConfigurableTransformerInterface
 {
     public function transform($value, array $options = [])
     {
-        foreach($options['replace_mapping'] as $pattern => $replacement) {
-            $value = str_replace($pattern, $replacement, $value);
+        foreach ($options['replace_mapping'] as $pattern => $replacement) {
+            $value = str_replace($pattern, $replacement, (string) $value);
         }
 
         return $value;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('replace_mapping');
         $resolver->setAllowedTypes('replace_mapping', 'array');
     }
 
-    public function getCode()
+    public function getCode(): string
     {
         return 'multi_replace';
     }
-
 }

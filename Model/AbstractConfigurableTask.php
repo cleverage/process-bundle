@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,42 +13,33 @@
 
 namespace CleverAge\ProcessBundle\Model;
 
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use InvalidArgumentException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Allow the task to configure it's options, set default basic options for errors handling
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 abstract class AbstractConfigurableTask implements InitializableTaskInterface
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $options;
 
     /**
      * Only validate the options at initialization, ensuring that the task will not fail at runtime
-     *
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
      */
-    public function initialize(ProcessState $state)
+    public function initialize(ProcessState $state): void
     {
         $this->getOptions($state);
     }
 
     /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
-     *
      * @return array
      */
     protected function getOptions(ProcessState $state)
     {
-        if (null === $this->options) {
+        if ($this->options === null) {
             $resolver = new OptionsResolver();
             $this->configureOptions($resolver);
             $this->options = $resolver->resolve($state->getContextualizedOptions());
@@ -55,26 +49,19 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
     }
 
     /**
-     * @param ProcessState $state
      * @param string       $code
-     *
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
      *
      * @return mixed
      */
     protected function getOption(ProcessState $state, $code)
     {
         $options = $this->getOptions($state);
-        if (!array_key_exists($code, $options)) {
-            throw new \InvalidArgumentException("Missing option {$code}");
+        if (! array_key_exists($code, $options)) {
+            throw new InvalidArgumentException("Missing option {$code}");
         }
 
         return $options[$code];
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     abstract protected function configureOptions(OptionsResolver $resolver);
 }

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -14,39 +17,25 @@ use CleverAge\ProcessBundle\Filesystem\CsvResource;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Generic abstract task to handle CSV resources
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implements FinalizableTaskInterface
 {
-    /** @var CsvResource */
+    /**
+     * @var CsvResource
+     */
     protected $csv;
 
-    /**
-     * @param ProcessState $state
-     */
-    public function finalize(ProcessState $state)
+    public function finalize(ProcessState $state): void
     {
         if ($this->csv instanceof CsvResource) {
             $this->csv->close();
         }
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \UnexpectedValueException
-     * @throws ExceptionInterface
-     * @throws \RuntimeException
-     */
     protected function initFile(ProcessState $state)
     {
         if ($this->csv) {
@@ -63,22 +52,14 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
         );
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'delimiter' => ';',
-                'enclosure' => '"',
-                'escape' => '\\',
-                'headers' => null,
-            ]
-        );
+        $resolver->setDefaults([
+            'delimiter' => ';',
+            'enclosure' => '"',
+            'escape' => '\\',
+            'headers' => null,
+        ]);
         $resolver->setAllowedTypes('delimiter', ['string']);
         $resolver->setAllowedTypes('enclosure', ['string']);
         $resolver->setAllowedTypes('escape', ['string']);
@@ -86,9 +67,6 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
     }
 
     /**
-     * @param ProcessState $state
-     * @param array        $options
-     *
      * @return array
      */
     abstract protected function getHeaders(ProcessState $state, array $options);

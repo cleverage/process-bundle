@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,25 +15,14 @@ namespace CleverAge\ProcessBundle\Logger;
 
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 
-/**
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
- */
 class AbstractProcessor
 {
-    /** @var ProcessManager */
-    protected $processManager;
-
-    /**
-     * @param ProcessManager $processManager
-     */
-    public function __construct(ProcessManager $processManager)
-    {
-        $this->processManager = $processManager;
+    public function __construct(
+        protected ProcessManager $processManager
+    ) {
     }
 
     /**
-     * @param array $record
-     *
      * @return array
      */
     public function __invoke(array $record)
@@ -48,11 +40,6 @@ class AbstractProcessor
         return $record;
     }
 
-    /**
-     * @param array $record
-     *
-     * @return array
-     */
     protected function normalizeRecordData(array $record): array
     {
         $newRecord = [];
@@ -63,15 +50,10 @@ class AbstractProcessor
         return $newRecord;
     }
 
-    /**
-     * @param array $record
-     *
-     * @return void
-     */
     protected function addProcessInfoToRecord(array &$record): void
     {
         $processHistory = $this->processManager->getProcessHistory();
-        if (!$processHistory) {
+        if (! $processHistory) {
             return;
         }
 
@@ -80,22 +62,17 @@ class AbstractProcessor
         $this->addToRecord($record, 'process_context', $processHistory->getContext());
     }
 
-    /**
-     * @param array $record
-     *
-     * @return void
-     */
     protected function addTaskInfoToRecord(array &$record): void
     {
         $taskConfiguration = $this->processManager->getTaskConfiguration();
-        if (!$taskConfiguration) {
+        if (! $taskConfiguration) {
             return;
         }
         $this->addToRecord($record, 'task_code', $taskConfiguration->getCode());
         $this->addToRecord($record, 'task_service', $taskConfiguration->getServiceReference());
 
         $state = $taskConfiguration->getState();
-        if (!$state) {
+        if (! $state) {
             return;
         }
         if ($state->hasErrorOutput()) {
@@ -108,13 +85,9 @@ class AbstractProcessor
     }
 
     /**
-     * @param array  $record
      * @param string $name
-     * @param mixed  $data
-     *
-     * @return void
      */
-    protected function addToRecord(array &$record, $name, $data): void
+    protected function addToRecord(array &$record, $name, mixed $data): void
     {
         $record[$name] = $data;
     }

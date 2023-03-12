@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -17,8 +20,6 @@ interface WritableStructuredFileInterface extends StructuredFileInterface, Writa
 {
     /**
      * Write headers to the file
-     *
-     * @throws \RuntimeException
      */
     public function writeHeaders(): void;
 }

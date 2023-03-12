@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -11,41 +14,28 @@
 namespace CleverAge\ProcessBundle\Model;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
+use DateTime;
+use Stringable;
 
 /**
  * Logs information about a process
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-class ProcessHistory
+class ProcessHistory implements Stringable
 {
-    public const STATE_STARTED = 'started';
-    public const STATE_SUCCESS = 'success';
-    public const STATE_FAILED = 'failed';
+    final public const STATE_STARTED = 'started';
+
+    final public const STATE_SUCCESS = 'success';
+
+    final public const STATE_FAILED = 'failed';
+
+    protected float $id;
+
+    protected string $processCode;
+
+    protected DateTime $startDate;
 
     /**
-     * @var int
-     */
-    protected $id;
-
-    /**
-     * @var string
-     */
-    protected $processCode;
-
-    /**
-     * @var array
-     */
-    protected $context;
-
-    /**
-     * @var \DateTime
-     */
-    protected $startDate;
-
-    /**
-     * @var \DateTime
+     * @var DateTime
      */
     protected $endDate;
 
@@ -54,61 +44,52 @@ class ProcessHistory
      */
     protected $state = self::STATE_STARTED;
 
-    /**
-     * @param ProcessConfiguration $processConfiguration
-     * @param array                $context
-     */
-    public function __construct(ProcessConfiguration $processConfiguration, array $context = [])
-    {
+    public function __construct(
+        ProcessConfiguration $processConfiguration,
+        protected array $context = []
+    ) {
         $this->id = microtime(true);
         $this->processCode = $processConfiguration->getCode();
-        $this->startDate = new \DateTime();
-        $this->context = $context;
+        $this->startDate = new DateTime();
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function __toString(): string
+    {
+        $reference = $this->getProcessCode() . '[' . $this->getState() . ']';
+        $time = $this->getStartDate()
+            ->format(DateTime::ATOM);
+
+        return $reference . ': ' . $time;
+    }
+
+    public function getId(): float
     {
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
     public function getProcessCode(): string
     {
         return $this->processCode;
     }
 
-    /**
-     * @return array
-     */
     public function getContext(): array
     {
         return $this->context;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getStartDate(): \DateTime
+    public function getStartDate(): DateTime
     {
         return $this->startDate;
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
     public function getEndDate()
     {
         return $this->endDate;
     }
 
-    /**
-     * @return string
-     */
     public function getState(): string
     {
         return $this->state;
@@ -117,35 +98,30 @@ class ProcessHistory
     /**
      * Set the process as failed
      */
-    public function setFailed()
+    public function setFailed(): void
     {
-        $this->endDate = new \DateTime();
+        $this->endDate = new DateTime();
         $this->state = self::STATE_FAILED;
     }
 
     /**
      * Set the process as succeded
      */
-    public function setSuccess()
+    public function setSuccess(): void
     {
-        $this->endDate = new \DateTime();
+        $this->endDate = new DateTime();
         $this->state = self::STATE_SUCCESS;
     }
 
     /**
      * Is true when the process is running
-     *
-     * @return bool
      */
-    public function isStarted()
+    public function isStarted(): bool
     {
         return $this->state === self::STATE_STARTED;
     }
 
-    /**
-     * @return bool
-     */
-    public function isFailed()
+    public function isFailed(): bool
     {
         return $this->state === self::STATE_FAILED;
     }
@@ -158,20 +134,11 @@ class ProcessHistory
     public function getDuration()
     {
         if ($this->getEndDate()) {
-            return $this->getEndDate()->getTimestamp() - $this->getStartDate()->getTimestamp();
+            return $this->getEndDate()
+                ->getTimestamp() - $this->getStartDate()
+                ->getTimestamp();
         }
 
         return null;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        $reference = $this->getProcessCode().'['.$this->getState().']';
-        $time = $this->getStartDate()->format(\DateTime::ATOM);
-
-        return $reference.': '.$time;
     }
 }

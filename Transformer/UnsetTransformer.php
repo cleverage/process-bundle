@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,6 +15,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use UnexpectedValueException;
 
 /**
  * Unset a given property
@@ -20,25 +24,19 @@ class UnsetTransformer implements ConfigurableTransformerInterface
 {
     use ConditionTrait;
 
-    /**
-     * @param PropertyAccessorInterface $accessor
-     */
     public function __construct(PropertyAccessorInterface $accessor)
     {
         $this->accessor = $accessor;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function transform($value, array $options = [])
     {
-        if (!\is_array($value)) {
-            throw new \UnexpectedValueException('Given value must be an array');
+        if (! \is_array($value)) {
+            throw new UnexpectedValueException('Given value must be an array');
         }
 
-        if (!array_key_exists($options['property'], $value)) {
-            throw new \UnexpectedValueException("Property {$options['property']} does not exists");
+        if (! array_key_exists($options['property'], $value)) {
+            throw new UnexpectedValueException("Property {$options['property']} does not exists");
         }
 
         if ($this->checkCondition($value, $options['condition'])) {
@@ -48,10 +46,7 @@ class UnsetTransformer implements ConfigurableTransformerInterface
         return $value;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('property');
         $resolver->setAllowedTypes('property', 'string');
@@ -59,10 +54,7 @@ class UnsetTransformer implements ConfigurableTransformerInterface
         $this->configureWrappedConditionOptions('condition', $resolver);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'unset';
     }

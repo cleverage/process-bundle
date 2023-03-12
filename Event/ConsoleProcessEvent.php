@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -20,13 +23,13 @@ class ConsoleProcessEvent extends GenericEvent
 {
     final public const EVENT_CLI_INIT = 'cleverage_process.cli.init';
 
-    /**
-     * ConsoleProcessEvent constructor.
-     */
-    public function __construct(private readonly InputInterface $consoleInput, private readonly OutputInterface $consoleOutput, private readonly mixed $processInput, private readonly array $processContext)
-    {
+    public function __construct(
+        private readonly InputInterface $consoleInput,
+        private readonly OutputInterface $consoleOutput,
+        private readonly mixed $processInput,
+        private readonly array $processContext
+    ) {
     }
-
 
     public function getConsoleInput(): InputInterface
     {

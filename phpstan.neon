@@ -3,6 +3,7 @@ parameters:
     paths:
         - .
     excludePaths:
+        - ecs.php
         - vendor/*
         - Resources/tests/*
         - Tests/*

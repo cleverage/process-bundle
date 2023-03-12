@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -17,15 +20,18 @@ use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
  */
 class MappingTransformerTest extends AbstractProcessTest
 {
-
     /**
      * Assert a simple mapping transformation, from one array to another
      */
-    public function testSimpleMapping()
+    public function testSimpleMapping(): void
     {
-        $result = $this->processManager->execute('test.mapping_transformer.simple', ['field' => 'value']);
+        $result = $this->processManager->execute('test.mapping_transformer.simple', [
+            'field' => 'value',
+        ]);
 
-        self::assertEquals(['field2' => 'value'], $result);
+        self::assertEquals([
+            'field2' => 'value',
+        ], $result);
     }
 
     /**
@@ -33,61 +39,87 @@ class MappingTransformerTest extends AbstractProcessTest
      *
      * @expectedException \RuntimeException
      */
-    public function testMissingMapping()
+    public function testMissingMapping(): void
     {
-        $this->processManager->execute('test.mapping_transformer.error', ['field' => 'value']);
+        $this->processManager->execute('test.mapping_transformer.error', [
+            'field' => 'value',
+        ]);
     }
 
     /**
      * Assert we can use multiple times the same sub-transformer using # suffixes
      */
-    public function testMultiSubtransformers()
+    public function testMultiSubtransformers(): void
     {
         $result = $this->processManager->execute(
             'test.mapping_transformer.multi_subtransformers',
-            ['field' => [3, null, 4, 2]]
+            [
+                'field' => [3, null, 4, 2],
+            ]
         );
 
-        self::assertEquals(['field2' => [2, 4, 3]], $result);
+        self::assertEquals([
+            'field2' => [2, 4, 3],
+        ], $result);
     }
 
     /**
      * Assert we can use a deep property path as a key to generate a multi-depth array
      */
-    public function testDeepMapping()
+    public function testDeepMapping(): void
     {
-        $result = $this->processManager->execute('test.mapping_transformer.deep_mapping', ['value' => 'ok']);
+        $result = $this->processManager->execute('test.mapping_transformer.deep_mapping', [
+            'value' => 'ok',
+        ]);
 
-        self::assertEquals(['field1' => ['field2' => ['field3' => 'ok']]], $result);
+        self::assertEquals([
+            'field1' => [
+                'field2' => [
+                    'field3' => 'ok',
+                ],
+            ],
+        ], $result);
     }
 
     /**
      * Test the '.' source property path
      */
-    public function testFullInput()
+    public function testFullInput(): void
     {
-        $result = $this->processManager->execute('test.mapping_transformer.full_input', ['value' => 'ok']);
+        $result = $this->processManager->execute('test.mapping_transformer.full_input', [
+            'value' => 'ok',
+        ]);
 
-        self::assertEquals(['out' => ['value' => 'ok']], $result);
+        self::assertEquals([
+            'out' => [
+                'value' => 'ok',
+            ],
+        ], $result);
     }
 
     /**
      * Test the '.' source property path inside an array of source codes
      */
-    public function testFullInputInArray()
+    public function testFullInputInArray(): void
     {
-        $result = $this->processManager->execute('test.mapping_transformer.full_input_in_array', ['field' => 'ok']);
+        $result = $this->processManager->execute('test.mapping_transformer.full_input_in_array', [
+            'field' => 'ok',
+        ]);
 
-        self::assertEquals(['out' => [
-            'some_field' => 'ok',
-            'full' => ['field' => 'ok'],
-        ]], $result);
+        self::assertEquals([
+            'out' => [
+                'some_field' => 'ok',
+                'full' => [
+                    'field' => 'ok',
+                ],
+            ],
+        ], $result);
     }
 
     /**
      * Test that a source property can be an array with numeric keys (see commit e141cb61)
      */
-    public function testMultiSourceFieldInSequence()
+    public function testMultiSourceFieldInSequence(): void
     {
         $result = $this->processManager->execute('test.mapping_transformer.multi_source_field_in_sequence', [
             'field1' => 'a',
@@ -95,6 +127,8 @@ class MappingTransformerTest extends AbstractProcessTest
             'field3' => 'c',
         ]);
 
-        self::assertEquals(['out' => ['a', 'b', 'c']], $result);
+        self::assertEquals([
+            'out' => ['a', 'b', 'c'],
+        ], $result);
     }
 }

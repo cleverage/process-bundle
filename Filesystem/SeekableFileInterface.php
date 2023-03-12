@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,13 +18,8 @@ namespace CleverAge\ProcessBundle\Filesystem;
  */
 interface SeekableFileInterface extends FileStreamInterface
 {
-
     /**
      * Returns the current position of the cursor inside the file
-     *
-     * @throws \RuntimeException
-     *
-     * @return int
      */
     public function tell(): int;
 
@@ -29,10 +27,6 @@ interface SeekableFileInterface extends FileStreamInterface
      * Go to a specific position inside the file
      *
      * @param int $offset
-     *
-     * @throws \RuntimeException
-     *
-     * @return int
      */
     public function seek($offset): int;
 }

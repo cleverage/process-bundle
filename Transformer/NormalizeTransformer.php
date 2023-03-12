@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,71 +13,43 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Normalize the given value based on options
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class NormalizeTransformer implements ConfigurableTransformerInterface
 {
-    /** @var NormalizerInterface */
-    protected $normalizer;
-
-    /**
-     * @param NormalizerInterface $normalizer
-     */
-    public function __construct(NormalizerInterface $normalizer)
-    {
-        $this->normalizer = $normalizer;
+    public function __construct(
+        protected NormalizerInterface $normalizer
+    ) {
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(
-            [
-                'format' => null,
-                'context' => [],
-            ]
-        );
+        $resolver->setDefaults([
+            'format' => null,
+            'context' => [],
+        ]);
         $resolver->setAllowedTypes('format', ['null', 'string']);
         $resolver->setAllowedTypes('context', ['array']);
     }
 
     /**
      * @param mixed $value
-     * @param array $options
      *
-     * @throws ExceptionInterface
      * @return array|bool|float|int|mixed|string
      */
     public function transform($value, array $options = [])
     {
-        return $this->normalizer->normalize(
-            $value,
-            $options['format'],
-            $options['context']
-        );
+        return $this->normalizer->normalize($value, $options['format'], $options['context']);
     }
 
     /**
      * Returns the unique code to identify the transformer
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return 'normalize';
     }

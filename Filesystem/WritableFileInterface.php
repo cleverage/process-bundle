@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,8 +18,5 @@ namespace CleverAge\ProcessBundle\Filesystem;
  */
 interface WritableFileInterface extends FileStreamInterface
 {
-    /**
-     * @return int
-     */
     public function writeLine(array $fields): int;
 }

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -11,9 +14,6 @@
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\PropertyAccess\Exception\AccessException;
-use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
-use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -21,40 +21,39 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 trait ConditionTrait
 {
-    /** @var PropertyAccessorInterface */
+    /**
+     * @var PropertyAccessorInterface
+     */
     protected $accessor;
 
     /**
      * Test the input with the given set of conditions
      * True by default
      *
-     * @param mixed $input
      * @param array $conditions
-     *
-     * @return bool
      */
-    protected function checkCondition($input, $conditions)
+    protected function checkCondition(mixed $input, $conditions): bool
     {
         foreach ($conditions['match'] as $key => $value) {
-            if (!$this->checkValue($input, $key, $value)) {
+            if (! $this->checkValue($input, $key, $value)) {
                 return false;
             }
         }
 
         foreach ($conditions['empty'] as $key => $value) {
-            if (!$this->checkEmpty($input, $key)) {
+            if (! $this->checkEmpty($input, $key)) {
                 return false;
             }
         }
 
         foreach ($conditions['match_regexp'] as $key => $value) {
-            if (!$this->checkValue($input, $key, $value, true, true)) {
+            if (! $this->checkValue($input, $key, $value, true, true)) {
                 return false;
             }
         }
 
         foreach ($conditions['not_match'] as $key => $value) {
-            if (!$this->checkValue($input, $key, $value, false)) {
+            if (! $this->checkValue($input, $key, $value, false)) {
                 return false;
             }
         }
@@ -66,7 +65,7 @@ trait ConditionTrait
         }
 
         foreach ($conditions['not_match_regexp'] as $key => $value) {
-            if (!$this->checkValue($input, $key, $value, false, true)) {
+            if (! $this->checkValue($input, $key, $value, false, true)) {
                 return false;
             }
         }
@@ -76,9 +75,6 @@ trait ConditionTrait
 
     /**
      * Configure available condition rules in a wrapper option
-     *
-     * @param string          $wrapperKey
-     * @param OptionsResolver $resolver
      */
     protected function configureWrappedConditionOptions(string $wrapperKey, OptionsResolver $resolver)
     {
@@ -86,7 +82,7 @@ trait ConditionTrait
         $resolver->setAllowedTypes($wrapperKey, ['array']);
         $resolver->setNormalizer(
             $wrapperKey,
-            function (OptionsResolver $options, $value) {
+            function (OptionsResolver $options, $value): array {
                 $conditionResolver = new OptionsResolver();
                 $this->configureConditionOptions($conditionResolver);
 
@@ -97,8 +93,6 @@ trait ConditionTrait
 
     /**
      * Configure available condition rules
-     *
-     * @param OptionsResolver $resolver
      */
     protected function configureConditionOptions(OptionsResolver $resolver)
     {
@@ -119,38 +113,31 @@ trait ConditionTrait
      *
      * @param object|array $input
      * @param string       $key
-     * @param mixed        $value
      * @param bool         $shouldMatch
      * @param bool         $regexpMode
-     *
-     * @throws UnexpectedTypeException
-     * @throws AccessException
-     * @throws InvalidArgumentException
-     *
-     * @return bool
      */
-    protected function checkValue($input, $key, $value, $shouldMatch = true, $regexpMode = false)
+    protected function checkValue($input, $key, mixed $value, $shouldMatch = true, $regexpMode = false): bool
     {
         $currentValue = $this->getValue($input, $key);
 
         /** @noinspection TypeUnsafeComparisonInspection */
-        if ($shouldMatch && !$regexpMode && $currentValue != $value) {
+        if ($shouldMatch && ! $regexpMode && $currentValue !== $value) {
             return false;
         }
 
         /** @noinspection TypeUnsafeComparisonInspection */
-        if (!$shouldMatch && !$regexpMode && $currentValue == $value) {
+        if (! $shouldMatch && ! $regexpMode && $currentValue === $value) {
             return false;
         }
 
         if ($regexpMode) {
-            $pregMatch = preg_match($value, $currentValue);
+            $pregMatch = preg_match($value, (string) $currentValue);
 
-            if ($shouldMatch && (false === $pregMatch || 0 === $pregMatch)) {
+            if ($shouldMatch && ($pregMatch === false || $pregMatch === 0)) {
                 return false;
             }
 
-            if (!$shouldMatch && (false === $pregMatch || $pregMatch > 0)) {
+            if (! $shouldMatch && ($pregMatch === false || $pregMatch > 0)) {
                 return false;
             }
         }
@@ -163,10 +150,8 @@ trait ConditionTrait
      *
      * @param array|object $input
      * @param string       $key
-     *
-     * @return bool
      */
-    protected function checkEmpty($input, $key)
+    protected function checkEmpty($input, $key): bool
     {
         $currentValue = $this->getValue($input, $key);
 
@@ -183,7 +168,7 @@ trait ConditionTrait
      */
     protected function getValue($input, $key)
     {
-        if ('' === $key) {
+        if ($key === '') {
             $currentValue = $input;
         } elseif ($this->accessor->isReadable($input, $key)) {
             $currentValue = $this->accessor->getValue($input, $key);

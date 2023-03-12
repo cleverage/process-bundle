@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,16 +13,12 @@
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Convert input based on a callback
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class CallbackTransformer implements ConfigurableTransformerInterface
 {
@@ -27,14 +26,13 @@ class CallbackTransformer implements ConfigurableTransformerInterface
      * Must return the transformed $value
      *
      * @param mixed $value
-     * @param array $options
      *
-     * @return mixed $value
+     * @return mixed
      */
     public function transform($value, array $options = [])
     {
-        if (count($options['additional_parameters'])
-            && !count($options['right_parameters'])) {
+        if ((is_countable($options['additional_parameters']) ? count($options['additional_parameters']) : 0)
+            && ! (is_countable($options['right_parameters']) ? count($options['right_parameters']) : 0)) {
             $options['right_parameters'] = $options['additional_parameters'];
         }
 
@@ -46,35 +44,22 @@ class CallbackTransformer implements ConfigurableTransformerInterface
 
     /**
      * Returns the unique code to identify the transformer
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return 'callback';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws ExceptionInterface
-     */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(
-            [
-                'callback',
-            ]
-        );
+        $resolver->setRequired(['callback']);
         $resolver->setAllowedTypes('callback', ['string', 'array']);
         /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'callback',
-            static function (Options $options, $value) {
-                if (!\is_callable($value)) {
-                    throw new InvalidOptionsException(
-                        'Callback option must be callable'
-                    );
+            static function (Options $options, $value): callable {
+                if (! \is_callable($value)) {
+                    throw new InvalidOptionsException('Callback option must be callable');
                 }
 
                 return $value;

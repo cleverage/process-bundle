@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,22 +18,21 @@ namespace CleverAge\ProcessBundle\Tests;
  */
 class BlockingTaskTest extends AbstractProcessTest
 {
-
-    public function testSimpleBlocking()
+    public function testSimpleBlocking(): void
     {
         $result = $this->processManager->execute('test.simple_blocking');
 
         self::assertEquals([1, 2, 3], $result);
     }
 
-    public function testBlockingSolo()
+    public function testBlockingSolo(): void
     {
         $result = $this->processManager->execute('test.blocking_solo', 'success');
 
         self::assertEquals(['success'], $result);
     }
 
-    public function testMultipleBlockingSolo()
+    public function testMultipleBlockingSolo(): void
     {
         $result = $this->processManager->execute('test.multiple_blocking_solo', 'success');
 
@@ -43,7 +45,7 @@ class BlockingTaskTest extends AbstractProcessTest
      *  - a subsequent blocking task will be proceeded at least once
      *  - a subsequent blocking task will be proceeded at most once
      */
-    public function testMultipleBlocking()
+    public function testMultipleBlocking(): void
     {
         $result = $this->processManager->execute('test.multiple_blocking');
 
@@ -54,7 +56,7 @@ class BlockingTaskTest extends AbstractProcessTest
      * Assert when there is multiple iterations before a blocking that all are successfully resolved, and the blocking
      * is executed only once
      */
-    public function testMultipleIterationBlocking()
+    public function testMultipleIterationBlocking(): void
     {
         $this->processManager->execute('test.multiple_iteration_blocking');
 
@@ -72,7 +74,7 @@ class BlockingTaskTest extends AbstractProcessTest
     /**
      * Assert that if a blocking is never executed, it will automatically skip subsequent tasks
      */
-    public function testBlockingEmptyData()
+    public function testBlockingEmptyData(): void
     {
         $this->processManager->execute('test.blocking_empty_data');
 

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,37 +15,25 @@ namespace CleverAge\ProcessBundle\Exception;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use UnexpectedValueException;
 
 /**
  * Thrown when the process configuration cannot be resolved
  */
-class InvalidProcessConfigurationException extends \UnexpectedValueException implements ProcessExceptionInterface
+class InvalidProcessConfigurationException extends UnexpectedValueException implements ProcessExceptionInterface
 {
-    /**
-     * @param ProcessConfiguration $processConfiguration
-     * @param TaskConfiguration    $taskConfig
-     * @param array                $mainTaskList
-     *
-     * @return InvalidProcessConfigurationException
-     */
     public static function createNotInMain(
         ProcessConfiguration $processConfiguration,
         TaskConfiguration $taskConfig,
         array $mainTaskList
     ): self {
-        $taskListStr = '['.implode(', ', $mainTaskList).']';
+        $taskListStr = '[' . implode(', ', $mainTaskList) . ']';
 
         return new self(
             "Task '{$taskConfig->getCode()}' is not in main task list : {$taskListStr} (from process: {$processConfiguration->getCode()})"
         );
     }
 
-    /**
-     * @param ProcessConfiguration $processConfiguration
-     * @param TaskConfiguration    $taskConfig
-     *
-     * @return InvalidProcessConfigurationException
-     */
     public static function createEntryPointHasAncestors(
         ProcessConfiguration $processConfiguration,
         TaskConfiguration $taskConfig

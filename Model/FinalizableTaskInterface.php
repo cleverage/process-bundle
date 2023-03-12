@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,14 +15,8 @@ namespace CleverAge\ProcessBundle\Model;
 
 /**
  * Allow the task to be initialized before any execution is done
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 interface FinalizableTaskInterface extends TaskInterface
 {
-    /**
-     * @param ProcessState $state
-     */
     public function finalize(ProcessState $state);
 }

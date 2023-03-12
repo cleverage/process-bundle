@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,6 +15,7 @@ namespace CleverAge\ProcessBundle\Task\File;
 
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use LogicException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -20,64 +24,52 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskInterface
 {
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     protected $folderPath;
 
-    /**
-     * {@inheritDoc}
-     */
     public function flush(ProcessState $state): void
     {
         $this->folderPath = null;
         $state->setSkipped(true);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function initialize(ProcessState $state): void
     {
         parent::getOptions($state);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
         $resolver->remove(['folder_path']);
 
-        $resolver->setDefaults(
-            [
-                'base_folder_path' => '',
-            ]
-        );
+        $resolver->setDefaults([
+            'base_folder_path' => '',
+        ]);
         $resolver->setAllowedTypes('base_folder_path', ['string']);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     protected function getOptions(ProcessState $state): array
     {
         $options = parent::getOptions($state);
         if ($state->getInput()) {
-            $folderPath = $options['base_folder_path'].$state->getInput();
+            $folderPath = $options['base_folder_path'] . $state->getInput();
             if ($this->folderPath && $folderPath !== $this->folderPath) {
-                throw new \LogicException(
+                throw new LogicException(
                     "Folder path '{$folderPath}' already initialized with a different value {$this->folderPath}"
                 );
             }
             $this->folderPath = $folderPath;
         }
 
-        if (!is_dir($this->folderPath)) {
+        if (! is_dir($this->folderPath)) {
             throw new InvalidConfigurationException(
                 "Folder path does not exists or is not a folder: '{$this->folderPath}'"
             );
         }
-        if (!is_readable($this->folderPath)) {
+        if (! is_readable($this->folderPath)) {
             throw new InvalidConfigurationException("Folder path is not readable: '{$this->folderPath}'");
         }
         $options['folder_path'] = $this->folderPath;

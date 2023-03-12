@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,36 +15,27 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 
 /**
  * Class AggregateIterableTask
  *
  * Aggregate the result of iterable tasks in an array
- *
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class AggregateIterableTask implements BlockingTaskInterface
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $result = [];
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $this->result[] = $state->getInput();
     }
 
-    /**
-     * @param ProcessState $state
-     */
-    public function proceed(ProcessState $state)
+    public function proceed(ProcessState $state): void
     {
-        if (0 === \count($this->result)) {
+        if (\count($this->result) === 0) {
             $state->setSkipped(true);
         } else {
             $state->setOutput($this->result);

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,9 +15,6 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 /**
  * Transforms a value to an other
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 interface TransformerInterface
 {
@@ -22,9 +22,8 @@ interface TransformerInterface
      * Must return the transformed $value
      *
      * @param mixed $value
-     * @param array $options
      *
-     * @return mixed $value
+     * @return mixed
      */
     public function transform($value, array $options = []);
 

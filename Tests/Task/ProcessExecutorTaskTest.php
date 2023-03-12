@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -20,7 +23,7 @@ class ProcessExecutorTaskTest extends AbstractProcessTest
     /**
      * Assert the process executor correctly chain the input/output
      */
-    public function testExecutor()
+    public function testExecutor(): void
     {
         $result = $this->processManager->execute('test.process_execute_task');
         self::assertEquals([1, 2, 3, 4], $result);
@@ -31,7 +34,7 @@ class ProcessExecutorTaskTest extends AbstractProcessTest
      *
      * @expectedException \RuntimeException
      */
-    public function testExecutorError()
+    public function testExecutorError(): void
     {
         $this->processManager->execute('test.process_execute_task.error');
     }

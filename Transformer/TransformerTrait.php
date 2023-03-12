@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,30 +13,51 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Closure;
+use InvalidArgumentException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Throwable;
 
-/**
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
- */
 trait TransformerTrait
 {
-    /** @var TransformerRegistry */
+    /**
+     * @var TransformerRegistry
+     */
     protected $transformerRegistry;
 
     /**
-     * @param array $transformers
-     * @param mixed $value
-     *
-     * @return mixed
-     * @throws TransformerException
-     *
+     * Transform the list of transformer codes + options into a list of Closure (better performances)
      */
-    protected function applyTransformers(array $transformers, $value)
+    public function normalizeTransformers(Options $options, $transformers): array
+    {
+        $transformerClosures = [];
+
+        foreach ($transformers as $origTransformerCode => $transformerOptions) {
+            $transformerOptionsResolver = new OptionsResolver();
+            $transformerCode = $this->getCleanedTransfomerCode($origTransformerCode);
+            $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+            $transformerOptions = $this->checkTransformerOptions($transformerOptions, $origTransformerCode);
+            if ($transformer instanceof ConfigurableTransformerInterface) {
+                $transformer->configureOptions($transformerOptionsResolver);
+                $transformerOptions = $transformerOptionsResolver->resolve($transformerOptions);
+            } elseif (! empty($transformerOptions)) {
+                throw new InvalidArgumentException("Transformer ${$origTransformerCode} should not have options");
+            }
+
+            $closure = static fn ($value) => $transformer->transform($value, $transformerOptions);
+            $transformerClosures[$origTransformerCode] = $closure;
+        }
+
+        return $transformerClosures;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function applyTransformers(array $transformers, mixed $value)
     {
         // Quick return for better perfs
         if (empty($transformers)) {
@@ -46,7 +68,7 @@ trait TransformerTrait
         foreach ($transformers as $transformerCode => $transformerClosure) {
             try {
                 $value = $transformerClosure($value);
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 throw new TransformerException($transformerCode, 0, $exception);
             }
         }
@@ -59,11 +81,7 @@ trait TransformerTrait
      * keys This way you can chain multiple times the same transformer. Without this, it would silently call only the
      * 1st one.
      *
-     * @param string $transformerCode
-     *
      * @return string
-     *
-     * @throws MissingTransformerException
      *
      * @example
      *     transformers:
@@ -71,14 +89,12 @@ trait TransformerTrait
      *         callback: array_filter
      *       callback#2:
      *         callback: array_reverse
-     *
-     *
      */
     protected function getCleanedTransfomerCode(string $transformerCode)
     {
         $match = preg_match('/([^#]+)(#[\d]+)?/', $transformerCode, $parts);
 
-        if (1 === $match && $this->transformerRegistry->hasTransformer($parts[1])) {
+        if ($match === 1 && $this->transformerRegistry->hasTransformer($parts[1])) {
             return $parts[1];
         }
 
@@ -86,60 +102,19 @@ trait TransformerTrait
     }
 
     /**
-     * @param OptionsResolver $resolver
      * @param string          $optionName
      */
     protected function configureTransformersOptions(OptionsResolver $resolver, $optionName = 'transformers')
     {
         $resolver->setDefault($optionName, []);
         $resolver->setAllowedTypes($optionName, ['array']);
-        $resolver->setNormalizer($optionName, \Closure::fromCallable([$this, 'normalizeTransformers']));
-    }
-
-    /**
-     * Transform the list of transformer codes + options into a list of Closure (better performances)
-     *
-     * @param Options $options
-     * @param         $transformers
-     *
-     * @return \Closure[]
-     *
-     * @throws ExceptionInterface
-     */
-    public function normalizeTransformers(Options $options, $transformers)
-    {
-        $transformerClosures = [];
-
-        foreach ($transformers as $origTransformerCode => $transformerOptions) {
-            $transformerOptionsResolver = new OptionsResolver();
-            $transformerCode = $this->getCleanedTransfomerCode($origTransformerCode);
-            $transformer = $this->transformerRegistry->getTransformer($transformerCode);
-            $transformerOptions = $this->checkTransformerOptions($transformerOptions, $origTransformerCode);
-            if ($transformer instanceof ConfigurableTransformerInterface) {
-                $transformer->configureOptions($transformerOptionsResolver);
-                $transformerOptions = $transformerOptionsResolver->resolve($transformerOptions);
-            } elseif (!empty($transformerOptions)) {
-                throw new \InvalidArgumentException("Transformer ${$origTransformerCode} should not have options");
-            }
-
-            $closure = static function ($value) use ($transformer, $transformerOptions) {
-                return $transformer->transform($value, $transformerOptions);
-            };
-            $transformerClosures[$origTransformerCode] = $closure;
-        }
-
-        return $transformerClosures;
+        $resolver->setNormalizer($optionName, Closure::fromCallable([$this, 'normalizeTransformers']));
     }
 
     /**
      * Check the options to always return an array, or fail on unexpected values
-     *
-     * @param mixed  $transformerOptions
-     * @param string $transformerCode
-     *
-     * @return array
      */
-    private function checkTransformerOptions($transformerOptions, string $transformerCode): array
+    private function checkTransformerOptions(mixed $transformerOptions, string $transformerCode): array
     {
         if (is_array($transformerOptions)) {
             return $transformerOptions;
@@ -148,9 +123,9 @@ trait TransformerTrait
             return [];
         }
 
-        $type = is_object($transformerOptions) ? get_class($transformerOptions) : gettype($transformerOptions);
+        $type = get_debug_type($transformerOptions);
 
-        throw new \InvalidArgumentException(
+        throw new InvalidArgumentException(
             "Options for transformer {$transformerCode} are invalid : found {$type}, expected array or null"
         );
     }

@@ -1,5 +1,8 @@
-<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
+<?php
+
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -19,65 +22,50 @@ class MultiBranchProcessTest extends AbstractProcessTest
     /**
      * Assert only one branch is called
      */
-    public function testMultiBranchProcess()
+    public function testMultiBranchProcess(): void
     {
         $this->processManager->execute('test.multi_branch_process_first');
-        $this->assertDataQueue(
+        $this->assertDataQueue([
             [
-                [
-                    'task' => 'data1',
-                    'value' => 'ok',
-                ],
+                'task' => 'data1',
+                'value' => 'ok',
             ],
-            'test.multi_branch_process_first'
-        );
+        ], 'test.multi_branch_process_first');
 
         $this->processManager->execute('test.multi_branch_process_entry');
-        $this->assertDataQueue(
+        $this->assertDataQueue([
             [
-                [
-                    'task' => 'data2',
-                    'value' => 'ok',
-                ],
+                'task' => 'data2',
+                'value' => 'ok',
             ],
-            'test.multi_branch_process_entry'
-        );
+        ], 'test.multi_branch_process_entry');
 
         $this->processManager->execute('test.multi_branch_process_entry_reversed');
-        $this->assertDataQueue(
+        $this->assertDataQueue([
             [
-                [
-                    'task' => 'data2',
-                    'value' => 'ok',
-                ],
+                'task' => 'data2',
+                'value' => 'ok',
             ],
-            'test.multi_branch_process_entry'
-        );
+        ], 'test.multi_branch_process_entry');
 
         $this->processManager->execute('test.multi_branch_process_end');
-        $this->assertDataQueue(
+        $this->assertDataQueue([
             [
-                [
-                    'task' => 'data2',
-                    'value' => 'ok',
-                ],
+                'task' => 'data2',
+                'value' => 'ok',
             ],
-            'test.multi_branch_process_end'
-        );
+        ], 'test.multi_branch_process_end');
 
         $this->processManager->execute('test.multi_branch_process_entry_end');
-        $this->assertDataQueue(
+        $this->assertDataQueue([
             [
-                [
-                    'task' => 'data2',
-                    'value' => 'ok',
-                ],
+                'task' => 'data2',
+                'value' => 'ok',
             ],
-            'test.multi_branch_process_entry_end'
-        );
+        ], 'test.multi_branch_process_entry_end');
     }
 
-    public function testMainGroupOrder()
+    public function testMainGroupOrder(): void
     {
         $process = $this->processConfigurationRegistry->getProcessConfiguration('test.multi_branch_process_first');
         self::assertEquals(
@@ -122,7 +110,7 @@ class MultiBranchProcessTest extends AbstractProcessTest
      *
      * @expectedException \CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException
      */
-    public function testMultiBranchProcessError()
+    public function testMultiBranchProcessError(): void
     {
         $this->processManager->execute('test.multi_branch_process_entry_end_error');
     }

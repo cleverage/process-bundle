@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,6 +15,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use UnexpectedValueException;
 
 /**
  * Array filtering transformer, should match native array_filter behavior
@@ -22,23 +26,18 @@ class ArrayFilterTransformer implements ConfigurableTransformerInterface
 {
     use ConditionTrait;
 
-    /**
-     * ColumnAggregatorTask constructor.
-     *
-     * @param PropertyAccessorInterface $accessor
-     */
     public function __construct(PropertyAccessorInterface $accessor)
     {
         $this->accessor = $accessor;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array<int|string, mixed>
      */
-    public function transform($value, array $options = [])
+    public function transform($value, array $options = []): array
     {
-        if (!(\is_array($value) || $value instanceof \Traversable)) {
-            throw new \UnexpectedValueException('Given value is not iterable');
+        if (! (is_iterable($value))) {
+            throw new UnexpectedValueException('Given value is not iterable');
         }
 
         $result = [];
@@ -52,18 +51,12 @@ class ArrayFilterTransformer implements ConfigurableTransformerInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'array_filter';
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $this->configureWrappedConditionOptions('condition', $resolver);
     }

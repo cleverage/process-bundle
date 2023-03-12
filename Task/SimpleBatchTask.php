@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -13,26 +16,21 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Simple example of how to manage an internal buffer for batch processing
- *
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskInterface
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $elements = [];
 
-    /**
-     * @param ProcessState $state
-     */
-    public function flush(ProcessState $state)
+    public function flush(ProcessState $state): void
     {
-        if (0 === \count($this->elements)) {
+        if (\count($this->elements) === 0) {
             $state->setSkipped(true);
         } else {
             $state->setOutput($this->elements);
@@ -40,18 +38,12 @@ class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskI
         }
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
-     * @throws \InvalidArgumentException
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $batchCount = $this->getOption($state, 'batch_count');
         $this->elements[] = $state->getInput();
 
-        if (null !== $batchCount && \count($this->elements) >= $batchCount) {
+        if ($batchCount !== null && \count($this->elements) >= $batchCount) {
             $state->setOutput($this->elements);
             $this->elements = [];
         } else {
@@ -59,17 +51,10 @@ class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskI
         }
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(
-            [
-                'batch_count' => 10,
-            ]
-        );
+        $resolver->setDefaults([
+            'batch_count' => 10,
+        ]);
     }
 }

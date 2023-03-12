@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -15,13 +18,7 @@ namespace CleverAge\ProcessBundle\Filesystem;
  */
 interface StructuredFileInterface extends FileStreamInterface
 {
-    /**
-     * @return array
-     */
     public function getHeaders(): array;
 
-    /**
-     * @return int
-     */
     public function getHeaderCount(): int;
 }

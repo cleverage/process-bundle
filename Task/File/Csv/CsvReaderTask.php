@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -13,56 +16,35 @@ namespace CleverAge\ProcessBundle\Task\File\Csv;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use LogicException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Reads the file path from configuration and iterates over it
  * Ignores any input
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
 {
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        protected LoggerInterface $logger
+    ) {
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
-     * @throws \LogicException
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
-        $output = null;
         if ($this->csv instanceof CsvFile
             && $this->csv->getFilePath() !== $this->getOption($state, 'file_path')) {
             $this->csv = null;
         }
 
-        if (!$this->csv instanceof CsvFile) {
+        if (! $this->csv instanceof CsvFile) {
             $this->initFile($state);
         }
         $lineNumber = $this->csv->getLineNumber();
         $output = $this->csv->readLine();
 
-        if (null === $output) {
+        if ($output === null) {
             if ($this->getOption($state, 'log_empty_lines')) {
                 $logContext = [
                     'csv_file' => $this->csv->getFilePath(),
@@ -83,51 +65,29 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
      * Moves the internal pointer to the next element,
      * return true if the task has a next element
      * return false if the task has terminated it's iteration
-     *
-     * @param ProcessState $state
-     *
-     * @throws \LogicException
-     * @throws \UnexpectedValueException
-     * @throws \RuntimeException
-     *
-     * @return bool
      */
-    public function next(ProcessState $state)
+    public function next(ProcessState $state): bool
     {
-        if (!$this->csv instanceof CsvFile) {
-            throw new \LogicException('No CSV File initialized');
+        if (! $this->csv instanceof CsvFile) {
+            throw new LogicException('No CSV File initialized');
         }
 
         $state->removeErrorContext('csv_file');
         $state->removeErrorContext('csv_line');
 
-        return !$this->csv->isEndOfFile();
+        return ! $this->csv->isEndOfFile();
     }
 
-    /**
-     * @param ProcessState $state
-     * @param array        $options
-     *
-     * @return array
-     */
-    protected function getHeaders(ProcessState $state, array $options)
+    protected function getHeaders(ProcessState $state, array $options): array
     {
         return $options['headers'];
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws UndefinedOptionsException
-     * @throws AccessException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         parent::configureOptions($resolver);
-        $resolver->setDefaults(
-            [
-                'log_empty_lines' => false,
-            ]
-        );
+        $resolver->setDefaults([
+            'log_empty_lines' => false,
+        ]);
     }
 }

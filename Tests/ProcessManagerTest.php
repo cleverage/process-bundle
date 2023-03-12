@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -22,20 +25,28 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 
 class ProcessManagerTest extends AbstractProcessTest
 {
-
-    public function testProcessEvents()
+    public function testProcessEvents(): void
     {
         $edProphecy = $this->prophesize(EventDispatcherInterface::class);
 
-        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [new TypeToken(ProcessEvent::class), ProcessEvent::EVENT_PROCESS_STARTED]);
+        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [
+            new TypeToken(ProcessEvent::class),
+            ProcessEvent::EVENT_PROCESS_STARTED,
+        ]);
         $dispatchStartProphecy->shouldBeCalled();
         $edProphecy->addMethodProphecy($dispatchStartProphecy);
 
-        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [new TypeToken(ProcessEvent::class), ProcessEvent::EVENT_PROCESS_ENDED]);
+        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [
+            new TypeToken(ProcessEvent::class),
+            ProcessEvent::EVENT_PROCESS_ENDED,
+        ]);
         $dispatchStartProphecy->shouldBeCalled();
         $edProphecy->addMethodProphecy($dispatchStartProphecy);
 
-        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [new TypeToken(ProcessEvent::class), ProcessEvent::EVENT_PROCESS_FAILED]);
+        $dispatchStartProphecy = new MethodProphecy($edProphecy, 'dispatch', [
+            new TypeToken(ProcessEvent::class),
+            ProcessEvent::EVENT_PROCESS_FAILED,
+        ]);
         $dispatchStartProphecy->shouldNotBeCalled();
         $edProphecy->addMethodProphecy($dispatchStartProphecy);
 
@@ -43,10 +54,14 @@ class ProcessManagerTest extends AbstractProcessTest
         $eventDispatcher = $edProphecy->reveal();
         $processManager = new ProcessManager(
             $this->getContainer(),
-            $this->getContainer()->get(ProcessLogger::class),
-            $this->getContainer()->get(TaskLogger::class),
-            $this->getContainer()->get(ProcessConfigurationRegistry::class),
-            $this->getContainer()->get(ContextualOptionResolver::class),
+            $this->getContainer()
+                ->get(ProcessLogger::class),
+            $this->getContainer()
+                ->get(TaskLogger::class),
+            $this->getContainer()
+                ->get(ProcessConfigurationRegistry::class),
+            $this->getContainer()
+                ->get(ContextualOptionResolver::class),
             $eventDispatcher
         );
 

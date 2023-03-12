@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -13,31 +16,23 @@ namespace CleverAge\ProcessBundle;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\CheckSerializerCompilerPass;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-/**
- * @author  Valentin Clavreul <vclavreul@clever-age.com>
- * @author  Vincent Chalnot <vchalnot@clever-age.com>
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
- */
 class CleverAgeProcessBundle extends Bundle
 {
     /**
      * Adding compiler passes to inject services into registry
-     *
-     * @param ContainerBuilder $container
      */
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(
-            new RegistryCompilerPass(
-                TransformerRegistry::class,
-                'cleverage.transformer',
-                'addTransformer'
-            )
+            new RegistryCompilerPass(TransformerRegistry::class, 'cleverage.transformer', 'addTransformer'),
+            PassConfig::TYPE_BEFORE_OPTIMIZATION,
+            0
         );
 
-        $container->addCompilerPass(new CheckSerializerCompilerPass());
+        $container->addCompilerPass(new CheckSerializerCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }
 }

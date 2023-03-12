@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -13,79 +16,53 @@ namespace CleverAge\ProcessBundle\Task\File;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use League\Flysystem\FileNotFoundException;
-use League\Flysystem\FilesystemInterface;
-use League\Flysystem\FilesystemNotFoundException;
+use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use UnexpectedValueException;
+
+use function in_array;
+use function is_array;
+use function is_resource;
 
 /**
  * Class FileFetchTask
  *
  * Copy (or move) file from one filesystem to another, using Flysystem
  * Either get files using a file regexp, or take files from input
- *
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInterface
 {
+    protected Filesystem $sourceFS;
 
-    /** @var  MountManager */
-    protected $mountManager;
+    protected Filesystem $destinationFS;
 
-    /** @var FilesystemInterface */
-    protected $sourceFS;
+    protected array $matchingFiles = [];
 
-    /** @var FilesystemInterface */
-    protected $destinationFS;
-
-    /** @var array */
-    protected $matchingFiles = [];
-
-    /**
-     * @param MountManager|null $mountManager
-     */
-    public function __construct(MountManager $mountManager = null)
-    {
-        $this->mountManager = $mountManager;
+    public function __construct(
+        protected ?MountManager $mountManager = null
+    ) {
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
-     * @throws FilesystemNotFoundException
-     */
-    public function initialize(ProcessState $state)
+    public function initialize(ProcessState $state): void
     {
-        if (!$this->mountManager) {
+        if (! $this->mountManager) {
             throw new ServiceNotFoundException('MountManager service not found, you need to install FlySystemBundle');
         }
         // Configure options
         parent::initialize($state);
 
-        $this->sourceFS = $this->mountManager->getFilesystem($this->getOption($state, 'source_filesystem'));
+        $this->sourceFS = $this->mountManager->get($this->getOption($state, 'source_filesystem'));
         $this->destinationFS = $this->mountManager->getFilesystem($this->getOption($state, 'destination_filesystem'));
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
-     * @throws \UnexpectedValueException
-     * @throws FilesystemNotFoundException
-     * @throws FileNotFoundException
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $this->findMatchingFiles($state);
 
         $file = current($this->matchingFiles);
-        if (!$file) {
+        if (! $file) {
             $state->setSkipped(true);
 
             return;
@@ -96,82 +73,59 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
     }
 
     /**
-     * @param ProcessState $state
-     *
-     * @throws \UnexpectedValueException
-     * @throws ExceptionInterface
-     * @throws \InvalidArgumentException
-     *
      * @return bool|mixed
      */
-    public function next(ProcessState $state)
+    public function next(ProcessState $state): mixed
     {
         $this->findMatchingFiles($state);
 
         return next($this->matchingFiles);
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \UnexpectedValueException
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
-     */
-    protected function findMatchingFiles(ProcessState $state)
+    protected function findMatchingFiles(ProcessState $state): void
     {
         $filePattern = $this->getOption($state, 'file_pattern');
         if ($filePattern) {
             foreach ($this->sourceFS->listContents('/') as $file) {
-                if ('file' === $file['type']
-                    && preg_match($filePattern, $file['path'])
-                    && !\in_array($file['path'], $this->matchingFiles, true)) {
+                if ($file['type'] === 'file'
+                    && preg_match($filePattern, (string) $file['path'])
+                    && ! in_array($file['path'], $this->matchingFiles, true)) {
                     $this->matchingFiles[] = $file['path'];
                 }
             }
         } else {
             $input = $state->getInput();
-            if (!$input) {
-                throw new \UnexpectedValueException('No pattern neither input provided for the Task');
+            if (! $input) {
+                throw new UnexpectedValueException('No pattern neither input provided for the Task');
             }
-            if (\is_array($input)) {
+            if (is_array($input)) {
                 foreach ($input as $file) {
-                    if (!\in_array($file, $this->matchingFiles, true)) {
+                    if (! in_array($file, $this->matchingFiles, true)) {
                         $this->matchingFiles[] = $file;
                     }
                 }
-            } elseif (!\in_array($input, $this->matchingFiles, true)) {
+            } elseif (! in_array($input, $this->matchingFiles, true)) {
                 $this->matchingFiles[] = $input;
             }
         }
     }
 
-    /**
-     * @param ProcessState $state
-     * @param string       $filename
-     * @param bool         $removeSource
-     *
-     * @throws FileNotFoundException
-     * @throws ExceptionInterface
-     * @throws FilesystemNotFoundException
-     * @throws \InvalidArgumentException
-     *
-     * @return mixed
-     */
-    protected function doFileCopy(ProcessState $state, $filename, $removeSource)
+    protected function doFileCopy(ProcessState $state, string $filename, bool $removeSource): string|bool|null
     {
         $prefixFrom = $this->getOption($state, 'source_filesystem');
         $prefixTo = $this->getOption($state, 'destination_filesystem');
 
-        $buffer = $this->mountManager->getFilesystem($prefixFrom)->readStream($filename);
+        $buffer = $this->mountManager->getFilesystem($prefixFrom)
+            ->readStream($filename);
 
-        if (false === $buffer) {
+        if ($buffer === false) {
             return false;
         }
 
-        $result = $this->mountManager->getFilesystem($prefixTo)->putStream($filename, $buffer);
+        $result = $this->mountManager->getFilesystem($prefixTo)
+            ->putStream($filename, $buffer);
 
-        if (\is_resource($buffer)) {
+        if (is_resource($buffer)) {
             fclose($buffer);
         }
 
@@ -182,9 +136,6 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
         return $result ? $filename : null;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setRequired(['source_filesystem', 'destination_filesystem']);

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,42 +15,23 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Exception;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\OptionsResolver\Exception\AccessException;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Accepts an object or an array as input and sets values from configuration
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class PropertySetterTask extends AbstractConfigurableTask
 {
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /** @var PropertyAccessorInterface */
-    protected $accessor;
-
-    /**
-     * @param LoggerInterface           $logger
-     * @param PropertyAccessorInterface $accessor
-     */
-    public function __construct(LoggerInterface $logger, PropertyAccessorInterface $accessor)
-    {
-        $this->logger = $logger;
-        $this->accessor = $accessor;
+    public function __construct(
+        protected LoggerInterface $logger,
+        protected PropertyAccessorInterface $accessor
+    ) {
     }
 
-    /**
-     * @param ProcessState $state
-     *
-     * @throws \Exception
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
         $input = $state->getInput();
@@ -55,7 +39,7 @@ class PropertySetterTask extends AbstractConfigurableTask
         foreach ($options['values'] as $key => $value) {
             try {
                 $this->accessor->setValue($input, $key, $value);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $state->addErrorContextValue('property', $key);
                 $state->addErrorContextValue('value', $value);
                 $state->setException($e);
@@ -67,19 +51,9 @@ class PropertySetterTask extends AbstractConfigurableTask
         $state->setOutput($input);
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
-     */
     protected function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setRequired(
-            [
-                'values',
-            ]
-        );
+        $resolver->setRequired(['values']);
         $resolver->setAllowedTypes('values', ['array']);
     }
 }

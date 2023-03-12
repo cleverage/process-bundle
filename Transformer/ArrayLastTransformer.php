@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,23 +15,15 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 /**
  * Return the last element of an array
- *
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ArrayLastTransformer implements TransformerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function transform($value, array $options = [])
     {
         return array_values(array_slice($value, -1))[0];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'array_last';
     }

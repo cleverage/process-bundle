@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -20,30 +23,50 @@ class ArrayFilterTransformerTest extends AbstractProcessTest
     /**
      * Assert data is correctly filtered
      */
-    public function testSimpleFilter()
+    public function testSimpleFilter(): void
     {
         $input = [
-            ['data' => 1, 'filter_value' => 'X'],
-            ['data' => 2, 'filter_value' => 'Y'],
-            ['data' => 3],
-            ['data' => 4, 'filter_value' => 'X'],
-            ['data' => 5, 'filter_value' => 'Y'],
-            ['data' => 6],
+            [
+                'data' => 1,
+                'filter_value' => 'X',
+            ],
+            [
+                'data' => 2,
+                'filter_value' => 'Y',
+            ],
+            [
+                'data' => 3,
+            ],
+            [
+                'data' => 4,
+                'filter_value' => 'X',
+            ],
+            [
+                'data' => 5,
+                'filter_value' => 'Y',
+            ],
+            [
+                'data' => 6,
+            ],
         ];
 
         $result = $this->processManager->execute('test.array_filter_transformer.simple', $input);
 
         $nativeResult = array_filter(
             $input,
-            static function ($item) {
-                return isset($item['filter_value']) && 'X' === $item['filter_value'];
-            }
+            static fn ($item): bool => isset($item['filter_value']) && $item['filter_value'] === 'X'
         );
 
         // Note that to match native function, key are preserved
         $expectedResult = [
-            0 => ['data' => 1, 'filter_value' => 'X'],
-            3 => ['data' => 4, 'filter_value' => 'X'],
+            0 => [
+                'data' => 1,
+                'filter_value' => 'X',
+            ],
+            3 => [
+                'data' => 4,
+                'filter_value' => 'X',
+            ],
         ];
 
         self::assertCount(2, $result);

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,23 +15,14 @@ namespace CleverAge\ProcessBundle\Task\File;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
-use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Simply delete the file passed as input
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class FileRemoverTask implements TaskInterface
 {
-    /**
-     * @param ProcessState $state
-     *
-     * @throws IOException
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $fs = new Filesystem();
         $fs->remove($state->getInput());

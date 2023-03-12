@@ -18,12 +18,7 @@ return static function (ECSConfig $ecsConfig): void {
         SetList::DOCTRINE_ANNOTATIONS,
     ]);
 
-    $ecsConfig->paths([
-        __DIR__,
-    ]);
+    $ecsConfig->paths([__DIR__]);
 
-    $ecsConfig->skip([
-        __DIR__ . 'vendor',
-        AssignmentInConditionSniff::class
-    ]);
+    $ecsConfig->skip([__DIR__ . 'vendor', AssignmentInConditionSniff::class]);
 };

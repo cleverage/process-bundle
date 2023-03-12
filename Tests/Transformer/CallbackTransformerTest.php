@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -17,9 +20,6 @@ use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
  */
 class CallbackTransformerTest extends AbstractProcessTest
 {
-    /**
-     * @return string
-     */
     public static function doCallback(): string
     {
         return implode('-', func_get_args());
@@ -28,7 +28,7 @@ class CallbackTransformerTest extends AbstractProcessTest
     /**
      * Assert data is correctly filtered
      */
-    public function testSimpleCallback()
+    public function testSimpleCallback(): void
     {
         $input = '3';
 
@@ -40,7 +40,7 @@ class CallbackTransformerTest extends AbstractProcessTest
     /**
      * Assert data is correctly filtered
      */
-    public function testLeftParametersCallback()
+    public function testLeftParametersCallback(): void
     {
         $input = '3';
 
@@ -52,7 +52,7 @@ class CallbackTransformerTest extends AbstractProcessTest
     /**
      * Assert data is correctly filtered
      */
-    public function testRightParametersCallback()
+    public function testRightParametersCallback(): void
     {
         $input = '3';
 
@@ -64,7 +64,7 @@ class CallbackTransformerTest extends AbstractProcessTest
     /**
      * Assert data is correctly filtered
      */
-    public function testAdditionalParametersCallback()
+    public function testAdditionalParametersCallback(): void
     {
         $input = '6';
 
@@ -76,7 +76,7 @@ class CallbackTransformerTest extends AbstractProcessTest
     /**
      * Assert data is correctly filtered
      */
-    public function testLeftAndRightParametersCallback()
+    public function testLeftAndRightParametersCallback(): void
     {
         $input = '3';
 

@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -16,16 +19,10 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 /**
  * This is a dummy task mostly intended for testing purpose.
  * Forward any input to the error output
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ErrorForwarderTask implements TaskInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function execute(ProcessState $state)
+    public function execute(ProcessState $state): void
     {
         $state->setSkipped(true);
         $state->setErrorOutput($state->getInput());

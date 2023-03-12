@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -20,22 +23,11 @@ use Psr\Log\LoggerInterface;
  */
 abstract class AbstractLogger extends BaseAbstractLogger
 {
-    /** @var LoggerInterface */
-    protected $logger;
-
-    /**
-     * TaskLoggger constructor.
-     *
-     * @param LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
+    public function __construct(
+        protected LoggerInterface $logger
+    ) {
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function log($level, $message, array $context = []): void
     {
         $this->logger->log($level, $message, $context);

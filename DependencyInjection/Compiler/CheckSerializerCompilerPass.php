@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -17,19 +20,14 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Check the presence of the serializer (required for this bundle), and help the user to set it
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
  */
 class CheckSerializerCompilerPass implements CompilerPassInterface
 {
-    const MSG = 'The Symfony serializer component do not seem enabled, consider toggling framework.serializer.enable (see https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled)';
+    final public const MSG = 'The Symfony serializer component do not seem enabled, consider toggling framework.serializer.enable (see https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled)';
 
-    /**
-     * {@inheritDoc}
-     */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->has('serializer') && !$container->has(DenormalizerInterface::class)) {
+        if (! $container->has('serializer') && ! $container->has(DenormalizerInterface::class)) {
             throw new AutowiringFailedException('serializer', self::MSG);
         }
     }

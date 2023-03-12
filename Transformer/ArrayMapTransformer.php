@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -13,20 +16,16 @@ namespace CleverAge\ProcessBundle\Transformer;
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Traversable;
+use UnexpectedValueException;
 
 /**
  * Applies transformers to each element of an array
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ArrayMapTransformer implements ConfigurableTransformerInterface
 {
     use TransformerTrait;
 
-    /**
-     * @param TransformerRegistry $transformerRegistry
-     */
     public function __construct(TransformerRegistry $transformerRegistry)
     {
         $this->transformerRegistry = $transformerRegistry;
@@ -36,16 +35,13 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
      * Must return the transformed $value
      *
      * @param array $values
-     * @param array $options
      *
-     * @throws \UnexpectedValueException
-     *
-     * @return mixed $value
+     * @return mixed[] $value
      */
-    public function transform($values, array $options = [])
+    public function transform($values, array $options = []): array
     {
-        if (!\is_array($values) && !$values instanceof \Traversable) {
-            throw new \UnexpectedValueException('Input value must be an array or traversable');
+        if (! \is_array($values) && ! $values instanceof Traversable) {
+            throw new UnexpectedValueException('Input value must be an array or traversable');
         }
 
         $results = [];
@@ -53,12 +49,12 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
         foreach ($values as $key => $item) {
             try {
                 $item = $this->applyTransformers($options['transformers'], $item);
-                if (null === $item && $options['skip_null']) {
+                if ($item === null && $options['skip_null']) {
                     continue;
                 }
                 $results[$key] = $item;
             } catch (TransformerException $exception) {
-                $exception->setTargetProperty((string)$key);
+                $exception->setTargetProperty((string) $key);
                 throw $exception;
             }
         }
@@ -68,30 +64,19 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
 
     /**
      * Returns the unique code to identify the transformer
-     *
-     * @return string
      */
-    public function getCode()
+    public function getCode(): string
     {
         return 'array_map';
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $this->configureTransformersOptions($resolver);
-        $resolver->setRequired(
-            [
-                'transformers',
-            ]
-        );
-        $resolver->setDefaults(
-            [
-                'skip_null' => false,
-            ]
-        );
+        $resolver->setRequired(['transformers']);
+        $resolver->setDefaults([
+            'skip_null' => false,
+        ]);
         $resolver->setAllowedTypes('skip_null', ['boolean']);
     }
 }

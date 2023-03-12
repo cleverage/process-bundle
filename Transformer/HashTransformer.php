@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -14,15 +17,10 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Use hash() function to generate hash value
- *
- * @author Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class HashTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * {@inheritDoc}
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('algo');
         $resolver->setAllowedValues('algo', hash_algos());
@@ -32,19 +30,12 @@ class HashTransformer implements ConfigurableTransformerInterface
         $resolver->setDefault('raw_output', false);
     }
 
-    /**
-     * {@inheritDoc}
-     * @throws \UnexpectedValueException
-     */
-    public function transform($value, array $options = [])
+    public function transform($value, array $options = []): string
     {
-        return hash($options['algo'], $value, $options['raw_output']);
+        return hash((string) $options['algo'], (string) $value, $options['raw_output']);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getCode()
+    public function getCode(): string
     {
         return 'hash';
     }

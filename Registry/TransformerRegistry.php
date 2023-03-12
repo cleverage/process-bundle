@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -12,25 +15,22 @@ namespace CleverAge\ProcessBundle\Registry;
 
 use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
+use UnexpectedValueException;
 
 /**
  * Holds all tagged transformer services
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class TransformerRegistry
 {
-    /** @var TransformerInterface[] */
+    /**
+     * @var TransformerInterface[]
+     */
     protected $transformers = [];
 
-    /**
-     * @param TransformerInterface $transformer
-     */
     public function addTransformer(TransformerInterface $transformer)
     {
         if (array_key_exists($transformer->getCode(), $this->transformers)) {
-            throw new \UnexpectedValueException("Transformer {$transformer->getCode()} is already defined");
+            throw new UnexpectedValueException("Transformer {$transformer->getCode()} is already defined");
         }
         $this->transformers[$transformer->getCode()] = $transformer;
     }
@@ -46,13 +46,11 @@ class TransformerRegistry
     /**
      * @param string $code
      *
-     * @throws MissingTransformerException
-     *
      * @return TransformerInterface
      */
     public function getTransformer($code)
     {
-        if (!$this->hasTransformer($code)) {
+        if (! $this->hasTransformer($code)) {
             throw MissingTransformerException::create($code);
         }
 
@@ -61,10 +59,8 @@ class TransformerRegistry
 
     /**
      * @param string $code
-     *
-     * @return bool
      */
-    public function hasTransformer($code)
+    public function hasTransformer($code): bool
     {
         return array_key_exists($code, $this->transformers);
     }

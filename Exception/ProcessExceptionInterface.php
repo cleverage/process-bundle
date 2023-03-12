@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,12 +13,11 @@
 
 namespace CleverAge\ProcessBundle\Exception;
 
+use Throwable;
+
 /**
  * Common interface for process exception
- *
- * @author Valentin Clavreul <vclavreul@clever-age.com>
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
-interface ProcessExceptionInterface extends \Throwable
+interface ProcessExceptionInterface extends Throwable
 {
 }

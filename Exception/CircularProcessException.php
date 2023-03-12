@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -10,18 +13,18 @@
 
 namespace CleverAge\ProcessBundle\Exception;
 
+use UnexpectedValueException;
+
 /**
  * Thrown when a circular dependency is found in a process
  */
-class CircularProcessException extends \UnexpectedValueException implements ProcessExceptionInterface
+class CircularProcessException extends UnexpectedValueException implements ProcessExceptionInterface
 {
     /**
      * @param string $processCode
      * @param string $taskCode
-     *
-     * @return CircularProcessException
      */
-    public static function create($processCode, $taskCode)
+    public static function create($processCode, $taskCode): self
     {
         $errorStr = "Process '{$processCode}' contains circular dependency (task '{$taskCode}' has itself as ancestor, at some point)";
 

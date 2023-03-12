@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
@@ -11,73 +14,46 @@
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
+use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use UnexpectedValueException;
 
 /**
  * Parse an input using the Expression Language and returning a specific value upon a specific condition
- *
- * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterface
 {
-    /** @var ExpressionLanguage */
-    protected $language;
-
-    /**
-     * @param ExpressionLanguage $language
-     */
-    public function __construct(ExpressionLanguage $language)
-    {
-        $this->language = $language;
+    public function __construct(
+        protected ExpressionLanguage $language
+    ) {
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws ExceptionInterface
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(
-            [
-                'map',
-            ]
-        );
+        $resolver->setRequired(['map']);
         $resolver->setAllowedTypes('map', ['array']);
-        $resolver->setDefaults(
-            [
-                'ignore_missing' => false,
-                'keep_missing' => false,
-            ]
-        );
+        $resolver->setDefaults([
+            'ignore_missing' => false,
+            'keep_missing' => false,
+        ]);
         $resolver->setAllowedTypes('ignore_missing', ['boolean']);
         $resolver->setAllowedTypes('keep_missing', ['boolean']);
         $resolver->setNormalizer(
             'map',
-            function (Options $options, $values) {
-                if (!is_array($values)) {
-                    throw new \UnexpectedValueException('The map must be an array');
+            function (Options $options, $values): array {
+                if (! is_array($values)) {
+                    throw new UnexpectedValueException('The map must be an array');
                 }
                 $resolver = new OptionsResolver();
-                $resolver->setRequired(
-                    [
-                        'condition',
-                        'output',
-                    ]
-                );
+                $resolver->setRequired(['condition', 'output']);
                 $resolver->setNormalizer(
                     'condition',
-                    function (Options $options, $value) {
-                        return $this->language->parse($value, ['data']);
-                    }
+                    fn (Options $options, $value): ParsedExpression => $this->language->parse($value, ['data'])
                 );
                 $resolver->setNormalizer(
                     'output',
-                    function (Options $options, $value) {
-                        return $this->language->parse($value, ['data']);
-                    }
+                    fn (Options $options, $value): ParsedExpression => $this->language->parse($value, ['data'])
                 );
                 $parsedValues = [];
                 foreach ($values as $value) {
@@ -93,13 +69,14 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
      * Must return the transformed $value
      *
      * @param mixed $value
-     * @param array $options
      *
-     * @return mixed $value
+     * @return mixed
      */
     public function transform($value, array $options = [])
     {
-        $input = ['data' => $value];
+        $input = [
+            'data' => $value,
+        ];
         foreach ($options['map'] as $mapItem) {
             if ($this->language->evaluate($mapItem['condition'], $input)) {
                 return $this->language->evaluate($mapItem['output'], $input);
@@ -109,8 +86,8 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
         if ($options['keep_missing']) {
             return $value;
         }
-        if (!$options['ignore_missing']) {
-            throw new \UnexpectedValueException("No expression accepting value '{$value}' in map");
+        if (! $options['ignore_missing']) {
+            throw new UnexpectedValueException("No expression accepting value '{$value}' in map");
         }
 
         return null;
@@ -118,8 +95,6 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
 
     /**
      * Returns the unique code to identify the transformer
-     *
-     * @return string
      */
     public function getCode(): string
     {
