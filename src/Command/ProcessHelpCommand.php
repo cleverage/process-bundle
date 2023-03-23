@@ -24,6 +24,7 @@ use CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask;
 use CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask;
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
@@ -35,10 +36,9 @@ use UnexpectedValueException;
  * Describe a process configuration
  * This is a POC, waiting to evolve properly
  */
+#[AsCommand(name: 'cleverage:process:help', description: 'Describe a process',)]
 class ProcessHelpCommand extends Command
 {
-    protected static $defaultName = 'cleverage:process:help';
-
     protected const CHAR_DOWN = '│';
 
     protected const CHAR_MERGE = '┘';
@@ -60,8 +60,6 @@ class ProcessHelpCommand extends Command
     protected const BRANCH_SIZE = 2;
 
     protected const INDENT_SIZE = 4;
-
-    protected static $defaultDescription = 'Describe the process';
 
     public function __construct(
         protected ProcessConfigurationRegistry $processConfigRegistry,

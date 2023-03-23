@@ -15,6 +15,7 @@ namespace CleverAge\ProcessBundle\Command;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,12 +24,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * List all configured processes
  */
+#[AsCommand(name: 'cleverage:process:list', description: 'List defined processes',)]
 class ListProcessCommand extends Command
 {
-    protected static $defaultName = 'cleverage:process:list';
-
-    protected static $defaultDescription = 'List defined process';
-
     public function __construct(
         protected ProcessConfigurationRegistry $processConfigRegistry
     ) {

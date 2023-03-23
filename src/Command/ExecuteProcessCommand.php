@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use InvalidArgumentException;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,10 +30,9 @@ use Symfony\Component\Yaml\Parser;
 /**
  * Run a process from the command line interface
  */
+#[AsCommand(name: 'cleverage:process:execute', description: 'Execute a process',)]
 class ExecuteProcessCommand extends Command
 {
-    protected static $defaultName = 'cleverage:process:execute';
-
     final public const OUTPUT_STDOUT = '-';
 
     final public const OUTPUT_FORMAT_DUMP = 'dump';
