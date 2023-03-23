@@ -1,6 +1,5 @@
 services:
     CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry:
-        public: false
         arguments:
             - ~
             - ~

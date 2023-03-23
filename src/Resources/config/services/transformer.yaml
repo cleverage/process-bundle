@@ -1,7 +1,8 @@
 services:
     _defaults:
         autowire: true
-        public: false
+        autoconfigure: true
+        public: true
         bind:
             $language: '@cleverage_process.expression_language'
 

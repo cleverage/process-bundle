@@ -4,3 +4,4 @@
 /vendor-sf4
 /vendor-sf5
 .env
+/phpunit.xml

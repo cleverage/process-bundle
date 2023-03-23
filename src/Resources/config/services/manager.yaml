@@ -3,7 +3,6 @@ services:
         autowire: true
         public: false
         arguments:
-            $eventDispatcher: '@Symfony\Contracts\EventDispatcher\EventDispatcherInterface'
             $container: '@service_container'
 
     CleverAge\ProcessBundle\Context\ContextualOptionResolver:

@@ -87,7 +87,7 @@ class ExecuteProcessCommand extends Command
 
         foreach ($input->getArgument('processCodes') as $code) {
             if (! $output->isQuiet()) {
-                $output->writeln("<comment>Starting process '{$code}'...</comment>");
+                $output->writeln("<comment>Starting process '$code'...</comment>");
             }
 
             // Execute each process
@@ -95,7 +95,7 @@ class ExecuteProcessCommand extends Command
             $this->handleOutputData($returnValue, $input, $output);
 
             if (! $output->isQuiet()) {
-                $output->writeln("<info>Process '{$code}' executed successfully</info>");
+                $output->writeln("<info>Process '$code' executed successfully</info>");
             }
         }
 
@@ -109,7 +109,7 @@ class ExecuteProcessCommand extends Command
     {
         $parser = new Parser();
 
-        $pattern = '/([\w]+):(.*)/';
+        $pattern = '/(\w+):(.*)/';
         $contextValues = $input->getOption('context');
         $context = [];
         foreach ($contextValues as $contextValue) {

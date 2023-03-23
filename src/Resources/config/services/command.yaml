@@ -4,5 +4,4 @@ services:
         autowire: true
         autoconfigure: true
         bind:
-            $eventDispatcher: '@Symfony\Contracts\EventDispatcher\EventDispatcherInterface'
             $container: '@service_container'

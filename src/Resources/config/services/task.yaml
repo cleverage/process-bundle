@@ -6,5 +6,3 @@ services:
         shared: false
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }
-        bind:
-            $eventDispatcher: '@Symfony\Contracts\EventDispatcher\EventDispatcherInterface'

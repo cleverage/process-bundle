@@ -100,9 +100,9 @@ abstract class AbstractProcessTest extends KernelTestCase
      *
      * Compatibility backport for symfony/phpunit-bridge that should work with v3 or v4
      */
-    protected function getContainer(): ContainerInterface
+    protected static function getContainer(): ContainerInterface
     {
-        if (isset(self::getContainer())) {
+        if (null !== self::getContainer()) {
             return self::getContainer();
         }
 

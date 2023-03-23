@@ -21,6 +21,7 @@ use LogicException;
 use Psr\Log\LogLevel;
 use function array_key_exists;
 use function array_keys;
+use function count;
 
 /**
  * Build and holds all the process configurations
@@ -30,7 +31,7 @@ class ProcessConfigurationRegistry
     /**
      * @var ProcessConfiguration[]
      */
-    protected $processConfigurations = [];
+    protected array $processConfigurations = [];
 
     public function __construct(
         protected array $rawConfiguration,
@@ -73,13 +74,12 @@ class ProcessConfigurationRegistry
         $rawProcessConfiguration = $this->rawConfiguration[$processCode];
         /** @var TaskConfiguration[] $taskConfigurations */
         $taskConfigurations = [];
-        /** @noinspection ForeachSourceInspection */
         foreach ($rawProcessConfiguration['tasks'] as $taskCode => $rawTaskConfiguration) {
-            if ((is_countable($rawTaskConfiguration['errors']) ? \count($rawTaskConfiguration['errors']) : 0) > 0) {
-                if ((is_countable($rawTaskConfiguration['error_outputs']) ? \count(
+            if ((is_countable($rawTaskConfiguration['errors']) ? count($rawTaskConfiguration['errors']) : 0) > 0) {
+                if ((is_countable($rawTaskConfiguration['error_outputs']) ? count(
                     $rawTaskConfiguration['error_outputs']
                 ) : 0) > 0) {
-                    $m = "Don't define both 'errors' and 'error_outputs' for task {$taskCode}, these options ";
+                    $m = "Don't define both 'errors' and 'error_outputs' for task $taskCode, these options ";
                     $m .= "are the same, 'errors' is deprecated, just use the new one 'error_outputs'";
                     throw new LogicException($m);
                 }
@@ -150,10 +150,7 @@ class ProcessConfigurationRegistry
         $this->processConfigurations[$processCode] = $processConfig;
     }
 
-    /**
-     * @param bool              $isErrorBranch
-     */
-    protected function markErrorBranch(TaskConfiguration $taskConfig, $isErrorBranch = true): void
+    protected function markErrorBranch(TaskConfiguration $taskConfig, bool $isErrorBranch = true): void
     {
         if ($taskConfig->isInErrorBranch() !== $isErrorBranch) {
             $taskConfig->setInErrorBranch($isErrorBranch);

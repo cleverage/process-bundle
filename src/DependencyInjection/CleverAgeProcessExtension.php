@@ -59,7 +59,7 @@ class CleverAgeProcessExtension extends Extension
     /**
      * Recursively import config files into container
      */
-    protected function findServices(ContainerBuilder $container, string $path, string $extension = 'yml'): void
+    protected function findServices(ContainerBuilder $container, string $path, string $extension = 'yaml'): void
     {
         $finder = new Finder();
         $finder->in($path)
