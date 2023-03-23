@@ -21,7 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractConfigurableTask implements InitializableTaskInterface
 {
-    protected ?array $options;
+    protected ?array $options = null;
 
     /**
      * Only validate the options at initialization, ensuring that the task will not fail at runtime
