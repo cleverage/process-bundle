@@ -13,18 +13,23 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Logger;
 
+use Monolog\LogRecord;
+
+/**
+ * Class TaskProcessor
+ *
+ * @package CleverAge\ProcessBundle\Logger
+ * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
+ */
 class TaskProcessor extends AbstractProcessor
 {
-    /**
-     * @return array
-     */
-    public function __invoke(array $record)
+    public function __invoke(LogRecord $record): LogRecord
     {
         $record = parent::__invoke($record);
 
-        $recordExtra = array_key_exists('extra', $record) ? $record['extra'] : [];
+        $recordExtra = $record->extra;
         $this->addTaskInfoToRecord($recordExtra);
-        $record['extra'] = $recordExtra;
+        $record->extra = $recordExtra;
 
         return $record;
     }

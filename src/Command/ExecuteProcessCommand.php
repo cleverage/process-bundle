@@ -31,6 +31,8 @@ use Symfony\Component\Yaml\Parser;
  */
 class ExecuteProcessCommand extends Command
 {
+    protected static $defaultName = 'cleverage:process:execute';
+
     final public const OUTPUT_STDOUT = '-';
 
     final public const OUTPUT_FORMAT_DUMP = 'dump';
@@ -46,7 +48,6 @@ class ExecuteProcessCommand extends Command
 
     protected function configure()
     {
-        $this->setName('cleverage:process:execute');
         $this->addArgument(
             'processCodes',
             InputArgument::IS_ARRAY | InputArgument::REQUIRED,

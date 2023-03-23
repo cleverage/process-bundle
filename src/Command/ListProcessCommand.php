@@ -25,6 +25,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class ListProcessCommand extends Command
 {
+    protected static $defaultName = 'cleverage:process:list';
+
     protected static $defaultDescription = 'List defined process';
 
     public function __construct(
@@ -73,7 +75,6 @@ class ListProcessCommand extends Command
 
     protected function configure()
     {
-        $this->setName('cleverage:process:list');
         $this->addOption('all', 'a', InputOption::VALUE_NONE, 'Shows all processes (including hidden ones)');
     }
 

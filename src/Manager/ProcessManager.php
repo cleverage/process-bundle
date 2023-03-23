@@ -32,8 +32,12 @@ use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\ErrorHandler\Error\FatalError;
 use Throwable;
 use UnexpectedValueException;
+
+use function count;
+use function in_array;
 
 /**
  * Execute processes
@@ -145,11 +149,10 @@ class ProcessManager
         }
 
         // Resolve task from main branch, starting by the end
-        /** @var TaskConfiguration[] $taskList */
         $taskList = array_reverse($processConfiguration->getTaskConfigurations());
         $allowedTasks = $processConfiguration->getMainTaskGroup();
         foreach ($taskList as $taskConfiguration) {
-            if (\in_array($taskConfiguration->getCode(), $allowedTasks, true)) {
+            if (in_array($taskConfiguration->getCode(), $allowedTasks, true)) {
                 $this->resolve($taskConfiguration);
             }
         }
@@ -229,7 +232,7 @@ class ProcessManager
         $this->taskConfiguration = $taskConfiguration;
 
         if ($taskConfiguration->getErrorStrategy() === TaskConfiguration::STRATEGY_STOP
-            && (\count($taskConfiguration->getErrorOutputs())) > 0) {
+            && (count($taskConfiguration->getErrorOutputs())) > 0) {
             $m = "Task configuration {$taskConfiguration->getCode()} has error outputs ";
             $m .= "but it's error strategy 'stop' implies they will never be reached.";
             $this->taskLogger->debug($m);
@@ -237,8 +240,8 @@ class ProcessManager
         // @todo Refactor this using a Registry with this feature:
         // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
         $serviceReference = $taskConfiguration->getServiceReference();
-        if (str_starts_with((string) $serviceReference, '@')) {
-            $task = $this->container->get(ltrim((string) $serviceReference, '@'));
+        if (str_starts_with($serviceReference, '@')) {
+            $task = $this->container->get(ltrim($serviceReference, '@'));
         } elseif ($this->container->has($serviceReference)) {
             $task = $this->container->get($serviceReference);
         } else {
@@ -303,7 +306,16 @@ class ProcessManager
                     $m .= " during process {$state->getTaskConfiguration()
                         ->getCode()}";
                     $m .= " with message: '{$exception->getMessage()}'.\n";
-                    throw new RuntimeException($m, -1, $exception);
+                    throw new FatalError(
+                        $m,
+                        -1,
+                        [
+                            'file' => $exception->getFile(),
+                            'line' => $exception->getLine(),
+                            'type' => 500,
+                            'message' => $exception->getMessage()
+                        ]
+                    );
                 }
 
                 return;
@@ -392,7 +404,7 @@ class ProcessManager
                 $this->processLogger->debug("Flushing task {$taskConfiguration->getCode()}");
                 $task->flush($state);
             } else {
-                throw new UnexpectedValueException("Unknown execution flag: {$executionFlag}");
+                throw new UnexpectedValueException("Unknown execution flag: $executionFlag");
             }
 
             $exception = $state->getException();
@@ -544,7 +556,7 @@ class ProcessManager
 
         // Check multi-branch processes
         foreach ($taskConfigurations as $taskConfiguration) {
-            if (! \in_array($taskConfiguration->getCode(), $mainTaskList, true)) {
+            if (! in_array($taskConfiguration->getCode(), $mainTaskList, true)) {
                 // We won't throw an error to ease development... but there must be some kind of warning
                 $state = $taskConfiguration->getState();
                 $logContext = [
@@ -560,14 +572,14 @@ class ProcessManager
 
         // Check coherence for entry/end points
         $processConfiguration->getEndPoint();
-        if ($entryPoint && ! \in_array($entryPoint->getCode(), $mainTaskList, true)) {
+        if ($entryPoint && ! in_array($entryPoint->getCode(), $mainTaskList, true)) {
             throw InvalidProcessConfigurationException::createNotInMain(
                 $processConfiguration,
                 $entryPoint,
                 $mainTaskList
             );
         }
-        if ($endPoint && ! \in_array($endPoint->getCode(), $mainTaskList, true)) {
+        if ($endPoint && ! in_array($endPoint->getCode(), $mainTaskList, true)) {
             throw InvalidProcessConfigurationException::createNotInMain(
                 $processConfiguration,
                 $endPoint,

@@ -37,6 +37,8 @@ use UnexpectedValueException;
  */
 class ProcessHelpCommand extends Command
 {
+    protected static $defaultName = 'cleverage:process:help';
+
     protected const CHAR_DOWN = '│';
 
     protected const CHAR_MERGE = '┘';
@@ -70,7 +72,6 @@ class ProcessHelpCommand extends Command
 
     protected function configure()
     {
-        $this->setName('cleverage:process:help');
         $this->addArgument('process_code', InputArgument::REQUIRED, 'The code of the process');
     }
 

@@ -25,12 +25,11 @@ class GroupByAggregateIterableTask extends AbstractConfigurableTask implements B
     /**
      * @var array
      */
-    protected $result;
+    protected array $result = [];
 
     public function __construct(
         protected PropertyAccessorInterface $accessor
     ) {
-        $this->result = [];
     }
 
     public function execute(ProcessState $state): void

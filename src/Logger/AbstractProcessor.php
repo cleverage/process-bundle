@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Logger;
 
 use CleverAge\ProcessBundle\Manager\ProcessManager;
+use Monolog\LogRecord;
 
 class AbstractProcessor
 {
@@ -22,20 +23,24 @@ class AbstractProcessor
     ) {
     }
 
-    /**
-     * @return array
-     */
-    public function __invoke(array $record)
+    public function __invoke(LogRecord $record): LogRecord
     {
-        if (array_key_exists('context', $record)
-            && $record['context']) {
-            $record['context'] = $this->normalizeRecordData($record['context']);
+        if (!empty($record->context)) {
+            $context = $this->normalizeRecordData($record->context);
+            $record = new LogRecord(
+                $record->datetime,
+                $record->channel,
+                $record->level,
+                $record->message,
+                $context,
+                $record->extra,
+                $record->formatted
+            );
         }
 
-        $this->processManager->getProcessHistory();
-        $recordExtra = array_key_exists('extra', $record) ? $record['extra'] : [];
+        $recordExtra = $record->extra;
         $this->addProcessInfoToRecord($recordExtra);
-        $record['extra'] = $recordExtra;
+        $record->extra = $recordExtra;
 
         return $record;
     }
