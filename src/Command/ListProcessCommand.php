@@ -20,6 +20,10 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function array_reduce;
+use function count;
+use function max;
+use function usort;
 
 /**
  * List all configured processes
@@ -33,45 +37,27 @@ class ListProcessCommand extends Command
         parent::__construct();
     }
 
-    /**
-     * Counter callback for public processes
-     *
-     * @param int                  $sum
-     */
-    public function publicProcessCounter($sum, ProcessConfiguration $processConfiguration): int
+    public function publicProcessCounter(int $sum, ProcessConfiguration $processConfiguration): int
     {
         return $sum + ($processConfiguration->isPublic() ? 1 : 0);
     }
 
-    /**
-     * Counter callback for private processes
-     *
-     * @param int                  $sum
-     */
-    public function privateProcessCounter($sum, ProcessConfiguration $processConfiguration): int
+    public function privateProcessCounter(int $sum, ProcessConfiguration $processConfiguration): int
     {
         return $sum + ($processConfiguration->isPrivate() ? 1 : 0);
     }
 
-    /**
-     * Sorter callback for process codes
-     */
     public function processSorter(ProcessConfiguration $a, ProcessConfiguration $b): int
     {
         return $a->getCode() <=> $b->getCode();
     }
 
-    /**
-     * Filter callback to find max message length
-     *
-     * @param int   $max
-     */
-    public function maxMessageLengthFilter($max, array $message): int
+    public function maxMessageLengthFilter(int $max, array $message): int
     {
-        return \max($max, strlen($this->filterOutTags($message['output'])));
+        return max($max, strlen($this->filterOutTags($message['output'])));
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption('all', 'a', InputOption::VALUE_NONE, 'Shows all processes (including hidden ones)');
     }
@@ -79,19 +65,19 @@ class ListProcessCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $processConfigurations = $this->processConfigRegistry->getProcessConfigurations();
-        \usort($processConfigurations, $this->processSorter(...));
+        usort($processConfigurations, $this->processSorter(...));
 
-        $publicCount = \array_reduce($processConfigurations, $this->publicProcessCounter(...), 0);
-        $privateCount = \array_reduce($processConfigurations, $this->privateProcessCounter(...), 0);
+        $publicCount = array_reduce($processConfigurations, $this->publicProcessCounter(...), 0);
+        $privateCount = array_reduce($processConfigurations, $this->privateProcessCounter(...), 0);
         $output->writeln(
-            "<info>There are {$publicCount} process configurations defined (and {$privateCount} private) :</info>"
+            "<info>There are $publicCount process configurations defined (and $privateCount private) :</info>"
         );
 
         $messages = [];
         foreach ($processConfigurations as $processConfiguration) {
             if ($processConfiguration->isPublic() || $input->getOption('all')) {
-                $countTasks = \count($processConfiguration->getTaskConfigurations());
-                $message = "<info> - </info>{$processConfiguration->getCode()}<info> with {$countTasks} tasks</info>";
+                $countTasks = count($processConfiguration->getTaskConfigurations());
+                $message = "<info> - </info>{$processConfiguration->getCode()}<info> with $countTasks tasks</info>";
 
                 if ($processConfiguration->isPrivate()) {
                     $message .= ' <comment>(private)</comment>';
@@ -105,7 +91,7 @@ class ListProcessCommand extends Command
         }
 
         // Add process descriptions at a fixed position
-        $maxMessageLength = \array_reduce($messages, $this->maxMessageLengthFilter(...), 0);
+        $maxMessageLength = array_reduce($messages, $this->maxMessageLengthFilter(...), 0);
         $outputMessages = [];
         foreach ($messages as $message) {
             /** @var ProcessConfiguration $processConfiguration */
@@ -128,12 +114,7 @@ class ListProcessCommand extends Command
         return Command::SUCCESS;
     }
 
-    /**
-     * Returns a padded message (without counting metadata)
-     *
-     * @param int    $length
-     */
-    protected function padMessage(string $message, $length = 80): string
+    protected function padMessage(string $message, int $length = 80): string
     {
         $currentLen = strlen($this->filterOutTags($message));
         if ($currentLen < $length) {
@@ -143,9 +124,6 @@ class ListProcessCommand extends Command
         return $message;
     }
 
-    /**
-     * Filter out tags used in console outputs
-     */
     protected function filterOutTags(string $string): string
     {
         return preg_replace('/<[^<>]*>/', '', $string);

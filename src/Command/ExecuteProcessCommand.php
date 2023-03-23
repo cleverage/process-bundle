@@ -27,6 +27,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\Yaml\Parser;
 
+use function is_array;
+
 /**
  * Run a process from the command line interface
  */
@@ -46,7 +48,7 @@ class ExecuteProcessCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument(
             'processCodes',
@@ -148,7 +150,7 @@ class ExecuteProcessCommand extends Command
         } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
             // JsonStreamFile::writeLine only takes an array...
             // TODO how to handle other cases ?
-            if (\is_array($data)) {
+            if (is_array($data)) {
                 $outputFile = new JsonStreamFile($input->getOption('output'), 'wb');
                 $outputFile->writeLine($data);
             }
