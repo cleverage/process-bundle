@@ -16,39 +16,27 @@ namespace CleverAge\ProcessBundle\Configuration;
 use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
 
+use function count;
+use function in_array;
+
 /**
  * Holds the processes configuration to launch a task
  */
 class ProcessConfiguration
 {
-    /**
-     * @var array
-     */
-    protected $dependencyGroups;
+    protected ?array $dependencyGroups = null;
 
-    /**
-     * @var array
-     */
-    protected $mainTaskGroup;
+    protected ?array $mainTaskGroup = null;
 
-    /**
-     * @param string              $code
-     * @param TaskConfiguration[] $taskConfigurations
-     * @param string              $entryPoint
-     * @param string              $endPoint
-     * @param string              $description
-     * @param string              $help
-     * @param bool                $public
-     */
     public function __construct(
-        protected $code,
+        protected string $code,
         protected array $taskConfigurations,
         protected array $options = [],
-        protected $entryPoint = null,
-        protected $endPoint = null,
-        protected $description = '',
-        protected $help = '',
-        protected $public = true
+        protected ?string $entryPoint = null,
+        protected ?string $endPoint = null,
+        protected string $description = '',
+        protected string $help = '',
+        protected bool $public = true
     ) {
     }
 
@@ -129,7 +117,7 @@ class ProcessConfiguration
             foreach ($this->getTaskConfigurations() as $taskConfiguration) {
                 $isInBranch = false;
                 foreach ($this->dependencyGroups as $branch) {
-                    if (\in_array($taskConfiguration->getCode(), $branch, true)) {
+                    if (in_array($taskConfiguration->getCode(), $branch, true)) {
                         $isInBranch = true;
                         break;
                     }
@@ -160,7 +148,7 @@ class ProcessConfiguration
             $mainTask = $this->getMainTask();
 
             foreach ($this->getDependencyGroups() as $branch) {
-                if (\in_array($mainTask->getCode(), $branch, true)) {
+                if (in_array($mainTask->getCode(), $branch, true)) {
                     $this->mainTaskGroup = $branch;
                     break;
                 }
@@ -223,7 +211,7 @@ class ProcessConfiguration
         $code = $taskConfig->getCode();
 
         // May have been added by previous task
-        if (! \in_array($code, $dependencies, true)) {
+        if (! in_array($code, $dependencies, true)) {
             $dependencies[] = $code;
 
             foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
@@ -247,7 +235,7 @@ class ProcessConfiguration
      */
     protected function sortDependencies(array $dependencies): array
     {
-        if (\count($dependencies) <= 1) {
+        if (count($dependencies) <= 1) {
             return $dependencies;
         }
 
@@ -259,7 +247,7 @@ class ProcessConfiguration
         }
 
         /** @var int $midOffset */
-        $midOffset = \count($dependencies) / 2;
+        $midOffset = round(count($dependencies) / 2);
         $midTaskCode = $dependencies[$midOffset];
         $midTask = $this->getTaskConfiguration($midTaskCode);
 

@@ -33,32 +33,25 @@ class TaskConfiguration
     /**
      * @var TaskConfiguration[]
      */
-    protected $nextTasksConfigurations = [];
+    protected array $nextTasksConfigurations = [];
 
     /**
      * @var TaskConfiguration[]
      */
-    protected $previousTasksConfigurations = [];
+    protected array $previousTasksConfigurations = [];
 
     /**
      * @var TaskConfiguration[]
      */
-    protected $errorTasksConfigurations = [];
+    protected array $errorTasksConfigurations = [];
 
-    /**
-     * @var bool
-     */
-    protected $inErrorBranch = false;
+    protected bool $inErrorBranch = false;
 
     protected bool $logErrors;
 
-    /**
-     * @param string $code
-     * @param string $serviceReference
-     */
     public function __construct(
-        protected $code,
-        protected $serviceReference,
+        protected string $code,
+        protected string $serviceReference,
         protected array $options,
         protected string $description = '',
         protected string $help = '',
@@ -105,12 +98,7 @@ class TaskConfiguration
         return $this->options;
     }
 
-    /**
-     * @param string $code
-     *
-     * @return mixed
-     */
-    public function getOption($code, mixed $default = null)
+    public function getOption(string $code, mixed $default = null): mixed
     {
         if (array_key_exists($code, $this->options)) {
             return $this->options[$code];
@@ -228,10 +216,8 @@ class TaskConfiguration
 
     /**
      * Check task ancestors to find if it have a given task as child
-     *
-     * @param bool              $checkErrors
      */
-    public function hasDescendant(self $taskConfig, $checkErrors = true): bool
+    public function hasDescendant(self $taskConfig, bool $checkErrors = true): bool
     {
         foreach ($this->getNextTasksConfigurations() as $nextTaskConfig) {
             // Avoid errors for direct descendant
@@ -276,15 +262,5 @@ class TaskConfiguration
     public function getLogLevel(): string
     {
         return $this->logLevel;
-    }
-
-    /**
-     * @deprecated Use getLogLevel instead
-     */
-    public function isLogErrors(): bool
-    {
-        @trigger_error('Deprecated method, use getLogLevel instead', E_USER_DEPRECATED);
-
-        return $this->logErrors;
     }
 }
