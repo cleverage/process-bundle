@@ -73,9 +73,11 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
      * return true if the task has a next element
      * return false if the task has terminated it's iteration
      *
+     * @param ProcessState $state
+     *
      * @return bool
      */
-    public function next(ProcessState $state)
+    public function next(ProcessState $state): bool
     {
         if (! $this->files) {
             return false;
@@ -86,21 +88,20 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
         return $this->files->valid();
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['folder_path']);
         $resolver->setAllowedTypes('folder_path', ['string']);
-        /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'folder_path',
             static function (Options $options, $value) {
                 if (! is_dir($value)) {
                     throw new InvalidConfigurationException(
-                        "Folder path does not exists or is not a folder: '{$value}'"
+                        "Folder path does not exists or is not a folder: '$value'"
                     );
                 }
                 if (! is_readable($value)) {
-                    throw new InvalidConfigurationException("Folder path is not readable: '{$value}'");
+                    throw new InvalidConfigurationException("Folder path is not readable: '$value'");
                 }
 
                 return $value;

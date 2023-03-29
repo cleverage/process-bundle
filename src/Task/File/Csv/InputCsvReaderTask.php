@@ -31,7 +31,7 @@ class InputCsvReaderTask extends CsvReaderTask
         return $options;
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
         $resolver->remove('file_path');

@@ -43,7 +43,7 @@ class XmlWriterTask extends AbstractConfigurableTask
         $state->setOutput($this->getOption($state, 'file_path'));
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('file_path');
         $resolver->setAllowedTypes('file_path', 'string');

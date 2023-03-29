@@ -28,6 +28,8 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use function count;
+
 /**
  * Launch a new process for each input received, input must be a scalar, a resource or a \Traversable
  */
@@ -36,14 +38,11 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     /**
      * @var SubprocessInstance[]
      */
-    protected $launchedProcesses = [];
+    protected array $launchedProcesses = [];
 
     protected SplQueue $finishedBuffers;
 
-    /**
-     * @var bool
-     */
-    protected $flushMode = false;
+    protected bool $flushMode = false;
 
     public function __construct(
         protected LoggerInterface $logger,
@@ -113,7 +112,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     protected function handleInput(ProcessState $state): void
     {
         $options = $this->getOptions($state);
-        while (\count($this->launchedProcesses) >= $options['max_processes']) {
+        while (count($this->launchedProcesses) >= $options['max_processes']) {
             $this->handleProcesses($state);
             usleep($options['sleep_interval']);
         }
@@ -186,15 +185,14 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         }
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['process']);
-        /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'process',
             function (Options $options, $value) {
                 if (! $this->processRegistry->hasProcessConfiguration($value)) {
-                    throw new InvalidConfigurationException("Unknown process {$value}");
+                    throw new InvalidConfigurationException("Unknown process $value");
                 }
 
                 return $value;

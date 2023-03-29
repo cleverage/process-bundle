@@ -21,16 +21,14 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Throwable;
 
 /**
  * Execute one or many processes while chaining inputs in a iterable way
  */
 class ProcessExecutorTask extends AbstractConfigurableTask
 {
-    /**
-     * @var array
-     */
-    protected $process;
+    protected ?array $process = null;
 
     public function __construct(
         protected ProcessManager $processManager,
@@ -39,6 +37,9 @@ class ProcessExecutorTask extends AbstractConfigurableTask
     ) {
     }
 
+    /**
+     * @throws Throwable
+     */
     public function execute(ProcessState $state): void
     {
         $input = $state->getInput();
@@ -54,7 +55,7 @@ class ProcessExecutorTask extends AbstractConfigurableTask
         $this->process = $this->getOption($state, 'process');
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('process');
         $resolver->setDefaults([
@@ -66,7 +67,7 @@ class ProcessExecutorTask extends AbstractConfigurableTask
             'process',
             function (Options $options, $processCode) {
                 if (! $this->processRegistry->hasProcessConfiguration($processCode)) {
-                    throw new InvalidConfigurationException("Unknown process {$processCode}");
+                    throw new InvalidConfigurationException("Unknown process $processCode");
                 }
 
                 return $processCode;

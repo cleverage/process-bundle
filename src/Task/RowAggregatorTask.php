@@ -28,10 +28,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
-    /**
-     * @var array
-     */
-    protected $result = [];
+    protected array $result = [];
 
     public function __construct(
         protected LoggerInterface $logger
@@ -52,7 +49,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
 
         if (! array_key_exists($aggregateBy, $input)) {
             throw new InvalidProcessConfigurationException(
-                "Array aggregator exception: missing column '{$aggregateBy}'"
+                "Array aggregator exception: missing column '$aggregateBy'"
             );
         }
 
@@ -71,7 +68,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         foreach ($aggregateColumns as $aggregateColumn) {
             if (! array_key_exists($aggregateColumn, $input)) {
                 throw new InvalidProcessConfigurationException(
-                    "Array aggregator exception: missing column {$aggregateColumn}"
+                    "Array aggregator exception: missing column $aggregateColumn"
                 );
             }
             $inputAggregateColumns[$aggregateColumn] = $input[$aggregateColumn];
@@ -84,7 +81,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         $state->setOutput(array_values($this->result));
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('aggregate_by');
         $resolver->setRequired('aggregate_columns');

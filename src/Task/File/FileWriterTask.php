@@ -30,7 +30,7 @@ class FileWriterTask extends AbstractConfigurableTask
         $state->setOutput($options['filename']);
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['filename']);
         $resolver->setAllowedTypes('filename', ['string']);

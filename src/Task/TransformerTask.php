@@ -29,10 +29,7 @@ class TransformerTask extends AbstractConfigurableTask
 {
     use TransformerTrait;
 
-    /**
-     * @var TransformerInterface
-     */
-    protected $transformer;
+    protected ?TransformerInterface $transformer = null;
 
     public function __construct(
         protected LoggerInterface $logger,
@@ -43,13 +40,12 @@ class TransformerTask extends AbstractConfigurableTask
 
     public function execute(ProcessState $state): void
     {
-        $output = null;
         $options = $this->getOptions($state);
 
         try {
             $output = $this->applyTransformers($options['transformers'], $state->getInput());
         } catch (TransformerException $e) {
-            $state->addErrorContextValue('error', $e->getPrevious()->getMessage());
+            $state->addErrorContextValue('error', $e->getPrevious()?->getMessage());
             $state->setException($e);
 
             return;
@@ -57,7 +53,7 @@ class TransformerTask extends AbstractConfigurableTask
         $state->setOutput($output);
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $this->configureTransformersOptions($resolver);
     }

@@ -26,9 +26,6 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  */
 class LoggerTask extends AbstractConfigurableTask
 {
-    /**
-     * @internal param LoggerInterface $logger
-     */
     public function __construct(
         protected LoggerInterface $logger,
         protected PropertyAccessorInterface $accessor
@@ -50,7 +47,7 @@ class LoggerTask extends AbstractConfigurableTask
         $state->setOutput($state->getInput());
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults(
             [

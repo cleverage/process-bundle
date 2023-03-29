@@ -91,10 +91,8 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
 
     /**
      * Allow to not implement this method, not required by most tasks, removing inheritance would break back-compat
-     *
-     * @inheritDoc
      */
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
     }
 

@@ -49,7 +49,7 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
         );
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'delimiter' => ';',
@@ -63,8 +63,5 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
         $resolver->setAllowedTypes('headers', ['null', 'array']);
     }
 
-    /**
-     * @return array
-     */
-    abstract protected function getHeaders(ProcessState $state, array $options);
+    abstract protected function getHeaders(ProcessState $state, array $options): array;
 }

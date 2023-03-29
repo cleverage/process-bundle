@@ -47,7 +47,7 @@ class FilterTask extends AbstractConfigurableTask
         $state->setOutput($input);
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $this->configureConditionOptions($resolver);
     }

@@ -20,6 +20,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
 use SplQueue;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use function count;
 
 /**
  * A Batch task that iterate on flush
@@ -27,15 +28,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class IterableBatchTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
 {
-    /**
-     * @var SplQueue
-     */
-    protected $outputQueue;
+    protected ?SplQueue $outputQueue = null;
 
-    /**
-     * @var bool
-     */
-    protected $flushMode = false;
+    protected bool $flushMode = false;
 
     public function __construct(
         protected LoggerInterface $logger
@@ -68,7 +63,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
         }
 
         // Detect flushing
-        if ($batchCount !== null && \count($this->outputQueue) >= $batchCount) {
+        if ($batchCount !== null && count($this->outputQueue) >= $batchCount) {
             $this->flushMode = true;
         }
 
@@ -80,20 +75,17 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
         }
     }
 
-    /**
-     * @return bool
-     */
-    public function next(ProcessState $state)
+    public function next(ProcessState $state): bool
     {
         // Stop flushing once over
-        if (! \count($this->outputQueue)) {
+        if (! count($this->outputQueue)) {
             $this->flushMode = false;
         }
 
         return $this->flushMode;
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'batch_count' => 10,
@@ -104,10 +96,8 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
 
     /**
      * Override this method to add a custom processing behavior
-     *
-     * @return mixed
      */
-    protected function processInput(ProcessState $state)
+    protected function processInput(ProcessState $state): mixed
     {
         return $state->getInput();
     }

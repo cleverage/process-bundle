@@ -32,7 +32,7 @@ class SerializerTask extends AbstractConfigurableTask
         $state->setOutput($serializeData);
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['format']);
         $resolver->setAllowedTypes('format', ['string']);

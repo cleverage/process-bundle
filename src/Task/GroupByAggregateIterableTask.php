@@ -10,6 +10,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Exception;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use function count;
 
 /**
  * Attempt to aggregate inputs in an associative array with a key formed by configurable fields of the input.
@@ -56,7 +57,7 @@ class GroupByAggregateIterableTask extends AbstractConfigurableTask implements B
 
     public function proceed(ProcessState $state): void
     {
-        if (\count($this->result) === 0) {
+        if (count($this->result) === 0) {
             $state->setSkipped(true);
         } else {
             $state->setOutput($this->result);

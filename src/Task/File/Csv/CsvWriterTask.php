@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use UnexpectedValueException;
 
+use function is_array;
+
 /**
  * Reads the file path from configuration and iterates over it
  * Ignores any input
@@ -44,7 +46,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         $state->setOutput($this->csv->getFilePath());
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
         $resolver->setDefaults([
@@ -69,13 +71,13 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     protected function getInput(ProcessState $state): array
     {
         $input = $state->getInput();
-        if (! \is_array($input)) {
+        if (! is_array($input)) {
             throw new UnexpectedValueException('Input value is not an array');
         }
         $splitCharacter = $this->getOption($state, 'split_character');
 
         foreach ($input as &$item) {
-            if (\is_array($item)) {
+            if (is_array($item)) {
                 $item = implode($splitCharacter, $item);
             }
         }

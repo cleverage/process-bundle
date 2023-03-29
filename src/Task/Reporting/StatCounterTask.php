@@ -22,10 +22,7 @@ use Psr\Log\LoggerInterface;
  */
 class StatCounterTask implements FinalizableTaskInterface
 {
-    /**
-     * @var int
-     */
-    protected $counter = 0;
+    protected int $counter = 0;
 
     public function __construct(
         protected LoggerInterface $logger
@@ -34,7 +31,7 @@ class StatCounterTask implements FinalizableTaskInterface
 
     public function finalize(ProcessState $state): void
     {
-        $this->logger->info("Processed item count: {$this->counter}");
+        $this->logger->info("Processed item count: $this->counter");
     }
 
     public function execute(ProcessState $state): void

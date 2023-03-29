@@ -30,7 +30,7 @@ class YamlWriterTask extends AbstractConfigurableTask
         $state->setOutput($options['file_path']);
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['file_path']);
         $resolver->setAllowedTypes('file_path', ['string']);

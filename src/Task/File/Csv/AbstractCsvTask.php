@@ -40,7 +40,7 @@ abstract class AbstractCsvTask extends AbstractCsvResourceTask
         );
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
         $resolver->setRequired(['file_path']);

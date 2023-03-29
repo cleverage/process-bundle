@@ -59,7 +59,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
             if ($seconds > 0) {
                 $rate = number_format($items / $seconds, 2, ',', ' ');
             }
-            $fullText .= " - {$rate} items/s - {$items} items processed";
+            $fullText .= " - $rate items/s - $items items processed";
             $fullText .= " in {$now->diff($this->startedAt)
                 ->format('%H:%I:%S')}";
 
@@ -71,7 +71,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
         $this->counter++;
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'num_items' => 1,

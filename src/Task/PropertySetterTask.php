@@ -35,7 +35,6 @@ class PropertySetterTask extends AbstractConfigurableTask
     {
         $options = $this->getOptions($state);
         $input = $state->getInput();
-        /** @noinspection ForeachSourceInspection */
         foreach ($options['values'] as $key => $value) {
             try {
                 $this->accessor->setValue($input, $key, $value);
@@ -51,7 +50,7 @@ class PropertySetterTask extends AbstractConfigurableTask
         $state->setOutput($input);
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['values']);
         $resolver->setAllowedTypes('values', ['array']);

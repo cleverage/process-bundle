@@ -66,7 +66,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
 
         if (! empty($missingColumns)) {
             $colStr = implode(', ', $missingColumns);
-            $message = "Missing columns [{$colStr}] in input";
+            $message = "Missing columns [$colStr] in input";
 
             if ($this->getOption($state, 'ignore_missing')) {
                 $this->logger->warning($message);
@@ -97,7 +97,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         $this->result[$column][$aggregationKey][] = $input;
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('columns');
         $resolver->setAllowedTypes('columns', 'array');

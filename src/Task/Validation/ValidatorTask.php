@@ -68,7 +68,7 @@ class ValidatorTask extends AbstractConfigurableTask
         $state->setOutput($state->getInput());
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('log_errors', LogLevel::CRITICAL);
         $resolver->setAllowedValues(

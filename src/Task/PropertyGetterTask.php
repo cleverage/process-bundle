@@ -49,7 +49,7 @@ class PropertyGetterTask extends AbstractConfigurableTask
         $state->setOutput($output);
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['property']);
         $resolver->setAllowedTypes('property', ['string']);

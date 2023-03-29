@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle\Task\Serialization;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 use UnexpectedValueException;
 
@@ -29,6 +30,9 @@ class NormalizerTask extends AbstractConfigurableTask
     ) {
     }
 
+    /**
+     * @throws ExceptionInterface
+     */
     public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
@@ -45,7 +49,7 @@ class NormalizerTask extends AbstractConfigurableTask
         $state->setOutput($normalizedData);
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['format']);
         $resolver->setAllowedTypes('format', ['string']);

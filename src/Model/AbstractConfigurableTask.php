@@ -46,11 +46,11 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
     {
         $options = $this->getOptions($state);
         if (! array_key_exists($code, $options)) {
-            throw new InvalidArgumentException("Missing option {$code}");
+            throw new InvalidArgumentException("Missing option $code");
         }
 
         return $options[$code];
     }
 
-    abstract protected function configureOptions(OptionsResolver $resolver);
+    abstract protected function configureOptions(OptionsResolver $resolver): void;
 }

@@ -101,7 +101,7 @@ class CsvSplitterTask extends InputCsvReaderTask
         return $tmpFilePath;
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
         $resolver->setDefaults([

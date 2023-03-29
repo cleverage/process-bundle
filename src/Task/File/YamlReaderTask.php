@@ -22,13 +22,14 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Yaml\Yaml;
 use UnexpectedValueException;
+use function is_array;
 
 /**
  * Reads a YAML file and iterate over its root elements
  */
 class YamlReaderTask extends AbstractIterableOutputTask
 {
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['file_path']);
         $resolver->setAllowedTypes('file_path', ['string']);
@@ -36,7 +37,7 @@ class YamlReaderTask extends AbstractIterableOutputTask
             'file_path',
             static function (Options $options, $value) {
                 if (! file_exists($value)) {
-                    throw new UnexpectedValueException("File not found: {$value}");
+                    throw new UnexpectedValueException("File not found: $value");
                 }
 
                 return $value;
@@ -48,8 +49,8 @@ class YamlReaderTask extends AbstractIterableOutputTask
     {
         $filePath = $this->getOption($state, 'file_path');
         $content = Yaml::parseFile($filePath);
-        if (! \is_array($content)) {
-            throw new InvalidArgumentException("File content is not an array: {$filePath}");
+        if (! is_array($content)) {
+            throw new InvalidArgumentException("File content is not an array: $filePath");
         }
 
         return new ArrayIterator($content);

@@ -30,7 +30,7 @@ class FileMoverTask extends AbstractConfigurableTask
         $fs = new Filesystem();
         $file = $state->getInput();
         if (! $fs->exists($file)) {
-            throw new UnexpectedValueException("File does not exists: '{$file}'");
+            throw new UnexpectedValueException("File does not exists: '$file'");
         }
         $dest = $options['destination'];
         if (is_dir($dest)) {
@@ -43,7 +43,7 @@ class FileMoverTask extends AbstractConfigurableTask
         $state->setOutput($dest);
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['destination']);
         $resolver->setAllowedTypes('destination', ['string']);

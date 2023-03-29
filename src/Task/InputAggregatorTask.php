@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use RuntimeException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use UnexpectedValueException;
+use function in_array;
 
 /**
  * Wait for defined inputs before passing an aggregated output.
@@ -47,7 +48,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
                 $this->inputs = [];
             } else {
                 throw new UnexpectedValueException(
-                    "The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output"
+                    "The output from input '$inputCode' has already been defined, please use an aggregator if you have an iterable output"
                 );
             }
         }
@@ -59,7 +60,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
             $keepInputs = $this->getOption($state, 'keep_inputs');
             // Only clear inputs that are not in the keep_inputs option
             foreach ($this->inputs as $inputCode => $value) {
-                if ($keepInputs !== null && \in_array($inputCode, $keepInputs, true)) {
+                if ($keepInputs !== null && in_array($inputCode, $keepInputs, true)) {
                     continue;
                 }
                 unset($this->inputs[$inputCode]);
@@ -69,7 +70,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
         }
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('input_codes');
         $resolver->setDefaults([
@@ -83,10 +84,8 @@ class InputAggregatorTask extends AbstractConfigurableTask
 
     /**
      * Map the previous task code to an input code
-     *
-     * @return string
      */
-    protected function getInputCode(ProcessState $state)
+    protected function getInputCode(ProcessState $state): string
     {
         $previousState = $state->getPreviousState();
         if (! $previousState) {
@@ -96,7 +95,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
             ->getCode();
         $inputCodes = $this->getOption($state, 'input_codes');
         if (! array_key_exists($previousTaskCode, $inputCodes)) {
-            throw new UnexpectedValueException("Task '{$previousTaskCode}' is not mapped in the input_codes option");
+            throw new UnexpectedValueException("Task '$previousTaskCode' is not mapped in the input_codes option");
         }
 
         return $inputCodes[$previousTaskCode];

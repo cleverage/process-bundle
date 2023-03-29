@@ -27,7 +27,7 @@ class ConstantOutputTask extends AbstractConfigurableTask
         $state->setOutput($this->getOption($state, 'output'));
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['output']);
     }

@@ -24,10 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CounterTask extends AbstractConfigurableTask implements FlushableTaskInterface
 {
-    /**
-     * @var int
-     */
-    protected $counter = 0;
+    protected int $counter = 0;
 
     public function execute(ProcessState $state): void
     {

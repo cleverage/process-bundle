@@ -23,7 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ConstantIterableOutputTask extends AbstractIterableOutputTask
 {
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['output']);
         $resolver->setAllowedTypes('output', ['array']);

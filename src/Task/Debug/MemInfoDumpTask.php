@@ -40,7 +40,7 @@ class MemInfoDumpTask extends AbstractConfigurableTask
         }
     }
 
-    protected function configureOptions(OptionsResolver $resolver)
+    protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['file_path']);
         $resolver->setAllowedTypes('file_path', ['string']);
