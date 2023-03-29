@@ -28,7 +28,7 @@ class TypeSetterTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('type', 'string');
     }
 
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         $return = settype($value, $options['type']);
 

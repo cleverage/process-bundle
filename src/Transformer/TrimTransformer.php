@@ -20,12 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TrimTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * Must return the transformed $value
-     *
-     * @param mixed $value
-     */
-    public function transform($value, array $options = []): ?string
+    public function transform(mixed $value, array $options = []): ?string
     {
         if ($value === null) {
             return null;

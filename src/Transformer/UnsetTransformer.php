@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use UnexpectedValueException;
+use function is_array;
 
 /**
  * Unset a given property
@@ -29,9 +30,9 @@ class UnsetTransformer implements ConfigurableTransformerInterface
         $this->accessor = $accessor;
     }
 
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): array
     {
-        if (! \is_array($value)) {
+        if (! is_array($value)) {
             throw new UnexpectedValueException('Given value must be an array');
         }
 

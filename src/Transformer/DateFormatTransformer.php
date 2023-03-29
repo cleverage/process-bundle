@@ -28,10 +28,7 @@ use UnexpectedValueException;
  */
 class DateFormatTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * @param mixed $value
-     */
-    public function transform($value, array $options = []): mixed
+    public function transform(mixed $value, array $options = []): mixed
     {
         if (! $value) {
             return $value;

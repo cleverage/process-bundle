@@ -26,20 +26,11 @@ class GenericTransformer implements ConfigurableTransformerInterface
 {
     use TransformerTrait;
 
-    /**
-     * @var string
-     */
-    protected $transformerCode;
+    protected ?string $transformerCode = null;
 
-    /**
-     * @var array
-     */
-    protected $preconfiguredTransformerOptions;
+    protected ?array $preconfiguredTransformerOptions = null;
 
-    /**
-     * @var array
-     */
-    protected $contextualOptions;
+    protected ?array $contextualOptions = null;
 
     public function __construct(
         protected ContextualOptionResolver $contextualOptionResolver,
@@ -86,7 +77,7 @@ class GenericTransformer implements ConfigurableTransformerInterface
     /**
      * Called on process startup, prepare the real transformers
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         foreach ($this->contextualOptions as $option => $optionConfig) {
             if ($optionConfig['default'] !== null || $optionConfig['default_is_null']) {
@@ -106,18 +97,17 @@ class GenericTransformer implements ConfigurableTransformerInterface
             }
 
             $transformerOptions = $this->normalizeTransformerOptions($options, $this->preconfiguredTransformerOptions);
-            $transformers = $this->normalizeTransformers($options, $transformerOptions);
 
-            return $transformers;
+            return $this->normalizeTransformers($options, $transformerOptions);
         });
     }
 
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         return $this->applyTransformers($options['transformers'], $value);
     }
 
-    public function getCode()
+    public function getCode(): string
     {
         return $this->transformerCode;
     }

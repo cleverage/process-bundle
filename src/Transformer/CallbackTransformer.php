@@ -16,6 +16,8 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use function call_user_func_array;
+use function is_callable;
 
 /**
  * Convert input based on a callback
@@ -24,12 +26,8 @@ class CallbackTransformer implements ConfigurableTransformerInterface
 {
     /**
      * Must return the transformed $value
-     *
-     * @param mixed $value
-     *
-     * @return mixed
      */
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         if ((is_countable($options['additional_parameters']) ? count($options['additional_parameters']) : 0)
             && ! (is_countable($options['right_parameters']) ? count($options['right_parameters']) : 0)) {
@@ -39,7 +37,7 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         $parameters = $options['left_parameters'];
         array_push($parameters, $value, ...$options['right_parameters']);
 
-        return \call_user_func_array($options['callback'], $parameters);
+        return call_user_func_array($options['callback'], $parameters);
     }
 
     /**
@@ -50,15 +48,14 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         return 'callback';
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['callback']);
         $resolver->setAllowedTypes('callback', ['string', 'array']);
-        /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'callback',
             static function (Options $options, $value): callable {
-                if (! \is_callable($value)) {
+                if (! is_callable($value)) {
                     throw new InvalidOptionsException('Callback option must be callable');
                 }
 
@@ -76,7 +73,6 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('right_parameters', ['array']);
         $resolver->setAllowedTypes('additional_parameters', ['array']);
 
-        /** @noinspection PhpUnusedParameterInspection */
         $resolver->setNormalizer(
             'additional_parameters',
             static function (Options $options, $value) {

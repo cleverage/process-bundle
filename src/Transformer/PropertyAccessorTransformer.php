@@ -26,14 +26,7 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
     ) {
     }
 
-    /**
-     * Must return the transformed $value
-     *
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         if ($value === null && $options['ignore_null']) {
             return null;

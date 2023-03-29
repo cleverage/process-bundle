@@ -20,5 +20,5 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 interface ConfigurableTransformerInterface extends TransformerInterface
 {
-    public function configureOptions(OptionsResolver $resolver);
+    public function configureOptions(OptionsResolver $resolver): void;
 }

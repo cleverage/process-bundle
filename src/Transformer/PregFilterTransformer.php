@@ -17,12 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PregFilterTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * Must return the transformed $value
-     *
-     * @param mixed $value
-     */
-    public function transform($value, array $options = []): array|string|null
+    public function transform(mixed $value, array $options = []): array|string|null
     {
         $pattern = $options['pattern'];
         $replacement = $options['replacement'];

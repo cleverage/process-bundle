@@ -27,12 +27,7 @@ use UnexpectedValueException;
  */
 class DateParserTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * @param mixed $value
-     *
-     * @return mixed|string
-     */
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         if (! $value || $value instanceof DateTime) {
             return $value;

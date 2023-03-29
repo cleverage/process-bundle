@@ -22,12 +22,8 @@ class ArrayFirstTransformer implements ConfigurableTransformerInterface
 {
     /**
      * Must return the transformed $value
-     *
-     * @param mixed $value
-     *
-     * @return mixed
      */
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         if ($options['allow_not_iterable'] && ! is_iterable($value)) {
             return $value;

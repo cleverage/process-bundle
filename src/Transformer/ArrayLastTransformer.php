@@ -18,7 +18,7 @@ namespace CleverAge\ProcessBundle\Transformer;
  */
 class ArrayLastTransformer implements TransformerInterface
 {
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         return array_values(array_slice($value, -1))[0];
     }

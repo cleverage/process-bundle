@@ -28,12 +28,8 @@ class ConstantTransformer implements ConfigurableTransformerInterface
 
     /**
      * Must return the transformed $value
-     *
-     * @param mixed $value
-     *
-     * @return mixed
      */
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         return $options['constant'] ?? null;
     }

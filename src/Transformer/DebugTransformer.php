@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 class DebugTransformer implements TransformerInterface
 {
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         if (class_exists(VarDumper::class)) {
             VarDumper::dump($value);

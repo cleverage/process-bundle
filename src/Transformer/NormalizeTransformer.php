@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
@@ -37,11 +38,9 @@ class NormalizeTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * @param mixed $value
-     *
-     * @return array|bool|float|int|mixed|string
+     * @throws ExceptionInterface
      */
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         return $this->normalizer->normalize($value, $options['format'], $options['context']);
     }

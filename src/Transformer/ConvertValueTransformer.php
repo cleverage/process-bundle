@@ -23,22 +23,18 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
 {
     /**
      * Must return the transformed $value
-     *
-     * @param mixed $value
-     *
-     * @return mixed
      */
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         if ($value === null) {
-            return $value;
+            return null;
         }
 
         if (! is_string($value) && ! is_int($value)) { // If not a valid array index
             if (! $options['auto_cast']) {
                 $type = gettype($value);
                 throw new UnexpectedValueException(
-                    "Value of type {$type} is not a valid array index, set auto_cast to true to cast it to a string"
+                    "Value of type $type is not a valid array index, set auto_cast to true to cast it to a string"
                 );
             }
             if (is_array($value)) { // Array to string conversion is a simple notice so we need to catch it here
@@ -52,7 +48,7 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
                 return $value;
             }
             if (! $options['ignore_missing']) {
-                throw new UnexpectedValueException("Missing value in map '{$value}'");
+                throw new UnexpectedValueException("Missing value in map '$value'");
             }
 
             return null;

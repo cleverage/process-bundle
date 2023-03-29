@@ -29,14 +29,7 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
     ) {
     }
 
-    /**
-     * Must return the transformed $value
-     *
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         if ($value === null && $options['ignore_null']) {
             return null;
@@ -54,9 +47,7 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
         $protertiesToSet = [];
         foreach ($options['set_properties'] as $propertyName => $propertyValuePath) {
             $protertiesValue = null;
-            if ($options['ignore_missing'] && ! $this->accessor->isReadable($value, $propertyValuePath)) {
-                $protertiesValue = null;
-            } else {
+            if (! $options['ignore_missing'] || $this->accessor->isReadable($value, $propertyValuePath)) {
                 $protertiesValue = $this->accessor->getValue($value, $propertyValuePath);
                 if ($protertiesValue === null && ! $options['ignore_null']) {
                     throw new TransformerException($propertyValuePath);

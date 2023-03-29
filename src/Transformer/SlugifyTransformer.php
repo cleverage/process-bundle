@@ -22,12 +22,7 @@ use Transliterator;
  */
 class SlugifyTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * Must return the transformed $value
-     *
-     * @param mixed $value
-     */
-    public function transform($value, array $options = []): string
+    public function transform(mixed $value, array $options = []): string
     {
         /** @var Transliterator $transliterator */
         $transliterator = $options['transliterator'];

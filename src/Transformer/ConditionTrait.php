@@ -26,10 +26,8 @@ trait ConditionTrait
     /**
      * Test the input with the given set of conditions
      * True by default
-     *
-     * @param array $conditions
      */
-    protected function checkCondition(mixed $input, $conditions): bool
+    protected function checkCondition(mixed $input, array $conditions): bool
     {
         foreach ($conditions['match'] as $key => $value) {
             if (! $this->checkValue($input, $key, $value)) {
@@ -107,22 +105,15 @@ trait ConditionTrait
 
     /**
      * Softly check if an input key match a value, or not
-     *
-     * @param object|array $input
-     * @param string       $key
-     * @param bool         $shouldMatch
-     * @param bool         $regexpMode
      */
-    protected function checkValue($input, $key, mixed $value, $shouldMatch = true, $regexpMode = false): bool
+    protected function checkValue(object|array $input, string $key, mixed $value, bool $shouldMatch = true, bool $regexpMode = false): bool
     {
         $currentValue = $this->getValue($input, $key);
 
-        /** @noinspection TypeUnsafeComparisonInspection */
         if ($shouldMatch && ! $regexpMode && $currentValue !== $value) {
             return false;
         }
 
-        /** @noinspection TypeUnsafeComparisonInspection */
         if (! $shouldMatch && ! $regexpMode && $currentValue === $value) {
             return false;
         }
@@ -144,11 +135,8 @@ trait ConditionTrait
 
     /**
      * Check if the input property is empty or not
-     *
-     * @param array|object $input
-     * @param string       $key
      */
-    protected function checkEmpty($input, $key): bool
+    protected function checkEmpty(object|array $input, string $key): bool
     {
         $currentValue = $this->getValue($input, $key);
 
@@ -157,13 +145,8 @@ trait ConditionTrait
 
     /**
      * Soft value getter (return the value or null)
-     *
-     * @param array|object $input
-     * @param string       $key
-     *
-     * @return mixed|null
      */
-    protected function getValue($input, $key): mixed
+    protected function getValue(object|array $input, string $key): mixed
     {
         if ($key === '') {
             $currentValue = $input;

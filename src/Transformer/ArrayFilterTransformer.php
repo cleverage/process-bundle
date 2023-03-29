@@ -34,7 +34,7 @@ class ArrayFilterTransformer implements ConfigurableTransformerInterface
     /**
      * @return array<int|string, mixed>
      */
-    public function transform($value, array $options = []): array
+    public function transform(mixed $value, array $options = []): array
     {
         if (! (is_iterable($value))) {
             throw new UnexpectedValueException('Given value is not iterable');

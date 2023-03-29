@@ -25,12 +25,7 @@ class DefaultTransformer implements ConfigurableTransformerInterface
         $resolver->setRequired('value');
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         if (! $value) {
             return $options['value'];

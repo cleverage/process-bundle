@@ -21,6 +21,9 @@ use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use function implode;
+use function is_string;
+use function rawurlencode;
 
 class CachedTransformer implements ConfigurableTransformerInterface
 {
@@ -62,7 +65,7 @@ class CachedTransformer implements ConfigurableTransformerInterface
         $this->configureTransformersOptions($resolver, 'key_transformers');
     }
 
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         $cacheKey = $this->generateCacheKey($options['cache_key'], $value, $options);
         if ($cacheKey && $this->cache instanceof CacheItemPoolInterface) {
@@ -108,10 +111,10 @@ class CachedTransformer implements ConfigurableTransformerInterface
     {
         $value = $this->applyTransformers($options['key_transformers'], $value);
 
-        if (! \is_string($value)) {
+        if (! is_string($value)) {
             return false;
         }
 
-        return \implode(self::CACHE_SEPARATOR, [$cacheKeyRoot, \rawurlencode($value)]);
+        return implode(self::CACHE_SEPARATOR, [$cacheKeyRoot, rawurlencode($value)]);
     }
 }

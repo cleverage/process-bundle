@@ -15,7 +15,6 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
-use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
@@ -23,6 +22,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use UnexpectedValueException;
+use function is_array;
+use function is_callable;
 
 /**
  * Maps properties of an array/object to an other array/object
@@ -39,12 +40,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
         $this->transformerRegistry = $transformerRegistry;
     }
 
-    /**
-     * Must return the transformed $value
-     *
-     * @param mixed $input
-     */
-    public function transform($input, array $options = []): mixed
+    public function transform(mixed $value, array $options = []): mixed
     {
         if (! empty($options['initial_value']) && $options['keep_input']) {
             throw new InvalidOptionsException(
@@ -54,10 +50,9 @@ class MappingTransformer implements ConfigurableTransformerInterface
 
         $result = $options['initial_value'];
         if ($options['keep_input']) {
-            $result = $input;
+            $result = $value;
         }
 
-        /** @noinspection ForeachSourceInspection */
         foreach ($options['mapping'] as $targetProperty => $mapping) {
             $targetProperty = (string) $targetProperty;
             $sourceProperty = $mapping['code'] ?? $targetProperty;
@@ -68,12 +63,11 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 $inputValue = $mapping['constant'];
             } elseif ($mapping['set_null']) {
                 $inputValue = null;
-            } elseif (\is_array($sourceProperty)) {
+            } elseif (is_array($sourceProperty)) {
                 $inputValue = [];
-                /** @var array $sourceProperty */
                 foreach ($sourceProperty as $destKey => $srcKey) {
                     try {
-                        $inputValue[$destKey] = $this->extractInputValue($input, $srcKey);
+                        $inputValue[$destKey] = $this->extractInputValue($value, $srcKey);
                     } catch (RuntimeException $missingPropertyError) {
                         $this->handleInputMissingExceptions($missingPropertyError, $srcKey);
                         if ($ignoreMissingFlag) {
@@ -84,7 +78,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 }
             } else {
                 try {
-                    $inputValue = $this->extractInputValue($input, $sourceProperty);
+                    $inputValue = $this->extractInputValue($value, $sourceProperty);
                 } catch (RuntimeException $missingPropertyError) {
                     $this->handleInputMissingExceptions($missingPropertyError, $sourceProperty);
                     if ($ignoreMissingFlag) {
@@ -103,13 +97,13 @@ class MappingTransformer implements ConfigurableTransformerInterface
                     'Transformation exception',
                     [
                         'message' => $exception->getPrevious()
-                            ->getMessage(),
+                            ?->getMessage(),
                         'file' => $exception->getPrevious()
-                            ->getFile(),
+                            ?->getFile(),
                         'line' => $exception->getPrevious()
-                            ->getLine(),
+                            ?->getLine(),
                         'trace' => $exception->getPrevious()
-                            ->getTraceAsString(),
+                            ?->getTraceAsString(),
                     ]
                 );
 
@@ -117,14 +111,14 @@ class MappingTransformer implements ConfigurableTransformerInterface
             }
 
             // Set transformed value into result
-            if (\is_callable($options['merge_callback'])) {
+            if (is_callable($options['merge_callback'])) {
                 $options['merge_callback']($result, $targetProperty, $transformedValue);
             } elseif ($this->accessor->isWritable($result, $targetProperty)) {
                 $this->accessor->setValue($result, $targetProperty, $transformedValue);
-            } elseif (\is_array($result)) {
+            } elseif (is_array($result)) {
                 $result[$targetProperty] = $transformedValue;
             } else {
-                throw new UnexpectedValueException("Property '{$targetProperty}' is not writable");
+                throw new UnexpectedValueException("Property '$targetProperty' is not writable");
             }
         }
 
@@ -149,7 +143,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
 
         $resolver->setNormalizer(
             'mapping',
-            function (/** @noinspection PhpUnusedParameterInspection */ Options $options, $value): array {
+            function (Options $options, $value): array {
                 $resolvedMapping = [];
                 $mappingResolver = new OptionsResolver();
                 $this->configureMappingOptions($mappingResolver);

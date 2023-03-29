@@ -20,10 +20,10 @@ class WrapperTransformer implements ConfigurableTransformerInterface
     /**
      * Must return the transformed $value
      */
-    public function transform(mixed $input, array $options = []): array
+    public function transform(mixed $value, array $options = []): array
     {
         return [
-            $options['wrapper_key'] => $input,
+            $options['wrapper_key'] => $value,
         ];
     }
 

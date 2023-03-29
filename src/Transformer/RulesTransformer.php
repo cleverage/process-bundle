@@ -34,16 +34,15 @@ class RulesTransformer implements ConfigurableTransformerInterface
         $this->transformerRegistry = $transformerRegistry;
     }
 
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         foreach ($options['rules_set'] as $rule) {
             if ($this->matchRule($value, $rule, $options['use_value_as_variables'])) {
                 if ($rule['set_null']) {
                     return null;
-                } elseif ($rule['constant'] !== null) {
-                    return $rule['constant'];
                 }
-                return $this->applyTransformers($rule['transformers'], $value);
+
+                return $rule['constant'] ?? $this->applyTransformers($rule['transformers'], $value);
             }
         }
 
@@ -55,7 +54,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
         return 'rules';
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('use_value_as_variables', false);
         $resolver->setAllowedTypes('use_value_as_variables', 'bool');
@@ -141,6 +140,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
             return $this->language->evaluate($rule['condition'], $expressionValues);
         }
 
+        /** @noinspection PhpStrictTypeCheckingInspection */
         return $rule['default'];
     }
 }

@@ -20,17 +20,11 @@ interface TransformerInterface
 {
     /**
      * Must return the transformed $value
-     *
-     * @param mixed $value
-     *
-     * @return mixed
      */
-    public function transform($value, array $options = []);
+    public function transform(mixed $value, array $options = []): mixed;
 
     /**
      * Returns the unique code to identify the transformer
-     *
-     * @return string
      */
-    public function getCode();
+    public function getCode(): string;
 }

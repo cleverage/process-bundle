@@ -65,14 +65,7 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
         );
     }
 
-    /**
-     * Must return the transformed $value
-     *
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         $input = [
             'data' => $value,
@@ -87,7 +80,7 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
             return $value;
         }
         if (! $options['ignore_missing']) {
-            throw new UnexpectedValueException("No expression accepting value '{$value}' in map");
+            throw new UnexpectedValueException("No expression accepting value '$value' in map");
         }
 
         return null;

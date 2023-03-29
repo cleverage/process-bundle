@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use function is_array;
 
 /**
  * Use sprintf() function to format string
@@ -27,9 +28,9 @@ class SprintfTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('format', 'string');
     }
 
-    public function transform($value, array $options = []): string
+    public function transform(mixed $value, array $options = []): string
     {
-        if (! \is_array($value)) {
+        if (! is_array($value)) {
             $value = [$value];
         }
 

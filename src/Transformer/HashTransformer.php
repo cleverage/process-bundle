@@ -30,7 +30,7 @@ class HashTransformer implements ConfigurableTransformerInterface
         $resolver->setDefault('raw_output', false);
     }
 
-    public function transform($value, array $options = []): string
+    public function transform(mixed $value, array $options = []): string
     {
         return hash((string) $options['algo'], (string) $value, $options['raw_output']);
     }

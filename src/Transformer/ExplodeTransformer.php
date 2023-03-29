@@ -20,14 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ExplodeTransformer implements ConfigurableTransformerInterface
 {
-    /**
-     * Must return the transformed $value
-     *
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): array
     {
         if ($value === null || $value === '') {
             return [];

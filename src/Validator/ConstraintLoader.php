@@ -15,6 +15,8 @@ namespace CleverAge\ProcessBundle\Validator;
 
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
+use function count;
+use function is_array;
 
 class ConstraintLoader extends AbstractLoader
 {
@@ -32,16 +34,16 @@ class ConstraintLoader extends AbstractLoader
         $values = [];
 
         foreach ($nodes as $name => $childNodes) {
-            if (is_numeric($name) && \is_array($childNodes) && \count($childNodes) === 1) {
+            if (is_numeric($name) && is_array($childNodes) && count($childNodes) === 1) {
                 $options = current($childNodes);
 
-                if (\is_array($options)) {
+                if (is_array($options)) {
                     $options = $this->buildConstraints($options);
                 }
 
                 $values[] = $this->newConstraint(key($childNodes), $options);
             } else {
-                if (\is_array($childNodes)) {
+                if (is_array($childNodes)) {
                     $childNodes = $this->buildConstraints($childNodes);
                 }
 

@@ -23,24 +23,27 @@ use InvalidArgumentException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use UnexpectedValueException;
+use function array_map;
+use function is_array;
+use function is_string;
 
 /**
  * Manipulate XML elements using xpath
  */
 class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
 {
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired('query');
         $resolver->setAllowedTypes('query', ['string', 'array']);
         $resolver->setNormalizer('query', function (Options $options, $value): string|array {
             // Basic case : a single query
-            if (\is_string($value)) {
+            if (is_string($value)) {
                 return $value;
             }
 
             // Complex case : a list of subqueries, each can override root level options
-            if (\is_array($value)) {
+            if (is_array($value)) {
                 $queryOptions = [];
                 $queryResolver = new OptionsResolver();
                 $this->configureQueryOptions($queryResolver, $options);
@@ -48,7 +51,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
                 $queryResolver->setAllowedTypes('subquery', 'string');
 
                 foreach ($value as $code => $subquery) {
-                    if (\is_string($subquery)) {
+                    if (is_string($subquery)) {
                         $subquery = [
                             'subquery' => $subquery,
                         ];
@@ -84,7 +87,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('unwrap_value', 'bool');
     }
 
-    public function transform($value, array $options = [])
+    public function transform(mixed $value, array $options = []): mixed
     {
         if (! $value instanceof DOMNode) {
             throw new UnexpectedValueException('Input should be a ' . DOMNode::class);
@@ -93,8 +96,8 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         $xpath = $this->buildXpath($value);
 
         $query = $options['query'];
-        if (\is_array($query)) {
-            $result = \array_map(
+        if (is_array($query)) {
+            $result = array_map(
                 fn ($subquery) => $this->query($xpath, $subquery['subquery'], $value, $subquery),
                 $query
             );
@@ -117,10 +120,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         return new DOMXPath($doc);
     }
 
-    /**
-     * @return mixed
-     */
-    public function query(DOMXPath $xpath, string $query, DOMNode $node, array $options)
+    public function query(DOMXPath $xpath, string $query, DOMNode $node, array $options): mixed
     {
         // TODO check if query is relative ?
         $nodeList = $xpath->query($query, $node);
@@ -128,7 +128,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
 
         // Convert results to text
         if ($options['unwrap_value']) {
-            $results = \array_map(function (DOMNode $item) use ($query): string {
+            $results = array_map(static function (DOMNode $item) use ($query): string {
                 if ($item instanceof DOMAttr) {
                     return $item->value;
                 }
@@ -138,18 +138,18 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
                     return $item->textContent;
                 }
 
-                throw new UnexpectedValueException("Xpath result cannot be unwrapped for query '{$query}'");
+                throw new UnexpectedValueException("Xpath result cannot be unwrapped for query '$query'");
             }, $results);
         }
 
         // Unwrap the node list
         if ($options['single_result']) {
             if (count($results) > 1) {
-                throw new UnexpectedValueException("There is too much results for query '{$query}'");
+                throw new UnexpectedValueException("There is too much results for query '$query'");
             }
 
-            if (count($results) === 0 && ! $options['ignore_missing']) {
-                throw new UnexpectedValueException("There is not enough results for query '{$query}'");
+            if ( ! $options['ignore_missing'] && count($results) === 0) {
+                throw new UnexpectedValueException("There is not enough results for query '$query'");
             }
 
             if (count($results) === 1) {

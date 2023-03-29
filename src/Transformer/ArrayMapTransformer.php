@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Traversable;
 use UnexpectedValueException;
+use function is_array;
 
 /**
  * Applies transformers to each element of an array
@@ -33,17 +34,15 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
 
     /**
      * Must return the transformed $value
-     *
-     * @param mixed $values
      */
-    public function transform($values, array $options = []): array
+    public function transform(mixed $value, array $options = []): array
     {
-        if (! \is_array($values) && ! $values instanceof Traversable) {
+        if (! is_array($value) && ! $value instanceof Traversable) {
             throw new UnexpectedValueException('Input value must be an array or traversable');
         }
 
         $results = [];
-        foreach ($values as $key => $item) {
+        foreach ($value as $key => $item) {
             try {
                 $item = $this->applyTransformers($options['transformers'], $item);
                 if ($item === null && $options['skip_null']) {
