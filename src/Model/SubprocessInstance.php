@@ -49,7 +49,7 @@ class SubprocessInstance
 
         $this->consolePath = $kernel->getProjectDir() . '/bin/console';
         $this->environment = $kernel->getEnvironment();
-        $this->bufferPath = $kernel->getProjectDir() . '/var/cdm_buffer_' . uniqid() . '.json-stream'; // Todo use param ?
+        $this->bufferPath = $kernel->getProjectDir() . '/var/cdm_buffer_' . uniqid('', true) . '.json-stream';
         $this->logDir = $kernel->getLogDir() . '/process';
     }
 
@@ -58,7 +58,7 @@ class SubprocessInstance
      *
      * @return $this
      */
-    public function buildProcess()
+    public function buildProcess(): static
     {
         $pathFinder = new PhpExecutableFinder();
 
@@ -74,7 +74,7 @@ class SubprocessInstance
         $fs = new Filesystem();
         $fs->mkdir($this->logDir);
         if (! $fs->exists($this->consolePath)) {
-            throw new RuntimeException("Unable to resolve path to symfony console '{$this->consolePath}'");
+            throw new RuntimeException("Unable to resolve path to symfony console '$this->consolePath'");
         }
 
         if ($this->options[self::OPTION_JSON_BUFFERING]) {
