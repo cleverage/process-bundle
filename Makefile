@@ -17,11 +17,8 @@ pull: pull/$(SF_ENV)
 pull/sf5:
 	docker pull cleverage/process-bundle:sf5
 
-build/local:
+build:
 	docker build -t cleverage_process:test .
-
-build/%:
-	DOCKER_TAG=$(@F) DOCKERFILE_PATH=Dockerfile IMAGE_NAME=cleverage/process-bundle:$(@F) ./hooks/build
 
 shell: shell/$(SF_ENV)
 
