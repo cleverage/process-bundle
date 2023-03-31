@@ -5,10 +5,10 @@ parameters:
     excludePaths:
         - ecs.php
         - vendor/*
-        - Resources/tests/*
-        - Tests/*
+        - tests/*
         - rector.php
         - var/*
+        - src/Resources/tests/*
     ignoreErrors:
         - '#type has no value type specified in iterable type#'
         - '#has parameter .* with no value type specified in iterable type#'
@@ -21,3 +21,4 @@ parameters:
     checkGenericClassInNonGenericObjectType: false
     reportUnmatchedIgnoredErrors: false
     inferPrivatePropertyTypeFromConstructor: true
+    treatPhpDocTypesAsCertain: false
