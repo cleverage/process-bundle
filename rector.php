@@ -14,11 +14,12 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->importShortClasses();
 
     $rectorConfig->paths([__DIR__ . '/src']);
+    $rectorConfig->skip([__DIR__ . '/src/Resources/tests']);
 
     $rectorConfig->sets([
         SetList::TYPE_DECLARATION,
         LevelSetList::UP_TO_PHP_81,
-        SymfonyLevelSetList::UP_TO_SYMFONY_54,
+        SymfonyLevelSetList::UP_TO_SYMFONY_62,
     ]);
 
     $rectorConfig->phpVersion(PhpVersion::PHP_81);

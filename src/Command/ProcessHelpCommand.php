@@ -475,7 +475,7 @@ class ProcessHelpCommand extends Command
             }
 
             // Str_pad does not work with unicode ?
-            $noFormatStrLen = mb_strlen(preg_replace('/<[^>]*>/', '', $str));
+            $noFormatStrLen = mb_strlen(preg_replace('/<[^>]*>/', '', (string) $str));
             for ($j = $noFormatStrLen; $j < self::BRANCH_SIZE; ++$j) {
                 $str .= ' ';
             }

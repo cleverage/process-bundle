@@ -51,9 +51,6 @@ trait TransformerTrait
         return $transformerClosures;
     }
 
-    /**
-     * @return mixed
-     */
     protected function applyTransformers(array $transformers, mixed $value): mixed
     {
         // Quick return for better perfs
