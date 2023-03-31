@@ -17,7 +17,6 @@ use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -33,9 +32,10 @@ class Configuration implements ConfigurationInterface
     ) {
     }
 
-    public function getConfigTreeBuilder()
+    public function getConfigTreeBuilder(): TreeBuilder
     {
-        [$treeBuilder, $rootNode] = $this->createTreeBuilder();
+        $treeBuilder = new TreeBuilder($this->root);
+        $rootNode = $treeBuilder->getRootNode();
         $definition = $rootNode->children();
         // Default error strategy
         $definition->enumNode('default_error_strategy')
@@ -86,7 +86,6 @@ class Configuration implements ConfigurationInterface
 
     /**
      * "configurations" root configuration
-     * @TODO rename this root as "processes"
      */
     protected function appendRootProcessConfigDefinition(NodeBuilder $definition): void
     {
@@ -179,21 +178,5 @@ class Configuration implements ConfigurationInterface
                 ->then(fn ($item): array => [$item])->end()
                 ->prototype('scalar');
         }
-    }
-
-    /**
-     * An helper method to create a TreeBuilder and get the root node.
-     * Provides compatibility with Sf3, 4 and 5
-     *
-     * @TODO remove this once support for Symfony 3 and 4 is dropped
-     *
-     * @return array A tuple containing [TreeBuilder, NodeDefinition]
-     */
-    protected function createTreeBuilder(): array
-    {
-        $treeBuilder = new TreeBuilder($this->root);
-        $rootNode = $treeBuilder->getRootNode();
-
-        return [$treeBuilder, $rootNode];
     }
 }
