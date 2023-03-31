@@ -15,6 +15,7 @@ namespace CleverAge\ProcessBundle\DependencyInjection;
 
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Transformer\GenericTransformer;
+use Exception;
 use ReflectionClass;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -22,6 +23,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Finder\Finder;
+use function dirname;
 
 /**
  * This is the class that loads and manages your bundle configuration.
@@ -30,11 +32,14 @@ use Symfony\Component\Finder\Finder;
  */
 class CleverAgeProcessExtension extends Extension
 {
+    /**
+     * @throws Exception
+     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         // Get the path of the service folder wherever the bundle is installed
         $reflection = new ReflectionClass($this);
-        $serviceFolderPath = \dirname($reflection->getFileName(), 2) . '/Resources/config/services';
+        $serviceFolderPath = dirname($reflection->getFileName(), 2) . '/Resources/config/services';
         $this->findServices($container, $serviceFolderPath);
 
         $configuration = new Configuration();
@@ -58,6 +63,8 @@ class CleverAgeProcessExtension extends Extension
 
     /**
      * Recursively import config files into container
+     *
+     * @throws Exception
      */
     protected function findServices(ContainerBuilder $container, string $path, string $extension = 'yaml'): void
     {
