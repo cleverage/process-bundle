@@ -148,7 +148,7 @@ class ProcessConfiguration
             $mainTask = $this->getMainTask();
 
             foreach ($this->getDependencyGroups() as $branch) {
-                if (in_array($mainTask->getCode(), $branch, true)) {
+                if (in_array($mainTask?->getCode(), $branch, true)) {
                     $this->mainTaskGroup = $branch;
                     break;
                 }

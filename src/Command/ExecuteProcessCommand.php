@@ -17,6 +17,7 @@ use CleverAge\ProcessBundle\Event\ConsoleProcessEvent;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use InvalidArgumentException;
+use JsonException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -26,7 +27,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\Yaml\Parser;
-
+use Throwable;
+use function count;
 use function is_array;
 
 /**
@@ -74,6 +76,10 @@ class ExecuteProcessCommand extends Command
         $this->addOption('output-format', 't', InputOption::VALUE_OPTIONAL, 'Output format');
     }
 
+    /**
+     * @throws Throwable
+     * @throws JsonException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $inputData = $input->getOption('input');
@@ -117,7 +123,7 @@ class ExecuteProcessCommand extends Command
         $context = [];
         foreach ($contextValues as $contextValue) {
             preg_match($pattern, (string) $contextValue, $parts);
-            if (\count($parts) !== 3
+            if (count($parts) !== 3
                 || $parts[0] !== $contextValue) {
                 throw new InvalidArgumentException(sprintf('Invalid context %s', $contextValue));
             }
@@ -127,6 +133,9 @@ class ExecuteProcessCommand extends Command
         return $context;
     }
 
+    /**
+     * @throws JsonException
+     */
     protected function handleOutputData(mixed $data, InputInterface $input, OutputInterface $output): void
     {
         // Skip all if undefined
@@ -137,8 +146,8 @@ class ExecuteProcessCommand extends Command
         // Handle printing the output
         if ($input->getOption('output') === self::OUTPUT_STDOUT) {
             if ($output->isVeryVerbose()) {
-                if ($input->getOption('output-format') === self::OUTPUT_FORMAT_DUMP && class_exists(VarDumper::class)) {
-                    VarDumper::dump($data); // @todo remove this please
+                if (class_exists(VarDumper::class) && ($input->getOption('output-format') === self::OUTPUT_FORMAT_DUMP)) {
+                    VarDumper::dump($data);
                 } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
                     $output->writeln(json_encode($data, JSON_THROW_ON_ERROR));
                 } else {
@@ -155,7 +164,7 @@ class ExecuteProcessCommand extends Command
                 $outputFile->writeLine($data);
             }
 
-            if ($output->isVerbose() && isset($outputFile)) {
+            if (isset($outputFile) && $output->isVerbose()) {
                 $output->writeln(sprintf("Output stored in '%s'", $input->getOption('output')));
             }
         } else {
