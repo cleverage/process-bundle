@@ -106,8 +106,13 @@ trait ConditionTrait
     /**
      * Softly check if an input key match a value, or not
      */
-    protected function checkValue(object|array $input, string $key, mixed $value, bool $shouldMatch = true, bool $regexpMode = false): bool
-    {
+    protected function checkValue(
+        object|array $input,
+        string $key,
+        mixed $value,
+        bool $shouldMatch = true,
+        bool $regexpMode = false
+    ): bool {
         $currentValue = $this->getValue($input, $key);
 
         if ($shouldMatch && ! $regexpMode && $currentValue !== $value) {

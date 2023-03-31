@@ -80,7 +80,7 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
             return $value;
         }
         if (! $options['ignore_missing']) {
-            throw new UnexpectedValueException("No expression accepting value '$value' in map");
+            throw new UnexpectedValueException("No expression accepting value '{$value}' in map");
         }
 
         return null;

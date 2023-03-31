@@ -25,8 +25,6 @@ interface SeekableFileInterface extends FileStreamInterface
 
     /**
      * Go to a specific position inside the file
-     *
-     * @param int $offset
      */
-    public function seek($offset): int;
+    public function seek(int $offset): int;
 }

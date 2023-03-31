@@ -40,7 +40,7 @@ class ArrayMergeTask extends AbstractConfigurableTask implements BlockingTaskInt
 
         $mergeFunction = $this->getOption($state, 'merge_function');
         if (! in_array($mergeFunction, self::MERGE_FUNC, true)) {
-            throw new InvalidArgumentException("Unknown merge function $mergeFunction");
+            throw new InvalidArgumentException("Unknown merge function {$mergeFunction}");
         }
         $this->mergedOutput = $mergeFunction($this->mergedOutput, $input);
     }

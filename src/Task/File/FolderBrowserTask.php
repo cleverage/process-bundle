@@ -72,10 +72,6 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
      * Moves the internal pointer to the next element,
      * return true if the task has a next element
      * return false if the task has terminated it's iteration
-     *
-     * @param ProcessState $state
-     *
-     * @return bool
      */
     public function next(ProcessState $state): bool
     {
@@ -97,11 +93,11 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
             static function (Options $options, $value) {
                 if (! is_dir($value)) {
                     throw new InvalidConfigurationException(
-                        "Folder path does not exists or is not a folder: '$value'"
+                        "Folder path does not exists or is not a folder: '{$value}'"
                     );
                 }
                 if (! is_readable($value)) {
-                    throw new InvalidConfigurationException("Folder path is not readable: '$value'");
+                    throw new InvalidConfigurationException("Folder path is not readable: '{$value}'");
                 }
 
                 return $value;

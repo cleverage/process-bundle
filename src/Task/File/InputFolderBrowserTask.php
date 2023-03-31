@@ -55,7 +55,7 @@ class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskI
             $folderPath = $options['base_folder_path'] . $state->getInput();
             if ($this->folderPath && $folderPath !== $this->folderPath) {
                 throw new LogicException(
-                    "Folder path '$folderPath' already initialized with a different value $this->folderPath"
+                    "Folder path '{$folderPath}' already initialized with a different value {$this->folderPath}"
                 );
             }
             $this->folderPath = $folderPath;
@@ -63,11 +63,11 @@ class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskI
 
         if (! is_dir($this->folderPath)) {
             throw new InvalidConfigurationException(
-                "Folder path does not exists or is not a folder: '$this->folderPath'"
+                "Folder path does not exists or is not a folder: '{$this->folderPath}'"
             );
         }
         if (! is_readable($this->folderPath)) {
-            throw new InvalidConfigurationException("Folder path is not readable: '$this->folderPath'");
+            throw new InvalidConfigurationException("Folder path is not readable: '{$this->folderPath}'");
         }
         $options['folder_path'] = $this->folderPath;
 

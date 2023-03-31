@@ -22,7 +22,7 @@ class MissingProcessException extends UnexpectedValueException implements Proces
 {
     public static function create(?string $code = ''): self
     {
-        $errorStr = "No process with code : $code";
+        $errorStr = "No process with code : {$code}";
 
         return new self($errorStr);
     }

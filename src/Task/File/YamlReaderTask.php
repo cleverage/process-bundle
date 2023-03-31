@@ -37,7 +37,7 @@ class YamlReaderTask extends AbstractIterableOutputTask
             'file_path',
             static function (Options $options, $value) {
                 if (! file_exists($value)) {
-                    throw new UnexpectedValueException("File not found: $value");
+                    throw new UnexpectedValueException("File not found: {$value}");
                 }
 
                 return $value;
@@ -50,7 +50,7 @@ class YamlReaderTask extends AbstractIterableOutputTask
         $filePath = $this->getOption($state, 'file_path');
         $content = Yaml::parseFile($filePath);
         if (! is_array($content)) {
-            throw new InvalidArgumentException("File content is not an array: $filePath");
+            throw new InvalidArgumentException("File content is not an array: {$filePath}");
         }
 
         return new ArrayIterator($content);

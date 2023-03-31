@@ -138,18 +138,18 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
                     return $item->textContent;
                 }
 
-                throw new UnexpectedValueException("Xpath result cannot be unwrapped for query '$query'");
+                throw new UnexpectedValueException("Xpath result cannot be unwrapped for query '{$query}'");
             }, $results);
         }
 
         // Unwrap the node list
         if ($options['single_result']) {
             if (count($results) > 1) {
-                throw new UnexpectedValueException("There is too much results for query '$query'");
+                throw new UnexpectedValueException("There is too much results for query '{$query}'");
             }
 
-            if ( ! $options['ignore_missing'] && count($results) === 0) {
-                throw new UnexpectedValueException("There is not enough results for query '$query'");
+            if (! $options['ignore_missing'] && count($results) === 0) {
+                throw new UnexpectedValueException("There is not enough results for query '{$query}'");
             }
 
             if (count($results) === 1) {

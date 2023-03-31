@@ -29,11 +29,11 @@ class FileReaderTask extends AbstractConfigurableTask
         $filename = $options['filename'];
 
         if (! file_exists($filename)) {
-            throw new UnexpectedValueException("File does not exists: '$filename'");
+            throw new UnexpectedValueException("File does not exists: '{$filename}'");
         }
 
         if (! is_readable($filename)) {
-            throw new UnexpectedValueException("File is not readable: '$filename'");
+            throw new UnexpectedValueException("File is not readable: '{$filename}'");
         }
 
         $state->setOutput(file_get_contents($filename));

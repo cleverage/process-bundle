@@ -23,9 +23,7 @@ class GroupByAggregateIterableTask extends AbstractConfigurableTask implements B
      */
     final public const GROUP_BY_OPTION = 'group_by_accessors';
 
-    /**
-     * @var array
-     */
+
     protected array $result = [];
 
     public function __construct(

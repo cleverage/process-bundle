@@ -48,7 +48,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
                 $this->inputs = [];
             } else {
                 throw new UnexpectedValueException(
-                    "The output from input '$inputCode' has already been defined, please use an aggregator if you have an iterable output"
+                    "The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output"
                 );
             }
         }
@@ -95,7 +95,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
             ->getCode();
         $inputCodes = $this->getOption($state, 'input_codes');
         if (! array_key_exists($previousTaskCode, $inputCodes)) {
-            throw new UnexpectedValueException("Task '$previousTaskCode' is not mapped in the input_codes option");
+            throw new UnexpectedValueException("Task '{$previousTaskCode}' is not mapped in the input_codes option");
         }
 
         return $inputCodes[$previousTaskCode];

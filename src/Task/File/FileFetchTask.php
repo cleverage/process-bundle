@@ -58,9 +58,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
         $this->destinationFS = new Filesystem($this->getOption($state, 'destination_filesystem'));
     }
 
-    /**
-     * @throws FilesystemException
-     */
+
     public function execute(ProcessState $state): void
     {
         $this->findMatchingFiles($state);
@@ -76,9 +74,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
         $state->setOutput($file);
     }
 
-    /**
-     * @throws FilesystemException
-     */
+
     public function next(ProcessState $state): mixed
     {
         $this->findMatchingFiles($state);
@@ -86,9 +82,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
         return next($this->matchingFiles);
     }
 
-    /**
-     * @throws FilesystemException
-     */
+
     protected function findMatchingFiles(ProcessState $state): void
     {
         $filePattern = $this->getOption($state, 'file_pattern');
@@ -117,9 +111,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
         }
     }
 
-    /**
-     * @throws FilesystemException
-     */
+
     protected function doFileCopy(ProcessState $state, string $filename, bool $removeSource): string|bool|null
     {
         $prefixFrom = $this->getOption($state, 'source_filesystem');

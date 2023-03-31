@@ -192,7 +192,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             'process',
             function (Options $options, $value) {
                 if (! $this->processRegistry->hasProcessConfiguration($value)) {
-                    throw new InvalidConfigurationException("Unknown process $value");
+                    throw new InvalidConfigurationException("Unknown process {$value}");
                 }
 
                 return $value;

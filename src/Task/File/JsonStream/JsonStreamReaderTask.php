@@ -16,15 +16,12 @@ namespace CleverAge\ProcessBundle\Task\File\JsonStream;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use JsonException;
 
 class JsonStreamReaderTask implements IterableTaskInterface
 {
     protected ?JsonStreamFile $file = null;
 
-    /**
-     * @throws JsonException
-     */
+
     public function execute(ProcessState $state): void
     {
         if ($this->file === null) {

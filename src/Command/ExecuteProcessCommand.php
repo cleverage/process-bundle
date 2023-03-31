@@ -17,7 +17,6 @@ use CleverAge\ProcessBundle\Event\ConsoleProcessEvent;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use InvalidArgumentException;
-use JsonException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -27,7 +26,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\Yaml\Parser;
-use Throwable;
 use function count;
 use function is_array;
 
@@ -76,10 +74,7 @@ class ExecuteProcessCommand extends Command
         $this->addOption('output-format', 't', InputOption::VALUE_OPTIONAL, 'Output format');
     }
 
-    /**
-     * @throws Throwable
-     * @throws JsonException
-     */
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $inputData = $input->getOption('input');
@@ -96,7 +91,7 @@ class ExecuteProcessCommand extends Command
 
         foreach ($input->getArgument('processCodes') as $code) {
             if (! $output->isQuiet()) {
-                $output->writeln("<comment>Starting process '$code'...</comment>");
+                $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
 
             // Execute each process
@@ -104,7 +99,7 @@ class ExecuteProcessCommand extends Command
             $this->handleOutputData($returnValue, $input, $output);
 
             if (! $output->isQuiet()) {
-                $output->writeln("<info>Process '$code' executed successfully</info>");
+                $output->writeln("<info>Process '{$code}' executed successfully</info>");
             }
         }
 
@@ -133,9 +128,7 @@ class ExecuteProcessCommand extends Command
         return $context;
     }
 
-    /**
-     * @throws JsonException
-     */
+
     protected function handleOutputData(mixed $data, InputInterface $input, OutputInterface $output): void
     {
         // Skip all if undefined
@@ -146,7 +139,9 @@ class ExecuteProcessCommand extends Command
         // Handle printing the output
         if ($input->getOption('output') === self::OUTPUT_STDOUT) {
             if ($output->isVeryVerbose()) {
-                if (class_exists(VarDumper::class) && ($input->getOption('output-format') === self::OUTPUT_FORMAT_DUMP)) {
+                if (class_exists(VarDumper::class) && ($input->getOption(
+                    'output-format'
+                ) === self::OUTPUT_FORMAT_DUMP)) {
                     VarDumper::dump($data);
                 } elseif ($input->getOption('output-format') === self::OUTPUT_FORMAT_JSON) {
                     $output->writeln(json_encode($data, JSON_THROW_ON_ERROR));

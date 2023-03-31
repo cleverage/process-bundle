@@ -17,9 +17,6 @@ use Monolog\LogRecord;
 
 /**
  * Class TaskProcessor
- *
- * @package CleverAge\ProcessBundle\Logger
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class TaskProcessor extends AbstractProcessor
 {

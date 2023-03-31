@@ -25,7 +25,7 @@ class AbstractProcessor
 
     public function __invoke(LogRecord $record): LogRecord
     {
-        if (!empty($record->context)) {
+        if (! empty($record->context)) {
             $context = $this->normalizeRecordData($record->context);
             $record = new LogRecord(
                 $record->datetime,

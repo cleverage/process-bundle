@@ -29,9 +29,15 @@ class CleverAgeProcessBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(
-            new RegistryCompilerPass(TransformerRegistry::class, 'cleverage.transformer', 'addTransformer')
+            new RegistryCompilerPass(TransformerRegistry::class, 'cleverage.transformer', 'addTransformer'),
+            \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION,
+            0
         );
 
-        $container->addCompilerPass(new CheckSerializerCompilerPass());
+        $container->addCompilerPass(
+            new CheckSerializerCompilerPass(),
+            \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION,
+            0
+        );
     }
 }

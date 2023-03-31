@@ -22,7 +22,7 @@ class MissingTransformerException extends UnexpectedValueException implements Pr
 {
     public static function create(?string $code = ''): self
     {
-        $errorStr = "No transformer with code : $code";
+        $errorStr = "No transformer with code : {$code}";
 
         return new self($errorStr);
     }

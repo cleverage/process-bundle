@@ -31,7 +31,7 @@ class StatCounterTask implements FinalizableTaskInterface
 
     public function finalize(ProcessState $state): void
     {
-        $this->logger->info("Processed item count: $this->counter");
+        $this->logger->info("Processed item count: {$this->counter}");
     }
 
     public function execute(ProcessState $state): void

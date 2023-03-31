@@ -79,7 +79,7 @@ class ProcessConfigurationRegistry
                 if ((is_countable($rawTaskConfiguration['error_outputs']) ? count(
                     $rawTaskConfiguration['error_outputs']
                 ) : 0) > 0) {
-                    $m = "Don't define both 'errors' and 'error_outputs' for task $taskCode, these options ";
+                    $m = "Don't define both 'errors' and 'error_outputs' for task {$taskCode}, these options ";
                     $m .= "are the same, 'errors' is deprecated, just use the new one 'error_outputs'";
                     throw new LogicException($m);
                 }

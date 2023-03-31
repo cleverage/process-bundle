@@ -22,7 +22,7 @@ class CircularProcessException extends UnexpectedValueException implements Proce
 {
     public static function create(?string $processCode = '', ?string $taskCode = ''): self
     {
-        $errorStr = "Process '$processCode' contains circular dependency (task '$taskCode' has itself as ancestor, at some point)";
+        $errorStr = "Process '{$processCode}' contains circular dependency (task '{$taskCode}' has itself as ancestor, at some point)";
 
         return new self($errorStr);
     }

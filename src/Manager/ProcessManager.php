@@ -313,7 +313,7 @@ class ProcessManager
                             'file' => $exception->getFile(),
                             'line' => $exception->getLine(),
                             'type' => 500,
-                            'message' => $exception->getMessage()
+                            'message' => $exception->getMessage(),
                         ]
                     );
                 }
@@ -404,7 +404,7 @@ class ProcessManager
                 $this->processLogger->debug("Flushing task {$taskConfiguration->getCode()}");
                 $task->flush($state);
             } else {
-                throw new UnexpectedValueException("Unknown execution flag: $executionFlag");
+                throw new UnexpectedValueException("Unknown execution flag: {$executionFlag}");
             }
 
             $exception = $state->getException();

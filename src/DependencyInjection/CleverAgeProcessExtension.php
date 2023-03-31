@@ -15,7 +15,6 @@ namespace CleverAge\ProcessBundle\DependencyInjection;
 
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Transformer\GenericTransformer;
-use Exception;
 use ReflectionClass;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -32,9 +31,6 @@ use function dirname;
  */
 class CleverAgeProcessExtension extends Extension
 {
-    /**
-     * @throws Exception
-     */
     public function load(array $configs, ContainerBuilder $container): void
     {
         // Get the path of the service folder wherever the bundle is installed
@@ -63,8 +59,6 @@ class CleverAgeProcessExtension extends Extension
 
     /**
      * Recursively import config files into container
-     *
-     * @throws Exception
      */
     protected function findServices(ContainerBuilder $container, string $path, string $extension = 'yaml'): void
     {

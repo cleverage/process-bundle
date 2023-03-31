@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Filesystem;
 
+use JsonException;
 use SplFileObject;
 
 /**
@@ -22,22 +23,11 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
 {
     protected SplFileObject $file;
 
-    /**
-     * @var int
-     */
-    protected $lineCount;
+    protected ?int $lineCount = null;
 
-    /**
-     * @var int
-     */
-    protected $lineNumber = 1;
+    protected int $lineNumber = 1;
 
-    /**
-     * JsonStreamFile constructor.
-     *
-     * @param string $mode
-     */
-    public function __construct(string $filename, $mode = 'rb')
+    public function __construct(string $filename, string $mode = 'rb')
     {
         $this->file = new SplFileObject($filename, $mode);
 
@@ -78,9 +68,9 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
     /**
      * Return an array containing current data and moving the file pointer
      *
-     * @param null $length
+     * @throws JsonException
      */
-    public function readLine($length = null): ?array
+    public function readLine(int $length = null): ?array
     {
         if ($this->isEndOfFile()) {
             return null;
@@ -92,9 +82,12 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
         return json_decode($rawLine, true, 512, JSON_THROW_ON_ERROR);
     }
 
-    public function writeLine(array $item): int
+    /**
+     * @throws JsonException
+     */
+    public function writeLine(array $fields): int
     {
-        $this->file->fwrite(json_encode($item, JSON_THROW_ON_ERROR) . PHP_EOL);
+        $this->file->fwrite(json_encode($fields, JSON_THROW_ON_ERROR) . PHP_EOL);
         $this->lineNumber++;
 
         return $this->lineNumber;

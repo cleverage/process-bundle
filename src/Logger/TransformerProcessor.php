@@ -17,9 +17,6 @@ use Monolog\LogRecord;
 
 /**
  * Class TransformerProcessor
- *
- * @package CleverAge\ProcessBundle\Logger
- * @author  Madeline Veyrenc <mveyrenc@clever-age.com>
  */
 class TransformerProcessor extends AbstractProcessor
 {

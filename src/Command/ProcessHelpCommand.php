@@ -126,7 +126,7 @@ class ProcessHelpCommand extends Command
         $branches = array_filter($branches);
         if (! empty($branches)) {
             $branchStr = '[' . implode(', ', $branches) . ']';
-            $output->writeln("<error>All branches are not resolved : $branchStr</error>");
+            $output->writeln("<error>All branches are not resolved : {$branchStr}</error>");
         }
 
         return Command::SUCCESS;
@@ -135,8 +135,11 @@ class ProcessHelpCommand extends Command
     /**
      * Try to find a best candidate for next display
      */
-    protected function findBestNextTask(array $branches, array $taskList, ProcessConfiguration $process): int|null|string
-    {
+    protected function findBestNextTask(
+        array $branches,
+        array $taskList,
+        ProcessConfiguration $process
+    ): int|null|string {
         // Get resolvable tasks
         $taskCandidates = [];
         foreach ($taskList as $taskCode) {
@@ -272,7 +275,7 @@ class ProcessHelpCommand extends Command
 
                 if (! $foundBranch) {
                     $output->writeln(
-                        "<error>Could not find previous branch : $taskCode depends on {$prevTask->getCode()}</error>"
+                        "<error>Could not find previous branch : {$taskCode} depends on {$prevTask->getCode()}</error>"
                     );
                 }
             }
@@ -346,7 +349,7 @@ class ProcessHelpCommand extends Command
         // Write main line
         $nodeStr = self::CHAR_NODE;
         if ($task->isInErrorBranch()) {
-            $nodeStr = "<fire>$nodeStr</fire>";
+            $nodeStr = "<fire>{$nodeStr}</fire>";
         }
 
         $this->writeBranches(
@@ -361,7 +364,7 @@ class ProcessHelpCommand extends Command
         if ($output->isVerbose() && $task->getHelp()) {
             $helpLines = array_filter(explode("\n", $task->getHelp()));
             foreach ($helpLines as $helpLine) {
-                $helpMessage = str_repeat(' ', self::INDENT_SIZE) . "<info>$helpLine</info>";
+                $helpMessage = str_repeat(' ', self::INDENT_SIZE) . "<info>{$helpLine}</info>";
                 $this->writeBranches($output, $branches, $helpMessage);
             }
         }
@@ -472,7 +475,7 @@ class ProcessHelpCommand extends Command
             }
 
             // Str_pad does not work with unicode ?
-            $noFormatStrLen = mb_strlen(preg_replace('/<[^>]*>/', '', $str));
+            $noFormatStrLen = mb_strlen(preg_replace('/<[^>]*>/', '', (string) $str));
             for ($j = $noFormatStrLen; $j < self::BRANCH_SIZE; ++$j) {
                 $str .= ' ';
             }

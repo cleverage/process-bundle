@@ -118,7 +118,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
             } elseif (is_array($result)) {
                 $result[$targetProperty] = $transformedValue;
             } else {
-                throw new UnexpectedValueException("Property '$targetProperty' is not writable");
+                throw new UnexpectedValueException("Property '{$targetProperty}' is not writable");
             }
         }
 

@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
@@ -39,9 +38,7 @@ class DenormalizeTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('context', ['array']);
     }
 
-    /**
-     * @throws ExceptionInterface
-     */
+
     public function transform(mixed $value, array $options = []): mixed
     {
         return $this->denormalizer->denormalize($value, $options['class'], $options['format'], $options['context']);

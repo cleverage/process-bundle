@@ -50,7 +50,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
                     'csv_file' => $this->csv->getFilePath(),
                     'csv_line' => $lineNumber,
                 ];
-                $this->logger->warning("Empty line detected at line: $lineNumber", $logContext);
+                $this->logger->warning("Empty line detected at line: {$lineNumber}", $logContext);
             }
 
             $state->setSkipped(true);

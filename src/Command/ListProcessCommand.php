@@ -70,14 +70,14 @@ class ListProcessCommand extends Command
         $publicCount = array_reduce($processConfigurations, $this->publicProcessCounter(...), 0);
         $privateCount = array_reduce($processConfigurations, $this->privateProcessCounter(...), 0);
         $output->writeln(
-            "<info>There are $publicCount process configurations defined (and $privateCount private) :</info>"
+            "<info>There are {$publicCount} process configurations defined (and {$privateCount} private) :</info>"
         );
 
         $messages = [];
         foreach ($processConfigurations as $processConfiguration) {
             if ($processConfiguration->isPublic() || $input->getOption('all')) {
                 $countTasks = count($processConfiguration->getTaskConfigurations());
-                $message = "<info> - </info>{$processConfiguration->getCode()}<info> with $countTasks tasks</info>";
+                $message = "<info> - </info>{$processConfiguration->getCode()}<info> with {$countTasks} tasks</info>";
 
                 if ($processConfiguration->isPrivate()) {
                     $message .= ' <comment>(private)</comment>';
