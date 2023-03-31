@@ -30,7 +30,7 @@ class InvalidProcessConfigurationException extends UnexpectedValueException impl
         $taskListStr = '[' . implode(', ', $mainTaskList) . ']';
 
         return new self(
-            "Task '{$taskConfig->getCode()}' is not in main task list : {$taskListStr} (from process: {$processConfiguration->getCode()})"
+            "Task '{$taskConfig->getCode()}' is not in main task list : $taskListStr (from process: {$processConfiguration->getCode()})"
         );
     }
 

@@ -29,7 +29,7 @@ class PhpFunctionProvider implements ExpressionFunctionProviderInterface
     /**
      * @return ExpressionFunction[]
      */
-    public function getFunctions()
+    public function getFunctions(): array
     {
         return array_map(fn ($func): ExpressionFunction => ExpressionFunction::fromPhp($func), $this->functions);
     }

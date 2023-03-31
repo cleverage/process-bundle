@@ -20,12 +20,9 @@ use UnexpectedValueException;
  */
 class MissingTaskConfigurationException extends UnexpectedValueException implements ProcessExceptionInterface
 {
-    /**
-     * @param string $code
-     */
-    public static function create($code): self
+    public static function create(?string $code = ''): self
     {
-        $errorStr = "No task configuration with code : {$code}";
+        $errorStr = "No task configuration with code : $code";
 
         return new self($errorStr);
     }

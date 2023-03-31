@@ -20,12 +20,9 @@ use UnexpectedValueException;
  */
 class MissingProcessException extends UnexpectedValueException implements ProcessExceptionInterface
 {
-    /**
-     * @param string $code
-     */
-    public static function create($code): self
+    public static function create(?string $code = ''): self
     {
-        $errorStr = "No process with code : {$code}";
+        $errorStr = "No process with code : $code";
 
         return new self($errorStr);
     }
