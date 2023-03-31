@@ -172,15 +172,6 @@ class Configuration implements ConfigurationInterface
             ->values($logLevels)
             ->defaultValue(LogLevel::CRITICAL);
 
-        $logErrorNode = $definition->booleanNode('log_errors')
-            ->defaultTrue();
-        $this->deprecateNode(
-            $logErrorNode,
-            'cleverage/process-bundle',
-            '2.0',
-            'The child node "%node%" at path "%path%" is deprecated in favor of "log_level".'
-        );
-
         foreach (['outputs', 'errors', 'error_outputs'] as $nodeName) {
             $definition->arrayNode($nodeName)
                 ->beforeNormalization()
@@ -188,17 +179,6 @@ class Configuration implements ConfigurationInterface
                 ->then(fn ($item): array => [$item])->end()
                 ->prototype('scalar');
         }
-    }
-
-    /**
-     * An helper method to deprecate a node.
-     * Provides compatibility with Sf3, 4 and 5
-     *
-     * @TODO remove this once support for Symfony 3 and 4 is dropped
-     */
-    protected function deprecateNode(NodeDefinition $node, string $package, string $version, string $message): void
-    {
-        $node->setDeprecated($package, $version, $message);
     }
 
     /**
