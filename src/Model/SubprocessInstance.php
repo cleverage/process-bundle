@@ -89,7 +89,7 @@ class SubprocessInstance
 
         $arguments[] = $this->processCode;
 
-        $this->process = Process::fromShellCommandline($this->process->getCommandLine(), null, null, $this->input);
+        $this->process = new Process($arguments, null, null, $this->input);
         $this->process->enableOutput();
 
         return $this;

@@ -19,6 +19,7 @@ use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use RuntimeException;
 use Throwable;
 use UnexpectedValueException;
+use function in_array;
 
 /**
  * Used to pass information between tasks
@@ -42,66 +43,33 @@ class ProcessState
 
     protected TaskConfiguration $taskConfiguration;
 
-    /**
-     * @var mixed
-     */
-    protected $input;
+    protected mixed $input = null;
 
-    /**
-     * @var mixed
-     */
-    protected $output;
+    protected mixed $output = null;
 
-    /**
-     * @var mixed
-     */
-    protected $errorOutput;
+    protected mixed $errorOutput = null;
 
-    /**
-     * @var boolean
-     */
-    protected $hasErrorOutput = false;
+    protected bool $hasErrorOutput = false;
 
-    /**
-     * @var bool
-     */
-    protected $stopped = false;
+    protected bool $stopped = false;
 
     protected ?Throwable $exception = null;
 
-    /**
-     * @var array
-     */
-    protected $errorContext = [];
+    protected array $errorContext = [];
 
-    /**
-     * @var int
-     */
-    protected $returnCode;
+    protected ?int $returnCode = null;
 
     protected bool $skipped;
 
-    /**
-     * @var array
-     */
-    protected $context;
+    protected ?array $context = null;
 
-    /**
-     * @var ContextualOptionResolver
-     */
-    protected $contextualOptionResolver;
+    protected ?ContextualOptionResolver $contextualOptionResolver = null;
 
-    /**
-     * @var array
-     */
-    protected $contextualizedOptions;
+    protected ?array $contextualizedOptions = null;
 
-    protected ?\CleverAge\ProcessBundle\Model\ProcessState $previousState = null;
+    protected ?ProcessState $previousState = null;
 
-    /**
-     * @var string
-     */
-    protected $status = self::STATUS_NEW;
+    protected string $status = self::STATUS_NEW;
 
     public function __construct(
         protected ProcessConfiguration $processConfiguration,
@@ -128,10 +96,8 @@ class ProcessState
     /**
      * Reset the state object
      * To be used before execution
-     *
-     * @param bool $cleanInput
      */
-    public function reset($cleanInput): void
+    public function reset(bool $cleanInput): void
     {
         $this->setOutput(null);
         $this->setSkipped(false);
@@ -165,10 +131,7 @@ class ProcessState
         $this->taskConfiguration = $taskConfiguration;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getInput()
+    public function getInput(): mixed
     {
         return $this->input;
     }
@@ -178,10 +141,7 @@ class ProcessState
         $this->input = $input;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getOutput()
+    public function getOutput(): mixed
     {
         return $this->output;
     }
@@ -191,42 +151,7 @@ class ProcessState
         $this->output = $output;
     }
 
-    /**
-     * @return mixed
-     *
-     * @deprecated Use getErrorOutput instead
-     */
-    public function getError()
-    {
-        @trigger_error('Deprecated method, use getErrorOutput instead', E_USER_DEPRECATED);
-
-        return $this->getErrorOutput();
-    }
-
-    /**
-     * @deprecated Use setErrorOutput instead
-     */
-    public function setError(mixed $error): void
-    {
-        @trigger_error('Deprecated method, use setErrorOutput instead', E_USER_DEPRECATED);
-
-        $this->setErrorOutput($error);
-    }
-
-    /**
-     * @deprecated Use hasErrorOutput instead
-     */
-    public function hasError(): bool
-    {
-        @trigger_error('Deprecated method, use hasErrorOutput instead', E_USER_DEPRECATED);
-
-        return $this->hasErrorOutput();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getErrorOutput()
+    public function getErrorOutput(): mixed
     {
         return $this->errorOutput;
     }
@@ -292,11 +217,7 @@ class ProcessState
 
     public function getReturnCode(): int
     {
-        if ($this->returnCode !== null) {
-            return $this->returnCode;
-        }
-
-        return 0;
+        return $this->returnCode ?? 0;
     }
 
     public function setReturnCode(int $returnCode): void
@@ -331,7 +252,7 @@ class ProcessState
 
     public function setStatus(string $status): void
     {
-        if (! \in_array($status, self::STATUS, true)) {
+        if (! in_array($status, self::STATUS, true)) {
             throw new UnexpectedValueException("Unknown status {$status}");
         }
 
@@ -371,12 +292,7 @@ class ProcessState
         return $this->contextualizedOptions;
     }
 
-    /**
-     * @param string $code
-     *
-     * @return mixed
-     */
-    public function getContextualizedOption($code, mixed $default = null)
+    public function getContextualizedOption(string $code, mixed $default = null): mixed
     {
         $contextualizedOptions = $this->getContextualizedOptions();
         if (array_key_exists($code, $contextualizedOptions)) {
@@ -384,30 +300,5 @@ class ProcessState
         }
 
         return $default;
-    }
-
-    /**
-     * @deprecated Use monolog processors instead
-     */
-    public function getLogContext(): array
-    {
-        @trigger_error('Deprecated method, use monolog processors instead', E_USER_DEPRECATED);
-        $context = [
-            'process_id' => $this->processHistory->getId(),
-            'process_code' => $this->processConfiguration->getCode(),
-            'process_context' => $this->context,
-            'task_code' => $this->taskConfiguration->getCode(),
-            'task_service' => $this->taskConfiguration->getServiceReference(),
-        ];
-
-        if ($this->hasErrorOutput()) {
-            $context['error'] = $this->getErrorOutput();
-        }
-
-        if ($this->exception) {
-            $context['exception'] = $this->exception;
-        }
-
-        return $context;
     }
 }

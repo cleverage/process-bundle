@@ -21,7 +21,6 @@ class JsonStreamReaderTask implements IterableTaskInterface
 {
     protected ?JsonStreamFile $file = null;
 
-
     public function execute(ProcessState $state): void
     {
         if ($this->file === null) {

@@ -74,7 +74,6 @@ class ExecuteProcessCommand extends Command
         $this->addOption('output-format', 't', InputOption::VALUE_OPTIONAL, 'Output format');
     }
 
-
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $inputData = $input->getOption('input');
@@ -127,7 +126,6 @@ class ExecuteProcessCommand extends Command
 
         return $context;
     }
-
 
     protected function handleOutputData(mixed $data, InputInterface $input, OutputInterface $output): void
     {

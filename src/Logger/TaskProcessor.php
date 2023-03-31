@@ -15,9 +15,6 @@ namespace CleverAge\ProcessBundle\Logger;
 
 use Monolog\LogRecord;
 
-/**
- * Class TaskProcessor
- */
 class TaskProcessor extends AbstractProcessor
 {
     public function __invoke(LogRecord $record): LogRecord

@@ -38,7 +38,6 @@ class DenormalizeTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('context', ['array']);
     }
 
-
     public function transform(mixed $value, array $options = []): mixed
     {
         return $this->denormalizer->denormalize($value, $options['class'], $options['format'], $options['context']);

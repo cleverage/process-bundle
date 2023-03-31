@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\CheckSerializerCompilerPass;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -30,14 +31,10 @@ class CleverAgeProcessBundle extends Bundle
 
         $container->addCompilerPass(
             new RegistryCompilerPass(TransformerRegistry::class, 'cleverage.transformer', 'addTransformer'),
-            \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION,
+            PassConfig::TYPE_BEFORE_OPTIMIZATION,
             0
         );
 
-        $container->addCompilerPass(
-            new CheckSerializerCompilerPass(),
-            \Symfony\Component\DependencyInjection\Compiler\PassConfig::TYPE_BEFORE_OPTIMIZATION,
-            0
-        );
+        $container->addCompilerPass(new CheckSerializerCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
     }
 }

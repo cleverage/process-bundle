@@ -28,7 +28,6 @@ class DenormalizerTask extends AbstractConfigurableTask
     ) {
     }
 
-
     public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);

@@ -51,19 +51,14 @@ class ProcessManager
     protected const EXECUTE_FLUSH = 4;
 
     /**
-     * @var TaskConfiguration
+     * @var TaskConfiguration[]
      */
-    protected $blockingTaskConfiguration;
+    protected array $processedIterables = [];
 
     /**
      * @var TaskConfiguration[]
      */
-    protected $processedIterables = [];
-
-    /**
-     * @var TaskConfiguration[]
-     */
-    protected $processedBlockings = [];
+    protected array $processedBlockings = [];
 
     protected ?ProcessHistory $processHistory = null;
 
@@ -94,12 +89,8 @@ class ProcessManager
      *
      * This method decorates the real execution to add event & error handling
      * @see ProcessManager::doExecute
-     *
-     * @param null $input
-     *
-     * @return mixed
      */
-    public function execute(string $processCode, mixed $input = null, array $context = [])
+    public function execute(string $processCode, mixed $input = null, array $context = []): mixed
     {
         try {
             $this->eventDispatcher->dispatch(new ProcessEvent($processCode, $input, $context));
@@ -123,10 +114,8 @@ class ProcessManager
 
     /**
      * Real process execution, with a given input and context
-     *
-     * @return mixed
      */
-    protected function doExecute(string $processCode, mixed $input = null, array $context = [])
+    protected function doExecute(string $processCode, mixed $input = null, array $context = []): mixed
     {
         $parentProcessHistory = $this->processHistory;
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);

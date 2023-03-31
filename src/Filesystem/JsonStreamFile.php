@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Filesystem;
 
-use JsonException;
 use SplFileObject;
 
 /**
@@ -67,8 +66,6 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
 
     /**
      * Return an array containing current data and moving the file pointer
-     *
-     * @throws JsonException
      */
     public function readLine(int $length = null): ?array
     {
@@ -82,9 +79,6 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
         return json_decode($rawLine, true, 512, JSON_THROW_ON_ERROR);
     }
 
-    /**
-     * @throws JsonException
-     */
     public function writeLine(array $fields): int
     {
         $this->file->fwrite(json_encode($fields, JSON_THROW_ON_ERROR) . PHP_EOL);
