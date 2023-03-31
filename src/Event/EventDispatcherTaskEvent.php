@@ -14,8 +14,9 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Event;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Contracts\EventDispatcher\Event;
 
-class EventDispatcherTaskEvent extends GenericEvent
+class EventDispatcherTaskEvent extends Event
 {
     public function __construct(
         protected ProcessState $state

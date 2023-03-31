@@ -15,11 +15,12 @@ namespace CleverAge\ProcessBundle\Event;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event object used during CLI process manipulation
  */
-class ConsoleProcessEvent extends GenericEvent
+class ConsoleProcessEvent extends Event
 {
     final public const EVENT_CLI_INIT = 'cleverage_process.cli.init';
 
@@ -41,10 +42,7 @@ class ConsoleProcessEvent extends GenericEvent
         return $this->consoleOutput;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getProcessInput()
+    public function getProcessInput(): mixed
     {
         return $this->processInput;
     }

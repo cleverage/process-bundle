@@ -13,12 +13,13 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Event;
 
+use Symfony\Contracts\EventDispatcher\Event;
 use Throwable;
 
 /**
  * Event object for process start/stop/fail
  */
-class ProcessEvent extends GenericEvent
+class ProcessEvent extends Event
 {
     final public const EVENT_PROCESS_STARTED = 'cleverage_process.start';
 
@@ -40,18 +41,12 @@ class ProcessEvent extends GenericEvent
         return $this->processCode;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getProcessInput()
+    public function getProcessInput(): mixed
     {
         return $this->processInput;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getProcessOutput()
+    public function getProcessOutput(): mixed
     {
         return $this->processOutput;
     }
