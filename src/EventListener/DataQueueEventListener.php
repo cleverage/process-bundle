@@ -26,7 +26,7 @@ class DataQueueEventListener
     /**
      * @var SplQueue[]
      */
-    protected $queues = [];
+    protected array $queues = [];
 
     public function pushData(EventDispatcherTaskEvent $event): void
     {
@@ -34,10 +34,7 @@ class DataQueueEventListener
         $queue->push(clone $event->getState());
     }
 
-    /**
-     * @param string $processName
-     */
-    public function getQueue($processName): SplQueue
+    public function getQueue(string $processName): SplQueue
     {
         if (! array_key_exists($processName, $this->queues)) {
             $this->queues[$processName] = new SplQueue();
