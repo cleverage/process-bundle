@@ -14,6 +14,11 @@
         <server name="APP_DEBUG" value="1" />
         <!-- set this to 0 to scan deprecation notices -->
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
+
+        <!-- ###+ symfony/framework-bundle ### -->
+        <env name="APP_ENV" value="dev"/>
+        <env name="APP_SECRET" value="bb25a826f74fd06b6f4e1b8d188c0150"/>
+        <!-- ###- symfony/framework-bundle ### -->
     </php>
 
     <testsuites>

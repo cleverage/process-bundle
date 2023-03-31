@@ -73,7 +73,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
         $state->setOutput($file);
     }
 
-    public function next(ProcessState $state): mixed
+    public function next(ProcessState $state): bool
     {
         $this->findMatchingFiles($state);
 

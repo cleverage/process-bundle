@@ -54,14 +54,13 @@ trait TransformerTrait
     /**
      * @return mixed
      */
-    protected function applyTransformers(array $transformers, mixed $value)
+    protected function applyTransformers(array $transformers, mixed $value): mixed
     {
         // Quick return for better perfs
         if (empty($transformers)) {
             return $value;
         }
 
-        /** @noinspection ForeachSourceInspection */
         foreach ($transformers as $transformerCode => $transformerClosure) {
             try {
                 $value = $transformerClosure($value);
@@ -78,8 +77,6 @@ trait TransformerTrait
      * keys This way you can chain multiple times the same transformer. Without this, it would silently call only the
      * 1st one.
      *
-     * @return string
-     *
      * @example
      *     transformers:
      *       callback#1:
@@ -87,7 +84,7 @@ trait TransformerTrait
      *       callback#2:
      *         callback: array_reverse
      */
-    protected function getCleanedTransfomerCode(string $transformerCode)
+    protected function getCleanedTransfomerCode(string $transformerCode): string
     {
         $match = preg_match('/([^#]+)(#[\d]+)?/', $transformerCode, $parts);
 
@@ -104,7 +101,7 @@ trait TransformerTrait
     ): void {
         $resolver->setDefault($optionName, []);
         $resolver->setAllowedTypes($optionName, ['array']);
-        $resolver->setNormalizer($optionName, Closure::fromCallable([$this, 'normalizeTransformers']));
+        $resolver->setNormalizer($optionName, $this->normalizeTransformers(...));
     }
 
     /**

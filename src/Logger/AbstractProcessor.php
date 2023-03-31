@@ -77,9 +77,7 @@ class AbstractProcessor
         $this->addToRecord($record, 'task_service', $taskConfiguration->getServiceReference());
 
         $state = $taskConfiguration->getState();
-        if (! $state) {
-            return;
-        }
+
         if ($state->hasErrorOutput()) {
             $this->addToRecord($record, 'error', $state->getErrorOutput());
         }
@@ -89,10 +87,7 @@ class AbstractProcessor
         }
     }
 
-    /**
-     * @param string $name
-     */
-    protected function addToRecord(array &$record, $name, mixed $data): void
+    protected function addToRecord(array &$record, string $name, mixed $data): void
     {
         $record[$name] = $data;
     }

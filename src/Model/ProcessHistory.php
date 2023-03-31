@@ -15,6 +15,7 @@ namespace CleverAge\ProcessBundle\Model;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use DateTime;
+use DateTimeInterface;
 use Stringable;
 
 /**
@@ -32,9 +33,9 @@ class ProcessHistory implements Stringable
 
     protected string $processCode;
 
-    protected ?DateTime $startDate;
+    protected ?DateTimeInterface $startDate;
 
-    protected ?DateTime $endDate = null;
+    protected ?DateTimeInterface $endDate = null;
 
     protected string $state = self::STATE_STARTED;
 
@@ -51,7 +52,7 @@ class ProcessHistory implements Stringable
     {
         $reference = $this->getProcessCode() . '[' . $this->getState() . ']';
         $time = $this->getStartDate()
-            ->format(DateTime::ATOM);
+            ->format(DateTimeInterface::ATOM);
 
         return $reference . ': ' . $time;
     }
@@ -71,12 +72,12 @@ class ProcessHistory implements Stringable
         return $this->context;
     }
 
-    public function getStartDate(): DateTime
+    public function getStartDate(): DateTimeInterface
     {
         return $this->startDate;
     }
 
-    public function getEndDate(): ?DateTime
+    public function getEndDate(): ?DateTimeInterface
     {
         return $this->endDate;
     }
