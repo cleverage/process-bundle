@@ -22,8 +22,6 @@ use Symfony\Contracts\EventDispatcher\Event;
  */
 class ConsoleProcessEvent extends Event
 {
-    final public const EVENT_CLI_INIT = 'cleverage_process.cli.init';
-
     public function __construct(
         private readonly InputInterface $consoleInput,
         private readonly OutputInterface $consoleOutput,

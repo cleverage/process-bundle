@@ -16,7 +16,7 @@
     {
       "name": "Vincent Chalnot",
       "email": "vchalnot@clever-age.com",
-      "homepage": "http://chalnot.fr",
+      "homepage": "https://github.com/VincentChalnot",
       "role": "Lead Developer"
     },
     {
@@ -75,6 +75,7 @@
     "symfony/process": "^6.2",
     "symfony/property-access": "^6.2",
     "symfony/serializer": "^6.2",
+    "symfony/stopwatch": "^6.2",
     "symfony/validator": "^6.2",
     "symfony/yaml": "^6.2",
     "league/flysystem-bundle": "^3.1"

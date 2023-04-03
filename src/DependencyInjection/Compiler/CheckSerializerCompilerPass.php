@@ -25,7 +25,7 @@ class CheckSerializerCompilerPass implements CompilerPassInterface
 {
     final public const MSG = 'The Symfony serializer component do not seem enabled, consider toggling framework.serializer.enable (see https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled)';
 
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (! $container->has('serializer') && ! $container->has(DenormalizerInterface::class)) {
             throw new AutowiringFailedException('serializer', self::MSG);
