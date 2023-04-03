@@ -94,7 +94,7 @@ class ProcessConfigurationRegistry
                 $rawTaskConfiguration['outputs'],
                 $rawTaskConfiguration['error_outputs'],
                 $rawTaskConfiguration['error_strategy'] ?? $this->defaultErrorStrategy,
-                $rawTaskConfiguration['log_errors'] ? $rawTaskConfiguration['log_level'] : LogLevel::DEBUG
+                $rawTaskConfiguration['log_level'] ?: LogLevel::DEBUG
             );
         }
 
