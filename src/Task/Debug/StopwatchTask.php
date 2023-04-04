@@ -26,13 +26,12 @@ class StopwatchTask implements TaskInterface
     public function __construct(
         protected LoggerInterface $logger,
         private readonly Stopwatch $stopwatch
-    )
-    {
+    ) {
     }
 
     public function execute(ProcessState $state): void
     {
-        foreach($this->stopwatch->getSectionEvents('__root__') as $event) {
+        foreach ($this->stopwatch->getSectionEvents('__root__') as $event) {
             $this->logger->info($event);
         }
     }

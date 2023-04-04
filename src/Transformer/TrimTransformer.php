@@ -20,8 +20,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class TrimTransformer implements ConfigurableTransformerInterface
 {
-    public function transform(mixed $value, array $options = []): ?string
+    public function transform(mixed $value, ?array $options = []): ?string
     {
+        if ($options === null || $options === []) {
+            $options = [
+                'charlist' => " \t\n\r\0\x0B",
+            ];
+        }
+
         if ($value === null) {
             return null;
         }
@@ -37,6 +43,9 @@ class TrimTransformer implements ConfigurableTransformerInterface
         return 'trim';
     }
 
+    /**
+     * @codeCoverageIgnore
+     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
