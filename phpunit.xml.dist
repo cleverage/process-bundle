@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<!-- http://phpunit.de/manual/4.1/en/appendixes.configuration.html -->
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="http://schema.phpunit.de/4.1/phpunit.xsd"
-         backupGlobals="false"
-         colors="true"
->
-    <php>
-        <ini name="error_reporting" value="-1" />
-        <server name="KERNEL_CLASS" value="CleverAge\ProcessBundle\Tests\AbstractProcessTest" />
-        <server name="KERNEL_DIR" value="src/" />
-        <server name="APP_ENV" value="test" />
-        <server name="APP_DEBUG" value="1" />
-        <!-- set this to 0 to scan deprecation notices -->
-        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
-    </php>
-
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.6/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
+         cacheResultFile=".phpunit.cache/test-results"
+         executionOrder="depends,defects"
+         forceCoversAnnotation="true"
+         beStrictAboutCoversAnnotation="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         convertDeprecationsToExceptions="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         verbose="true">
     <testsuites>
-        <testsuite name="Project Test Suite">
-            <directory>/tests</directory>
+        <testsuite name="default">
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
+
+    <coverage cacheDirectory=".phpunit.cache/code-coverage"
+              processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+    </coverage>
 </phpunit>

@@ -32,7 +32,7 @@ test: test/$(SF_ENV)
 
 test/local:
 	$(DOCKER_RUN) $(LOCAL_DOCKER_TAG) ./bin/console c:c
-	$(DOCKER_RUN) $(LOCAL_DOCKER_TAG) php vendor/bin/phpunit
+	$(DOCKER_RUN) $(LOCAL_DOCKER_TAG) php -dxdebug.mode=coverage vendor/bin/phpunit --coverage-html coverage-report
 
 test/%:
 	$(DOCKER_RUN) cleverage/process-bundle:$(@F) ./bin/console c:c
@@ -62,3 +62,4 @@ linter/local:
 	vendor/bin/rector process
 	vendor/bin/ecs check --fix
 	vendor/bin/phpstan
+	php -dxdebug.mode=coverage vendor/bin/phpunit --coverage-html coverage-report

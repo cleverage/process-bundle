@@ -101,7 +101,8 @@
   "config": {
     "allow-plugins": {
       "phpstan/extension-installer": true,
-      "symfony/flex": true
+      "symfony/flex": true,
+      "symfony/runtime": true
     }
   }
 }
