@@ -4,4 +4,7 @@
 /vendor-sf4
 /vendor-sf5
 .env
+.idea
 /phpunit.xml
+.phpunit.result.cache
+.phpunit.cache
