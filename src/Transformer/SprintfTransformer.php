@@ -21,13 +21,6 @@ use function is_array;
  */
 class SprintfTransformer implements ConfigurableTransformerInterface
 {
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setRequired('format');
-        $resolver->setDefault('format', '%s');
-        $resolver->setAllowedTypes('format', 'string');
-    }
-
     public function transform(mixed $value, array $options = []): string
     {
         if (! is_array($value)) {
@@ -40,5 +33,15 @@ class SprintfTransformer implements ConfigurableTransformerInterface
     public function getCode(): string
     {
         return 'sprintf';
+    }
+
+    /**
+     * @codeCoverageIgnore
+     */
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setRequired('format');
+        $resolver->setDefault('format', '%s');
+        $resolver->setAllowedTypes('format', 'string');
     }
 }
