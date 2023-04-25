@@ -29,7 +29,9 @@ class WrapperTransformer implements ConfigurableTransformerInterface
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(['wrapper_key']);
+        $resolver->setDefaults([
+            'wrapper_key' => 0,
+        ]);
         $resolver->setAllowedTypes('wrapper_key', ['string', 'int']);
     }
 
