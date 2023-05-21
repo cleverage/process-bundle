@@ -11,6 +11,8 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
+namespace Transformer;
+
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -43,9 +45,6 @@ class TrimTransformer implements ConfigurableTransformerInterface
         return 'trim';
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

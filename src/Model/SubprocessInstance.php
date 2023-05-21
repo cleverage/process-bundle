@@ -78,7 +78,7 @@ class SubprocessInstance
         }
 
         if ($this->options[self::OPTION_JSON_BUFFERING]) {
-            $arguments = array_merge($arguments, ['--output=' . $this->bufferPath, '--output-format=json-stream']);
+            $arguments = [...$arguments, '--output=' . $this->bufferPath, '--output-format=json-stream'];
         }
 
         if (! empty($this->context)) {
