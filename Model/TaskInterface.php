@@ -23,6 +23,8 @@ interface TaskInterface
 {
     /**
      * @param ProcessState $state
+     *
+     * @internal
      */
     public function execute(ProcessState $state);
 }

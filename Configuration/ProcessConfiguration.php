@@ -16,6 +16,8 @@ use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
 /**
  * Holds the processes configuration to launch a task
  *
+ * @internal
+ *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */

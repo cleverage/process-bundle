@@ -19,6 +19,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Read an XML file
  *
+ * Requires `php-xml`.
+ *
+ * ##### Task reference
+ * 
+ * * **Service**: `CleverAge\ProcessBundle\Task\File\Xml\XmlReaderTask`
+ * * **Input**: _ignored_
+ * * **Output**: `\DOMDocument`, built from the given file.
+ * 
+ * ##### Options
+ *
+ * * `file_path` (`string`, _required_): Path of the file to read from (relative to symfony root or absolute)
+ * * `mode` (`string`,_defaults to_ `rb`): File open mode (see [fopen mode parameter](https://secure.php.net/manual/en/function.fopen.php))
+ *
+ * @example "Resources/examples/task/file/xml/xml_reader_task.yaml"
+
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  */
 class XmlReaderTask extends AbstractConfigurableTask
@@ -27,9 +42,7 @@ class XmlReaderTask extends AbstractConfigurableTask
     protected $logger;
 
     /**
-     * XmlReaderTask constructor.
-     *
-     * @param LoggerInterface $logger
+     * @internal
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -50,6 +63,8 @@ class XmlReaderTask extends AbstractConfigurableTask
 
     /**
      * {@inheritDoc}
+     *
+     * @internal
      */
     public function execute(ProcessState $state)
     {

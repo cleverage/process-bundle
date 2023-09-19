@@ -18,6 +18,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 /**
  * Check the presence of the serializer (required for this bundle), and help the user to set it
  *
+ * @internal
+ *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  */
 class CheckSerializerCompilerPass implements CompilerPassInterface

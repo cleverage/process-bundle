@@ -16,8 +16,22 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Takes an array containing an object and a value updates an object's property with this value, then return the object
+ * Update an object from input, using a value from input
  *
+ * Takes an array containing an object and a value updates an object's property with this value, then return the object
+ * ##### Task reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\ObjectUpdaterTask`
+ * * **Input**: `array` containing
+ *     - a key `object`: an `array` or an `object` that can be used by the [PropertyAccess component](https://symfony.com/components/PropertyAccess)
+ *     - a key `value` that will be set inside the object
+ * * **Output**: `array` or `object` from the `object` input array
+ *
+ * ##### Options
+ *
+ * * `property_path` (`string`, _required_): the property path to use on the object to set the given value
+ *
+ * @TODO refactor this as a transformer ?
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class ObjectUpdaterTask extends AbstractConfigurableTask

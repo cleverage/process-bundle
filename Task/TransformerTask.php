@@ -28,7 +28,19 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Transform an array of data based on mapping and sub-transformers
+ * Transform an array of data using transformers
+ * 
+ * See transformers references.
+ * 
+ * ##### Task reference
+ * 
+ * * **Service**: `CleverAge\ProcessBundle\Task\TransformerTask`
+ * * **Input**: `any`, it should match the 1st expected input of the transform chain
+ * * **Output**: `any`, result of the transform chain
+ * 
+ * ##### Options
+ *
+ * * `transformers` (`array`, _required_): List of transformers, see {@see TransformerTrait}
  *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
@@ -44,9 +56,7 @@ class TransformerTask extends AbstractConfigurableTask
     protected $transformer;
 
     /**
-     * @param LoggerInterface     $logger
-     * @param TransformerRegistry $transformerRegistry
-     *
+     * @internal
      */
     public function __construct(LoggerInterface $logger, TransformerRegistry $transformerRegistry)
     {
@@ -55,17 +65,9 @@ class TransformerTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws ExceptionInterface
-     * @throws MissingTransformerException
-     * @throws \UnexpectedValueException
-     * @throws AccessException
-     * @throws InvalidOptionsException
-     * @throws MissingOptionsException
-     * @throws NoSuchOptionException
-     * @throws OptionDefinitionException
-     * @throws UndefinedOptionsException
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -84,16 +86,9 @@ class TransformerTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritDoc}
      *
-     * @throws UndefinedOptionsException
-     * @throws OptionDefinitionException
-     * @throws NoSuchOptionException
-     * @throws MissingOptionsException
-     * @throws InvalidOptionsException
-     * @throws AccessException
-     * @throws MissingTransformerException
-     * @throws ExceptionInterface
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

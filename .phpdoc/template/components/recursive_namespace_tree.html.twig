@@ -1,0 +1,32 @@
+{% if namespace.children|length > 0 or namespace.interfaces|length > 0 or namespace.classes|length > 0 or namespace.traits|length > 0 %}
+    <ul class="phpdocumentor-list">
+        {% for child in namespace.children %}
+            {% if child.children|length > 0 or child.interfaces|length > 0 or child.classes|length > 0 or child.traits|length > 0 %}
+                <li>
+                    {{ child|route('class:short') }}
+                    {% include 'components/recursive_namespace_tree.html.twig' with {'namespace': child} %}
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% for interface in namespace.interfaces %}
+            <li class="sidebar-item -interface">{{ interface|route('class:short') }}</li>
+        {% endfor %}
+
+        {% for trait in namespace.traits %}
+            <li class="sidebar-item -trait">{{ trait|route('class:short') }}</li>
+        {% endfor %}
+
+        {% for class in namespace.classes %}
+            {% if class.abstract %}
+                <li class="sidebar-item -class -abstract">{{ class|route('class:short') }}</li>
+            {% endif %}
+        {% endfor %}
+
+        {% for class in namespace.classes %}
+            {% if not class.abstract %}
+                <li class="sidebar-item -class">{{ class|route('class:short') }}</li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endif %}

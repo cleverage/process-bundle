@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- See https://docs.phpdoc.org/latest/guide/references/configuration.html for documentation -->
+<phpdocumentor configVersion="3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="https://www.phpdoc.org">
+    <title>Clever Age - Process Bundle</title>
+    <paths>
+        <output>var/doc</output>
+    </paths>
+    <version number="latest">
+        <api>
+            <source dsn=".">
+                <path>.</path>
+            </source>
+            <ignore>
+                <!-- Empty paths -->
+                <path>Configuration/**/*</path>
+                <path>Context/**/*</path>
+                <path>DependencyInjection/**/*</path>
+                <path>EventDispatcher/**/*</path>
+                <path>ExpressionLanguage/**/*</path>
+                <path>Logger/**/*</path>
+                <path>Validator/**/*</path>
+
+                <!-- Always excluded paths -->
+                <path>.github/**/*</path>
+                <path>.phpdoc/**/*</path>
+                <path>hooks/**/*</path>
+                <path>Resources/**/*</path>
+                <path>Tests/**/*</path>
+                <path>var/**/*</path>
+                <path>vendor/**/*</path>
+                <path>CleverAgeProcessBundle.php</path>
+            </ignore>
+            <visibility>public</visibility>
+        </api>
+    </version>
+</phpdocumentor>

@@ -20,6 +20,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Base class to handle output iterations
  *
+ * Extends this class and implement `initializeIterator()` to provide data that will be iterated upon.
+ *
+ * ##### Task reference
+ *
+ * * **Abstract task**
+ * * **Iterable task**
+ *
+ * @example "Resources/examples/task/abstract_iterable_output_task.php" A simple implementation
+ *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
@@ -29,10 +38,9 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
     protected $iterator;
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws \InvalidArgumentException
-     * @throws ExceptionInterface
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -49,13 +57,9 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
     }
 
     /**
-     * Moves the internal pointer to the next element,
-     * return true if the task has a next element
-     * return false if the task has terminated it's iteration
+     * {@inheritDoc}
      *
-     * @param ProcessState $state
-     *
-     * @return bool
+     * @internal
      */
     public function next(ProcessState $state)
     {

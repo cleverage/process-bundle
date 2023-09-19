@@ -18,6 +18,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface as ContractsEvent
  * A dispatcher that is flexible enough to handle every sf version
  * We use the PSR interface that is more simple, since PHP allow this kind of override
  *
+ * @internal
+ *
  * @deprecated once sf3.4 is fully dropped, only "ContractsEventDispatcherInterface" should be used
  * @author Fabien Salles <fsalles@clever-age.com>
  */

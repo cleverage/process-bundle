@@ -18,7 +18,21 @@ use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Simple example of how to manage an internal buffer for batch processing
+ * Group elements by batch of a defined size.
+ *
+ * Simple example of how to manage an internal buffer for batch processing.
+ *
+ * ##### Task reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\SimpleBatchTask`
+ * * **Flushable task**
+ * * **Input**: `any`
+ * * **Output**: `array`, containing received inputs since previous flush
+ *
+ * ##### Options
+ *
+ * * `batch_count` (`int` _defaults to_ `10`): description
+ *
  *
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
@@ -28,7 +42,8 @@ class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskI
     protected $elements = [];
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
+     * @internal
      */
     public function flush(ProcessState $state)
     {
@@ -41,10 +56,8 @@ class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskI
     }
 
     /**
-     * @param ProcessState $state
-     *
-     * @throws ExceptionInterface
-     * @throws \InvalidArgumentException
+     * {@inheritDoc}
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -60,9 +73,8 @@ class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskI
     }
 
     /**
-     * @param OptionsResolver $resolver
-     *
-     * @throws AccessException
+     * {@inheritDoc}
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {
