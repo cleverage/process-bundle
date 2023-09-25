@@ -98,7 +98,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         $query = $options['query'];
         if (is_array($query)) {
             $result = array_map(
-                fn ($subquery) => $this->query($xpath, $subquery['subquery'], $value, $subquery),
+                fn ($subquery): mixed => $this->query($xpath, $subquery['subquery'], $value, $subquery),
                 $query
             );
         } else {

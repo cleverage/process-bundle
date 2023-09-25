@@ -60,7 +60,3 @@ Compatible with every [currently supported Symfony versions](https://symfony.com
         - [DateParserTransformer](doc/reference/transformers/date_parser.md)
         - [XpathEvaluatorTransformer](doc/reference/transformers/xpath_evaluator.md)
     - [Generic transformers definition](doc/reference/03-generic_transformers_definition.md)
-- Changelog
-    - [v3.2](doc/changelog/CHANGELOG-3.2.md)
-    - [v3.1](doc/changelog/CHANGELOG-3.1.md)
-    - [Older versions](doc/changelog/CHANGELOG-2.0-1.1.md)
