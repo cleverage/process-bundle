@@ -20,16 +20,16 @@ The most common example is the ETL. It's a kind of application whose main purpos
 
 ## Installation
 
-This bundle requires Symfony 3. You can install it using composer:
+This bundle requires Symfony 6.3 minimum. You can install it using composer:
 
 ```bash
 composer require cleverage/process-bundle
 ```
 
-Remember to update your AppKernel
+Remember to add the following line to bundles.php (not required if Symfony Flex is used)
 
 ```php
-$bundles[] = new CleverAge\ProcessBundle\CleverAgeProcessBundle();
+CleverAge\ProcessBundle\CleverAgeProcessBundle::class => ['all' => true],
 ```
 
 Some tasks and transformers use the main Symfony serializer service. You might need to explicitly enable it, or dependency 
