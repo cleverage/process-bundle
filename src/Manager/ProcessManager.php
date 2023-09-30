@@ -93,18 +93,27 @@ class ProcessManager
     public function execute(string $processCode, mixed $input = null, array $context = []): mixed
     {
         try {
-            $this->eventDispatcher->dispatch(new ProcessEvent($processCode, $input, $context));
+            $this->eventDispatcher->dispatch(
+                new ProcessEvent($processCode, $input, $context),
+                ProcessEvent::EVENT_PROCESS_STARTED
+            );
             $this->processLogger->debug('Process start');
 
             $result = $this->doExecute($processCode, $input, $context);
 
             $this->processLogger->debug('Process end');
-            $this->eventDispatcher->dispatch(new ProcessEvent($processCode, $input, $context, $result));
+            $this->eventDispatcher->dispatch(
+                new ProcessEvent($processCode, $input, $context, $result),
+                ProcessEvent::EVENT_PROCESS_ENDED
+            );
         } catch (Throwable $error) {
             $this->processLogger->critical('Critical process failure', [
                 'error' => $error->getMessage(),
             ]);
-            $this->eventDispatcher->dispatch(new ProcessEvent($processCode, $input, $context, null, $error));
+            $this->eventDispatcher->dispatch(
+                new ProcessEvent($processCode, $input, $context, null, $error),
+                ProcessEvent::EVENT_PROCESS_FAILED
+            );
 
             throw $error;
         }
