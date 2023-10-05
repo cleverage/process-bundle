@@ -42,7 +42,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
 
     protected ?int $lineNumber = 1;
 
-    protected bool $closed;
+    protected bool $closed = false;
 
     protected bool $seekCalled = false;
 

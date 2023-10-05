@@ -78,7 +78,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         return ! $this->csv->isEndOfFile();
     }
 
-    protected function getHeaders(ProcessState $state, array $options): array
+    protected function getHeaders(ProcessState $state, array $options): ?array
     {
         return $options['headers'];
     }
