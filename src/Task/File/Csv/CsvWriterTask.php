@@ -85,7 +85,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         return $input;
     }
 
-    protected function getHeaders(ProcessState $state, array $options): array
+    protected function getHeaders(ProcessState $state, array $options): ?array
     {
         $headers = $options['headers'];
         if ($headers === null) {
