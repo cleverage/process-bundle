@@ -41,7 +41,7 @@ trait TransformerTrait
                 $transformer->configureOptions($transformerOptionsResolver);
                 $transformerOptions = $transformerOptionsResolver->resolve($transformerOptions);
             } elseif (! empty($transformerOptions)) {
-                throw new InvalidArgumentException("Transformer ${$origTransformerCode} should not have options");
+                throw new InvalidArgumentException("Transformer {${$origTransformerCode}} should not have options");
             }
 
             $closure = static fn ($value) => $transformer->transform($value, $transformerOptions);
