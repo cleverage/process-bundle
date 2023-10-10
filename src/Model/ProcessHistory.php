@@ -14,14 +14,11 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Model;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
-use DateTime;
-use DateTimeInterface;
-use Stringable;
 
 /**
- * Logs information about a process
+ * Logs information about a process.
  */
-class ProcessHistory implements Stringable
+class ProcessHistory implements \Stringable
 {
     final public const STATE_STARTED = 'started';
 
@@ -33,9 +30,9 @@ class ProcessHistory implements Stringable
 
     protected string $processCode;
 
-    protected ?DateTimeInterface $startDate;
+    protected ?\DateTimeInterface $startDate;
 
-    protected ?DateTimeInterface $endDate = null;
+    protected ?\DateTimeInterface $endDate = null;
 
     protected string $state = self::STATE_STARTED;
 
@@ -45,16 +42,16 @@ class ProcessHistory implements Stringable
     ) {
         $this->id = microtime(true);
         $this->processCode = $processConfiguration->getCode();
-        $this->startDate = new DateTime();
+        $this->startDate = new \DateTime();
     }
 
     public function __toString(): string
     {
-        $reference = $this->getProcessCode() . '[' . $this->getState() . ']';
+        $reference = $this->getProcessCode().'['.$this->getState().']';
         $time = $this->getStartDate()
-            ->format(DateTimeInterface::ATOM);
+            ->format(\DateTimeInterface::ATOM);
 
-        return $reference . ': ' . $time;
+        return $reference.': '.$time;
     }
 
     public function getId(): float
@@ -72,12 +69,12 @@ class ProcessHistory implements Stringable
         return $this->context;
     }
 
-    public function getStartDate(): DateTimeInterface
+    public function getStartDate(): \DateTimeInterface
     {
         return $this->startDate;
     }
 
-    public function getEndDate(): ?DateTimeInterface
+    public function getEndDate(): ?\DateTimeInterface
     {
         return $this->endDate;
     }
@@ -88,38 +85,38 @@ class ProcessHistory implements Stringable
     }
 
     /**
-     * Set the process as failed
+     * Set the process as failed.
      */
     public function setFailed(): void
     {
-        $this->endDate = new DateTime();
+        $this->endDate = new \DateTime();
         $this->state = self::STATE_FAILED;
     }
 
     /**
-     * Set the process as succeded
+     * Set the process as succeded.
      */
     public function setSuccess(): void
     {
-        $this->endDate = new DateTime();
+        $this->endDate = new \DateTime();
         $this->state = self::STATE_SUCCESS;
     }
 
     /**
-     * Is true when the process is running
+     * Is true when the process is running.
      */
     public function isStarted(): bool
     {
-        return $this->state === self::STATE_STARTED;
+        return self::STATE_STARTED === $this->state;
     }
 
     public function isFailed(): bool
     {
-        return $this->state === self::STATE_FAILED;
+        return self::STATE_FAILED === $this->state;
     }
 
     /**
-     * Get process duration in seconds
+     * Get process duration in seconds.
      */
     public function getDuration(): ?int
     {

@@ -20,7 +20,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Generic abstract task to handle CSV resources
+ * Generic abstract task to handle CSV resources.
  */
 abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implements FinalizableTaskInterface
 {

@@ -16,16 +16,16 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Return the first element of an array
+ * Return the first element of an array.
  */
 class ArrayFirstTransformer implements ConfigurableTransformerInterface
 {
     /**
-     * Must return the transformed $value
+     * Must return the transformed $value.
      */
     public function transform(mixed $value, array $options = []): mixed
     {
-        if ($options['allow_not_iterable'] === false && ! is_iterable($value)) {
+        if (false === $options['allow_not_iterable'] && !is_iterable($value)) {
             return $value;
         }
 
@@ -33,7 +33,7 @@ class ArrayFirstTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {

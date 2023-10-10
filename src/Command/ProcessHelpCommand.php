@@ -22,7 +22,6 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask;
 use CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask;
-use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -30,19 +29,12 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use UnexpectedValueException;
-
-use function array_slice;
-use function count;
-use function in_array;
-use function is_callable;
-use function is_string;
 
 /**
  * Describe a process configuration
- * This is a POC, waiting to evolve properly
+ * This is a POC, waiting to evolve properly.
  */
-#[AsCommand(name: 'cleverage:process:help', description: 'Describe a process',)]
+#[AsCommand(name: 'cleverage:process:help', description: 'Describe a process', )]
 class ProcessHelpCommand extends Command
 {
     protected const CHAR_DOWN = '│';
@@ -88,12 +80,12 @@ class ProcessHelpCommand extends Command
         $process = $this->processConfigRegistry->getProcessConfiguration($processCode);
 
         $output->writeln('<comment>Process: </comment>');
-        $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $processCode);
+        $output->writeln(str_repeat(' ', self::INDENT_SIZE).$processCode);
         $output->writeln('');
 
         if ($process->getDescription()) {
             $output->writeln('<comment>Description:</comment>');
-            $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $process->getDescription());
+            $output->writeln(str_repeat(' ', self::INDENT_SIZE).$process->getDescription());
             $output->writeln('');
         }
 
@@ -101,7 +93,7 @@ class ProcessHelpCommand extends Command
             $output->writeln('<comment>Help:</comment>');
             $helpLines = array_filter(explode("\n", $process->getHelp()));
             foreach ($helpLines as $helpLine) {
-                $output->writeln(str_repeat(' ', self::INDENT_SIZE) . $helpLine);
+                $output->writeln(str_repeat(' ', self::INDENT_SIZE).$helpLine);
             }
             $output->writeln('');
         }
@@ -112,8 +104,8 @@ class ProcessHelpCommand extends Command
 
         $taskList = $process->getMainTaskGroup();
         $remainingTasks = $taskList;
-        $totalBranches = count($taskList);
-        for ($i = 0; $i < $totalBranches; $i++) {
+        $totalBranches = \count($taskList);
+        for ($i = 0; $i < $totalBranches; ++$i) {
             // Find the best task to display
             $nextTaskCode = $this->findBestNextTask($branches, $remainingTasks, $process);
 
@@ -124,8 +116,8 @@ class ProcessHelpCommand extends Command
         }
 
         $branches = array_filter($branches);
-        if (! empty($branches)) {
-            $branchStr = '[' . implode(', ', $branches) . ']';
+        if (!empty($branches)) {
+            $branchStr = '['.implode(', ', $branches).']';
             $output->writeln("<error>All branches are not resolved : {$branchStr}</error>");
         }
 
@@ -133,7 +125,7 @@ class ProcessHelpCommand extends Command
     }
 
     /**
-     * Try to find a best candidate for next display
+     * Try to find a best candidate for next display.
      */
     protected function findBestNextTask(
         array $branches,
@@ -151,7 +143,7 @@ class ProcessHelpCommand extends Command
             // Check if task has all necessary ancestors in branches
             $hasAllAncestors = array_reduce(
                 $task->getPreviousTasksConfigurations(),
-                static fn ($result, TaskConfiguration $prevTask): bool => $result && in_array(
+                static fn ($result, TaskConfiguration $prevTask): bool => $result && \in_array(
                     $prevTask->getCode(),
                     $branches,
                     true
@@ -165,7 +157,7 @@ class ProcessHelpCommand extends Command
         }
 
         if (empty($taskCandidates)) {
-            throw new UnexpectedValueException('Cannot find a task to output');
+            throw new \UnexpectedValueException('Cannot find a task to output');
         }
 
         // Try to find the task the most on the right
@@ -177,14 +169,14 @@ class ProcessHelpCommand extends Command
                 $key = array_search($prevTask->getCode(), $branches, true);
 
                 // Should never be non-numeric...
-                if (! is_numeric($key)) {
-                    throw new UnexpectedValueException('Invalid key type');
+                if (!is_numeric($key)) {
+                    throw new \UnexpectedValueException('Invalid key type');
                 }
                 $weight += $key;
             }
 
-            if (! empty($task->getPreviousTasksConfigurations())) {
-                $weight /= count($task->getPreviousTasksConfigurations());
+            if (!empty($task->getPreviousTasksConfigurations())) {
+                $weight /= \count($task->getPreviousTasksConfigurations());
             }
 
             $taskWeights[$taskCandidate] = $weight;
@@ -196,7 +188,7 @@ class ProcessHelpCommand extends Command
 
         $equalWeights = array_filter($taskWeights, static fn ($item): bool => $item === $bestWeight);
 
-        if (count($equalWeights) === 1) {
+        if (1 === \count($equalWeights)) {
             return $bestCandidate;
         }
 
@@ -212,7 +204,7 @@ class ProcessHelpCommand extends Command
     }
 
     /**
-     * Get the number of children (error or not) of a task
+     * Get the number of children (error or not) of a task.
      */
     protected function getTaskChildrenCount(TaskConfiguration $task): int
     {
@@ -230,7 +222,7 @@ class ProcessHelpCommand extends Command
     }
 
     /**
-     * Merge needed branches, display a task node, split following needed branches
+     * Merge needed branches, display a task node, split following needed branches.
      */
     protected function resolveBranchOutput(
         array &$branches,
@@ -253,7 +245,7 @@ class ProcessHelpCommand extends Command
         // Check previous branches
         if (empty($previousTasks)) {
             $branches[] = $task->getCode();
-        } elseif (count($previousTasks) === 1) {
+        } elseif (1 === \count($previousTasks)) {
             $prevTask = current($previousTasks)
                 ->getCode();
             foreach (array_reverse($branches, true) as $i => $branchTask) {
@@ -273,7 +265,7 @@ class ProcessHelpCommand extends Command
                     }
                 }
 
-                if (! $foundBranch) {
+                if (!$foundBranch) {
                     $output->writeln(
                         "<error>Could not find previous branch : {$taskCode} depends on {$prevTask->getCode()}</error>"
                     );
@@ -286,7 +278,7 @@ class ProcessHelpCommand extends Command
             $gapFrom = null;
             foreach ($branchesToMerge as $i) {
                 $gapTo = $i;
-                if ($gapFrom !== null) {
+                if (null !== $gapFrom) {
                     for ($j = $gapFrom + 1; $j < $gapTo; ++$j) {
                         $gapBranches[] = $j;
                     }
@@ -300,22 +292,22 @@ class ProcessHelpCommand extends Command
         }
 
         // Merge branches
-        if (! empty($branchesToMerge)) {
+        if (!empty($branchesToMerge)) {
             $this->writeBranches($output, $branches);
 
             $this->writeBranches(
                 $output,
                 $branches,
                 '',
-                static fn ($taskCode, $i): bool => in_array($i, $branchesToMerge, true)
-                    || in_array($i, $gapBranches, true)
+                static fn ($taskCode, $i): bool => \in_array($i, $branchesToMerge, true)
+                    || \in_array($i, $gapBranches, true)
                     || $i === $origin,
                 static function ($taskCode, $i) use ($gapBranches, $origin, $final, $branches): string {
                     if ($i === $origin) {
                         return self::CHAR_RECEIVE;
                     }
-                    if (in_array($i, $gapBranches, true)) {
-                        if ($branches[$i] !== null) {
+                    if (\in_array($i, $gapBranches, true)) {
+                        if (null !== $branches[$i]) {
                             return self::CHAR_JUMP;
                         }
 
@@ -331,7 +323,7 @@ class ProcessHelpCommand extends Command
             );
 
             foreach ($branches as $i => $branchTask) {
-                if (in_array($i, $branchesToMerge, true)) {
+                if (\in_array($i, $branchesToMerge, true)) {
                     $branches[$i] = null;
                 }
             }
@@ -340,8 +332,8 @@ class ProcessHelpCommand extends Command
 
         // Cleanup empty trailing branches
         foreach (array_reverse($branches, true) as $i => $branchTask) {
-            if ($branchTask !== null) {
-                $branches = array_slice($branches, 0, $i + 1);
+            if (null !== $branchTask) {
+                $branches = \array_slice($branches, 0, $i + 1);
                 break;
             }
         }
@@ -364,7 +356,7 @@ class ProcessHelpCommand extends Command
         if ($output->isVerbose() && $task->getHelp()) {
             $helpLines = array_filter(explode("\n", $task->getHelp()));
             foreach ($helpLines as $helpLine) {
-                $helpMessage = str_repeat(' ', self::INDENT_SIZE) . "<info>{$helpLine}</info>";
+                $helpMessage = str_repeat(' ', self::INDENT_SIZE)."<info>{$helpLine}</info>";
                 $this->writeBranches($output, $branches, $helpMessage);
             }
         }
@@ -376,19 +368,19 @@ class ProcessHelpCommand extends Command
                 array_merge($task->getNextTasksConfigurations(), $task->getErrorTasksConfigurations())
             )
         );
-        if (count($nextTasks) > 1) {
+        if (\count($nextTasks) > 1) {
             $this->writeBranches($output, $branches);
             array_shift($nextTasks);
             $origin = array_search($taskCode, $branches, true);
             $expandBranches = [];
             foreach ($nextTasks as $nextTask) {
                 $index = array_search(null, $branches, true);
-                if ($index !== false && $index >= $origin) {
+                if (false !== $index && $index >= $origin) {
                     /** @var int $index */
                     $branches[$index] = $taskCode;
                     $expandBranches[] = $index;
                 } else {
-                    $expandBranches[] = count($branches);
+                    $expandBranches[] = \count($branches);
                     $branches[] = $taskCode;
                 }
             }
@@ -415,8 +407,8 @@ class ProcessHelpCommand extends Command
                     if ($i === $origin) {
                         return self::CHAR_RECEIVE;
                     }
-                    if (in_array($i, $gapBranches, true)) {
-                        if ($branches[$i] !== null) {
+                    if (\in_array($i, $gapBranches, true)) {
+                        if (null !== $branches[$i]) {
                             return self::CHAR_JUMP;
                         }
 
@@ -441,8 +433,8 @@ class ProcessHelpCommand extends Command
 
         // Cleanup empty trailing branches
         foreach (array_reverse($branches, true) as $i => $branchTask) {
-            if ($branchTask !== null) {
-                $branches = array_slice($branches, 0, $i + 1);
+            if (null !== $branchTask) {
+                $branches = \array_slice($branches, 0, $i + 1);
                 break;
             }
         }
@@ -455,22 +447,22 @@ class ProcessHelpCommand extends Command
         array $branches,
         string|iterable $comment = '',
         ?callable $match = null,
-        string|callable $char = null
+        string|callable|null $char = null
     ): void {
         $output->write(str_repeat(' ', self::INDENT_SIZE));
 
         // Merge lines
         foreach ($branches as $i => $branchTask) {
             $str = '';
-            if ($match !== null && $match($branchTask, $i)) {
-                if (is_string($char)) {
+            if (null !== $match && $match($branchTask, $i)) {
+                if (\is_string($char)) {
                     $str = $char;
-                } elseif (is_callable($char)) {
+                } elseif (\is_callable($char)) {
                     $str = $char($branchTask, $i);
                 } else {
-                    throw new InvalidArgumentException('Char must be string|callable');
+                    throw new \InvalidArgumentException('Char must be string|callable');
                 }
-            } elseif ($branchTask !== null) {
+            } elseif (null !== $branchTask) {
                 $str = self::CHAR_DOWN;
             }
 
@@ -507,12 +499,12 @@ class ProcessHelpCommand extends Command
             $subprocess[] = $task->getOption('process');
         }
 
-        if (count($interfaces)) {
-            $description .= ' <info>(' . implode(', ', $interfaces) . ')</info>';
+        if (\count($interfaces)) {
+            $description .= ' <info>('.implode(', ', $interfaces).')</info>';
         }
 
-        if (count($subprocess)) {
-            $description .= ' <fire>{' . implode(', ', $subprocess) . '}</fire>';
+        if (\count($subprocess)) {
+            $description .= ' <fire>{'.implode(', ', $subprocess).'}</fire>';
         }
 
         if ($task->getDescription()) {
@@ -533,12 +525,12 @@ class ProcessHelpCommand extends Command
         } elseif ($this->container->has($serviceReference)) {
             $task = $this->container->get($serviceReference);
         } else {
-            throw new UnexpectedValueException(
+            throw new \UnexpectedValueException(
                 "Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'"
             );
         }
-        if (! $task instanceof TaskInterface) {
-            throw new UnexpectedValueException(
+        if (!$task instanceof TaskInterface) {
+            throw new \UnexpectedValueException(
                 "Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface"
             );
         }

@@ -16,12 +16,12 @@ namespace CleverAge\ProcessBundle\Tests\Transformer;
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
- * Tests for Hash transformer
+ * Tests for Hash transformer.
  */
 class HashTransformerTest extends AbstractProcessTest
 {
     /**
-     * Assert a string can be hash in md5
+     * Assert a string can be hash in md5.
      */
     public function testMd5Hash(): void
     {
@@ -30,7 +30,7 @@ class HashTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Assert a string can be hash in sha512
+     * Assert a string can be hash in sha512.
      */
     public function testSha512Hash(): void
     {

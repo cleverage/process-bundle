@@ -14,11 +14,9 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
-use function is_array;
 
 /**
- * Implode multiple array values to a string, based on a split character
+ * Implode multiple array values to a string, based on a split character.
  */
 class ImplodeTransformer implements ConfigurableTransformerInterface
 {
@@ -31,8 +29,8 @@ class ImplodeTransformer implements ConfigurableTransformerInterface
 
     public function transform(mixed $value, array $options = []): string
     {
-        if (! is_array($value)) {
-            throw new UnexpectedValueException('Given value is not an array');
+        if (!\is_array($value)) {
+            throw new \UnexpectedValueException('Given value is not an array');
         }
 
         return implode($options['separator'], $value);

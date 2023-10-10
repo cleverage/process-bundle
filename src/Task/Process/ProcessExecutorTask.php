@@ -23,7 +23,7 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Execute one or many processes while chaining inputs in a iterable way
+ * Execute one or many processes while chaining inputs in a iterable way.
  */
 class ProcessExecutorTask extends AbstractConfigurableTask
 {
@@ -62,7 +62,7 @@ class ProcessExecutorTask extends AbstractConfigurableTask
         $resolver->setNormalizer(
             'process',
             function (Options $options, $processCode) {
-                if (! $this->processRegistry->hasProcessConfiguration($processCode)) {
+                if (!$this->processRegistry->hasProcessConfiguration($processCode)) {
                     throw new InvalidConfigurationException("Unknown process {$processCode}");
                 }
 

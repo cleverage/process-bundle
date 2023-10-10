@@ -21,12 +21,9 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use UnexpectedValueException;
-use function is_array;
-use function is_callable;
 
 /**
- * Maps properties of an array/object to an other array/object
+ * Maps properties of an array/object to an other array/object.
  */
 class MappingTransformer implements ConfigurableTransformerInterface
 {
@@ -42,7 +39,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
 
     public function transform(mixed $value, array $options = []): mixed
     {
-        if (! empty($options['initial_value']) && $options['keep_input']) {
+        if (!empty($options['initial_value']) && $options['keep_input']) {
             throw new InvalidOptionsException(
                 'The options "initial_value" and "keep_input" can\'t be both enabled.'
             );
@@ -59,11 +56,11 @@ class MappingTransformer implements ConfigurableTransformerInterface
             $ignoreMissingFlag = $mapping['ignore_missing'] || $options['ignore_missing'];
 
             // Prepare input value
-            if ($mapping['constant'] !== null) {
+            if (null !== $mapping['constant']) {
                 $inputValue = $mapping['constant'];
             } elseif ($mapping['set_null']) {
                 $inputValue = null;
-            } elseif (is_array($sourceProperty)) {
+            } elseif (\is_array($sourceProperty)) {
                 $inputValue = [];
                 foreach ($sourceProperty as $destKey => $srcKey) {
                     try {
@@ -111,14 +108,14 @@ class MappingTransformer implements ConfigurableTransformerInterface
             }
 
             // Set transformed value into result
-            if (is_callable($options['merge_callback'])) {
+            if (\is_callable($options['merge_callback'])) {
                 $options['merge_callback']($result, $targetProperty, $transformedValue);
             } elseif ($this->accessor->isWritable($result, $targetProperty)) {
                 $this->accessor->setValue($result, $targetProperty, $transformedValue);
-            } elseif (is_array($result)) {
+            } elseif (\is_array($result)) {
                 $result[$targetProperty] = $transformedValue;
             } else {
-                throw new UnexpectedValueException("Property '{$targetProperty}' is not writable");
+                throw new \UnexpectedValueException("Property '{$targetProperty}' is not writable");
             }
         }
 
@@ -158,7 +155,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {
@@ -183,11 +180,11 @@ class MappingTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Custom rules to get a value from an input object or array
+     * Custom rules to get a value from an input object or array.
      */
     protected function extractInputValue(mixed $input, string $sourceProperty): mixed
     {
-        if ($sourceProperty === '.') {
+        if ('.' === $sourceProperty) {
             return $input;
         }
 
@@ -195,7 +192,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Wrap error handling when there is an property access error
+     * Wrap error handling when there is an property access error.
      *
      * @TODO WARNING there is no error if framework.property_access.throw_exception_on_invalid_index is false (which is
      *       the default)

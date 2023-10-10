@@ -22,10 +22,9 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use UnexpectedValueException;
 
 /**
- * Validate the input and pass it to the output
+ * Validate the input and pass it to the output.
  */
 class ValidatorTask extends AbstractConfigurableTask
 {
@@ -62,7 +61,7 @@ class ValidatorTask extends AbstractConfigurableTask
                 return;
             }
 
-            throw new UnexpectedValueException("{$violations->count()} constraint violations detected on validation");
+            throw new \UnexpectedValueException("{$violations->count()} constraint violations detected on validation");
         }
 
         $state->setOutput($state->getInput());
@@ -89,7 +88,7 @@ class ValidatorTask extends AbstractConfigurableTask
         $resolver->setNormalizer(
             'log_errors',
             static function (Options $options, $value) {
-                if ($value === true) {
+                if (true === $value) {
                     return LogLevel::CRITICAL;
                 }
 
@@ -105,7 +104,7 @@ class ValidatorTask extends AbstractConfigurableTask
         $resolver->setNormalizer(
             'constraints',
             static function (Options $options, $constraints): ?array {
-                if ($constraints === null) {
+                if (null === $constraints) {
                     return null;
                 }
 

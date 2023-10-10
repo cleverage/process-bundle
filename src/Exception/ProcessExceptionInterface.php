@@ -13,11 +13,9 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Exception;
 
-use Throwable;
-
 /**
- * Common interface for process exception
+ * Common interface for process exception.
  */
-interface ProcessExceptionInterface extends Throwable
+interface ProcessExceptionInterface extends \Throwable
 {
 }

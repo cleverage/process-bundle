@@ -18,19 +18,19 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Trim an input based on specific characters
+ * Trim an input based on specific characters.
  */
 class TrimTransformer implements ConfigurableTransformerInterface
 {
     public function transform(mixed $value, ?array $options = []): ?string
     {
-        if ($options === null || $options === []) {
+        if (null === $options || [] === $options) {
             $options = [
                 'charlist' => " \t\n\r\0\x0B",
             ];
         }
 
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 
@@ -38,7 +38,7 @@ class TrimTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {

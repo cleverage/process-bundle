@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests;
 
 /**
- * Check empty process behaviours
+ * Check empty process behaviours.
  */
 class EmptyProcessTest extends AbstractProcessTest
 {
     /**
-     * Assert an empty process do not fail
+     * Assert an empty process do not fail.
      */
     public function testEmptyProcess(): void
     {

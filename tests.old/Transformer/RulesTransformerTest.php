@@ -18,7 +18,7 @@ use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 class RulesTransformerTest extends AbstractProcessTest
 {
     /**
-     * Assert basic rules types
+     * Assert basic rules types.
      */
     public function testSimpleRule(): void
     {

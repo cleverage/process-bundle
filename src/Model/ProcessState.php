@@ -16,13 +16,9 @@ namespace CleverAge\ProcessBundle\Model;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
-use RuntimeException;
-use Throwable;
-use UnexpectedValueException;
-use function in_array;
 
 /**
- * Used to pass information between tasks
+ * Used to pass information between tasks.
  */
 class ProcessState
 {
@@ -53,7 +49,7 @@ class ProcessState
 
     protected bool $stopped = false;
 
-    protected ?Throwable $exception = null;
+    protected ?\Throwable $exception = null;
 
     protected array $errorContext = [];
 
@@ -83,7 +79,7 @@ class ProcessState
     }
 
     /**
-     * Clone the current object and keep a back reference
+     * Clone the current object and keep a back reference.
      */
     public function duplicate(): self
     {
@@ -95,7 +91,7 @@ class ProcessState
 
     /**
      * Reset the state object
-     * To be used before execution
+     * To be used before execution.
      */
     public function reset(bool $cleanInput): void
     {
@@ -167,7 +163,7 @@ class ProcessState
         return $this->hasErrorOutput;
     }
 
-    public function stop(Throwable $e = null): void
+    public function stop(?\Throwable $e = null): void
     {
         if ($e) {
             $this->setException($e);
@@ -185,12 +181,12 @@ class ProcessState
         $this->stopped = $stopped;
     }
 
-    public function getException(): ?Throwable
+    public function getException(): ?\Throwable
     {
         return $this->exception;
     }
 
-    public function setException(Throwable $exception = null): void
+    public function setException(?\Throwable $exception = null): void
     {
         $this->exception = $exception;
     }
@@ -252,8 +248,8 @@ class ProcessState
 
     public function setStatus(string $status): void
     {
-        if (! in_array($status, self::STATUS, true)) {
-            throw new UnexpectedValueException("Unknown status {$status}");
+        if (!\in_array($status, self::STATUS, true)) {
+            throw new \UnexpectedValueException("Unknown status {$status}");
         }
 
         $this->status = $status;
@@ -261,7 +257,7 @@ class ProcessState
 
     public function isResolved(): bool
     {
-        return $this->status === self::STATUS_RESOLVED;
+        return self::STATUS_RESOLVED === $this->status;
     }
 
     public function getContext(): array
@@ -272,7 +268,7 @@ class ProcessState
     public function setContext(array $context): void
     {
         if ($this->context) {
-            throw new RuntimeException('Once defined, context is immutable');
+            throw new \RuntimeException('Once defined, context is immutable');
         }
 
         $this->context = $context;
@@ -280,7 +276,7 @@ class ProcessState
 
     public function getContextualizedOptions(): ?array
     {
-        if (! $this->contextualizedOptions) {
+        if (!$this->contextualizedOptions) {
             $options = $this->getTaskConfiguration()
                 ->getOptions();
             $this->contextualizedOptions = $this->contextualOptionResolver->contextualizeOptions(
@@ -295,7 +291,7 @@ class ProcessState
     public function getContextualizedOption(string $code, mixed $default = null): mixed
     {
         $contextualizedOptions = $this->getContextualizedOptions();
-        if (array_key_exists($code, $contextualizedOptions)) {
+        if (\array_key_exists($code, $contextualizedOptions)) {
             return $contextualizedOptions[$code];
         }
 

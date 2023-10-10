@@ -14,10 +14,8 @@ declare(strict_types=1);
 namespace Transformer;
 
 use CleverAge\ProcessBundle\Transformer\DateFormatTransformer;
-use DateTime;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
 
 class DateFormatTransformerTest extends TestCase
 {
@@ -27,7 +25,7 @@ class DateFormatTransformerTest extends TestCase
     public function testTransformValidDate(): void
     {
         $transformer = new DateFormatTransformer();
-        $value = new DateTime('2023-09-28');
+        $value = new \DateTime('2023-09-28');
         $options = ['format' => 'Y-m-d'];
 
         $transformedValue = $transformer->transform($value, $options);
@@ -45,7 +43,7 @@ class DateFormatTransformerTest extends TestCase
         $value = 'invalid_date';
         $options = ['format' => 'Y-m-d'];
 
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
 
         $transformer->transform($value, $options);
     }

@@ -18,7 +18,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Always send the same output regardless of the input
+ * Always send the same output regardless of the input.
  */
 class ConstantOutputTask extends AbstractConfigurableTask
 {

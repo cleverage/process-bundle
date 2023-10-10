@@ -16,17 +16,15 @@ namespace CleverAge\ProcessBundle\Transformer;
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Closure;
-use InvalidArgumentException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Throwable;
 
 trait TransformerTrait
 {
     protected ?TransformerRegistry $transformerRegistry = null;
 
     /**
-     * Transform the list of transformer codes + options into a list of Closure (better performances)
+     * Transform the list of transformer codes + options into a list of Closure (better performances).
      */
     public function normalizeTransformers(Options $options, array $transformers): array
     {
@@ -40,8 +38,8 @@ trait TransformerTrait
             if ($transformer instanceof ConfigurableTransformerInterface) {
                 $transformer->configureOptions($transformerOptionsResolver);
                 $transformerOptions = $transformerOptionsResolver->resolve($transformerOptions);
-            } elseif (! empty($transformerOptions)) {
-                throw new InvalidArgumentException("Transformer {${$origTransformerCode}} should not have options");
+            } elseif (!empty($transformerOptions)) {
+                throw new \InvalidArgumentException("Transformer {${$origTransformerCode}} should not have options");
             }
 
             $closure = static fn ($value) => $transformer->transform($value, $transformerOptions);
@@ -61,7 +59,7 @@ trait TransformerTrait
         foreach ($transformers as $transformerCode => $transformerClosure) {
             try {
                 $value = $transformerClosure($value);
-            } catch (Throwable $exception) {
+            } catch (\Throwable $exception) {
                 throw new TransformerException($transformerCode, 0, $exception);
             }
         }
@@ -85,7 +83,7 @@ trait TransformerTrait
     {
         $match = preg_match('/([^#]+)(#[\d]+)?/', $transformerCode, $parts);
 
-        if ($match === 1 && $this->transformerRegistry->hasTransformer($parts[1])) {
+        if (1 === $match && $this->transformerRegistry->hasTransformer($parts[1])) {
             return $parts[1];
         }
 
@@ -102,20 +100,20 @@ trait TransformerTrait
     }
 
     /**
-     * Check the options to always return an array, or fail on unexpected values
+     * Check the options to always return an array, or fail on unexpected values.
      */
     private function checkTransformerOptions(mixed $transformerOptions, string $transformerCode): array
     {
-        if (is_array($transformerOptions)) {
+        if (\is_array($transformerOptions)) {
             return $transformerOptions;
         }
-        if ($transformerOptions === null) {
+        if (null === $transformerOptions) {
             return [];
         }
 
         $type = get_debug_type($transformerOptions);
 
-        throw new InvalidArgumentException(
+        throw new \InvalidArgumentException(
             "Options for transformer {$transformerCode} are invalid : found {$type}, expected array or null"
         );
     }

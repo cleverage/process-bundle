@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Provide all necessary setup to test a process
+ * Provide all necessary setup to test a process.
  */
 abstract class AbstractProcessTest extends KernelTestCase
 {
@@ -44,7 +44,7 @@ abstract class AbstractProcessTest extends KernelTestCase
     protected $transformerRegistry;
 
     /**
-     * Initialize DI
+     * Initialize DI.
      */
     protected function setUp(): void
     {
@@ -60,7 +60,7 @@ abstract class AbstractProcessTest extends KernelTestCase
 
     /**
      * Assert that an array of values match what's been registered in the standard queue
-     * It can also match task codes using the checkTask flag
+     * It can also match task codes using the checkTask flag.
      */
     protected function assertDataQueue(array $expected, string $processName, bool $checkTask = true)
     {
@@ -77,7 +77,7 @@ abstract class AbstractProcessTest extends KernelTestCase
         foreach ($actualQueue as $key => $value) {
             self::assertArrayHasKey($key, $expected);
             if ($checkTask) {
-                if (array_key_exists('task', $expected[$key])) {
+                if (\array_key_exists('task', $expected[$key])) {
                     self::assertEquals(
                         $expected[$key]['task'],
                         $value->getPreviousState()
@@ -86,7 +86,7 @@ abstract class AbstractProcessTest extends KernelTestCase
                         "Task #{$key} does not match"
                     );
                 }
-                if (array_key_exists('value', $expected[$key])) {
+                if (\array_key_exists('value', $expected[$key])) {
                     self::assertEquals($expected[$key]['value'], $value->getInput(), "Value #{$key} does not match");
                 }
             } else {
@@ -96,7 +96,7 @@ abstract class AbstractProcessTest extends KernelTestCase
     }
 
     /**
-     * Returns the booted symfony container
+     * Returns the booted symfony container.
      *
      * Compatibility backport for symfony/phpunit-bridge that should work with v3 or v4
      */
@@ -113,7 +113,7 @@ abstract class AbstractProcessTest extends KernelTestCase
     }
 
     /**
-     * Helper method to configure options and test a transformation
+     * Helper method to configure options and test a transformation.
      */
     protected function assertTransformation(string $transformerCode, mixed $expected, mixed $value, array $options = [])
     {
@@ -122,9 +122,7 @@ abstract class AbstractProcessTest extends KernelTestCase
     }
 
     /**
-     * Transform some value using referenced transformer with given options
-     *
-     * @return mixed
+     * Transform some value using referenced transformer with given options.
      */
     protected function transform(string $transformerCode, mixed $value, array $options = [])
     {

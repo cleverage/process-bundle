@@ -13,20 +13,17 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Exception;
 
-use RuntimeException;
-use Throwable;
-
 /**
- * Runtime error that should wrap any Transformation error
+ * Runtime error that should wrap any Transformation error.
  */
-class TransformerException extends RuntimeException implements ProcessExceptionInterface
+class TransformerException extends \RuntimeException implements ProcessExceptionInterface
 {
     protected string $targetProperty;
 
     public function __construct(
         protected string $transformerCode,
         int $code = 0,
-        Throwable $previous = null
+        ?\Throwable $previous = null
     ) {
         parent::__construct('', $code, $previous);
         $this->updateMessage();

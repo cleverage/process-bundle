@@ -13,22 +13,20 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use ReflectionClass;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
 
 /**
- * Instantiate a new object with parameters from the input array
+ * Instantiate a new object with parameters from the input array.
  */
 class InstantiateTransformer implements ConfigurableTransformerInterface
 {
     public function transform(mixed $value, array $options = []): mixed
     {
-        if (! is_array($value)) {
-            throw new UnexpectedValueException('Input value must be an array for transformer instantiate');
+        if (!\is_array($value)) {
+            throw new \UnexpectedValueException('Input value must be an array for transformer instantiate');
         }
 
-        return (new ReflectionClass($options['class']))->newInstanceArgs($value);
+        return (new \ReflectionClass($options['class']))->newInstanceArgs($value);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Cast a value to a different PHP type
+ * Cast a value to a different PHP type.
  */
 class CastTransformer implements ConfigurableTransformerInterface
 {

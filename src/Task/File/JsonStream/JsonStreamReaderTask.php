@@ -23,7 +23,7 @@ class JsonStreamReaderTask implements IterableTaskInterface
 
     public function execute(ProcessState $state): void
     {
-        if ($this->file === null) {
+        if (null === $this->file) {
             $this->file = new JsonStreamFile($this->getFilePath($state), 'rb');
         }
 
@@ -42,7 +42,7 @@ class JsonStreamReaderTask implements IterableTaskInterface
             $this->file = null;
         }
 
-        return ! $eof;
+        return !$eof;
     }
 
     protected function getFilePath(ProcessState $state): string

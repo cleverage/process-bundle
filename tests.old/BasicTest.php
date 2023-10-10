@@ -15,22 +15,22 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests;
 
 /**
- * Test the basic behavior of the process
+ * Test the basic behavior of the process.
  */
 class BasicTest extends AbstractProcessTest
 {
     /**
-     * Check that an unknown process produce the right error
-     *
-     * @expectedException \CleverAge\ProcessBundle\Exception\MissingProcessException
+     * Check that an unknown process produce the right error.
      */
     public function testUnknownProcess(): void
     {
+        $this->setExpectedException(\CleverAge\ProcessBundle\Exception\MissingProcessException::class);
+
         $this->processManager->execute('test.unknown_test');
     }
 
     /**
-     * Check that a known process can be executed and return defined output
+     * Check that a known process can be executed and return defined output.
      */
     public function testSimpleProcess(): void
     {
@@ -40,7 +40,7 @@ class BasicTest extends AbstractProcessTest
     }
 
     /**
-     * Assert that the error branch is not called
+     * Assert that the error branch is not called.
      */
     public function testErrorProcess(): void
     {
@@ -65,7 +65,7 @@ class BasicTest extends AbstractProcessTest
     }
 
     /**
-     * Assert that the error branch is called, and blocking task are correctly working
+     * Assert that the error branch is called, and blocking task are correctly working.
      */
     public function testErrorProcessBlocking(): void
     {
@@ -93,16 +93,15 @@ class BasicTest extends AbstractProcessTest
         );
     }
 
-    /**
-     * @expectedException \CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException
-     */
     public function testFailingEntryPointWithAncestors(): void
     {
+        $this->setExpectedException(\CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException::class);
+
         $this->processManager->execute('test.entry_point_with_ancestor');
     }
 
     /**
-     * Check that the use of a string in task "outputs" or "errors" is possible
+     * Check that the use of a string in task "outputs" or "errors" is possible.
      */
     public function testStringOutput(): void
     {

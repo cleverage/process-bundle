@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests;
 
 /**
- * Assert basic behavior for flushable tasks (using the aggregator implementation)
+ * Assert basic behavior for flushable tasks (using the aggregator implementation).
  */
 class FlushableTaskTest extends AbstractProcessTest
 {

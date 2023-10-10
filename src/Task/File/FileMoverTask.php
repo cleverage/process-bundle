@@ -17,10 +17,9 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
 
 /**
- * Move the file passed as input, requires the destination path in options
+ * Move the file passed as input, requires the destination path in options.
  */
 class FileMoverTask extends AbstractConfigurableTask
 {
@@ -29,12 +28,12 @@ class FileMoverTask extends AbstractConfigurableTask
         $options = $this->getOptions($state);
         $fs = new Filesystem();
         $file = $state->getInput();
-        if (! $fs->exists($file)) {
-            throw new UnexpectedValueException("File does not exists: '{$file}'");
+        if (!$fs->exists($file)) {
+            throw new \UnexpectedValueException("File does not exists: '{$file}'");
         }
         $dest = $options['destination'];
         if (is_dir($dest)) {
-            $dest = rtrim((string) $dest, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . basename((string) $file);
+            $dest = rtrim((string) $dest, \DIRECTORY_SEPARATOR).\DIRECTORY_SEPARATOR.basename((string) $file);
         }
         if ($options['autoincrement']) {
             $dest = $this->makeFilenameUnique($dest);
@@ -61,10 +60,10 @@ class FileMoverTask extends AbstractConfigurableTask
         $i = 1;
         while ($fs->exists($dest)) {
             if (preg_match('/^(.*?)(-\d+)?(\.[^.]*)$/', $dest, $matches)) {
-                $dest = $matches[1] . '-' . $i . $matches[3];
+                $dest = $matches[1].'-'.$i.$matches[3];
                 ++$i;
             } else {
-                $dest .= '-' . $i; // Fallback brutal mode
+                $dest .= '-'.$i; // Fallback brutal mode
             }
         }
 

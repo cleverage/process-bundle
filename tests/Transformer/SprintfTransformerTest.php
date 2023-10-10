@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 
 class SprintfTransformerTest extends TestCase
 {
-
     /**
      * @covers \CleverAge\ProcessBundle\Transformer\SprintfTransformer::transform
      */

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
- * Define a common interface for all file with headers
+ * Define a common interface for all file with headers.
  */
 interface StructuredFileInterface extends FileStreamInterface
 {

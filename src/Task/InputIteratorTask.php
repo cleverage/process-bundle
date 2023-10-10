@@ -13,31 +13,26 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
-use ArrayIterator;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Iterator;
-use IteratorAggregate;
-use UnexpectedValueException;
-use function is_array;
 
 /**
- * Iterates from the input of the previous task
+ * Iterates from the input of the previous task.
  */
 class InputIteratorTask extends AbstractIterableOutputTask
 {
-    protected function initializeIterator(ProcessState $state): Iterator
+    protected function initializeIterator(ProcessState $state): \Iterator
     {
         $input = $state->getInput();
-        if ($input instanceof Iterator) {
+        if ($input instanceof \Iterator) {
             return $input;
         }
-        if ($input instanceof IteratorAggregate) {
+        if ($input instanceof \IteratorAggregate) {
             return $input->getIterator();
         }
-        if (is_array($input)) {
-            return new ArrayIterator($input);
+        if (\is_array($input)) {
+            return new \ArrayIterator($input);
         }
 
-        throw new UnexpectedValueException('Cannot create iterator from input');
+        throw new \UnexpectedValueException('Cannot create iterator from input');
     }
 }

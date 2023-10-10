@@ -17,14 +17,14 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Reads the filepath from the input
+ * Reads the filepath from the input.
  */
 class InputCsvReaderTask extends CsvReaderTask
 {
     protected function getOptions(ProcessState $state): array
     {
         $options = parent::getOptions($state);
-        if ($state->getInput() !== null) {
+        if (null !== $state->getInput()) {
             $options['file_path'] = $this->getFilePath($options, $state->getInput());
         }
 
@@ -42,15 +42,15 @@ class InputCsvReaderTask extends CsvReaderTask
     }
 
     /**
-     * If there is no base_path, then the given path from input should be absolute
+     * If there is no base_path, then the given path from input should be absolute.
      */
     protected function getFilePath(array $options, string $input): string
     {
         $basePath = $options['base_path'];
-        if ($basePath !== '') {
-            $basePath = rtrim((string) $options['base_path'], '/') . '/';
+        if ('' !== $basePath) {
+            $basePath = rtrim((string) $options['base_path'], '/').'/';
         }
 
-        return $basePath . $input;
+        return $basePath.$input;
     }
 }

@@ -15,18 +15,17 @@ namespace CleverAge\ProcessBundle\Task\Reporting;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use DateTime;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Count the time between 2 iterations
+ * Count the time between 2 iterations.
  */
 class AdvancedStatCounterTask extends AbstractConfigurableTask
 {
-    protected ?DateTime $startedAt = null;
+    protected ?\DateTime $startedAt = null;
 
-    protected ?DateTime $lastUpdate = null;
+    protected ?\DateTime $lastUpdate = null;
 
     protected int $counter = 0;
 
@@ -39,18 +38,18 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
 
     public function execute(ProcessState $state): void
     {
-        $now = new DateTime();
-        if (! $this->startedAt) {
+        $now = new \DateTime();
+        if (!$this->startedAt) {
             $this->startedAt = $now;
             $this->lastUpdate = $now;
         }
         if ($this->preInitCounter < $this->getOption($state, 'skip_first')) {
-            $this->preInitCounter++;
+            ++$this->preInitCounter;
             $state->setSkipped(true);
 
             return;
         }
-        if ($this->counter > 0 && $this->counter % $this->getOption($state, 'show_every') === 0) {
+        if ($this->counter > 0 && 0 === $this->counter % $this->getOption($state, 'show_every')) {
             $diff = $now->diff($this->lastUpdate);
             $fullText = "Last iteration {$diff->format('%H:%I:%S')} ago";
             $items = $this->getOption($state, 'num_items') * $this->counter;
@@ -68,7 +67,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
         } else {
             $state->setSkipped(true);
         }
-        $this->counter++;
+        ++$this->counter;
     }
 
     protected function configureOptions(OptionsResolver $resolver): void

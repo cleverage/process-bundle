@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Use hash() function to generate hash value
+ * Use hash() function to generate hash value.
  */
 class HashTransformer implements ConfigurableTransformerInterface
 {

@@ -17,14 +17,10 @@ use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Exception\MissingProcessException;
-use LogicException;
 use Psr\Log\LogLevel;
-use function array_key_exists;
-use function array_keys;
-use function count;
 
 /**
- * Build and holds all the process configurations
+ * Build and holds all the process configurations.
  */
 class ProcessConfigurationRegistry
 {
@@ -41,7 +37,7 @@ class ProcessConfigurationRegistry
 
     public function getProcessConfiguration(string $processCode): ProcessConfiguration
     {
-        if (! $this->hasProcessConfiguration($processCode)) {
+        if (!$this->hasProcessConfiguration($processCode)) {
             throw MissingProcessException::create($processCode);
         }
         $this->resolveConfiguration($processCode);
@@ -54,7 +50,7 @@ class ProcessConfigurationRegistry
      */
     public function getProcessConfigurations(): array
     {
-        foreach (array_keys($this->rawConfiguration) as $processCode) {
+        foreach (\array_keys($this->rawConfiguration) as $processCode) {
             $this->resolveConfiguration($processCode);
         }
 
@@ -63,25 +59,25 @@ class ProcessConfigurationRegistry
 
     public function hasProcessConfiguration(string $processCode): bool
     {
-        return array_key_exists($processCode, $this->rawConfiguration);
+        return \array_key_exists($processCode, $this->rawConfiguration);
     }
 
     protected function resolveConfiguration(string $processCode): void
     {
-        if (array_key_exists($processCode, $this->processConfigurations)) {
+        if (\array_key_exists($processCode, $this->processConfigurations)) {
             return;
         }
         $rawProcessConfiguration = $this->rawConfiguration[$processCode];
         /** @var TaskConfiguration[] $taskConfigurations */
         $taskConfigurations = [];
         foreach ($rawProcessConfiguration['tasks'] as $taskCode => $rawTaskConfiguration) {
-            if ((is_countable($rawTaskConfiguration['errors']) ? count($rawTaskConfiguration['errors']) : 0) > 0) {
-                if ((is_countable($rawTaskConfiguration['error_outputs']) ? count(
+            if ((is_countable($rawTaskConfiguration['errors']) ? \count($rawTaskConfiguration['errors']) : 0) > 0) {
+                if ((is_countable($rawTaskConfiguration['error_outputs']) ? \count(
                     $rawTaskConfiguration['error_outputs']
                 ) : 0) > 0) {
                     $m = "Don't define both 'errors' and 'error_outputs' for task {$taskCode}, these options ";
                     $m .= "are the same, 'errors' is deprecated, just use the new one 'error_outputs'";
-                    throw new LogicException($m);
+                    throw new \LogicException($m);
                 }
                 $rawTaskConfiguration['error_outputs'] = $rawTaskConfiguration['errors'];
             }

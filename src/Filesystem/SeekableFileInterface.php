@@ -14,17 +14,17 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
- * Define a common interface for seekable files
+ * Define a common interface for seekable files.
  */
 interface SeekableFileInterface extends FileStreamInterface
 {
     /**
-     * Returns the current position of the cursor inside the file
+     * Returns the current position of the cursor inside the file.
      */
     public function tell(): int;
 
     /**
-     * Go to a specific position inside the file
+     * Go to a specific position inside the file.
      */
     public function seek(int $offset): int;
 }

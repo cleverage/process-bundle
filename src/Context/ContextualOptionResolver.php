@@ -13,23 +13,20 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Context;
 
-use function is_array;
-use function is_string;
-
 class ContextualOptionResolver
 {
     /**
      * Basic value inference
-     * Replaces "{{ key }}" by context[key]
+     * Replaces "{{ key }}" by context[key].
      */
     public function contextualizeOption(mixed $value, array $context): mixed
     {
         // Recursively parse options
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return $this->contextualizeOptions($value, $context);
         }
 
-        if (is_string($value)) {
+        if (\is_string($value)) {
             $pattern = sprintf('/{{[ ]*(%s){1}[ ]*}}/', implode('|', array_keys($context)));
 
             $matches = [];
@@ -48,7 +45,7 @@ class ContextualOptionResolver
     }
 
     /**
-     * Replace all contextualized values from options
+     * Replace all contextualized values from options.
      */
     public function contextualizeOptions(array $options, array $context): array
     {

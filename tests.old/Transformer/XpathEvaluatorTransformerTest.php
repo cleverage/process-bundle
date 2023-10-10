@@ -15,17 +15,15 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests\Transformer;
 
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
-use DOMDocument;
-use DOMNodeList;
 
 /**
- * Test the xpath_evaluator transformer
+ * Test the xpath_evaluator transformer.
  */
 class XpathEvaluatorTransformerTest extends AbstractProcessTest
 {
     public function testSimpleQuery(): void
     {
-        $domDocument = new DOMDocument();
+        $domDocument = new \DOMDocument();
         $domDocument->loadXML('<a>ok</a>');
         $this->assertTransformation('xpath_evaluator', 'ok', $domDocument, [
             'query' => '/a/text()',
@@ -34,7 +32,7 @@ class XpathEvaluatorTransformerTest extends AbstractProcessTest
 
     public function testAttributeValueQuery(): void
     {
-        $domDocument = new DOMDocument();
+        $domDocument = new \DOMDocument();
         $domDocument->loadXML('<node data="ok">ko</node>');
         $this->assertTransformation('xpath_evaluator', 'ok', $domDocument, [
             'query' => '/node/@data',
@@ -43,7 +41,7 @@ class XpathEvaluatorTransformerTest extends AbstractProcessTest
 
     public function testSubQuery(): void
     {
-        $domDocument = new DOMDocument();
+        $domDocument = new \DOMDocument();
         $domDocument->loadXML('<a><b><c>ok</c></b></a>');
 
         $node = $domDocument->getElementsByTagName('b')[0];
@@ -54,7 +52,7 @@ class XpathEvaluatorTransformerTest extends AbstractProcessTest
 
     public function testMultiResults(): void
     {
-        $domDocument = new DOMDocument();
+        $domDocument = new \DOMDocument();
         $domDocument->loadXML('<a><b><c>ok1</c><c>ok2</c><c>ok3</c></b></a>');
 
         $node = $domDocument->getElementsByTagName('b')[0];
@@ -66,11 +64,11 @@ class XpathEvaluatorTransformerTest extends AbstractProcessTest
 
     public function testMultiResultsAsNodeList(): void
     {
-        $domDocument = new DOMDocument();
+        $domDocument = new \DOMDocument();
         $domDocument->loadXML('<a><b><c>ok1</c><c>ok2</c><c>ok3</c></b></a>');
 
         $node = $domDocument->getElementsByTagName('b')[0];
-        /** @var DOMNodeList $result */
+        /** @var \DOMNodeList $result */
         $result = $this->transform('xpath_evaluator', $node, [
             'query' => './c/text()',
             'single_result' => false,
@@ -85,7 +83,7 @@ class XpathEvaluatorTransformerTest extends AbstractProcessTest
 
     public function testMultiQuery(): void
     {
-        $domDocument = new DOMDocument();
+        $domDocument = new \DOMDocument();
         $domDocument->loadXML('<a><b><c>ok1</c><d>ok2</d><e>ok3</e></b></a>');
 
         $node = $domDocument->getElementsByTagName('b')[0];
@@ -96,7 +94,7 @@ class XpathEvaluatorTransformerTest extends AbstractProcessTest
 
     public function testMultiQueryWithKey(): void
     {
-        $domDocument = new DOMDocument();
+        $domDocument = new \DOMDocument();
         $domDocument->loadXML('<a><b><c>ok1</c><d>ok2</d><e>ok3</e></b></a>');
 
         $node = $domDocument->getElementsByTagName('b')[0];
@@ -130,7 +128,7 @@ class XpathEvaluatorTransformerTest extends AbstractProcessTest
     </d>
 </a>
 XML;
-        $domDocument = new DOMDocument();
+        $domDocument = new \DOMDocument();
         $domDocument->loadXML($xml);
 
         $node = $domDocument->getElementsByTagName('b')[0];

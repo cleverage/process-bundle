@@ -20,7 +20,6 @@ use CleverAge\ProcessBundle\Transformer\ConditionTrait;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use UnexpectedValueException;
 
 /**
  * @todo   @vclavreul describe this task
@@ -46,7 +45,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
 
         $missingColumns = [];
         foreach ($columns as $column) {
-            if (! isset($input[$column])) {
+            if (!isset($input[$column])) {
                 $missingColumns[] = $column;
                 continue;
             }
@@ -64,14 +63,14 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
             }
         }
 
-        if (! empty($missingColumns)) {
+        if (!empty($missingColumns)) {
             $colStr = implode(', ', $missingColumns);
             $message = "Missing columns [{$colStr}] in input";
 
             if ($this->getOption($state, 'ignore_missing')) {
                 $this->logger->warning($message);
             } else {
-                throw new UnexpectedValueException($message);
+                throw new \UnexpectedValueException($message);
             }
         }
     }
@@ -87,7 +86,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         string $referenceKey,
         string $aggregationKey
     ): void {
-        if (! isset($this->result[$column])) {
+        if (!isset($this->result[$column])) {
             $this->result[$column] = [
                 $referenceKey => $column,
                 $aggregationKey => [],

@@ -16,11 +16,8 @@ namespace CleverAge\ProcessBundle\Configuration;
 use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
 
-use function count;
-use function in_array;
-
 /**
- * Holds the processes configuration to launch a task
+ * Holds the processes configuration to launch a task.
  */
 class ProcessConfiguration
 {
@@ -52,7 +49,7 @@ class ProcessConfiguration
 
     public function getEntryPoint(): ?TaskConfiguration
     {
-        if ($this->entryPoint === null) {
+        if (null === $this->entryPoint) {
             return null;
         }
 
@@ -61,7 +58,7 @@ class ProcessConfiguration
 
     public function getEndPoint(): ?TaskConfiguration
     {
-        if ($this->endPoint === null) {
+        if (null === $this->endPoint) {
             return null;
         }
 
@@ -85,7 +82,7 @@ class ProcessConfiguration
 
     public function isPrivate(): bool
     {
-        return ! $this->public;
+        return !$this->public;
     }
 
     /**
@@ -98,7 +95,7 @@ class ProcessConfiguration
 
     public function getTaskConfiguration(string $taskCode): TaskConfiguration
     {
-        if (! array_key_exists($taskCode, $this->taskConfigurations)) {
+        if (!\array_key_exists($taskCode, $this->taskConfigurations)) {
             throw MissingTaskConfigurationException::create($taskCode);
         }
 
@@ -106,24 +103,24 @@ class ProcessConfiguration
     }
 
     /**
-     * Group all task by dependencies
+     * Group all task by dependencies.
      *
      * If one task depend from another, it should come after
      */
     public function getDependencyGroups(): array
     {
-        if ($this->dependencyGroups === null) {
+        if (null === $this->dependencyGroups) {
             $this->dependencyGroups = [];
             foreach ($this->getTaskConfigurations() as $taskConfiguration) {
                 $isInBranch = false;
                 foreach ($this->dependencyGroups as $branch) {
-                    if (in_array($taskConfiguration->getCode(), $branch, true)) {
+                    if (\in_array($taskConfiguration->getCode(), $branch, true)) {
                         $isInBranch = true;
                         break;
                     }
                 }
 
-                if (! $isInBranch) {
+                if (!$isInBranch) {
                     $dependencies = $this->buildDependencies($taskConfiguration);
                     $dependencies = $this->sortDependencies($dependencies);
 
@@ -137,18 +134,18 @@ class ProcessConfiguration
 
     /**
      * Get the main task group that will be executed
-     * It may be defined by the entry_point, or the end_point or simply the first task
+     * It may be defined by the entry_point, or the end_point or simply the first task.
      *
      * If one task depend from another, it should come after
      */
     public function getMainTaskGroup(): array
     {
-        if ($this->mainTaskGroup === null) {
+        if (null === $this->mainTaskGroup) {
             $this->mainTaskGroup = [];
             $mainTask = $this->getMainTask();
 
             foreach ($this->getDependencyGroups() as $branch) {
-                if (in_array($mainTask?->getCode(), $branch, true)) {
+                if (\in_array($mainTask?->getCode(), $branch, true)) {
                     $this->mainTaskGroup = $branch;
                     break;
                 }
@@ -160,24 +157,24 @@ class ProcessConfiguration
 
     /**
      * Get the most important task (may be the entry or end task, or simply the first)
-     * Used to check which tree should be used
+     * Used to check which tree should be used.
      */
     public function getMainTask(): ?TaskConfiguration
     {
         $entryTask = $this->getEntryPoint();
 
         // If there's no entry point, we might use the end point
-        if (! $entryTask) {
+        if (!$entryTask) {
             $entryTask = $this->getEndPoint();
         }
 
         // By default use the first defined task
-        if (! $entryTask) {
+        if (!$entryTask) {
             $entryTask = reset($this->taskConfigurations);
         }
 
         // May happen with an empty array
-        if ($entryTask === false) {
+        if (false === $entryTask) {
             return null;
         }
 
@@ -185,7 +182,7 @@ class ProcessConfiguration
     }
 
     /**
-     * Assert the process does not contain circular dependencies
+     * Assert the process does not contain circular dependencies.
      */
     public function checkCircularDependencies(): void
     {
@@ -204,14 +201,14 @@ class ProcessConfiguration
     }
 
     /**
-     * Cross all relations of a task to find all dependencies, and append them to the given array
+     * Cross all relations of a task to find all dependencies, and append them to the given array.
      */
     protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies = []): array
     {
         $code = $taskConfig->getCode();
 
         // May have been added by previous task
-        if (! in_array($code, $dependencies, true)) {
+        if (!\in_array($code, $dependencies, true)) {
             $dependencies[] = $code;
 
             foreach ($taskConfig->getPreviousTasksConfigurations() as $previousTasksConfig) {
@@ -231,11 +228,11 @@ class ProcessConfiguration
     }
 
     /**
-     * Sort the tasks by dependencies
+     * Sort the tasks by dependencies.
      */
     protected function sortDependencies(array $dependencies): array
     {
-        if (count($dependencies) <= 1) {
+        if (\count($dependencies) <= 1) {
             return $dependencies;
         }
 
@@ -247,7 +244,7 @@ class ProcessConfiguration
         }
 
         /** @var int $midOffset */
-        $midOffset = round(count($dependencies) / 2);
+        $midOffset = round(\count($dependencies) / 2);
         $midTaskCode = $dependencies[$midOffset];
         $midTask = $this->getTaskConfiguration($midTaskCode);
 

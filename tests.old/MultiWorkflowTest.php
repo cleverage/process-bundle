@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests;
 
 /**
- * Assert the behavior of multiple-branch workflow
+ * Assert the behavior of multiple-branch workflow.
  */
 class MultiWorkflowTest extends AbstractProcessTest
 {

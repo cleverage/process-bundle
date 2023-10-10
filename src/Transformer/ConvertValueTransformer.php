@@ -14,41 +14,40 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
 
 /**
- * Transform a value to another value based on a conversion table
+ * Transform a value to another value based on a conversion table.
  */
 class ConvertValueTransformer implements ConfigurableTransformerInterface
 {
     /**
-     * Must return the transformed $value
+     * Must return the transformed $value.
      */
     public function transform(mixed $value, array $options = []): mixed
     {
-        if ($value === null) {
+        if (null === $value) {
             return null;
         }
 
-        if (! is_string($value) && ! is_int($value)) { // If not a valid array index
-            if (! $options['auto_cast']) {
-                $type = gettype($value);
-                throw new UnexpectedValueException(
+        if (!\is_string($value) && !\is_int($value)) { // If not a valid array index
+            if (!$options['auto_cast']) {
+                $type = \gettype($value);
+                throw new \UnexpectedValueException(
                     "Value of type {$type} is not a valid array index, set auto_cast to true to cast it to a string"
                 );
             }
-            if (is_array($value)) { // Array to string conversion is a simple notice so we need to catch it here
-                throw new UnexpectedValueException("Unexpected input of type 'array' in convert_value transformer");
+            if (\is_array($value)) { // Array to string conversion is a simple notice so we need to catch it here
+                throw new \UnexpectedValueException("Unexpected input of type 'array' in convert_value transformer");
             }
             $value = (string) $value; // Let's cast it to string
         }
 
-        if (! array_key_exists($value, $options['map'])) {
+        if (!\array_key_exists($value, $options['map'])) {
             if ($options['keep_missing']) {
                 return $value;
             }
-            if (! $options['ignore_missing']) {
-                throw new UnexpectedValueException("Missing value in map '{$value}'");
+            if (!$options['ignore_missing']) {
+                throw new \UnexpectedValueException("Missing value in map '{$value}'");
             }
 
             return null;
@@ -58,7 +57,7 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {

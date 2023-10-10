@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Model;
 
-use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -47,14 +46,14 @@ class SubprocessInstance
         $this->configureOptions($resolver);
         $this->options = $resolver->resolve($options);
 
-        $this->consolePath = $kernel->getProjectDir() . '/bin/console';
+        $this->consolePath = $kernel->getProjectDir().'/bin/console';
         $this->environment = $kernel->getEnvironment();
-        $this->bufferPath = $kernel->getProjectDir() . '/var/cdm_buffer_' . uniqid('', true) . '.json-stream';
-        $this->logDir = $kernel->getLogDir() . '/process';
+        $this->bufferPath = $kernel->getProjectDir().'/var/cdm_buffer_'.uniqid('', true).'.json-stream';
+        $this->logDir = $kernel->getLogDir().'/process';
     }
 
     /**
-     * Prepare the process before start
+     * Prepare the process before start.
      *
      * @return $this
      */
@@ -66,22 +65,22 @@ class SubprocessInstance
             'nohup',
             $pathFinder->find(),
             $this->consolePath,
-            '--env=' . $this->environment,
+            '--env='.$this->environment,
             'cleverage:process:execute',
             '--input-from-stdin',
         ];
 
         $fs = new Filesystem();
         $fs->mkdir($this->logDir);
-        if (! $fs->exists($this->consolePath)) {
-            throw new RuntimeException("Unable to resolve path to symfony console '{$this->consolePath}'");
+        if (!$fs->exists($this->consolePath)) {
+            throw new \RuntimeException("Unable to resolve path to symfony console '{$this->consolePath}'");
         }
 
         if ($this->options[self::OPTION_JSON_BUFFERING]) {
-            $arguments = [...$arguments, '--output=' . $this->bufferPath, '--output-format=json-stream'];
+            $arguments = [...$arguments, '--output='.$this->bufferPath, '--output-format=json-stream'];
         }
 
-        if (! empty($this->context)) {
+        if (!empty($this->context)) {
             foreach ($this->context as $key => $value) {
                 $arguments[] = sprintf('--context=%s:%s', $key, $value);
             }
@@ -96,7 +95,7 @@ class SubprocessInstance
     }
 
     /**
-     * Start the process
+     * Start the process.
      *
      * @return $this
      */
@@ -108,7 +107,7 @@ class SubprocessInstance
     }
 
     /**
-     * Stop the process
+     * Stop the process.
      *
      * @return $this
      */
@@ -155,7 +154,7 @@ class SubprocessInstance
     }
 
     /**
-     * Available options for process launcher
+     * Available options for process launcher.
      */
     protected function configureOptions(OptionsResolver $resolver): void
     {

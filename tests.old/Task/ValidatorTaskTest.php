@@ -16,12 +16,12 @@ namespace CleverAge\ProcessBundle\Tests\Task;
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
- * Tests for the ValidatorTask
+ * Tests for the ValidatorTask.
  */
 class ValidatorTaskTest extends AbstractProcessTest
 {
     /**
-     * Assert the input is Valid and no error is thrown
+     * Assert the input is Valid and no error is thrown.
      */
     public function testSimpleValidation(): void
     {

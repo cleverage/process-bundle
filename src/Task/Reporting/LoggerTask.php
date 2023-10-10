@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Class LoggerTask
+ * Class LoggerTask.
  *
  * Add custom log in state
  */

@@ -16,12 +16,12 @@ namespace CleverAge\ProcessBundle\Tests\Task;
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
- * Tests for the ProcessExecutorTask
+ * Tests for the ProcessExecutorTask.
  */
 class ProcessExecutorTaskTest extends AbstractProcessTest
 {
     /**
-     * Assert the process executor correctly chain the input/output
+     * Assert the process executor correctly chain the input/output.
      */
     public function testExecutor(): void
     {
@@ -30,12 +30,12 @@ class ProcessExecutorTaskTest extends AbstractProcessTest
     }
 
     /**
-     * Assert correct error if it doesn't match a good subprocess name
-     *
-     * @expectedException \RuntimeException
+     * Assert correct error if it doesn't match a good subprocess name.
      */
     public function testExecutorError(): void
     {
+        $this->setExpectedException(\RuntimeException::class);
+
         $this->processManager->execute('test.process_execute_task.error');
     }
 }

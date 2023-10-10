@@ -13,19 +13,14 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File;
 
-use ArrayIterator;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Task\AbstractIterableOutputTask;
-use InvalidArgumentException;
-use Iterator;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Yaml\Yaml;
-use UnexpectedValueException;
-use function is_array;
 
 /**
- * Reads a YAML file and iterate over its root elements
+ * Reads a YAML file and iterate over its root elements.
  */
 class YamlReaderTask extends AbstractIterableOutputTask
 {
@@ -36,8 +31,8 @@ class YamlReaderTask extends AbstractIterableOutputTask
         $resolver->setNormalizer(
             'file_path',
             static function (Options $options, $value) {
-                if (! file_exists($value)) {
-                    throw new UnexpectedValueException("File not found: {$value}");
+                if (!file_exists($value)) {
+                    throw new \UnexpectedValueException("File not found: {$value}");
                 }
 
                 return $value;
@@ -45,14 +40,14 @@ class YamlReaderTask extends AbstractIterableOutputTask
         );
     }
 
-    protected function initializeIterator(ProcessState $state): Iterator
+    protected function initializeIterator(ProcessState $state): \Iterator
     {
         $filePath = $this->getOption($state, 'file_path');
         $content = Yaml::parseFile($filePath);
-        if (! is_array($content)) {
-            throw new InvalidArgumentException("File content is not an array: {$filePath}");
+        if (!\is_array($content)) {
+            throw new \InvalidArgumentException("File content is not an array: {$filePath}");
         }
 
-        return new ArrayIterator($content);
+        return new \ArrayIterator($content);
     }
 }

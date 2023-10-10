@@ -17,7 +17,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 
 /**
- * Class DieTask
+ * Class DieTask.
  *
  * Stops the process brutally
  *
@@ -27,6 +27,6 @@ class DieTask implements TaskInterface
 {
     public function execute(ProcessState $state): never
     {
-        die();
+        exit;
     }
 }

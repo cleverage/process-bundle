@@ -15,14 +15,12 @@ namespace CleverAge\ProcessBundle\DependencyInjection;
 
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Transformer\GenericTransformer;
-use ReflectionClass;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\Finder\Finder;
-use function dirname;
 
 /**
  * This is the class that loads and manages your bundle configuration.
@@ -34,8 +32,8 @@ class CleverAgeProcessExtension extends Extension
     public function load(array $configs, ContainerBuilder $container): void
     {
         // Get the path of the service folder wherever the bundle is installed
-        $reflection = new ReflectionClass($this);
-        $serviceFolderPath = dirname($reflection->getFileName(), 2) . '/Resources/config/services';
+        $reflection = new \ReflectionClass($this);
+        $serviceFolderPath = \dirname($reflection->getFileName(), 2).'/Resources/config/services';
         $this->findServices($container, $serviceFolderPath);
 
         $configuration = new Configuration();
@@ -53,18 +51,18 @@ class CleverAgeProcessExtension extends Extension
             $transformerDefinition->addMethodCall('initialize', [$transformerCode, $transformerConfig]);
             $transformerDefinition->addTag('cleverage.transformer');
 
-            $container->setDefinition(GenericTransformer::class . '\\' . $transformerCode, $transformerDefinition);
+            $container->setDefinition(GenericTransformer::class.'\\'.$transformerCode, $transformerDefinition);
         }
     }
 
     /**
-     * Recursively import config files into container
+     * Recursively import config files into container.
      */
     protected function findServices(ContainerBuilder $container, string $path, string $extension = 'yaml'): void
     {
         $finder = new Finder();
         $finder->in($path)
-            ->name('*.' . $extension)->files();
+            ->name('*.'.$extension)->files();
         $loader = new YamlFileLoader($container, new FileLocator($path));
         foreach ($finder as $file) {
             $loader->load($file->getFilename());

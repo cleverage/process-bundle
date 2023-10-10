@@ -14,17 +14,17 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 /**
- * Transforms a value to an other
+ * Transforms a value to an other.
  */
 interface TransformerInterface
 {
     /**
-     * Must return the transformed $value
+     * Must return the transformed $value.
      */
     public function transform(mixed $value, array $options = []): mixed;
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string;
 }

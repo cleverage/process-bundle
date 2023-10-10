@@ -13,21 +13,18 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
-use ArrayIterator;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Iterator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
 
 /**
- * Split a single line into multiple lines based on multiple columns and split characters
+ * Split a single line into multiple lines based on multiple columns and split characters.
  */
 class SplitJoinLineTask extends AbstractIterableOutputTask
 {
     public function next(ProcessState $state): bool
     {
         $valid = parent::next($state);
-        if (! $valid) {
+        if (!$valid) {
             $this->iterator = null;
         }
 
@@ -44,7 +41,7 @@ class SplitJoinLineTask extends AbstractIterableOutputTask
         ]);
     }
 
-    protected function initializeIterator(ProcessState $state): Iterator
+    protected function initializeIterator(ProcessState $state): \Iterator
     {
         $originalLine = $state->getInput();
         $options = $this->getOptions($state);
@@ -56,8 +53,8 @@ class SplitJoinLineTask extends AbstractIterableOutputTask
 
         $outputLines = [];
         foreach ($options['split_columns'] as $column) {
-            if (! array_key_exists($column, $originalLine)) {
-                throw new UnexpectedValueException("Missing column {$column}");
+            if (!\array_key_exists($column, $originalLine)) {
+                throw new \UnexpectedValueException("Missing column {$column}");
             }
             $columnValues = explode($options['split_character'], (string) $originalLine[$column]);
             foreach ($columnValues as $columnValue) {
@@ -67,6 +64,6 @@ class SplitJoinLineTask extends AbstractIterableOutputTask
             }
         }
 
-        return new ArrayIterator($outputLines);
+        return new \ArrayIterator($outputLines);
     }
 }

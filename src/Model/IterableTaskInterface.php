@@ -14,14 +14,14 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Model;
 
 /**
- * Allow the task to be iterated over until "next" returns false
+ * Allow the task to be iterated over until "next" returns false.
  */
 interface IterableTaskInterface extends TaskInterface
 {
     /**
      * Moves the internal pointer to the next element,
      * return true if the task has a next element
-     * return false if the task has terminated it's iteration
+     * return false if the task has terminated it's iteration.
      */
     public function next(ProcessState $state): bool;
 }

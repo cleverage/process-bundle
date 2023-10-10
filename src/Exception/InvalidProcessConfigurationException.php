@@ -15,19 +15,18 @@ namespace CleverAge\ProcessBundle\Exception;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
-use UnexpectedValueException;
 
 /**
- * Thrown when the process configuration cannot be resolved
+ * Thrown when the process configuration cannot be resolved.
  */
-class InvalidProcessConfigurationException extends UnexpectedValueException implements ProcessExceptionInterface
+class InvalidProcessConfigurationException extends \UnexpectedValueException implements ProcessExceptionInterface
 {
     public static function createNotInMain(
         ProcessConfiguration $processConfiguration,
         TaskConfiguration $taskConfig,
         array $mainTaskList
     ): self {
-        $taskListStr = '[' . implode(', ', $mainTaskList) . ']';
+        $taskListStr = '['.implode(', ', $mainTaskList).']';
 
         return new self(
             "Task '{$taskConfig->getCode()}' is not in main task list : {$taskListStr} (from process: {$processConfiguration->getCode()})"

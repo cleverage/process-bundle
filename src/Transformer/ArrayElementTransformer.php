@@ -16,13 +16,13 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Return the nth element of an array
+ * Return the nth element of an array.
  */
 class ArrayElementTransformer implements ConfigurableTransformerInterface
 {
     public function transform(mixed $value, array $options = []): mixed
     {
-        return array_values(array_slice($value, $options['index'], 1))[0];
+        return array_values(\array_slice($value, $options['index'], 1))[0];
     }
 
     public function getCode(): string

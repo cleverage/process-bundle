@@ -16,17 +16,17 @@ namespace CleverAge\ProcessBundle\Tests\Transformer;
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
- * Test suite for CallbackTransformerTest
+ * Test suite for CallbackTransformerTest.
  */
 class CallbackTransformerTest extends AbstractProcessTest
 {
     public static function doCallback(): string
     {
-        return implode('-', func_get_args());
+        return implode('-', \func_get_args());
     }
 
     /**
-     * Assert data is correctly filtered
+     * Assert data is correctly filtered.
      */
     public function testSimpleCallback(): void
     {
@@ -38,7 +38,7 @@ class CallbackTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Assert data is correctly filtered
+     * Assert data is correctly filtered.
      */
     public function testLeftParametersCallback(): void
     {
@@ -50,7 +50,7 @@ class CallbackTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Assert data is correctly filtered
+     * Assert data is correctly filtered.
      */
     public function testRightParametersCallback(): void
     {
@@ -62,7 +62,7 @@ class CallbackTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Assert data is correctly filtered
+     * Assert data is correctly filtered.
      */
     public function testAdditionalParametersCallback(): void
     {
@@ -74,7 +74,7 @@ class CallbackTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Assert data is correctly filtered
+     * Assert data is correctly filtered.
      */
     public function testLeftAndRightParametersCallback(): void
     {

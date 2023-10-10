@@ -20,15 +20,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use function array_reduce;
-use function count;
-use function max;
-use function usort;
 
 /**
- * List all configured processes
+ * List all configured processes.
  */
-#[AsCommand(name: 'cleverage:process:list', description: 'List defined processes',)]
+#[AsCommand(name: 'cleverage:process:list', description: 'List defined processes', )]
 class ListProcessCommand extends Command
 {
     public function __construct(
@@ -54,7 +50,7 @@ class ListProcessCommand extends Command
 
     public function maxMessageLengthFilter(int $max, array $message): int
     {
-        return max($max, strlen($this->filterOutTags($message['output'])));
+        return \max($max, \strlen($this->filterOutTags($message['output'])));
     }
 
     protected function configure(): void
@@ -65,10 +61,10 @@ class ListProcessCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $processConfigurations = $this->processConfigRegistry->getProcessConfigurations();
-        usort($processConfigurations, $this->processSorter(...));
+        \usort($processConfigurations, $this->processSorter(...));
 
-        $publicCount = array_reduce($processConfigurations, $this->publicProcessCounter(...), 0);
-        $privateCount = array_reduce($processConfigurations, $this->privateProcessCounter(...), 0);
+        $publicCount = \array_reduce($processConfigurations, $this->publicProcessCounter(...), 0);
+        $privateCount = \array_reduce($processConfigurations, $this->privateProcessCounter(...), 0);
         $output->writeln(
             "<info>There are {$publicCount} process configurations defined (and {$privateCount} private) :</info>"
         );
@@ -76,7 +72,7 @@ class ListProcessCommand extends Command
         $messages = [];
         foreach ($processConfigurations as $processConfiguration) {
             if ($processConfiguration->isPublic() || $input->getOption('all')) {
-                $countTasks = count($processConfiguration->getTaskConfigurations());
+                $countTasks = \count($processConfiguration->getTaskConfigurations());
                 $message = "<info> - </info>{$processConfiguration->getCode()}<info> with {$countTasks} tasks</info>";
 
                 if ($processConfiguration->isPrivate()) {
@@ -91,7 +87,7 @@ class ListProcessCommand extends Command
         }
 
         // Add process descriptions at a fixed position
-        $maxMessageLength = array_reduce($messages, $this->maxMessageLengthFilter(...), 0);
+        $maxMessageLength = \array_reduce($messages, $this->maxMessageLengthFilter(...), 0);
         $outputMessages = [];
         foreach ($messages as $message) {
             /** @var ProcessConfiguration $processConfiguration */
@@ -116,7 +112,7 @@ class ListProcessCommand extends Command
 
     protected function padMessage(string $message, int $length = 80): string
     {
-        $currentLen = strlen($this->filterOutTags($message));
+        $currentLen = \strlen($this->filterOutTags($message));
         if ($currentLen < $length) {
             $message .= str_repeat(' ', $length - $currentLen);
         }

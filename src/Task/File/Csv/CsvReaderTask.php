@@ -16,13 +16,12 @@ namespace CleverAge\ProcessBundle\Task\File\Csv;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use LogicException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Reads the file path from configuration and iterates over it
- * Ignores any input
+ * Ignores any input.
  */
 class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
 {
@@ -38,13 +37,13 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
             $this->csv = null;
         }
 
-        if (! $this->csv instanceof CsvFile) {
+        if (!$this->csv instanceof CsvFile) {
             $this->initFile($state);
         }
         $lineNumber = $this->csv->getLineNumber();
         $output = $this->csv->readLine();
 
-        if ($output === null) {
+        if (null === $output) {
             if ($this->getOption($state, 'log_empty_lines')) {
                 $logContext = [
                     'csv_file' => $this->csv->getFilePath(),
@@ -64,18 +63,18 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     /**
      * Moves the internal pointer to the next element,
      * return true if the task has a next element
-     * return false if the task has terminated it's iteration
+     * return false if the task has terminated it's iteration.
      */
     public function next(ProcessState $state): bool
     {
-        if (! $this->csv instanceof CsvFile) {
-            throw new LogicException('No CSV File initialized');
+        if (!$this->csv instanceof CsvFile) {
+            throw new \LogicException('No CSV File initialized');
         }
 
         $state->removeErrorContext('csv_file');
         $state->removeErrorContext('csv_line');
 
-        return ! $this->csv->isEndOfFile();
+        return !$this->csv->isEndOfFile();
     }
 
     protected function getHeaders(ProcessState $state, array $options): ?array

@@ -13,25 +13,21 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Filesystem;
 
-use DOMDocument;
-use RuntimeException;
-use SplFileObject;
-
 /**
- * Read and write XML files
+ * Read and write XML files.
  */
 class XmlFile
 {
-    protected SplFileObject $file;
+    protected \SplFileObject $file;
 
     public function __construct(string $path, string $mode = 'rb')
     {
-        $this->file = new SplFileObject($path, $mode);
+        $this->file = new \SplFileObject($path, $mode);
     }
 
-    public function read(): DOMDocument
+    public function read(): \DOMDocument
     {
-        $dom = new DOMDocument();
+        $dom = new \DOMDocument();
         $this->file->rewind();
         $fileSize = $this->file->getSize();
         $fileContent = $this->file->fread($fileSize);
@@ -41,13 +37,13 @@ class XmlFile
         return $dom;
     }
 
-    public function write(DOMDocument $dom): void
+    public function write(\DOMDocument $dom): void
     {
         $content = $dom->saveXML();
         $result = $this->file->fwrite($content);
 
-        if ($result === false) {
-            throw new RuntimeException('Could not write content to file');
+        if (false === $result) {
+            throw new \RuntimeException('Could not write content to file');
         }
     }
 }

@@ -17,7 +17,7 @@ use Psr\Log\AbstractLogger as BaseAbstractLogger;
 use Psr\Log\LoggerInterface;
 
 /**
- * Base logic for logger tasks, see inherited services for more information
+ * Base logic for logger tasks, see inherited services for more information.
  *
  * Used for simplified autowiring
  */

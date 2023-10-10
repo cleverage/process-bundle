@@ -19,19 +19,14 @@ use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\SubprocessInstance;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
-use RuntimeException;
-use SplQueue;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use function count;
-
 /**
- * Launch a new process for each input received, input must be a scalar, a resource or a \Traversable
+ * Launch a new process for each input received, input must be a scalar, a resource or a \Traversable.
  */
 class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
 {
@@ -40,7 +35,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     protected array $launchedProcesses = [];
 
-    protected SplQueue $finishedBuffers;
+    protected \SplQueue $finishedBuffers;
 
     protected bool $flushMode = false;
 
@@ -49,7 +44,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         protected ProcessConfigurationRegistry $processRegistry,
         protected KernelInterface $kernel
     ) {
-        $this->finishedBuffers = new SplQueue();
+        $this->finishedBuffers = new \SplQueue();
     }
 
     public function execute(ProcessState $state): void
@@ -57,10 +52,10 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         // TODO still not perfect, optimize and secure it
         $this->handleProcesses($state); // Handler processes first
 
-        if (! $this->flushMode) {
+        if (!$this->flushMode) {
             $this->handleInput($state);
             $state->setSkipped(true);
-        } elseif (! $this->finishedBuffers->isEmpty()) {
+        } elseif (!$this->finishedBuffers->isEmpty()) {
             $state->setOutput($this->finishedBuffers->dequeue());
 
             // After dequeue, stop flush
@@ -76,14 +71,14 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     public function flush(ProcessState $state): void
     {
         $this->flushMode = true;
-        if (! $this->finishedBuffers->isEmpty()) {
+        if (!$this->finishedBuffers->isEmpty()) {
             $state->setOutput($this->finishedBuffers->dequeue());
         } else {
             $state->setSkipped(true);
         }
 
         // After dequeue, stop flush
-        if ($this->finishedBuffers->isEmpty() && ! count($this->launchedProcesses)) {
+        if ($this->finishedBuffers->isEmpty() && !\count($this->launchedProcesses)) {
             $this->flushMode = false;
         }
     }
@@ -101,7 +96,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
 
         // if we are in flush mode, we should wait for process to finish
         if ($this->flushMode) {
-            return count($this->launchedProcesses) > 0;
+            return \count($this->launchedProcesses) > 0;
         }
 
         usleep($this->getOption($state, 'sleep_on_finalize_interval'));
@@ -112,7 +107,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     protected function handleInput(ProcessState $state): void
     {
         $options = $this->getOptions($state);
-        while (count($this->launchedProcesses) >= $options['max_processes']) {
+        while (\count($this->launchedProcesses) >= $options['max_processes']) {
             $this->handleProcesses($state);
             usleep($options['sleep_interval']);
         }
@@ -132,7 +127,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
 
     protected function launchProcess(ProcessState $state): SubprocessInstance
     {
-        $input = $state->getInput() !== null ? (string) $state->getInput() : null;
+        $input = null !== $state->getInput() ? (string) $state->getInput() : null;
 
         $subprocess = new SubprocessInstance(
             $this->kernel,
@@ -151,7 +146,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     protected function handleProcesses(ProcessState $state): void
     {
         foreach ($this->launchedProcesses as $key => $process) {
-            if (! $process->getProcess()->isTerminated()) {
+            if (!$process->getProcess()->isTerminated()) {
                 // @todo handle incremental error output properly, specially for terminal where logs are lost
                 echo $process->getProcess()
                     ->getIncrementalErrorOutput();
@@ -171,11 +166,11 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             $this->logger->debug('Command terminated', $logContext);
 
             unset($this->launchedProcesses[$key]);
-            if ($process->getProcess()->getExitCode() !== 0) {
+            if (0 !== $process->getProcess()->getExitCode()) {
                 $this->logger->critical($process->getProcess()->getErrorOutput(), $logContext);
                 $this->killProcesses();
 
-                throw new RuntimeException("Sub-process has failed: {$process->getProcess()->getExitCodeText()}");
+                throw new \RuntimeException("Sub-process has failed: {$process->getProcess()->getExitCodeText()}");
             }
 
             $result = $process->getResult();
@@ -191,7 +186,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $resolver->setNormalizer(
             'process',
             function (Options $options, $value) {
-                if (! $this->processRegistry->hasProcessConfiguration($value)) {
+                if (!$this->processRegistry->hasProcessConfiguration($value)) {
                     throw new InvalidConfigurationException("Unknown process {$value}");
                 }
 
@@ -226,9 +221,9 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $resolver->setNormalizer(
             'process_options',
             static function (Options $options, $value): int|float|string|bool|null {
-                if (! empty($value)) {
+                if (!empty($value)) {
                     // Todo deprecation trigger
-                    throw new InvalidArgumentException('Deprecated option, please contact support for help');
+                    throw new \InvalidArgumentException('Deprecated option, please contact support for help');
                 }
 
                 return $value;
@@ -237,7 +232,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     }
 
     /**
-     * Kill all running processes
+     * Kill all running processes.
      */
     protected function killProcesses(): void
     {

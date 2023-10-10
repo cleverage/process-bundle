@@ -21,14 +21,9 @@ use League\Flysystem\FilesystemException;
 use League\Flysystem\MountManager;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
-
-use function in_array;
-use function is_array;
-use function is_resource;
 
 /**
- * Class FileFetchTask
+ * Class FileFetchTask.
  *
  * Copy (or move) file from one filesystem to another, using Flysystem
  * Either get files using a file regexp, or take files from input
@@ -48,7 +43,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
 
     public function initialize(ProcessState $state): void
     {
-        if (! $this->mountManager) {
+        if (!$this->mountManager) {
             throw new ServiceNotFoundException('MountManager service not found, you need to install FlySystemBundle');
         }
         // Configure options
@@ -63,7 +58,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
         $this->findMatchingFiles($state);
 
         $file = current($this->matchingFiles);
-        if (! $file) {
+        if (!$file) {
             $state->setSkipped(true);
 
             return;
@@ -85,24 +80,24 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
         $filePattern = $this->getOption($state, 'file_pattern');
         if ($filePattern) {
             foreach ($this->sourceFS->listContents('/') as $file) {
-                if ($file['type'] === 'file'
+                if ('file' === $file['type']
                     && preg_match($filePattern, (string) $file['path'])
-                    && ! in_array($file['path'], $this->matchingFiles, true)) {
+                    && !\in_array($file['path'], $this->matchingFiles, true)) {
                     $this->matchingFiles[] = $file['path'];
                 }
             }
         } else {
             $input = $state->getInput();
-            if (! $input) {
-                throw new UnexpectedValueException('No pattern neither input provided for the Task');
+            if (!$input) {
+                throw new \UnexpectedValueException('No pattern neither input provided for the Task');
             }
-            if (is_array($input)) {
+            if (\is_array($input)) {
                 foreach ($input as $file) {
-                    if (! in_array($file, $this->matchingFiles, true)) {
+                    if (!\in_array($file, $this->matchingFiles, true)) {
                         $this->matchingFiles[] = $file;
                     }
                 }
-            } elseif (! in_array($input, $this->matchingFiles, true)) {
+            } elseif (!\in_array($input, $this->matchingFiles, true)) {
                 $this->matchingFiles[] = $input;
             }
         }
@@ -121,7 +116,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
             $result = false;
         }
 
-        if (is_resource($buffer)) {
+        if (\is_resource($buffer)) {
             fclose($buffer);
         }
 

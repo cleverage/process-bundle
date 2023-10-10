@@ -15,13 +15,12 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Accepts an object or an array as input and sets values from configuration
+ * Accepts an object or an array as input and sets values from configuration.
  */
 class PropertySetterTask extends AbstractConfigurableTask
 {
@@ -38,7 +37,7 @@ class PropertySetterTask extends AbstractConfigurableTask
         foreach ($options['values'] as $key => $value) {
             try {
                 $this->accessor->setValue($input, $key, $value);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 $state->addErrorContextValue('property', $key);
                 $state->addErrorContextValue('value', $value);
                 $state->setException($e);

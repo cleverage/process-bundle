@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace Transformer;
 
-use CleverAge\ProcessBundle\Transformer\ArrayElementTransformer;
 use CleverAge\ProcessBundle\Transformer\ConstantTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;

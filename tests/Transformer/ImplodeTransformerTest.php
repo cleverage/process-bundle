@@ -16,7 +16,6 @@ namespace Transformer;
 use CleverAge\ProcessBundle\Transformer\ImplodeTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
 
 class ImplodeTransformerTest extends TestCase
 {
@@ -37,7 +36,7 @@ class ImplodeTransformerTest extends TestCase
      */
     public function testTransformWithInvalidValue(): void
     {
-        $this->expectException(UnexpectedValueException::class);
+        $this->expectException(\UnexpectedValueException::class);
 
         $transformer = new ImplodeTransformer();
 

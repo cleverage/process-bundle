@@ -49,7 +49,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * "generic_transformers" root configuration
+     * "generic_transformers" root configuration.
      */
     protected function appendRootTransformersConfigDefinition(NodeBuilder $definition): void
     {
@@ -69,7 +69,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * Single transformer configuration
+     * Single transformer configuration.
      */
     protected function appendTransformerConfigDefinition(NodeBuilder $definition): void
     {
@@ -85,7 +85,7 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * "configurations" root configuration
+     * "configurations" root configuration.
      */
     protected function appendRootProcessConfigDefinition(NodeBuilder $definition): void
     {

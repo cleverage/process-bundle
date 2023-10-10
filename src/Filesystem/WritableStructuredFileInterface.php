@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
- * Define a common interface for all file with headers
+ * Define a common interface for all file with headers.
  */
 interface WritableStructuredFileInterface extends StructuredFileInterface, WritableFileInterface
 {
     /**
-     * Write headers to the file
+     * Write headers to the file.
      */
     public function writeHeaders(): void;
 }

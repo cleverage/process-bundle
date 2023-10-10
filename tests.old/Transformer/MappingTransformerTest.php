@@ -16,12 +16,12 @@ namespace CleverAge\ProcessBundle\Tests\Transformer;
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
- * Tests for the MappingTransformer
+ * Tests for the MappingTransformer.
  */
 class MappingTransformerTest extends AbstractProcessTest
 {
     /**
-     * Assert a simple mapping transformation, from one array to another
+     * Assert a simple mapping transformation, from one array to another.
      */
     public function testSimpleMapping(): void
     {
@@ -35,19 +35,19 @@ class MappingTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Assert that if "ignore_missing" is false, then an error is thrown for missing fields
-     *
-     * @expectedException \RuntimeException
+     * Assert that if "ignore_missing" is false, then an error is thrown for missing fields.
      */
     public function testMissingMapping(): void
     {
+        $this->setExpectedException(\RuntimeException::class);
+
         $this->processManager->execute('test.mapping_transformer.error', [
             'field' => 'value',
         ]);
     }
 
     /**
-     * Assert we can use multiple times the same sub-transformer using # suffixes
+     * Assert we can use multiple times the same sub-transformer using # suffixes.
      */
     public function testMultiSubtransformers(): void
     {
@@ -64,7 +64,7 @@ class MappingTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Assert we can use a deep property path as a key to generate a multi-depth array
+     * Assert we can use a deep property path as a key to generate a multi-depth array.
      */
     public function testDeepMapping(): void
     {
@@ -82,7 +82,7 @@ class MappingTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Test the '.' source property path
+     * Test the '.' source property path.
      */
     public function testFullInput(): void
     {
@@ -98,7 +98,7 @@ class MappingTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Test the '.' source property path inside an array of source codes
+     * Test the '.' source property path inside an array of source codes.
      */
     public function testFullInputInArray(): void
     {
@@ -117,7 +117,7 @@ class MappingTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Test that a source property can be an array with numeric keys (see commit e141cb61)
+     * Test that a source property can be an array with numeric keys (see commit e141cb61).
      */
     public function testMultiSourceFieldInSequence(): void
     {

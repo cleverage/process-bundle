@@ -18,17 +18,15 @@ use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
-use SplQueue;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use function count;
 
 /**
  * A Batch task that iterate on flush
- * It's mainly an example task since it's not useful as-is, but the processInput method may allow custom overrides
+ * It's mainly an example task since it's not useful as-is, but the processInput method may allow custom overrides.
  */
 class IterableBatchTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
 {
-    protected ?SplQueue $outputQueue = null;
+    protected ?\SplQueue $outputQueue = null;
 
     protected bool $flushMode = false;
 
@@ -40,7 +38,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     public function initialize(ProcessState $state): void
     {
         parent::initialize($state);
-        $this->outputQueue = new SplQueue();
+        $this->outputQueue = new \SplQueue();
     }
 
     public function flush(ProcessState $state): void
@@ -58,12 +56,12 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
         $batchCount = $this->getOption($state, 'batch_count');
 
         // Register new input
-        if (! $this->flushMode) {
+        if (!$this->flushMode) {
             $this->outputQueue->enqueue($this->processInput($state));
         }
 
         // Detect flushing
-        if ($batchCount !== null && ($this->outputQueue === null ? 0 : count($this->outputQueue)) >= $batchCount) {
+        if (null !== $batchCount && (null === $this->outputQueue ? 0 : \count($this->outputQueue)) >= $batchCount) {
             $this->flushMode = true;
         }
 
@@ -78,7 +76,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     public function next(ProcessState $state): bool
     {
         // Stop flushing once over
-        if (! ($this->outputQueue === null ? 0 : count($this->outputQueue))) {
+        if (!(null === $this->outputQueue ? 0 : \count($this->outputQueue))) {
             $this->flushMode = false;
         }
 
@@ -95,7 +93,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     }
 
     /**
-     * Override this method to add a custom processing behavior
+     * Override this method to add a custom processing behavior.
      */
     protected function processInput(ProcessState $state): mixed
     {

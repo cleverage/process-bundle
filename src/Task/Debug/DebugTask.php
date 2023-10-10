@@ -18,7 +18,7 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 use Symfony\Component\VarDumper\VarDumper;
 
 /**
- * Dump the content of the input
+ * Dump the content of the input.
  *
  * @example https://github.com/cleverage/process-bundle-ui-demo/blob/main/config/packages/process/demo.debug.yaml
  */
