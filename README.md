@@ -34,6 +34,7 @@ Compatible with every [currently supported Symfony versions](https://symfony.com
         - [ConstantOutputTask](doc/reference/tasks/constant_output_task.md)
         - [ConstantIterableOutputTask](doc/reference/tasks/constant_iterable_output_task.md)
         - [DebugTask](doc/reference/tasks/debug_task.md)
+        - [DieTask](doc/reference/tasks/die_task.md)
         - [DummyTask](doc/reference/tasks/dummy_task.md)
         - [EventDispatcherTask](doc/reference/tasks/event_dispatcher_task.md)
       - Data manipulation and transformations
