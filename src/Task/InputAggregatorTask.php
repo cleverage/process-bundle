@@ -44,9 +44,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
             if ($this->getOption($state, 'clean_input_on_override')) {
                 $this->inputs = [];
             } else {
-                throw new \UnexpectedValueException(
-                    "The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output"
-                );
+                throw new \UnexpectedValueException("The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output");
             }
         }
 

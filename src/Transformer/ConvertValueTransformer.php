@@ -32,9 +32,7 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
         if (!\is_string($value) && !\is_int($value)) { // If not a valid array index
             if (!$options['auto_cast']) {
                 $type = \gettype($value);
-                throw new \UnexpectedValueException(
-                    "Value of type {$type} is not a valid array index, set auto_cast to true to cast it to a string"
-                );
+                throw new \UnexpectedValueException("Value of type {$type} is not a valid array index, set auto_cast to true to cast it to a string");
             }
             if (\is_array($value)) { // Array to string conversion is a simple notice so we need to catch it here
                 throw new \UnexpectedValueException("Unexpected input of type 'array' in convert_value transformer");

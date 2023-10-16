@@ -65,7 +65,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
      * Configure options about how to handle xpath query results.
      * Available at root and subquery level.
      */
-    public function configureQueryOptions(OptionsResolver $resolver, ?Options $parentOptions = null): void
+    public function configureQueryOptions(OptionsResolver $resolver, Options $parentOptions = null): void
     {
         $resolver->setDefault('single_result', $parentOptions ? $parentOptions['single_result'] : true);
         $resolver->setAllowedTypes('single_result', 'bool');
@@ -87,7 +87,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
 
         $query = $options['query'];
         if (\is_array($query)) {
-            $result = \array_map(
+            $result = array_map(
                 fn ($subquery): mixed => $this->query($xpath, $subquery['subquery'], $value, $subquery),
                 $query
             );
@@ -118,7 +118,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
 
         // Convert results to text
         if ($options['unwrap_value']) {
-            $results = \array_map(static function (\DOMNode $item) use ($query): string {
+            $results = array_map(static function (\DOMNode $item) use ($query): string {
                 if ($item instanceof \DOMAttr) {
                     return $item->value;
                 }

@@ -32,7 +32,7 @@ class MemInfoDumpTask extends AbstractConfigurableTask
     {
         if (\function_exists('meminfo_dump')) {
             gc_collect_cycles();
-            $handler = fopen($this->getOption($state, 'file_path'), 'wb');
+            $handler = fopen($this->getOption($state, 'file_path'), 'w');
             meminfo_dump($handler);
             fclose($handler);
         } else {

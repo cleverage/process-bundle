@@ -44,7 +44,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         protected string $delimiter = ',',
         protected string $enclosure = '"',
         protected string $escape = '\\',
-        ?array $headers = null
+        array $headers = null
     ) {
         if (!\is_resource($resource)) {
             $type = \gettype($resource);
@@ -149,7 +149,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /**
      * Warning, this function will return exactly the same value as the fgetcsv() function.
      */
-    public function readRaw(?int $length = null): array|false
+    public function readRaw(int $length = null): array|false
     {
         $this->assertOpened();
         ++$this->lineNumber;
@@ -157,7 +157,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         return fgetcsv($this->handler, $length, $this->delimiter, $this->enclosure, $this->escape);
     }
 
-    public function readLine(?int $length = null): ?array
+    public function readLine(int $length = null): ?array
     {
         if ($this->seekCalled) {
             $filePosition = "at position {$this->tell()}";
@@ -290,7 +290,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         }
     }
 
-    protected function parseHeaders(?array $headers = null): array
+    protected function parseHeaders(array $headers = null): array
     {
         // If headers are not passed in the constructor but file is readable, try to read headers from file
         if (null === $headers) {
@@ -308,15 +308,11 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         $this->manualHeaders = true;
 
         if (!\is_array($headers)) {
-            throw new \UnexpectedValueException(
-                "Invalid headers for {$this->getResourceName()}, you need to pass the headers manually"
-            );
+            throw new \UnexpectedValueException("Invalid headers for {$this->getResourceName()}, you need to pass the headers manually");
         }
 
         if (0 === \count($headers)) {
-            throw new \UnexpectedValueException(
-                "Empty headers for {$this->getResourceName()}, you need to pass the headers manually"
-            );
+            throw new \UnexpectedValueException("Empty headers for {$this->getResourceName()}, you need to pass the headers manually");
         }
 
         return $headers;

@@ -29,7 +29,7 @@ class CsvFile extends CsvResource
         string $delimiter = ',',
         string $enclosure = '"',
         string $escape = '\\',
-        ?array $headers = null,
+        array $headers = null,
         string $mode = 'rb'
     ) {
         if (!\in_array($filePath, ['php://stdin', 'php://stdout', 'php://stderr'], true)) {
@@ -47,9 +47,7 @@ class CsvFile extends CsvResource
         $readAllowedModes = ['r', 'r+', 'w+', 'a+', 'x+', 'c+'];
         if (null === $headers && !\in_array(str_replace('b', '', $mode), $readAllowedModes, true)) {
             // Cannot read headers if the file was just created
-            throw new \UnexpectedValueException(
-                "Invalid headers for {$this->getResourceName()}, you need to pass the headers manually"
-            );
+            throw new \UnexpectedValueException("Invalid headers for {$this->getResourceName()}, you need to pass the headers manually");
         }
 
         parent::__construct($resource, $delimiter, $enclosure, $escape, $headers);

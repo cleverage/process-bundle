@@ -50,7 +50,7 @@ class ListProcessCommand extends Command
 
     public function maxMessageLengthFilter(int $max, array $message): int
     {
-        return \max($max, \strlen($this->filterOutTags($message['output'])));
+        return max($max, \strlen($this->filterOutTags($message['output'])));
     }
 
     protected function configure(): void
@@ -61,10 +61,10 @@ class ListProcessCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $processConfigurations = $this->processConfigRegistry->getProcessConfigurations();
-        \usort($processConfigurations, $this->processSorter(...));
+        usort($processConfigurations, $this->processSorter(...));
 
-        $publicCount = \array_reduce($processConfigurations, $this->publicProcessCounter(...), 0);
-        $privateCount = \array_reduce($processConfigurations, $this->privateProcessCounter(...), 0);
+        $publicCount = array_reduce($processConfigurations, $this->publicProcessCounter(...), 0);
+        $privateCount = array_reduce($processConfigurations, $this->privateProcessCounter(...), 0);
         $output->writeln(
             "<info>There are {$publicCount} process configurations defined (and {$privateCount} private) :</info>"
         );
@@ -87,7 +87,7 @@ class ListProcessCommand extends Command
         }
 
         // Add process descriptions at a fixed position
-        $maxMessageLength = \array_reduce($messages, $this->maxMessageLengthFilter(...), 0);
+        $maxMessageLength = array_reduce($messages, $this->maxMessageLengthFilter(...), 0);
         $outputMessages = [];
         foreach ($messages as $message) {
             /** @var ProcessConfiguration $processConfiguration */

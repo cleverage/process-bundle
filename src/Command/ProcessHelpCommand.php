@@ -376,7 +376,7 @@ class ProcessHelpCommand extends Command
             foreach ($nextTasks as $nextTask) {
                 $index = array_search(null, $branches, true);
                 if (false !== $index && $index >= $origin) {
-                    /** @var int $index */
+                    /* @var int $index */
                     $branches[$index] = $taskCode;
                     $expandBranches[] = $index;
                 } else {
@@ -446,8 +446,8 @@ class ProcessHelpCommand extends Command
         OutputInterface $output,
         array $branches,
         string|iterable $comment = '',
-        ?callable $match = null,
-        string|callable|null $char = null
+        callable $match = null,
+        string|callable $char = null
     ): void {
         $output->write(str_repeat(' ', self::INDENT_SIZE));
 
@@ -525,14 +525,10 @@ class ProcessHelpCommand extends Command
         } elseif ($this->container->has($serviceReference)) {
             $task = $this->container->get($serviceReference);
         } else {
-            throw new \UnexpectedValueException(
-                "Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'"
-            );
+            throw new \UnexpectedValueException("Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'");
         }
         if (!$task instanceof TaskInterface) {
-            throw new \UnexpectedValueException(
-                "Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface"
-            );
+            throw new \UnexpectedValueException("Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface");
         }
 
         return $task;

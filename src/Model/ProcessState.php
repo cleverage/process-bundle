@@ -163,7 +163,7 @@ class ProcessState
         return $this->hasErrorOutput;
     }
 
-    public function stop(?\Throwable $e = null): void
+    public function stop(\Throwable $e = null): void
     {
         if ($e) {
             $this->setException($e);
@@ -186,7 +186,7 @@ class ProcessState
         return $this->exception;
     }
 
-    public function setException(?\Throwable $exception = null): void
+    public function setException(\Throwable $exception = null): void
     {
         $this->exception = $exception;
     }

@@ -50,7 +50,7 @@ class ProcessConfigurationRegistry
      */
     public function getProcessConfigurations(): array
     {
-        foreach (\array_keys($this->rawConfiguration) as $processCode) {
+        foreach (array_keys($this->rawConfiguration) as $processCode) {
             $this->resolveConfiguration($processCode);
         }
 
@@ -137,10 +137,7 @@ class ProcessConfigurationRegistry
 
         // #106 - entry point should not have an ancestor
         if ($processConfig->getEntryPoint() && $processConfig->getEntryPoint()->getPreviousTasksConfigurations()) {
-            throw InvalidProcessConfigurationException::createEntryPointHasAncestors(
-                $processConfig,
-                $processConfig->getEntryPoint()
-            );
+            throw InvalidProcessConfigurationException::createEntryPointHasAncestors($processConfig, $processConfig->getEntryPoint());
         }
 
         $this->processConfigurations[$processCode] = $processConfig;

@@ -238,14 +238,10 @@ class ProcessManager
         } elseif ($this->container->has($serviceReference)) {
             $task = $this->container->get($serviceReference);
         } else {
-            throw new \UnexpectedValueException(
-                "Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'"
-            );
+            throw new \UnexpectedValueException("Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'");
         }
         if (!$task instanceof TaskInterface) {
-            throw new \UnexpectedValueException(
-                "Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface"
-            );
+            throw new \UnexpectedValueException("Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface");
         }
         $taskConfiguration->setTask($task);
 
@@ -299,16 +295,7 @@ class ProcessManager
                     $m .= " during process {$state->getTaskConfiguration()
                         ->getCode()}";
                     $m .= " with message: '{$exception->getMessage()}'.\n";
-                    throw new FatalError(
-                        $m,
-                        -1,
-                        [
-                            'file' => $exception->getFile(),
-                            'line' => $exception->getLine(),
-                            'type' => 500,
-                            'message' => $exception->getMessage(),
-                        ]
-                    );
+                    throw new FatalError($m, -1, ['file' => $exception->getFile(), 'line' => $exception->getLine(), 'type' => 500, 'message' => $exception->getMessage()]);
                 }
 
                 return;
@@ -421,9 +408,7 @@ class ProcessManager
             } elseif (TaskConfiguration::STRATEGY_STOP === $taskConfiguration->getErrorStrategy()) {
                 $state->stop($exception);
             } else {
-                throw new \UnexpectedValueException(
-                    "Unknown error strategy '{$taskConfiguration->getErrorStrategy()}'"
-                );
+                throw new \UnexpectedValueException("Unknown error strategy '{$taskConfiguration->getErrorStrategy()}'");
             }
         }
     }
@@ -566,18 +551,10 @@ class ProcessManager
         // Check coherence for entry/end points
         $processConfiguration->getEndPoint();
         if ($entryPoint && !\in_array($entryPoint->getCode(), $mainTaskList, true)) {
-            throw InvalidProcessConfigurationException::createNotInMain(
-                $processConfiguration,
-                $entryPoint,
-                $mainTaskList
-            );
+            throw InvalidProcessConfigurationException::createNotInMain($processConfiguration, $entryPoint, $mainTaskList);
         }
         if ($endPoint && !\in_array($endPoint->getCode(), $mainTaskList, true)) {
-            throw InvalidProcessConfigurationException::createNotInMain(
-                $processConfiguration,
-                $endPoint,
-                $mainTaskList
-            );
+            throw InvalidProcessConfigurationException::createNotInMain($processConfiguration, $endPoint, $mainTaskList);
         }
     }
 

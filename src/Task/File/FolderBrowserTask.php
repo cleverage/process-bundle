@@ -91,9 +91,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
             'folder_path',
             static function (Options $options, $value) {
                 if (!is_dir($value)) {
-                    throw new InvalidConfigurationException(
-                        "Folder path does not exists or is not a folder: '{$value}'"
-                    );
+                    throw new InvalidConfigurationException("Folder path does not exists or is not a folder: '{$value}'");
                 }
                 if (!is_readable($value)) {
                     throw new InvalidConfigurationException("Folder path is not readable: '{$value}'");

@@ -78,11 +78,9 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
         }
 
         // This should never be reached
-        /** @phpstan-ignore-next-line */
+        /* @phpstan-ignore-next-line */
         if (null !== $this->iterator) {
-            throw new \UnexpectedValueException(
-                "At this point iterator should have been null, maybe it's a wrong type..."
-            );
+            throw new \UnexpectedValueException("At this point iterator should have been null, maybe it's a wrong type...");
         }
 
         $this->iterator = $this->initializeIterator($state);

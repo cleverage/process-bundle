@@ -59,7 +59,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             $state->setOutput($this->finishedBuffers->dequeue());
 
             // After dequeue, stop flush
-            /** @phpstan-ignore-next-line */
+            /* @phpstan-ignore-next-line */
             if ($this->finishedBuffers->isEmpty()) {
                 $this->flushMode = false;
             }

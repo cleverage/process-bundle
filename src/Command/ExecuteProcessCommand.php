@@ -141,9 +141,7 @@ class ExecuteProcessCommand extends Command
                 } elseif (self::OUTPUT_FORMAT_JSON === $input->getOption('output-format')) {
                     $output->writeln(json_encode($data, \JSON_THROW_ON_ERROR));
                 } else {
-                    throw new \InvalidArgumentException(
-                        sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format'))
-                    );
+                    throw new \InvalidArgumentException(sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
                 }
             }
         } elseif (self::OUTPUT_FORMAT_JSON === $input->getOption('output-format')) {
@@ -158,9 +156,7 @@ class ExecuteProcessCommand extends Command
                 $output->writeln(sprintf("Output stored in '%s'", $input->getOption('output')));
             }
         } else {
-            throw new \InvalidArgumentException(
-                sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format'))
-            );
+            throw new \InvalidArgumentException(sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
         }
     }
 }

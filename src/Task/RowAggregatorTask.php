@@ -48,9 +48,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         $aggregationKey = $this->getOption($state, 'aggregation_key');
 
         if (!\array_key_exists($aggregateBy, $input)) {
-            throw new InvalidProcessConfigurationException(
-                "Array aggregator exception: missing column '{$aggregateBy}'"
-            );
+            throw new InvalidProcessConfigurationException("Array aggregator exception: missing column '{$aggregateBy}'");
         }
 
         $inputAggregateBy = $input[$aggregateBy];
@@ -67,9 +65,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         $inputAggregateColumns = [];
         foreach ($aggregateColumns as $aggregateColumn) {
             if (!\array_key_exists($aggregateColumn, $input)) {
-                throw new InvalidProcessConfigurationException(
-                    "Array aggregator exception: missing column {$aggregateColumn}"
-                );
+                throw new InvalidProcessConfigurationException("Array aggregator exception: missing column {$aggregateColumn}");
             }
             $inputAggregateColumns[$aggregateColumn] = $input[$aggregateColumn];
         }

@@ -65,7 +65,7 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
     /**
      * Return an array containing current data and moving the file pointer.
      */
-    public function readLine(?int $length = null): ?array
+    public function readLine(int $length = null): ?array
     {
         if ($this->isEndOfFile()) {
             return null;

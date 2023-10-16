@@ -23,7 +23,7 @@ class TransformerException extends \RuntimeException implements ProcessException
     public function __construct(
         protected string $transformerCode,
         int $code = 0,
-        ?\Throwable $previous = null
+        \Throwable $previous = null
     ) {
         parent::__construct('', $code, $previous);
         $this->updateMessage();

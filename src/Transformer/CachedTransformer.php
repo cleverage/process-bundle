@@ -45,7 +45,7 @@ class CachedTransformer implements ConfigurableTransformerInterface
         $resolver->setNormalizer(
             'ttl',
             function (Options $options, $value) {
-                /**
+                /*
                  * Best use is a relative date string like "+1 hour".
                  *
                  * @see https://www.php.net/manual/en/datetime.formats.relative.php
@@ -112,6 +112,6 @@ class CachedTransformer implements ConfigurableTransformerInterface
             return false;
         }
 
-        return \implode(self::CACHE_SEPARATOR, [$cacheKeyRoot, \rawurlencode($value)]);
+        return implode(self::CACHE_SEPARATOR, [$cacheKeyRoot, rawurlencode($value)]);
     }
 }

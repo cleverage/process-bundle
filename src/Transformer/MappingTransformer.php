@@ -40,9 +40,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
     public function transform(mixed $value, array $options = []): mixed
     {
         if (!empty($options['initial_value']) && $options['keep_input']) {
-            throw new InvalidOptionsException(
-                'The options "initial_value" and "keep_input" can\'t be both enabled.'
-            );
+            throw new InvalidOptionsException('The options "initial_value" and "keep_input" can\'t be both enabled.');
         }
 
         $result = $options['initial_value'];

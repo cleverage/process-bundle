@@ -93,7 +93,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
     /**
      * Configure options for one "rule" block.
      */
-    public function configureRuleOptions(OptionsResolver $resolver, ?array $expressionVariables = null): void
+    public function configureRuleOptions(OptionsResolver $resolver, array $expressionVariables = null): void
     {
         $resolver->setDefaults([
             'condition' => null,
@@ -116,9 +116,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
         $resolver->setNormalizer('condition', $expressionNormalizer);
         $resolver->setNormalizer('default', function (Options $options, $value) {
             if ($value && $options['condition']) {
-                throw new \InvalidArgumentException(
-                    'A rule cannot have a condition and be the default in the same time'
-                );
+                throw new \InvalidArgumentException('A rule cannot have a condition and be the default in the same time');
             }
 
             return $value;
@@ -140,7 +138,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
             return $this->language->evaluate($rule['condition'], $expressionValues);
         }
 
-        /** @noinspection PhpStrictTypeCheckingInspection */
+        /* @noinspection PhpStrictTypeCheckingInspection */
         return $rule['default'];
     }
 }

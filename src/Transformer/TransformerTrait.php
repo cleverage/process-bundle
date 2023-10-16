@@ -113,8 +113,6 @@ trait TransformerTrait
 
         $type = get_debug_type($transformerOptions);
 
-        throw new \InvalidArgumentException(
-            "Options for transformer {$transformerCode} are invalid : found {$type}, expected array or null"
-        );
+        throw new \InvalidArgumentException("Options for transformer {$transformerCode} are invalid : found {$type}, expected array or null");
     }
 }
