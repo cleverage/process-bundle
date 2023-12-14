@@ -27,7 +27,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ProcessExecutorTask extends AbstractConfigurableTask
 {
-    protected ?array $process = null;
+    protected ?string $process = null;
 
     public function __construct(
         protected ProcessManager $processManager,
