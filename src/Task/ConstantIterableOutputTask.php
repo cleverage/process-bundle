@@ -13,13 +13,11 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
-use ArrayIterator;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Iterator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Always send the same output regardless of the input, only accepts array for values and iterate over it
+ * Always send the same output regardless of the input, only accepts array for values and iterate over it.
  */
 class ConstantIterableOutputTask extends AbstractIterableOutputTask
 {
@@ -29,8 +27,8 @@ class ConstantIterableOutputTask extends AbstractIterableOutputTask
         $resolver->setAllowedTypes('output', ['array']);
     }
 
-    protected function initializeIterator(ProcessState $state): Iterator
+    protected function initializeIterator(ProcessState $state): \Iterator
     {
-        return new ArrayIterator($this->getOption($state, 'output'));
+        return new \ArrayIterator($this->getOption($state, 'output'));
     }
 }

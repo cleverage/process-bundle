@@ -16,12 +16,12 @@ namespace CleverAge\ProcessBundle\Tests\Transformer;
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
- * Tests for type setter transformer
+ * Tests for type setter transformer.
  */
 class TypeSetterTransformerTest extends AbstractProcessTest
 {
     /**
-     * Assert int to int convertion
+     * Assert int to int convertion.
      */
     public function testIntToInt(): void
     {
@@ -30,7 +30,7 @@ class TypeSetterTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Assert string to int convertion
+     * Assert string to int convertion.
      */
     public function testStringToInt(): void
     {
@@ -39,7 +39,7 @@ class TypeSetterTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Assert int to string convertion
+     * Assert int to string convertion.
      */
     public function testIntToString(): void
     {

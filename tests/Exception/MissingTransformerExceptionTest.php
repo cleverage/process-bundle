@@ -6,7 +6,6 @@ namespace Exception;
 
 use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use PHPUnit\Framework\TestCase;
-use UnexpectedValueException;
 
 class MissingTransformerExceptionTest extends TestCase
 {
@@ -17,7 +16,7 @@ class MissingTransformerExceptionTest extends TestCase
     {
         $exception = MissingTransformerException::create('my_transformer');
 
-        $this->assertInstanceOf(UnexpectedValueException::class, $exception);
+        $this->assertInstanceOf(\UnexpectedValueException::class, $exception);
         $this->assertEquals('No transformer with code : my_transformer', $exception->getMessage());
     }
 }

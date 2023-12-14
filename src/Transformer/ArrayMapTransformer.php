@@ -16,12 +16,9 @@ namespace CleverAge\ProcessBundle\Transformer;
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Traversable;
-use UnexpectedValueException;
-use function is_array;
 
 /**
- * Applies transformers to each element of an array
+ * Applies transformers to each element of an array.
  */
 class ArrayMapTransformer implements ConfigurableTransformerInterface
 {
@@ -33,19 +30,19 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Must return the transformed $value
+     * Must return the transformed $value.
      */
     public function transform(mixed $value, array $options = []): array
     {
-        if (! is_array($value) && ! $value instanceof Traversable) {
-            throw new UnexpectedValueException('Input value must be an array or traversable');
+        if (!\is_array($value) && !$value instanceof \Traversable) {
+            throw new \UnexpectedValueException('Input value must be an array or traversable');
         }
 
         $results = [];
         foreach ($value as $key => $item) {
             try {
                 $item = $this->applyTransformers($options['transformers'], $item);
-                if ($item === null && $options['skip_null']) {
+                if (null === $item && $options['skip_null']) {
                     continue;
                 }
                 $results[$key] = $item;
@@ -59,7 +56,7 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {

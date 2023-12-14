@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
- * Ouputs the stopwatch  the content of the input
+ * Ouputs the stopwatch  the content of the input.
  */
 class StopwatchTask implements TaskInterface
 {

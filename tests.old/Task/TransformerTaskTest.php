@@ -16,12 +16,12 @@ namespace CleverAge\ProcessBundle\Tests\Task;
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
- * Tests for the TransformerTask
+ * Tests for the TransformerTask.
  */
 class TransformerTaskTest extends AbstractProcessTest
 {
     /**
-     * Assert a simple transformation, from one array to another
+     * Assert a simple transformation, from one array to another.
      */
     public function testSimpleMapping(): void
     {
@@ -33,17 +33,17 @@ class TransformerTaskTest extends AbstractProcessTest
     }
 
     /**
-     * Assert that if "ignore_missing" is false, then an error is thrown for missing fields
-     *
-     * @expectedException \RuntimeException
+     * Assert that if "ignore_missing" is false, then an error is thrown for missing fields.
      */
     public function testMissingMapping(): void
     {
+        $this->setExpectedException(\RuntimeException::class);
+
         $this->processManager->execute('test.transformer_task.error', 'value');
     }
 
     /**
-     * Assert we can use multiple times the same sub-transformer using # suffixes
+     * Assert we can use multiple times the same sub-transformer using # suffixes.
      */
     public function testMultiSubtransformers(): void
     {

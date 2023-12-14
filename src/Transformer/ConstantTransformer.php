@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Return always the same value configured in options, redundant when used inside mapping except in certain useful
- * circumstances
+ * circumstances.
  */
 class ConstantTransformer implements ConfigurableTransformerInterface
 {
@@ -27,7 +27,7 @@ class ConstantTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Must return the transformed $value
+     * Must return the transformed $value.
      */
     public function transform(mixed $value, array $options = []): mixed
     {
@@ -35,7 +35,7 @@ class ConstantTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {

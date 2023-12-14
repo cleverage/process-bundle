@@ -16,12 +16,12 @@ namespace CleverAge\ProcessBundle\Tests\Task;
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
- * Assert the correct behavior of the filter task
+ * Assert the correct behavior of the filter task.
  */
 class FilterTaskTest extends AbstractProcessTest
 {
     /**
-     * Assert simple matching/empty filters
+     * Assert simple matching/empty filters.
      */
     public function testFilterMatch(): void
     {

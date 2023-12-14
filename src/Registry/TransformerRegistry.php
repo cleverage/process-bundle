@@ -15,10 +15,9 @@ namespace CleverAge\ProcessBundle\Registry;
 
 use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
-use UnexpectedValueException;
 
 /**
- * Holds all tagged transformer services
+ * Holds all tagged transformer services.
  */
 class TransformerRegistry
 {
@@ -29,8 +28,8 @@ class TransformerRegistry
 
     public function addTransformer(TransformerInterface $transformer): void
     {
-        if (array_key_exists($transformer->getCode(), $this->transformers)) {
-            throw new UnexpectedValueException("Transformer {$transformer->getCode()} is already defined");
+        if (\array_key_exists($transformer->getCode(), $this->transformers)) {
+            throw new \UnexpectedValueException("Transformer {$transformer->getCode()} is already defined");
         }
         $this->transformers[$transformer->getCode()] = $transformer;
     }
@@ -45,7 +44,7 @@ class TransformerRegistry
 
     public function getTransformer(string $code): TransformerInterface
     {
-        if (! $this->hasTransformer($code)) {
+        if (!$this->hasTransformer($code)) {
             throw MissingTransformerException::create($code);
         }
 
@@ -54,6 +53,6 @@ class TransformerRegistry
 
     public function hasTransformer(string $code): bool
     {
-        return array_key_exists($code, $this->transformers);
+        return \array_key_exists($code, $this->transformers);
     }
 }

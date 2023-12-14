@@ -83,14 +83,13 @@
     "symfony/yaml": "^6.3"
   },
   "require-dev": {
-    "roave/security-advisories": "dev-latest",
-    "phpunit/phpunit": "*",
+    "friendsofphp/php-cs-fixer": "*",
+    "phpstan/extension-installer": "*",
     "phpstan/phpstan": "*",
     "phpstan/phpstan-symfony": "*",
-    "phpstan/extension-installer": "*",
+    "phpunit/phpunit": "*",
     "rector/rector": "*",
-    "symplify/easy-coding-standard": "*",
-    "symplify/phpstan-rules": "*",
+    "roave/security-advisories": "dev-latest",
     "symfony/test-pack": "^1.1"
   },
   "suggest": {

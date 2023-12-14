@@ -17,10 +17,9 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use function count;
 
 /**
- * Simple example of how to manage an internal buffer for batch processing
+ * Simple example of how to manage an internal buffer for batch processing.
  */
 class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskInterface
 {
@@ -28,7 +27,7 @@ class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskI
 
     public function flush(ProcessState $state): void
     {
-        if (count($this->elements) === 0) {
+        if (0 === \count($this->elements)) {
             $state->setSkipped(true);
         } else {
             $state->setOutput($this->elements);
@@ -41,7 +40,7 @@ class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskI
         $batchCount = $this->getOption($state, 'batch_count');
         $this->elements[] = $state->getInput();
 
-        if ($batchCount !== null && count($this->elements) >= $batchCount) {
+        if (null !== $batchCount && \count($this->elements) >= $batchCount) {
             $state->setOutput($this->elements);
             $this->elements = [];
         } else {

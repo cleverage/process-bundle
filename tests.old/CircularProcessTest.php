@@ -15,41 +15,38 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests;
 
 /**
- * Assert circular dependencies are correctly checked
+ * Assert circular dependencies are correctly checked.
  */
 class CircularProcessTest extends AbstractProcessTest
 {
-    /**
-     * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
-     */
     public function testCircularProcess(): void
     {
+        $this->setExpectedException(\CleverAge\ProcessBundle\Exception\CircularProcessException::class);
+
         $this->processManager->execute('test.circular_process');
     }
 
-    /**
-     * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
-     */
     public function testReversedCircularProcess(): void
     {
+        $this->setExpectedException(\CleverAge\ProcessBundle\Exception\CircularProcessException::class);
+
         $this->processManager->execute('test.circular_process.reversed');
     }
 
-    /**
-     * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
-     */
     public function testSelfCircularProcess(): void
     {
+        $this->setExpectedException(\CleverAge\ProcessBundle\Exception\CircularProcessException::class);
+
         $this->processManager->execute('test.circular_process.self');
     }
 
     /**
-     * A loop in an independent branch was sometime not properly detected
-     *
-     * @expectedException \CleverAge\ProcessBundle\Exception\CircularProcessException
+     * A loop in an independent branch was sometime not properly detected.
      */
     public function testLongCircularProcess(): void
     {
+        $this->setExpectedException(\CleverAge\ProcessBundle\Exception\CircularProcessException::class);
+
         $this->processManager->execute('test.circular_process.long');
     }
 }

@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
- * Generic compiler pass to add tagged services to a registry
+ * Generic compiler pass to add tagged services to a registry.
  */
 class RegistryCompilerPass implements CompilerPassInterface
 {
@@ -30,11 +30,11 @@ class RegistryCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * Inject tagged services into defined registry
+     * Inject tagged services into defined registry.
      */
     public function process(ContainerBuilder $container): void
     {
-        if (! $container->has($this->registry)) {
+        if (!$container->has($this->registry)) {
             return;
         }
 

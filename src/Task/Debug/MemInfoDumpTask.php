@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Dump memory info to file using meminfo extension if available: https://github.com/BitOne/php-meminfo
+ * Dump memory info to file using meminfo extension if available: https://github.com/BitOne/php-meminfo.
  */
 class MemInfoDumpTask extends AbstractConfigurableTask
 {
@@ -30,10 +30,10 @@ class MemInfoDumpTask extends AbstractConfigurableTask
 
     public function execute(ProcessState $state): void
     {
-        if (function_exists('meminfo_dump')) {
+        if (\function_exists('meminfo_dump')) {
             gc_collect_cycles();
-            $handler = fopen($this->getOption($state, 'file_path'), 'wb');
-            \meminfo_dump($handler);
+            $handler = fopen($this->getOption($state, 'file_path'), 'w');
+            meminfo_dump($handler);
             fclose($handler);
         } else {
             $this->logger->critical('meminfo PHP extension is not loaded');

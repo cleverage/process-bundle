@@ -19,3 +19,8 @@ Possible outputs
 ----------------
 
 `any`: re-output given input
+
+Example
+----------------
+
+https://github.com/cleverage/process-bundle-ui-demo/blob/main/config/packages/process/demo.debug.yaml

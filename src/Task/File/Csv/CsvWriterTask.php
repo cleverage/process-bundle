@@ -18,13 +18,10 @@ use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
-
-use function is_array;
 
 /**
  * Reads the file path from configuration and iterates over it
- * Ignores any input
+ * Ignores any input.
  *
  * @property CsvFile $csv
  */
@@ -32,9 +29,9 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 {
     public function execute(ProcessState $state): void
     {
-        if (! $this->csv instanceof CsvFile) {
+        if (!$this->csv instanceof CsvFile) {
             $this->initFile($state);
-            if ($this->getOption($state, 'write_headers') && filesize($this->csv->getFilePath()) === 0) {
+            if ($this->getOption($state, 'write_headers') && 0 === filesize($this->csv->getFilePath())) {
                 $this->csv->writeHeaders();
             }
         }
@@ -71,13 +68,13 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     protected function getInput(ProcessState $state): array
     {
         $input = $state->getInput();
-        if (! is_array($input)) {
-            throw new UnexpectedValueException('Input value is not an array');
+        if (!\is_array($input)) {
+            throw new \UnexpectedValueException('Input value is not an array');
         }
         $splitCharacter = $this->getOption($state, 'split_character');
 
         foreach ($input as &$item) {
-            if (is_array($item)) {
+            if (\is_array($item)) {
                 $item = implode($splitCharacter, $item);
             }
         }
@@ -88,7 +85,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     protected function getHeaders(ProcessState $state, array $options): ?array
     {
         $headers = $options['headers'];
-        if ($headers === null) {
+        if (null === $headers) {
             $headers = array_keys($state->getInput());
         }
 

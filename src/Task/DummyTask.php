@@ -17,7 +17,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 
 /**
- * Dummy task that pass the input to the output
+ * Dummy task that pass the input to the output.
  */
 class DummyTask implements TaskInterface
 {

@@ -16,12 +16,12 @@ namespace CleverAge\ProcessBundle\Tests\Transformer;
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 
 /**
- * Tests for the UnsetTransformer
+ * Tests for the UnsetTransformer.
  */
 class UnsetTransformerTest extends AbstractProcessTest
 {
     /**
-     * Assert the transformer can do a simple unset
+     * Assert the transformer can do a simple unset.
      */
     public function testSimpleUnset(): void
     {
@@ -38,7 +38,7 @@ class UnsetTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Assert a few simple condition can trigger unset (or not)
+     * Assert a few simple condition can trigger unset (or not).
      */
     public function testConditionalUnset(): void
     {
@@ -82,22 +82,22 @@ class UnsetTransformerTest extends AbstractProcessTest
     }
 
     /**
-     * Assert the transformer detect wrong types
-     *
-     * @expectedException \RuntimeException
+     * Assert the transformer detect wrong types.
      */
     public function testWrongUnsetString(): void
     {
+        $this->setExpectedException(\RuntimeException::class);
+
         $this->processManager->execute('test.unset_transformer.simple', 'not an array');
     }
 
     /**
-     * Assert the transformer detect wrong values
-     *
-     * @expectedException \RuntimeException
+     * Assert the transformer detect wrong values.
      */
     public function testWrongUnsetMissingProperty(): void
     {
+        $this->setExpectedException(\RuntimeException::class);
+
         $this->processManager->execute('test.unset_transformer.simple', ['no property found']);
     }
 }

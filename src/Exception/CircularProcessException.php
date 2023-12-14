@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Exception;
 
-use UnexpectedValueException;
-
 /**
- * Thrown when a circular dependency is found in a process
+ * Thrown when a circular dependency is found in a process.
  */
-class CircularProcessException extends UnexpectedValueException implements ProcessExceptionInterface
+class CircularProcessException extends \UnexpectedValueException implements ProcessExceptionInterface
 {
     public static function create(?string $processCode = '', ?string $taskCode = ''): self
     {

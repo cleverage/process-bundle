@@ -27,7 +27,7 @@ class DefaultTransformer implements ConfigurableTransformerInterface
 
     public function transform(mixed $value, array $options = []): mixed
     {
-        if (! $value) {
+        if (!$value) {
             return $options['value'];
         }
 

@@ -26,7 +26,7 @@ class PregFilterTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {

@@ -15,15 +15,11 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use DateTime;
-use DateTimeInterface;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use function implode;
-use function is_string;
-use function rawurlencode;
 
 class CachedTransformer implements ConfigurableTransformerInterface
 {
@@ -45,16 +41,17 @@ class CachedTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('cache_key', 'string');
 
         $resolver->setDefault('ttl', null);
-        $resolver->setAllowedTypes('ttl', ['null', 'string', DateTimeInterface::class]);
+        $resolver->setAllowedTypes('ttl', ['null', 'string', \DateTimeInterface::class]);
         $resolver->setNormalizer(
             'ttl',
             function (Options $options, $value) {
-                /**
-                 * Best use is a relative date string like "+1 hour"
+                /*
+                 * Best use is a relative date string like "+1 hour".
+                 *
                  * @see https://www.php.net/manual/en/datetime.formats.relative.php
                  */
-                if (is_string($value)) {
-                    $value = new DateTime($value);
+                if (\is_string($value)) {
+                    $value = new \DateTime($value);
                 }
 
                 return $value;
@@ -81,7 +78,7 @@ class CachedTransformer implements ConfigurableTransformerInterface
                 }
                 $success = $this->cache->saveDeferred($cacheItem);
 
-                if (! $success) {
+                if (!$success) {
                     $this->logger->warning('Cannot save cache item', [
                         'cache_key' => $cacheKey,
                     ]);
@@ -111,7 +108,7 @@ class CachedTransformer implements ConfigurableTransformerInterface
     {
         $value = $this->applyTransformers($options['key_transformers'], $value);
 
-        if (! is_string($value)) {
+        if (!\is_string($value)) {
             return false;
         }
 

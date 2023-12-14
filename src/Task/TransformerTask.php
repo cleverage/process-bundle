@@ -23,7 +23,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Transform an array of data based on mapping and sub-transformers
+ * Transform an array of data based on mapping and sub-transformers.
  */
 class TransformerTask extends AbstractConfigurableTask
 {

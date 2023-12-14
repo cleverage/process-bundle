@@ -15,16 +15,15 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Transliterator;
 
 /**
- * Slugify a value
+ * Slugify a value.
  */
 class SlugifyTransformer implements ConfigurableTransformerInterface
 {
     public function transform(mixed $value, array $options = []): string
     {
-        /** @var Transliterator $transliterator */
+        /** @var \Transliterator $transliterator */
         $transliterator = $options['transliterator'];
         $string = $transliterator->transliterate($value);
 
@@ -39,7 +38,7 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {
@@ -58,7 +57,7 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
 
         $resolver->setNormalizer(
             'transliterator',
-            static fn (Options $options, $value): ?Transliterator => Transliterator::create($value)
+            static fn (Options $options, $value): ?\Transliterator => \Transliterator::create($value)
         );
     }
 }

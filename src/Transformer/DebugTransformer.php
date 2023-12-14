@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\VarDumper\VarDumper;
 
 /**
- * Simple dump in a transformer, passthrough for value
+ * Simple dump in a transformer, passthrough for value.
  */
 class DebugTransformer implements TransformerInterface
 {

@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Denormalize the given value based on options
+ * Denormalize the given value based on options.
  */
 class DenormalizeTransformer implements ConfigurableTransformerInterface
 {
@@ -44,7 +44,7 @@ class DenormalizeTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {

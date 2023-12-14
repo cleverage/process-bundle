@@ -15,10 +15,9 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use UnexpectedValueException;
 
 /**
- * Array filtering transformer, should match native array_filter behavior
+ * Array filtering transformer, should match native array_filter behavior.
  *
  * @see https://secure.php.net/manual/fr/function.array-filter.php
  */
@@ -36,8 +35,8 @@ class ArrayFilterTransformer implements ConfigurableTransformerInterface
      */
     public function transform(mixed $value, array $options = []): array
     {
-        if (! (is_iterable($value))) {
-            throw new UnexpectedValueException('Given value is not iterable');
+        if (!is_iterable($value)) {
+            throw new \UnexpectedValueException('Given value is not iterable');
         }
 
         $result = [];

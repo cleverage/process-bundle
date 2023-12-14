@@ -14,10 +14,9 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Event;
 
 use Symfony\Contracts\EventDispatcher\Event;
-use Throwable;
 
 /**
- * Event object for process start/stop/fail
+ * Event object for process start/stop/fail.
  */
 class ProcessEvent extends Event
 {
@@ -32,7 +31,7 @@ class ProcessEvent extends Event
         protected mixed $processInput = null,
         protected array $processContext = [],
         protected mixed $processOutput = null,
-        protected ?Throwable $processError = null
+        protected ?\Throwable $processError = null
     ) {
     }
 
@@ -56,7 +55,7 @@ class ProcessEvent extends Event
         return $this->processContext;
     }
 
-    public function getProcessError(): ?Throwable
+    public function getProcessError(): ?\Throwable
     {
         return $this->processError;
     }

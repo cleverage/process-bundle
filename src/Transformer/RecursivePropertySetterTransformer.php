@@ -14,13 +14,12 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
-use stdClass;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Read a property from the input value and return it
+ * Read a property from the input value and return it.
  */
 class RecursivePropertySetterTransformer implements ConfigurableTransformerInterface
 {
@@ -31,25 +30,25 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
 
     public function transform(mixed $value, array $options = []): mixed
     {
-        if ($value === null && $options['ignore_null']) {
+        if (null === $value && $options['ignore_null']) {
             return null;
         }
 
-        if ($options['ignore_missing'] && ! $this->accessor->isReadable($value, $options['iterator'])) {
+        if ($options['ignore_missing'] && !$this->accessor->isReadable($value, $options['iterator'])) {
             return null;
         }
 
         $iterable = $this->accessor->getValue($value, $options['iterator']);
-        if (! is_iterable($iterable)) {
+        if (!is_iterable($iterable)) {
             throw new TransformerException($options['iterator']);
         }
 
         $protertiesToSet = [];
         foreach ($options['set_properties'] as $propertyName => $propertyValuePath) {
             $protertiesValue = null;
-            if (! $options['ignore_missing'] || $this->accessor->isReadable($value, $propertyValuePath)) {
+            if (!$options['ignore_missing'] || $this->accessor->isReadable($value, $propertyValuePath)) {
                 $protertiesValue = $this->accessor->getValue($value, $propertyValuePath);
-                if ($protertiesValue === null && ! $options['ignore_null']) {
+                if (null === $protertiesValue && !$options['ignore_null']) {
                     throw new TransformerException($propertyValuePath);
                 }
             }
@@ -61,7 +60,7 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
                 try {
                     $this->accessor->setValue($item, $protertyName, $propertyValue);
                 } catch (NoSuchPropertyException $e) {
-                    if ($item instanceof stdClass) {
+                    if ($item instanceof \stdClass) {
                         $item = (object) array_merge((array) $item, [
                             $protertyName => $propertyValue,
                         ]);
@@ -76,7 +75,7 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {

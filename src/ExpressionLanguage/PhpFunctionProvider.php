@@ -17,7 +17,7 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 /**
- * Allow to inject a set of PHP function into an ExpressionLanguage instance
+ * Allow to inject a set of PHP function into an ExpressionLanguage instance.
  */
 class PhpFunctionProvider implements ExpressionFunctionProviderInterface
 {

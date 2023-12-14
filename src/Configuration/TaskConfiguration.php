@@ -18,7 +18,7 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 use Psr\Log\LogLevel;
 
 /**
- * Represents a task configuration inside a process
+ * Represents a task configuration inside a process.
  */
 class TaskConfiguration
 {
@@ -60,7 +60,7 @@ class TaskConfiguration
         protected string $errorStrategy = self::STRATEGY_SKIP,
         protected string $logLevel = LogLevel::CRITICAL
     ) {
-        $this->logErrors = $logLevel !== LogLevel::DEBUG; // @deprecated, remove me in next version
+        $this->logErrors = LogLevel::DEBUG !== $logLevel; // @deprecated, remove me in next version
     }
 
     public function getCode(): string
@@ -100,7 +100,7 @@ class TaskConfiguration
 
     public function getOption(string $code, mixed $default = null): mixed
     {
-        if (array_key_exists($code, $this->options)) {
+        if (\array_key_exists($code, $this->options)) {
             return $this->options[$code];
         }
 
@@ -117,7 +117,7 @@ class TaskConfiguration
      */
     public function getErrors(): array
     {
-        @trigger_error('Deprecated method, use getErrorOutputs instead', E_USER_DEPRECATED);
+        @trigger_error('Deprecated method, use getErrorOutputs instead', \E_USER_DEPRECATED);
 
         return $this->getErrorOutputs();
     }
@@ -188,11 +188,11 @@ class TaskConfiguration
 
     public function isRoot(): bool
     {
-        return empty($this->getPreviousTasksConfigurations()) && ! $this->isInErrorBranch();
+        return empty($this->getPreviousTasksConfigurations()) && !$this->isInErrorBranch();
     }
 
     /**
-     * Check task ancestors to find if it have a given task as parent
+     * Check task ancestors to find if it have a given task as parent.
      */
     public function hasAncestor(self $taskConfig): bool
     {
@@ -215,7 +215,7 @@ class TaskConfiguration
     }
 
     /**
-     * Check task ancestors to find if it have a given task as child
+     * Check task ancestors to find if it have a given task as child.
      */
     public function hasDescendant(self $taskConfig, bool $checkErrors = true): bool
     {

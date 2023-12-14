@@ -16,7 +16,6 @@ namespace Transformer;
 use CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use TypeError;
 
 class ArrayFirstTransformerTest extends TestCase
 {
@@ -39,7 +38,7 @@ class ArrayFirstTransformerTest extends TestCase
      */
     public function testTransformReturnsValueIfNotIterableAndAllowed(): void
     {
-        $this->expectException(TypeError::class);
+        $this->expectException(\TypeError::class);
 
         $transformer = new ArrayFirstTransformer();
         $value = 'not_iterable_value';

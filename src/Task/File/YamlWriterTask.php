@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Writes a YAML file from an array
+ * Writes a YAML file from an array.
  */
 class YamlWriterTask extends AbstractConfigurableTask
 {

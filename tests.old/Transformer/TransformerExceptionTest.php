@@ -15,20 +15,18 @@ namespace CleverAge\ProcessBundle\Tests\Transformer;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
-use Exception;
-use RuntimeException;
 
 class TransformerExceptionTest extends AbstractProcessTest
 {
     /**
-     * Basic test cas with a simple error chain
+     * Basic test cas with a simple error chain.
      */
     public function testErrorMessageChain(): void
     {
-        $origException = new Exception('OriginalError');
+        $origException = new \Exception('OriginalError');
         $transformerException = $origException;
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; ++$i) {
             $transformerException = new TransformerException("sub_transformer_{$i}", 0, $transformerException);
         }
 
@@ -36,7 +34,7 @@ class TransformerExceptionTest extends AbstractProcessTest
     }
 
     /**
-     * Simple test case using a simulated error inside a mapping transformer and array_map transformers
+     * Simple test case using a simulated error inside a mapping transformer and array_map transformers.
      */
     public function testDeepError(): void
     {
@@ -52,7 +50,7 @@ class TransformerExceptionTest extends AbstractProcessTest
         $message = null;
         try {
             $this->processManager->execute('test.transformer_exception.deep', $input);
-        } catch (RuntimeException $exception) {
+        } catch (\RuntimeException $exception) {
             $message = $exception->getMessage();
         }
 

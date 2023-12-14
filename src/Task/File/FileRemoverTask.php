@@ -18,7 +18,7 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Simply delete the file passed as input
+ * Simply delete the file passed as input.
  */
 class FileRemoverTask implements TaskInterface
 {

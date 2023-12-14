@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Configurable set of conditions to use in tasks or transformers options
+ * Configurable set of conditions to use in tasks or transformers options.
  */
 trait ConditionTrait
 {
@@ -25,30 +25,30 @@ trait ConditionTrait
 
     /**
      * Test the input with the given set of conditions
-     * True by default
+     * True by default.
      */
     protected function checkCondition(mixed $input, array $conditions): bool
     {
         foreach ($conditions['match'] as $key => $value) {
-            if (! $this->checkValue($input, $key, $value)) {
+            if (!$this->checkValue($input, $key, $value)) {
                 return false;
             }
         }
 
         foreach ($conditions['empty'] as $key => $value) {
-            if (! $this->checkEmpty($input, $key)) {
+            if (!$this->checkEmpty($input, $key)) {
                 return false;
             }
         }
 
         foreach ($conditions['match_regexp'] as $key => $value) {
-            if (! $this->checkValue($input, $key, $value, true, true)) {
+            if (!$this->checkValue($input, $key, $value, true, true)) {
                 return false;
             }
         }
 
         foreach ($conditions['not_match'] as $key => $value) {
-            if (! $this->checkValue($input, $key, $value, false)) {
+            if (!$this->checkValue($input, $key, $value, false)) {
                 return false;
             }
         }
@@ -60,7 +60,7 @@ trait ConditionTrait
         }
 
         foreach ($conditions['not_match_regexp'] as $key => $value) {
-            if (! $this->checkValue($input, $key, $value, false, true)) {
+            if (!$this->checkValue($input, $key, $value, false, true)) {
                 return false;
             }
         }
@@ -69,7 +69,7 @@ trait ConditionTrait
     }
 
     /**
-     * Configure available condition rules in a wrapper option
+     * Configure available condition rules in a wrapper option.
      */
     protected function configureWrappedConditionOptions(string $wrapperKey, OptionsResolver $resolver): void
     {
@@ -87,7 +87,7 @@ trait ConditionTrait
     }
 
     /**
-     * Configure available condition rules
+     * Configure available condition rules.
      */
     protected function configureConditionOptions(OptionsResolver $resolver): void
     {
@@ -104,7 +104,7 @@ trait ConditionTrait
     }
 
     /**
-     * Softly check if an input key match a value, or not
+     * Softly check if an input key match a value, or not.
      */
     protected function checkValue(
         object|array $input,
@@ -115,22 +115,22 @@ trait ConditionTrait
     ): bool {
         $currentValue = $this->getValue($input, $key);
 
-        if ($shouldMatch && ! $regexpMode && $currentValue !== $value) {
+        if ($shouldMatch && !$regexpMode && $currentValue !== $value) {
             return false;
         }
 
-        if (! $shouldMatch && ! $regexpMode && $currentValue === $value) {
+        if (!$shouldMatch && !$regexpMode && $currentValue === $value) {
             return false;
         }
 
         if ($regexpMode) {
             $pregMatch = preg_match($value, (string) $currentValue);
 
-            if ($shouldMatch && ($pregMatch === false || $pregMatch === 0)) {
+            if ($shouldMatch && (false === $pregMatch || 0 === $pregMatch)) {
                 return false;
             }
 
-            if (! $shouldMatch && ($pregMatch === false || $pregMatch > 0)) {
+            if (!$shouldMatch && (false === $pregMatch || $pregMatch > 0)) {
                 return false;
             }
         }
@@ -139,7 +139,7 @@ trait ConditionTrait
     }
 
     /**
-     * Check if the input property is empty or not
+     * Check if the input property is empty or not.
      */
     protected function checkEmpty(object|array $input, string $key): bool
     {
@@ -149,11 +149,11 @@ trait ConditionTrait
     }
 
     /**
-     * Soft value getter (return the value or null)
+     * Soft value getter (return the value or null).
      */
     protected function getValue(object|array $input, string $key): mixed
     {
-        if ($key === '') {
+        if ('' === $key) {
             $currentValue = $input;
         } elseif ($this->accessor->isReadable($input, $key)) {
             $currentValue = $this->accessor->getValue($input, $key);

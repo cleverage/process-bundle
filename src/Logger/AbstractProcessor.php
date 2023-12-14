@@ -25,7 +25,7 @@ class AbstractProcessor
 
     public function __invoke(LogRecord $record): LogRecord
     {
-        if (! empty($record->context)) {
+        if (!empty($record->context)) {
             $context = $this->normalizeRecordData($record->context);
             $record = new LogRecord(
                 $record->datetime,
@@ -58,7 +58,7 @@ class AbstractProcessor
     protected function addProcessInfoToRecord(array &$record): void
     {
         $processHistory = $this->processManager->getProcessHistory();
-        if (! $processHistory) {
+        if (!$processHistory) {
             return;
         }
 
@@ -70,7 +70,7 @@ class AbstractProcessor
     protected function addTaskInfoToRecord(array &$record): void
     {
         $taskConfiguration = $this->processManager->getTaskConfiguration();
-        if (! $taskConfiguration) {
+        if (!$taskConfiguration) {
             return;
         }
         $this->addToRecord($record, 'task_code', $taskConfiguration->getCode());

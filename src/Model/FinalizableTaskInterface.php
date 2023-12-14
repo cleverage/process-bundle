@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Model;
 
 /**
- * Allow the task to be initialized before any execution is done
+ * Allow the task to be initialized before any execution is done.
  */
 interface FinalizableTaskInterface extends TaskInterface
 {

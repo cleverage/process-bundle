@@ -16,7 +16,6 @@ namespace Transformer;
 use CleverAge\ProcessBundle\Transformer\CastTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use ValueError;
 
 class CastTransformerTest extends TestCase
 {
@@ -89,7 +88,7 @@ class CastTransformerTest extends TestCase
         $value = '123';
         $options = ['type' => 'invalid_type'];
 
-        $this->expectException(ValueError::class);
+        $this->expectException(\ValueError::class);
 
         $transformer->transform($value, $options);
     }

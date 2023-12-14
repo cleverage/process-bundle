@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Reads the file path from configuration and iterates over it
- * Ignores any input
+ * Ignores any input.
  */
 abstract class AbstractCsvTask extends AbstractCsvResourceTask
 {

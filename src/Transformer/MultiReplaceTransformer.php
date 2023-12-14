@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Quickly replace a list of values in a string
+ * Quickly replace a list of values in a string.
  *
  * ##### Options
  *

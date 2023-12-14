@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Read an XML file
+ * Read an XML file.
  */
 class XmlReaderTask extends AbstractConfigurableTask
 {
@@ -31,7 +31,7 @@ class XmlReaderTask extends AbstractConfigurableTask
 
     public function execute(ProcessState $state): void
     {
-        if ($state->getInput() !== null) {
+        if (null !== $state->getInput()) {
             $this->logger->warning('Input has been ignored for XMLReaderTask');
         }
 

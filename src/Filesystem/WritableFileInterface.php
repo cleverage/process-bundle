@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
- * Define a common interface for all file reading systems
+ * Define a common interface for all file reading systems.
  */
 interface WritableFileInterface extends FileStreamInterface
 {

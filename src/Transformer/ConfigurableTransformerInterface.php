@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Allows a service to configure the options for a transformer before running the transform function
+ * Allows a service to configure the options for a transformer before running the transform function.
  */
 interface ConfigurableTransformerInterface extends TransformerInterface
 {

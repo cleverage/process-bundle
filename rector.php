@@ -13,8 +13,8 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->importNames();
     $rectorConfig->importShortClasses();
 
-    $rectorConfig->paths([__DIR__ . '/src']);
-    $rectorConfig->skip([__DIR__ . '/src/Resources/tests']);
+    $rectorConfig->paths([__DIR__.'/src']);
+    $rectorConfig->skip([__DIR__.'/src/Resources/tests']);
 
     $rectorConfig->sets([
         SetList::TYPE_DECLARATION,

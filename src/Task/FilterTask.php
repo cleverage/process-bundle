@@ -22,7 +22,7 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 /**
  * Skip inputs under given matching conditions
  * - equality is softly checked
- * - unexisting key is the same as null
+ * - unexisting key is the same as null.
  */
 class FilterTask extends AbstractConfigurableTask
 {
@@ -37,7 +37,7 @@ class FilterTask extends AbstractConfigurableTask
     public function execute(ProcessState $state): void
     {
         $input = $state->getInput();
-        if (! $this->checkCondition($input, $this->getOptions($state))) {
+        if (!$this->checkCondition($input, $this->getOptions($state))) {
             $state->setErrorOutput($input);
             $state->setSkipped(true);
 

@@ -13,9 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use DateTimeInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
 
 /**
  * Transformer aiming to take a date as an input (object or string) and format it according to options.
@@ -30,14 +28,14 @@ class DateFormatTransformer implements ConfigurableTransformerInterface
 {
     public function transform(mixed $value, array $options = []): mixed
     {
-        if (! $value) {
+        if (!$value) {
             return $value;
         }
 
-        if ($value instanceof DateTimeInterface) {
+        if ($value instanceof \DateTimeInterface) {
             $date = $value;
         } else {
-            throw new UnexpectedValueException('Given value cannot be parsed into a date');
+            throw new \UnexpectedValueException('Given value cannot be parsed into a date');
         }
 
         return $date->format($options['format']);

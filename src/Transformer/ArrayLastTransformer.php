@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 /**
- * Return the last element of an array
+ * Return the last element of an array.
  */
 class ArrayLastTransformer implements TransformerInterface
 {
     public function transform(mixed $value, array $options = []): mixed
     {
-        return array_values(array_slice($value, -1))[0];
+        return array_values(\array_slice($value, -1))[0];
     }
 
     public function getCode(): string

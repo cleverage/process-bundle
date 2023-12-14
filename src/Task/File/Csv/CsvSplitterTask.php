@@ -16,18 +16,17 @@ namespace CleverAge\ProcessBundle\Task\File\Csv;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Filesystem\CsvResource;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use RuntimeException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Split long CSV files into smaller ones, keeping the headers
+ * Split long CSV files into smaller ones, keeping the headers.
  */
 class CsvSplitterTask extends InputCsvReaderTask
 {
     public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
-        if ($this->csv === null) {
+        if (null === $this->csv) {
             $headers = $this->getHeaders($state, $options);
             $csv = new CsvFile(
                 $options['file_path'],
@@ -48,11 +47,11 @@ class CsvSplitterTask extends InputCsvReaderTask
     /**
      * Moves the internal pointer to the next element,
      * return true if the task has a next element
-     * return false if the task has terminated it's iteration
+     * return false if the task has terminated it's iteration.
      */
     public function next(ProcessState $state): bool
     {
-        if (! $this->csv instanceof CsvResource) {
+        if (!$this->csv instanceof CsvResource) {
             return false;
         }
 
@@ -62,7 +61,7 @@ class CsvSplitterTask extends InputCsvReaderTask
             $this->csv = null;
         }
 
-        return ! $endOfFile;
+        return !$endOfFile;
     }
 
     public function finalize(ProcessState $state): void
@@ -75,10 +74,10 @@ class CsvSplitterTask extends InputCsvReaderTask
 
     protected function splitCsv(CsvFile $csv, int $maxLines): string
     {
-        $tmpFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'php_' . uniqid('process', false) . '.csv';
+        $tmpFilePath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_'.uniqid('process', false).'.csv';
         $tmpFile = fopen($tmpFilePath, 'wb+');
-        if ($tmpFile === false) {
-            throw new RuntimeException("Unable to open temporary file {$tmpFilePath}");
+        if (false === $tmpFile) {
+            throw new \RuntimeException("Unable to open temporary file {$tmpFilePath}");
         }
         $splitCsv = new CsvResource(
             $tmpFile,
@@ -89,9 +88,9 @@ class CsvSplitterTask extends InputCsvReaderTask
         );
         $splitCsv->writeHeaders();
 
-        while ($splitCsv->getLineNumber() < $maxLines && ! $csv->isEndOfFile()) {
+        while ($splitCsv->getLineNumber() < $maxLines && !$csv->isEndOfFile()) {
             $raw = $csv->readRaw();
-            if ($raw === false) {
+            if (false === $raw) {
                 continue; // This is probably an empty line, no harm to skip it
             }
             $splitCsv->writeRaw($raw);

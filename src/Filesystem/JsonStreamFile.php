@@ -13,14 +13,12 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Filesystem;
 
-use SplFileObject;
-
 /**
- * Wrapper around JSON files to read them in a stream
+ * Wrapper around JSON files to read them in a stream.
  */
 class JsonStreamFile implements FileStreamInterface, WritableFileInterface
 {
-    protected SplFileObject $file;
+    protected \SplFileObject $file;
 
     protected ?int $lineCount = null;
 
@@ -28,10 +26,10 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
 
     public function __construct(string $filename, string $mode = 'rb')
     {
-        $this->file = new SplFileObject($filename, $mode);
+        $this->file = new \SplFileObject($filename, $mode);
 
         // Useful to skip empty trailing lines
-        $this->file->setFlags(SplFileObject::READ_AHEAD | SplFileObject::SKIP_EMPTY);
+        $this->file->setFlags(\SplFileObject::READ_AHEAD | \SplFileObject::SKIP_EMPTY);
     }
 
     /**
@@ -39,10 +37,10 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
      */
     public function getLineCount(): int
     {
-        if ($this->lineCount === null) {
+        if (null === $this->lineCount) {
             $this->rewind();
             $line = 0;
-            while (! $this->isEndOfFile()) {
+            while (!$this->isEndOfFile()) {
                 ++$line;
                 $this->file->next();
             }
@@ -65,7 +63,7 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
     }
 
     /**
-     * Return an array containing current data and moving the file pointer
+     * Return an array containing current data and moving the file pointer.
      */
     public function readLine(int $length = null): ?array
     {
@@ -74,21 +72,21 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
         }
 
         $rawLine = $this->file->fgets();
-        $this->lineNumber++;
+        ++$this->lineNumber;
 
-        return json_decode($rawLine, true, 512, JSON_THROW_ON_ERROR);
+        return json_decode($rawLine, true, 512, \JSON_THROW_ON_ERROR);
     }
 
     public function writeLine(array $fields): int
     {
-        $this->file->fwrite(json_encode($fields, JSON_THROW_ON_ERROR) . PHP_EOL);
-        $this->lineNumber++;
+        $this->file->fwrite(json_encode($fields, \JSON_THROW_ON_ERROR).\PHP_EOL);
+        ++$this->lineNumber;
 
         return $this->lineNumber;
     }
 
     /**
-     * Rewind data to array
+     * Rewind data to array.
      */
     public function rewind(): void
     {

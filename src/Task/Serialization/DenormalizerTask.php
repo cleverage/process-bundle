@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Denormalize input to output with configurable class and format
+ * Denormalize input to output with configurable class and format.
  */
 class DenormalizerTask extends AbstractConfigurableTask
 {

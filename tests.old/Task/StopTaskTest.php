@@ -18,7 +18,7 @@ use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
 class StopTaskTest extends AbstractProcessTest
 {
     /**
-     * Assert the iteration is stopped at the right time
+     * Assert the iteration is stopped at the right time.
      */
     public function testIterableInterruption(): void
     {

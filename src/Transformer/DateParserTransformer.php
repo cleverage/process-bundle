@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use DateTime;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
 
 /**
- * Transformer aiming to take a date as an input (object or a format defined string) to strictly output aa \DateTime
+ * Transformer aiming to take a date as an input (object or a format defined string) to strictly output aa \DateTime.
  *
  * @example in YML config
  * transformers:
@@ -29,14 +27,14 @@ class DateParserTransformer implements ConfigurableTransformerInterface
 {
     public function transform(mixed $value, array $options = []): mixed
     {
-        if (! $value || $value instanceof DateTime) {
+        if (!$value || $value instanceof \DateTime) {
             return $value;
         }
 
-        $date = DateTime::createFromFormat($options['format'], $value);
+        $date = \DateTime::createFromFormat($options['format'], $value);
 
-        if (! $date) {
-            throw new UnexpectedValueException('Given value cannot be parsed into a date');
+        if (!$date) {
+            throw new \UnexpectedValueException('Given value cannot be parsed into a date');
         }
 
         return $date;

@@ -14,12 +14,12 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests;
 
 /**
- * Test context replacement mechanism
+ * Test context replacement mechanism.
  */
 class ContextTest extends AbstractProcessTest
 {
     /**
-     * Assert a value can correctly passed through context
+     * Assert a value can correctly passed through context.
      */
     public function testSimpleContext(): void
     {
@@ -39,7 +39,7 @@ class ContextTest extends AbstractProcessTest
     }
 
     /**
-     * Assert a value can correctly passed and merged into a string, through context
+     * Assert a value can correctly passed and merged into a string, through context.
      */
     public function testContextMergedValue(): void
     {
@@ -51,7 +51,7 @@ class ContextTest extends AbstractProcessTest
     }
 
     /**
-     * Assert 2 values can correctly passed and merged into a string, through context
+     * Assert 2 values can correctly passed and merged into a string, through context.
      */
     public function testContextMultiValue(): void
     {
@@ -68,12 +68,12 @@ class ContextTest extends AbstractProcessTest
     }
 
     /**
-     * Assert a complex value will fail while being merged into a string, through context
-     *
-     * @expectedException \RuntimeException
+     * Assert a complex value will fail while being merged into a string, through context.
      */
     public function testContextCannotMergeValue(): void
     {
+        $this->setExpectedException(\RuntimeException::class);
+
         $this->processManager->execute(
             'test.context.merged_value',
             null,
@@ -86,7 +86,7 @@ class ContextTest extends AbstractProcessTest
     }
 
     /**
-     * Assert a complex value can correctly passed through context
+     * Assert a complex value can correctly passed through context.
      */
     public function testComplexContext(): void
     {

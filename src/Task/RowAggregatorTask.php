@@ -37,7 +37,7 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
 
     /**
      * Store inputs and once everything has been received, pass to next task
-     * Once an output has been generated this task is reset, and may wait for another loop
+     * Once an output has been generated this task is reset, and may wait for another loop.
      */
     public function execute(ProcessState $state): void
     {
@@ -47,18 +47,16 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
         $aggregateColumns = $this->getOption($state, 'aggregate_columns');
         $aggregationKey = $this->getOption($state, 'aggregation_key');
 
-        if (! array_key_exists($aggregateBy, $input)) {
-            throw new InvalidProcessConfigurationException(
-                "Array aggregator exception: missing column '{$aggregateBy}'"
-            );
+        if (!\array_key_exists($aggregateBy, $input)) {
+            throw new InvalidProcessConfigurationException("Array aggregator exception: missing column '{$aggregateBy}'");
         }
 
         $inputAggregateBy = $input[$aggregateBy];
 
-        if (! array_key_exists($inputAggregateBy, $this->result)) {
+        if (!\array_key_exists($inputAggregateBy, $this->result)) {
             $this->result[$inputAggregateBy] = $input;
             foreach ($aggregateColumns as $aggregateColumn) {
-                if (array_key_exists($aggregateColumn, $this->result[$inputAggregateBy])) {
+                if (\array_key_exists($aggregateColumn, $this->result[$inputAggregateBy])) {
                     unset($this->result[$inputAggregateBy][$aggregateColumn]);
                 }
             }
@@ -66,10 +64,8 @@ class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTask
 
         $inputAggregateColumns = [];
         foreach ($aggregateColumns as $aggregateColumn) {
-            if (! array_key_exists($aggregateColumn, $input)) {
-                throw new InvalidProcessConfigurationException(
-                    "Array aggregator exception: missing column {$aggregateColumn}"
-                );
+            if (!\array_key_exists($aggregateColumn, $input)) {
+                throw new InvalidProcessConfigurationException("Array aggregator exception: missing column {$aggregateColumn}");
             }
             $inputAggregateColumns[$aggregateColumn] = $input[$aggregateColumn];
         }

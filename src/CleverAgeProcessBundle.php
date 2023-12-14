@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class CleverAgeProcessBundle extends Bundle
 {
     /**
-     * Adding compiler passes to inject services into registry
+     * Adding compiler passes to inject services into registry.
      */
     public function build(ContainerBuilder $container): void
     {

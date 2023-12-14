@@ -38,7 +38,7 @@ class EvaluatorTransformer implements ConfigurableTransformerInterface
         $resolver->setNormalizer(
             'expression',
             function (Options $options, $expression) {
-                if (is_array($options['variables'])) {
+                if (\is_array($options['variables'])) {
                     return $this->language->parse($expression, $options['variables']);
                 }
 

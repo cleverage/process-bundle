@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Model;
 
 /**
- * When iterations are over, this allows task that have some inner buffer to flush it to the output
+ * When iterations are over, this allows task that have some inner buffer to flush it to the output.
  */
 interface FlushableTaskInterface extends TaskInterface
 {

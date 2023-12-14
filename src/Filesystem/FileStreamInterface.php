@@ -14,20 +14,20 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
- * Define a common interface for all file reading systems
+ * Define a common interface for all file reading systems.
  */
 interface FileStreamInterface
 {
     public function getLineCount(): int;
 
     /**
-     * Warning! This returns the line number of the pointer inside the file so you need to call it BEFORE reading a line
+     * Warning! This returns the line number of the pointer inside the file so you need to call it BEFORE reading a line.
      */
     public function getLineNumber(): int;
 
     public function isEndOfFile(): bool;
 
-    public function readLine(?int $length = null): ?array;
+    public function readLine(int $length = null): ?array;
 
     /**
      * This methods rewinds the file to the first line of data, skipping the headers.

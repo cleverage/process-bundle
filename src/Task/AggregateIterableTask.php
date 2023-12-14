@@ -15,10 +15,9 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use function count;
 
 /**
- * Class AggregateIterableTask
+ * Class AggregateIterableTask.
  *
  * Aggregate the result of iterable tasks in an array
  */
@@ -33,7 +32,7 @@ class AggregateIterableTask implements BlockingTaskInterface
 
     public function proceed(ProcessState $state): void
     {
-        if (count($this->result) === 0) {
+        if (0 === \count($this->result)) {
             $state->setSkipped(true);
         } else {
             $state->setOutput($this->result);

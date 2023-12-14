@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Tests;
 class IterableTaskTest extends AbstractProcessTest
 {
     /**
-     * Check the execution order of a process containing one iterable loop and a blocking task
+     * Check the execution order of a process containing one iterable loop and a blocking task.
      */
     public function testIterableProcess(): void
     {
@@ -67,7 +67,7 @@ class IterableTaskTest extends AbstractProcessTest
 
     /**
      * Assert 2 iterators can run alone, without a subsequent blocking task
-     * Assert \CleverAge\ProcessBundle\Task\InputIteratorTask can correctly reset
+     * Assert \CleverAge\ProcessBundle\Task\InputIteratorTask can correctly reset.
      */
     public function testDoubleIterableAlone(): void
     {
@@ -97,7 +97,7 @@ class IterableTaskTest extends AbstractProcessTest
     }
 
     /**
-     * Assert the SplitJoinLineTask works the way it's supposed to
+     * Assert the SplitJoinLineTask works the way it's supposed to.
      */
     public function testSplitJoinLine(): void
     {

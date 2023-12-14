@@ -17,10 +17,9 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
-use UnexpectedValueException;
 
 /**
- * Normalize input to output with configurable format
+ * Normalize input to output with configurable format.
  */
 class NormalizerTask extends AbstractConfigurableTask
 {
@@ -33,8 +32,8 @@ class NormalizerTask extends AbstractConfigurableTask
     {
         $options = $this->getOptions($state);
 
-        if (! $this->normalizer->supportsNormalization($state->getInput(), $options['format'])) {
-            throw new UnexpectedValueException('Given value is not normalizable for format ' . $options['format']);
+        if (!$this->normalizer->supportsNormalization($state->getInput(), $options['format'])) {
+            throw new \UnexpectedValueException('Given value is not normalizable for format '.$options['format']);
         }
 
         $normalizedData = $this->normalizer->normalize(

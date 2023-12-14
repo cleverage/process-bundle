@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Exception;
 
-use UnexpectedValueException;
-
 /**
- * Exception thrown when trying to fetch a missing task configuration
+ * Exception thrown when trying to fetch a missing task configuration.
  */
-class MissingTaskConfigurationException extends UnexpectedValueException implements ProcessExceptionInterface
+class MissingTaskConfigurationException extends \UnexpectedValueException implements ProcessExceptionInterface
 {
     public static function create(?string $code = ''): self
     {

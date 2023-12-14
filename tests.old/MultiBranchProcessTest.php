@@ -15,12 +15,12 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests;
 
 /**
- * Assert multiple branch processes are correctly checked
+ * Assert multiple branch processes are correctly checked.
  */
 class MultiBranchProcessTest extends AbstractProcessTest
 {
     /**
-     * Assert only one branch is called
+     * Assert only one branch is called.
      */
     public function testMultiBranchProcess(): void
     {
@@ -106,12 +106,12 @@ class MultiBranchProcessTest extends AbstractProcessTest
     }
 
     /**
-     * Assert a task cannot be started if the process is not valid
-     *
-     * @expectedException \CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException
+     * Assert a task cannot be started if the process is not valid.
      */
     public function testMultiBranchProcessError(): void
     {
+        $this->setExpectedException(\CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException::class);
+
         $this->processManager->execute('test.multi_branch_process_entry_end_error');
     }
 }

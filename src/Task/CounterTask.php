@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Count the number of times the task is processed and continue every N iteration (skip the rest of the time)
- * Flush at the end with the actual count
+ * Flush at the end with the actual count.
  */
 class CounterTask extends AbstractConfigurableTask implements FlushableTaskInterface
 {
@@ -28,9 +28,9 @@ class CounterTask extends AbstractConfigurableTask implements FlushableTaskInter
 
     public function execute(ProcessState $state): void
     {
-        $this->counter++;
+        ++$this->counter;
         $modulo = $this->getOption($state, 'flush_every');
-        if ($this->counter % $modulo === 0) {
+        if (0 === $this->counter % $modulo) {
             $state->setOutput($this->counter);
         } else {
             $state->setSkipped(true);
@@ -38,12 +38,12 @@ class CounterTask extends AbstractConfigurableTask implements FlushableTaskInter
     }
 
     /**
-     * Condition is inversed during flush
+     * Condition is inversed during flush.
      */
     public function flush(ProcessState $state): void
     {
         $modulo = $this->getOption($state, 'flush_every');
-        if ($this->counter % $modulo === 0) {
+        if (0 === $this->counter % $modulo) {
             $state->setSkipped(true);
         } else {
             $state->setOutput($this->counter);

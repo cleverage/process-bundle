@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests;
 
 /**
- * Assert basic behavior for blocking tasks (using the aggregator implementation)
+ * Assert basic behavior for blocking tasks (using the aggregator implementation).
  */
 class BlockingTaskTest extends AbstractProcessTest
 {
@@ -43,7 +43,7 @@ class BlockingTaskTest extends AbstractProcessTest
      * Assert a process with multiple blocking tasks can execute properly.
      * Check
      *  - a subsequent blocking task will be proceeded at least once
-     *  - a subsequent blocking task will be proceeded at most once
+     *  - a subsequent blocking task will be proceeded at most once.
      */
     public function testMultipleBlocking(): void
     {
@@ -54,7 +54,7 @@ class BlockingTaskTest extends AbstractProcessTest
 
     /**
      * Assert when there is multiple iterations before a blocking that all are successfully resolved, and the blocking
-     * is executed only once
+     * is executed only once.
      */
     public function testMultipleIterationBlocking(): void
     {
@@ -72,7 +72,7 @@ class BlockingTaskTest extends AbstractProcessTest
     }
 
     /**
-     * Assert that if a blocking is never executed, it will automatically skip subsequent tasks
+     * Assert that if a blocking is never executed, it will automatically skip subsequent tasks.
      */
     public function testBlockingEmptyData(): void
     {

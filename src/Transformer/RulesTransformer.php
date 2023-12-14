@@ -14,14 +14,13 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
-use InvalidArgumentException;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Uses a set of rules to conditionally transform a value
+ * Uses a set of rules to conditionally transform a value.
  */
 class RulesTransformer implements ConfigurableTransformerInterface
 {
@@ -77,13 +76,13 @@ class RulesTransformer implements ConfigurableTransformerInterface
             foreach ($rules as $rule) {
                 if ($rule['default']) {
                     if ($hasFoundDefault) {
-                        throw new InvalidArgumentException('Rules set cannot have more than 2 default rules');
+                        throw new \InvalidArgumentException('Rules set cannot have more than 2 default rules');
                     }
                     $hasFoundDefault = true;
                 }
 
-                if ($hasFoundDefault && $rule['condition'] !== null) {
-                    throw new InvalidArgumentException('A conditional rule cannot be placed after a default rule');
+                if ($hasFoundDefault && null !== $rule['condition']) {
+                    throw new \InvalidArgumentException('A conditional rule cannot be placed after a default rule');
                 }
             }
 
@@ -92,9 +91,9 @@ class RulesTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Configure options for one "rule" block
+     * Configure options for one "rule" block.
      */
-    public function configureRuleOptions(OptionsResolver $resolver, ?array $expressionVariables = null): void
+    public function configureRuleOptions(OptionsResolver $resolver, array $expressionVariables = null): void
     {
         $resolver->setDefaults([
             'condition' => null,
@@ -107,18 +106,17 @@ class RulesTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('set_null', 'bool');
 
         $expressionNormalizer = function (Options $options, $expression) use ($expressionVariables) {
-            if (is_array($expressionVariables) && $expression !== null) {
+            if (\is_array($expressionVariables) && null !== $expression) {
                 return $this->language->parse($expression, $expressionVariables);
             }
+
             return $expression;
         };
 
         $resolver->setNormalizer('condition', $expressionNormalizer);
         $resolver->setNormalizer('default', function (Options $options, $value) {
             if ($value && $options['condition']) {
-                throw new InvalidArgumentException(
-                    'A rule cannot have a condition and be the default in the same time'
-                );
+                throw new \InvalidArgumentException('A rule cannot have a condition and be the default in the same time');
             }
 
             return $value;
@@ -128,11 +126,11 @@ class RulesTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Test if a value match a rule
+     * Test if a value match a rule.
      */
     protected function matchRule(mixed $value, string|ParsedExpression $rule, bool $useValueAsVariable): bool
     {
-        if ($rule['condition'] !== null) {
+        if (null !== $rule['condition']) {
             $expressionValues = $useValueAsVariable ? $value : [
                 'value' => $value,
             ];
@@ -140,7 +138,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
             return $this->language->evaluate($rule['condition'], $expressionValues);
         }
 
-        /** @noinspection PhpStrictTypeCheckingInspection */
+        /* @noinspection PhpStrictTypeCheckingInspection */
         return $rule['default'];
     }
 }

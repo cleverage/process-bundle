@@ -18,14 +18,13 @@ use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Iterator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
 
 /**
- * Base class to handle output iterations
+ * Base class to handle output iterations.
  */
 abstract class AbstractIterableOutputTask extends AbstractConfigurableTask implements IterableTaskInterface
 {
-    protected ?Iterator $iterator = null;
+    protected ?\Iterator $iterator = null;
 
     public function execute(ProcessState $state): void
     {
@@ -44,18 +43,18 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
     /**
      * Moves the internal pointer to the next element,
      * return true if the task has a next element
-     * return false if the task has terminated it's iteration
+     * return false if the task has terminated it's iteration.
      */
     public function next(ProcessState $state): bool
     {
-        if (! $this->iterator) {
+        if (!$this->iterator) {
             return false;
         }
         $this->iterator->next();
 
         $state->removeErrorContext('iterator_key');
 
-        if (! $this->iterator->valid()) {
+        if (!$this->iterator->valid()) {
             // Reset the iterator to allow the following iteration
             $this->iterator = null;
 
@@ -66,11 +65,11 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
     }
 
     /**
-     * Create or recreate an iterator from input
+     * Create or recreate an iterator from input.
      */
     protected function handleIteratorFromInput(ProcessState $state): void
     {
-        if ($this->iterator instanceof Iterator) {
+        if ($this->iterator instanceof \Iterator) {
             if ($this->iterator->valid()) {
                 return; // No action needed, execution is in progress
             }
@@ -79,22 +78,20 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
         }
 
         // This should never be reached
-        /** @phpstan-ignore-next-line */
-        if ($this->iterator !== null) {
-            throw new UnexpectedValueException(
-                "At this point iterator should have been null, maybe it's a wrong type..."
-            );
+        /* @phpstan-ignore-next-line */
+        if (null !== $this->iterator) {
+            throw new \UnexpectedValueException("At this point iterator should have been null, maybe it's a wrong type...");
         }
 
         $this->iterator = $this->initializeIterator($state);
     }
 
     /**
-     * Allow to not implement this method, not required by most tasks, removing inheritance would break back-compat
+     * Allow to not implement this method, not required by most tasks, removing inheritance would break back-compat.
      */
     protected function configureOptions(OptionsResolver $resolver): void
     {
     }
 
-    abstract protected function initializeIterator(ProcessState $state): Iterator;
+    abstract protected function initializeIterator(ProcessState $state): \Iterator;
 }

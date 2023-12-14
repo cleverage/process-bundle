@@ -15,10 +15,7 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use RuntimeException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
-use function in_array;
 
 /**
  * Wait for defined inputs before passing an aggregated output.
@@ -33,23 +30,21 @@ class InputAggregatorTask extends AbstractConfigurableTask
 
     /**
      * Store inputs and once everything has been received, pass to next task
-     * Once an output has been generated this task is reset, and may wait for another loop
+     * Once an output has been generated this task is reset, and may wait for another loop.
      */
     public function execute(ProcessState $state): void
     {
         $previousState = $state->getPreviousState();
-        if (! $previousState || ! $previousState->getTaskConfiguration()) {
-            throw new UnexpectedValueException('This task cannot be used without a previous task');
+        if (!$previousState || !$previousState->getTaskConfiguration()) {
+            throw new \UnexpectedValueException('This task cannot be used without a previous task');
         }
 
         $inputCode = $this->getInputCode($state);
-        if (array_key_exists($inputCode, $this->inputs)) {
+        if (\array_key_exists($inputCode, $this->inputs)) {
             if ($this->getOption($state, 'clean_input_on_override')) {
                 $this->inputs = [];
             } else {
-                throw new UnexpectedValueException(
-                    "The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output"
-                );
+                throw new \UnexpectedValueException("The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output");
             }
         }
 
@@ -60,7 +55,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
             $keepInputs = $this->getOption($state, 'keep_inputs');
             // Only clear inputs that are not in the keep_inputs option
             foreach ($this->inputs as $inputCode => $value) {
-                if ($keepInputs !== null && in_array($inputCode, $keepInputs, true)) {
+                if (null !== $keepInputs && \in_array($inputCode, $keepInputs, true)) {
                     continue;
                 }
                 unset($this->inputs[$inputCode]);
@@ -83,32 +78,32 @@ class InputAggregatorTask extends AbstractConfigurableTask
     }
 
     /**
-     * Map the previous task code to an input code
+     * Map the previous task code to an input code.
      */
     protected function getInputCode(ProcessState $state): string
     {
         $previousState = $state->getPreviousState();
-        if (! $previousState) {
-            throw new RuntimeException('No previous state for current task');
+        if (!$previousState) {
+            throw new \RuntimeException('No previous state for current task');
         }
         $previousTaskCode = $previousState->getTaskConfiguration()
             ->getCode();
         $inputCodes = $this->getOption($state, 'input_codes');
-        if (! array_key_exists($previousTaskCode, $inputCodes)) {
-            throw new UnexpectedValueException("Task '{$previousTaskCode}' is not mapped in the input_codes option");
+        if (!\array_key_exists($previousTaskCode, $inputCodes)) {
+            throw new \UnexpectedValueException("Task '{$previousTaskCode}' is not mapped in the input_codes option");
         }
 
         return $inputCodes[$previousTaskCode];
     }
 
     /**
-     * Check if the received inputs match the defined mappings
+     * Check if the received inputs match the defined mappings.
      */
     protected function isResolved(ProcessState $state): bool
     {
         $inputCodes = $this->getOption($state, 'input_codes');
         foreach ($inputCodes as $inputCode) {
-            if (! array_key_exists($inputCode, $this->inputs)) {
+            if (!\array_key_exists($inputCode, $this->inputs)) {
                 return false;
             }
         }

@@ -19,7 +19,7 @@ use Symfony\Component\DependencyInjection\Exception\AutowiringFailedException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
- * Check the presence of the serializer (required for this bundle), and help the user to set it
+ * Check the presence of the serializer (required for this bundle), and help the user to set it.
  */
 class CheckSerializerCompilerPass implements CompilerPassInterface
 {
@@ -27,7 +27,7 @@ class CheckSerializerCompilerPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container): void
     {
-        if (! $container->has('serializer') && ! $container->has(DenormalizerInterface::class)) {
+        if (!$container->has('serializer') && !$container->has(DenormalizerInterface::class)) {
             throw new AutowiringFailedException('serializer', self::MSG);
         }
     }

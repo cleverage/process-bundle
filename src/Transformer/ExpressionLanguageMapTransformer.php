@@ -17,10 +17,9 @@ use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use UnexpectedValueException;
 
 /**
- * Parse an input using the Expression Language and returning a specific value upon a specific condition
+ * Parse an input using the Expression Language and returning a specific value upon a specific condition.
  */
 class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterface
 {
@@ -42,8 +41,8 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
         $resolver->setNormalizer(
             'map',
             function (Options $options, $values): array {
-                if (! is_array($values)) {
-                    throw new UnexpectedValueException('The map must be an array');
+                if (!\is_array($values)) {
+                    throw new \UnexpectedValueException('The map must be an array');
                 }
                 $resolver = new OptionsResolver();
                 $resolver->setRequired(['condition', 'output']);
@@ -79,15 +78,15 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
         if ($options['keep_missing']) {
             return $value;
         }
-        if (! $options['ignore_missing']) {
-            throw new UnexpectedValueException("No expression accepting value '{$value}' in map");
+        if (!$options['ignore_missing']) {
+            throw new \UnexpectedValueException("No expression accepting value '{$value}' in map");
         }
 
         return null;
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {

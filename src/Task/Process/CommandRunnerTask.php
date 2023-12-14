@@ -20,7 +20,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Process\Process;
 
 /**
- * Launch a system command for each input, passing input to command
+ * Launch a system command for each input, passing input to command.
  */
 class CommandRunnerTask extends AbstractConfigurableTask
 {

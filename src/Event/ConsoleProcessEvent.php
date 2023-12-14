@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**
- * Event object used during CLI process manipulation
+ * Event object used during CLI process manipulation.
  */
 class ConsoleProcessEvent extends Event
 {

@@ -13,12 +13,10 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Exception;
 
-use UnexpectedValueException;
-
 /**
- * Exception thrown when trying to fetch a missing process
+ * Exception thrown when trying to fetch a missing process.
  */
-class MissingProcessException extends UnexpectedValueException implements ProcessExceptionInterface
+class MissingProcessException extends \UnexpectedValueException implements ProcessExceptionInterface
 {
     public static function create(?string $code = ''): self
     {

@@ -16,7 +16,6 @@ namespace CleverAge\ProcessBundle\Task\File;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Iterator;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -26,14 +25,14 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Browse a folder an iterate each file for output
+ * Browse a folder an iterate each file for output.
  */
 class FolderBrowserTask extends AbstractConfigurableTask implements IterableTaskInterface
 {
     /**
-     * @var Iterator|SplFileInfo[]|null
+     * @var \Iterator|SplFileInfo[]|null
      */
-    protected Iterator|array|null $files = null;
+    protected \Iterator|array|null $files = null;
 
     public function __construct(
         protected LoggerInterface $logger
@@ -43,7 +42,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
     public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
-        if ($this->files === null) {
+        if (null === $this->files) {
             $finder = new Finder();
             $finder->files();
             if ($options['name_pattern']) {
@@ -53,7 +52,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
             $this->files->rewind();
         }
 
-        if (! $this->files->valid()) {
+        if (!$this->files->valid()) {
             $this->logger->log($options['empty_log_level'], "No item found in path {$options['folder_path']}");
             $state->setSkipped(true);
             $state->setErrorOutput($options['folder_path']);
@@ -71,11 +70,11 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
     /**
      * Moves the internal pointer to the next element,
      * return true if the task has a next element
-     * return false if the task has terminated it's iteration
+     * return false if the task has terminated it's iteration.
      */
     public function next(ProcessState $state): bool
     {
-        if (! $this->files) {
+        if (!$this->files) {
             return false;
         }
         $this->files->next();
@@ -91,12 +90,10 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
         $resolver->setNormalizer(
             'folder_path',
             static function (Options $options, $value) {
-                if (! is_dir($value)) {
-                    throw new InvalidConfigurationException(
-                        "Folder path does not exists or is not a folder: '{$value}'"
-                    );
+                if (!is_dir($value)) {
+                    throw new InvalidConfigurationException("Folder path does not exists or is not a folder: '{$value}'");
                 }
-                if (! is_readable($value)) {
+                if (!is_readable($value)) {
                     throw new InvalidConfigurationException("Folder path is not readable: '{$value}'");
                 }
 

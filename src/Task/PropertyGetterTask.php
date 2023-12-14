@@ -15,13 +15,12 @@ namespace CleverAge\ProcessBundle\Task;
 
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Get a property on the input and return it with PropertyAccessor
+ * Get a property on the input and return it with PropertyAccessor.
  */
 class PropertyGetterTask extends AbstractConfigurableTask
 {
@@ -39,7 +38,7 @@ class PropertyGetterTask extends AbstractConfigurableTask
 
         try {
             $output = $this->accessor->getValue($input, $property);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $state->addErrorContextValue('property', $property);
             $state->setException($e);
 

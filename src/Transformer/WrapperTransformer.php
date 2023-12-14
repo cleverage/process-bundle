@@ -18,7 +18,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class WrapperTransformer implements ConfigurableTransformerInterface
 {
     /**
-     * Must return the transformed $value
+     * Must return the transformed $value.
      */
     public function transform(mixed $value, array $options = []): array
     {
@@ -36,7 +36,7 @@ class WrapperTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {

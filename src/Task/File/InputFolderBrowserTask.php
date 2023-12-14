@@ -15,12 +15,11 @@ namespace CleverAge\ProcessBundle\Task\File;
 
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use LogicException;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Browse a folder with the path as an input and iterate each file for output
+ * Browse a folder with the path as an input and iterate each file for output.
  */
 class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskInterface
 {
@@ -52,21 +51,17 @@ class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskI
     {
         $options = parent::getOptions($state);
         if ($state->getInput()) {
-            $folderPath = $options['base_folder_path'] . $state->getInput();
+            $folderPath = $options['base_folder_path'].$state->getInput();
             if ($this->folderPath && $folderPath !== $this->folderPath) {
-                throw new LogicException(
-                    "Folder path '{$folderPath}' already initialized with a different value {$this->folderPath}"
-                );
+                throw new \LogicException("Folder path '{$folderPath}' already initialized with a different value {$this->folderPath}");
             }
             $this->folderPath = $folderPath;
         }
 
-        if (! is_dir($this->folderPath)) {
-            throw new InvalidConfigurationException(
-                "Folder path does not exists or is not a folder: '{$this->folderPath}'"
-            );
+        if (!is_dir($this->folderPath)) {
+            throw new InvalidConfigurationException("Folder path does not exists or is not a folder: '{$this->folderPath}'");
         }
-        if (! is_readable($this->folderPath)) {
+        if (!is_readable($this->folderPath)) {
             throw new InvalidConfigurationException("Folder path is not readable: '{$this->folderPath}'");
         }
         $options['folder_path'] = $this->folderPath;

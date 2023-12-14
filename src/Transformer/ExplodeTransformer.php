@@ -16,13 +16,13 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Explode a string to an array based on a split character
+ * Explode a string to an array based on a split character.
  */
 class ExplodeTransformer implements ConfigurableTransformerInterface
 {
     public function transform(mixed $value, array $options = []): array
     {
-        if ($value === null || $value === '') {
+        if (null === $value || '' === $value) {
             return [];
         }
 
@@ -30,7 +30,7 @@ class ExplodeTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {

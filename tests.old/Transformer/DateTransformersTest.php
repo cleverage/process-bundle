@@ -14,15 +14,14 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests\Transformer;
 
 use CleverAge\ProcessBundle\Tests\AbstractProcessTest;
-use DateTime;
 
 /**
- * Tests for Date transformers
+ * Tests for Date transformers.
  */
 class DateTransformersTest extends AbstractProcessTest
 {
     /**
-     * Assert a date string can be formatted into another string
+     * Assert a date string can be formatted into another string.
      */
     public function testDateFormatString(): void
     {
@@ -31,45 +30,45 @@ class DateTransformersTest extends AbstractProcessTest
     }
 
     /**
-     * Assert a date object can be formatted into a string
+     * Assert a date object can be formatted into a string.
      */
     public function testDateFormatObject(): void
     {
-        $date = DateTime::createFromFormat(DATE_ATOM, '2001-01-02T00:00:00+00:00');
+        $date = \DateTime::createFromFormat(\DATE_ATOM, '2001-01-02T00:00:00+00:00');
         $result = $this->processManager->execute('test.date_transformers.date_format', $date);
         self::assertEquals('2001-01-02', $result);
     }
 
     /**
-     * Assert a date can be parsed using a given format
+     * Assert a date can be parsed using a given format.
      */
     public function testDateParser(): void
     {
-        $date = DateTime::createFromFormat('d/m/Y', '01/01/2001');
+        $date = \DateTime::createFromFormat('d/m/Y', '01/01/2001');
         $result = $this->processManager->execute('test.date_transformers.date_parser', '2001-01-01');
 
         // There could be a 1s difference, depending on execution time...
         $date->setTime(0, 0);
         $result->setTime(0, 0);
 
-        self::assertInstanceOf(DateTime::class, $result);
-        if ($result instanceof DateTime) {
+        self::assertInstanceOf(\DateTime::class, $result);
+        if ($result instanceof \DateTime) {
             self::assertEquals($date->getTimestamp(), $result->getTimestamp());
         }
     }
 
     /**
-     * Assert that a date is not parsed if the format doesn't match
-     *
-     * @expectedException \RuntimeException
+     * Assert that a date is not parsed if the format doesn't match.
      */
     public function testDateParserError(): void
     {
+        $this->setExpectedException(\RuntimeException::class);
+
         $this->processManager->execute('test.date_transformers.date_parser', '2001-01-01T00:00:00+00:00');
     }
 
     /**
-     * Assert date parser & formatter can be chained to transform a date string into another
+     * Assert date parser & formatter can be chained to transform a date string into another.
      */
     public function testDateParseFormat(): void
     {

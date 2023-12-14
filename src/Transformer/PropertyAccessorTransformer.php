@@ -17,7 +17,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Read a property from the input value and return it
+ * Read a property from the input value and return it.
  */
 class PropertyAccessorTransformer implements ConfigurableTransformerInterface
 {
@@ -28,11 +28,11 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
 
     public function transform(mixed $value, array $options = []): mixed
     {
-        if ($value === null && $options['ignore_null']) {
+        if (null === $value && $options['ignore_null']) {
             return null;
         }
 
-        if ($options['ignore_missing'] && ! $this->accessor->isReadable($value, $options['property_path'])) {
+        if ($options['ignore_missing'] && !$this->accessor->isReadable($value, $options['property_path'])) {
             return null;
         }
 
@@ -40,7 +40,7 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
     }
 
     /**
-     * Returns the unique code to identify the transformer
+     * Returns the unique code to identify the transformer.
      */
     public function getCode(): string
     {
