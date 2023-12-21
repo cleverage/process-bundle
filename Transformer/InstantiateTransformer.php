@@ -19,7 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class InstantiateTransformer implements ConfigurableTransformerInterface
 {
-    public function transform(mixed $value, array $options = [])
+    public function transform($value, array $options = [])
     {
         if (!is_array($value)) {
             throw new \UnexpectedValueException('Input value must be an array for transformer instantiate');
