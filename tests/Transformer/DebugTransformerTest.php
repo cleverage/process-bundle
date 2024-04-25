@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\DebugTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\VarDumper;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\DebugTransformer
+ */
 class DebugTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DebugTransformer::transform
+     * @covers ::transform
      */
     public function testTransform(): void
     {
@@ -37,7 +40,7 @@ class DebugTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DebugTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCodeReturnsCorrectCode(): void
     {

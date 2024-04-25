@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\ConstantTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\ConstantTransformer
+ */
 class ConstantTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ConstantTransformer::transform
+     * @covers ::transform
      */
     public function testTransform(): void
     {
@@ -34,7 +37,7 @@ class ConstantTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ConstantTransformer::transform
+     * @covers ::transform
      */
     public function testTransformWithNullValue(): void
     {
@@ -48,7 +51,7 @@ class ConstantTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ConstantTransformer::configureOptions
+     * @covers ::configureOptions
      */
     public function testConfigureOptions(): void
     {
@@ -61,7 +64,7 @@ class ConstantTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ConstantTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCodeReturnsCorrectCode(): void
     {

@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer
+ */
 class ArrayFirstTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer::transform
+     * @covers ::transform
      */
     public function testTransformReturnsFirstElementIfIterableAndAllowed(): void
     {
@@ -34,7 +37,7 @@ class ArrayFirstTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer::transform
+     * @covers ::transform
      */
     public function testTransformReturnsValueIfNotIterableAndAllowed(): void
     {
@@ -50,7 +53,7 @@ class ArrayFirstTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer::transform
+     * @covers ::transform
      */
     public function testTransformThrowsExceptionIfNotIterableAndNotAllowed(): void
     {
@@ -64,7 +67,7 @@ class ArrayFirstTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCodeReturnsCorrectCode(): void
     {
@@ -76,7 +79,7 @@ class ArrayFirstTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ArrayFirstTransformer::configureOptions
+     * @covers ::configureOptions
      */
     public function testConfigureOptionsSetsDefaultOptions(): void
     {

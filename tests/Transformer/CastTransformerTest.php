@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\CastTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\CastTransformer
+ */
 class CastTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\CastTransformer::transform
+     * @covers ::transform
      */
     public function testCastToInt(): void
     {
@@ -35,7 +38,7 @@ class CastTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\CastTransformer::transform
+     * @covers ::transform
      */
     public function testCastToFloat(): void
     {
@@ -50,7 +53,7 @@ class CastTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\CastTransformer::transform
+     * @covers ::transform
      */
     public function testCastToString(): void
     {
@@ -65,7 +68,7 @@ class CastTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\CastTransformer::transform
+     * @covers ::transform
      */
     public function testCastToBool(): void
     {
@@ -80,7 +83,7 @@ class CastTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\CastTransformer::transform
+     * @covers ::transform
      */
     public function testCastToInvalidType(): void
     {
@@ -94,7 +97,7 @@ class CastTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\CastTransformer::configureOptions
+     * @covers ::configureOptions
      */
     public function testConfigureOptionsSetsRequiredOptions(): void
     {
@@ -110,7 +113,7 @@ class CastTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\CastTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCodeReturnsCorrectCode(): void
     {

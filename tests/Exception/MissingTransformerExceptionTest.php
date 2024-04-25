@@ -7,10 +7,13 @@ namespace Exception;
 use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Exception\MissingTransformerException
+ */
 class MissingTransformerExceptionTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Exception\MissingTransformerException::create
+     * @covers ::create
      */
     public function testCreate(): void
     {

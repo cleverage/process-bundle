@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\DateFormatTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\DateFormatTransformer
+ */
 class DateFormatTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DateFormatTransformer::transform
+     * @covers ::transform
      */
     public function testTransformValidDate(): void
     {
@@ -35,7 +38,7 @@ class DateFormatTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DateFormatTransformer::transform
+     * @covers ::transform
      */
     public function testTransformInvalidDate(): void
     {
@@ -49,7 +52,7 @@ class DateFormatTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DateFormatTransformer::transform
+     * @covers ::transform
      */
     public function testTransformNullValue(): void
     {
@@ -64,7 +67,7 @@ class DateFormatTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DateFormatTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCode(): void
     {
@@ -76,7 +79,7 @@ class DateFormatTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DateFormatTransformer::configureOptions
+     * @covers ::configureOptions
      */
     public function testConfigureOptions(): void
     {

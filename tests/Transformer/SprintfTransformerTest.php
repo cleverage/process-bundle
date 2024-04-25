@@ -7,10 +7,13 @@ namespace Transformer;
 use CleverAge\ProcessBundle\Transformer\SprintfTransformer;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\SprintfTransformer
+ */
 class SprintfTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\SprintfTransformer::transform
+     * @covers ::transform
      */
     public function testTransform(): void
     {
@@ -23,7 +26,7 @@ class SprintfTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\SprintfTransformer::getCode
+     * @covers ::getCode
      */
     public function testCode(): void
     {

@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer
+ */
 class MultiReplaceTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer::transform
+     * @covers ::transform
      */
     public function testTransform(): void
     {
@@ -39,7 +42,7 @@ class MultiReplaceTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer::transform
+     * @covers ::transform
      */
     public function testTransformWithEmptyReplaceMapping(): void
     {
@@ -55,7 +58,7 @@ class MultiReplaceTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer::transform
+     * @covers ::transform
      */
     public function testTransformWithNullValue(): void
     {
@@ -74,7 +77,7 @@ class MultiReplaceTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer::configureOptions
+     * @covers ::configureOptions
      */
     public function testConfigureOptions(): void
     {
@@ -91,7 +94,7 @@ class MultiReplaceTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCodeReturnsCorrectCode(): void
     {

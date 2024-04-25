@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\WrapperTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\WrapperTransformer
+ */
 class WrapperTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\WrapperTransformer::transform
+     * @covers ::transform
      */
     public function testTransform(): void
     {
@@ -36,7 +39,7 @@ class WrapperTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\WrapperTransformer::transform
+     * @covers ::transform
      */
     public function testTransformWithIntegerWrapperKey(): void
     {
@@ -52,7 +55,7 @@ class WrapperTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\WrapperTransformer::transform
+     * @covers ::transform
      */
     public function testTransformWithNullValue(): void
     {
@@ -68,7 +71,7 @@ class WrapperTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\WrapperTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCodeReturnsCorrectCode(): void
     {
@@ -80,7 +83,7 @@ class WrapperTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\WrapperTransformer::configureOptions
+     * @covers ::configureOptions
      */
     public function testConfigureOptionsSetsDefaultOptions(): void
     {

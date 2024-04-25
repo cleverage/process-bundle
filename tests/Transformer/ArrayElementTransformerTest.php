@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\ArrayElementTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\ArrayElementTransformer
+ */
 class ArrayElementTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ArrayElementTransformer::transform
+     * @covers ::transform
      */
     public function testTransformReturnsNthElementFromArray(): void
     {
@@ -34,7 +37,7 @@ class ArrayElementTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ArrayElementTransformer::configureOptions
+     * @covers ::configureOptions
      */
     public function testConfigureOptionsSetsRequiredOptions(): void
     {
@@ -50,7 +53,7 @@ class ArrayElementTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ArrayElementTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCodeReturnsCorrectCode(): void
     {

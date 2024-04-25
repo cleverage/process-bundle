@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\ImplodeTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\ImplodeTransformer
+ */
 class ImplodeTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ImplodeTransformer::transform
+     * @covers ::transform
      */
     public function testTransform(): void
     {
@@ -32,7 +35,7 @@ class ImplodeTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ImplodeTransformer::transform
+     * @covers ::transform
      */
     public function testTransformWithInvalidValue(): void
     {
@@ -44,7 +47,7 @@ class ImplodeTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ImplodeTransformer::transform
+     * @covers ::transform
      */
     public function testTransformWithDefaultSeparator(): void
     {
@@ -56,7 +59,7 @@ class ImplodeTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ImplodeTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCode(): void
     {
@@ -68,7 +71,7 @@ class ImplodeTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ImplodeTransformer::configureOptions
+     * @covers ::configureOptions
      */
     public function testConfigureOptions(): void
     {

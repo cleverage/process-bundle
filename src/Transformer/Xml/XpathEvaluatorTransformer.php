@@ -112,7 +112,6 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
 
     public function query(\DOMXPath $xpath, string $query, \DOMNode $node, array $options): mixed
     {
-        // TODO check if query is relative ?
         $nodeList = $xpath->query($query, $node);
         $results = iterator_to_array($nodeList);
 

@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\TrimTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\TrimTransformer
+ */
 class TrimTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\TrimTransformer::transform
+     * @covers ::transform
      */
     public function testTransformTrimsStringWithDefaultCharlist(): void
     {
@@ -33,7 +36,7 @@ class TrimTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\TrimTransformer::transform
+     * @covers ::transform
      */
     public function testTransformTrimsStringWithCustomCharlist(): void
     {
@@ -47,7 +50,7 @@ class TrimTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\TrimTransformer::transform
+     * @covers ::transform
      */
     public function testTransformReturnsNullForNullValue(): void
     {
@@ -60,7 +63,7 @@ class TrimTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\TrimTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCodeReturnsCorrectCode(): void
     {
@@ -72,7 +75,7 @@ class TrimTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\TrimTransformer::configureOptions
+     * @covers ::configureOptions
      */
     public function testConfigureOptionsSetsDefaultOptions(): void
     {

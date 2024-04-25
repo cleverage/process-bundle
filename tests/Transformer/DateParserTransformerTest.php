@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\DateParserTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\DateParserTransformer
+ */
 class DateParserTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DateParserTransformer::transform
+     * @covers ::transform
      */
     public function testTransformValidDate(): void
     {
@@ -35,7 +38,7 @@ class DateParserTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DateParserTransformer::transform
+     * @covers ::transform
      */
     public function testTransformInvalidDate(): void
     {
@@ -49,7 +52,7 @@ class DateParserTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DateParserTransformer::transform
+     * @covers ::transform
      */
     public function testTransformNullValue(): void
     {
@@ -63,7 +66,7 @@ class DateParserTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DateParserTransformer::transform
+     * @covers ::transform
      */
     public function testTransformDateTimeObject(): void
     {
@@ -78,7 +81,7 @@ class DateParserTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DateParserTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCode(): void
     {
@@ -90,7 +93,7 @@ class DateParserTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\DateParserTransformer::configureOptions
+     * @covers ::configureOptions
      */
     public function testConfigureOptions(): void
     {

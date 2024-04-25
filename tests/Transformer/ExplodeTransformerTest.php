@@ -17,10 +17,13 @@ use CleverAge\ProcessBundle\Transformer\ExplodeTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\ExplodeTransformer
+ */
 class ExplodeTransformerTest extends TestCase
 {
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ExplodeTransformer::transform
+     * @covers ::transform
      */
     public function testTransform(): void
     {
@@ -32,7 +35,7 @@ class ExplodeTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ExplodeTransformer::transform
+     * @covers ::transform
      */
     public function testTransformWithEmptyString(): void
     {
@@ -44,7 +47,7 @@ class ExplodeTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ExplodeTransformer::transform
+     * @covers ::transform
      */
     public function testTransformWithNullValue(): void
     {
@@ -56,7 +59,7 @@ class ExplodeTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ExplodeTransformer::getCode
+     * @covers ::getCode
      */
     public function testGetCode(): void
     {
@@ -68,7 +71,7 @@ class ExplodeTransformerTest extends TestCase
     }
 
     /**
-     * @covers \CleverAge\ProcessBundle\Transformer\ExplodeTransformer::configureOptions
+     * @covers ::configureOptions
      */
     public function testConfigureOptions(): void
     {
