@@ -66,3 +66,8 @@ vendor/%:
 	docker container create --name cleverage_process_bundle_tmp cleverage/process-bundle:$(@F)
 	docker cp cleverage_process_bundle_tmp:/app/vendor vendor-$(@F)
 	docker container rm cleverage_process_bundle_tmp
+
+doc:
+	$(DOCKER_RUN) -w /src-cleverage_process cleverage/process-bundle:$(SF_ENV) phpdoc
+	$(DOCKER_RUN) -w /src-cleverage_process -u root cleverage/process-bundle:$(SF_ENV) chown -R $(shell id -u) var/doc .phpdoc
+	@echo "The phpdoc has been generated, you can see it at file://$$(realpath var/doc/index.html)"

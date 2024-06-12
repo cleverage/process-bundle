@@ -20,9 +20,23 @@ use Symfony\Component\OptionsResolver\Exception\ExceptionInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * A Batch task that iterate on flush
- * It's mainly an example task since it's not useful as-is, but the processInput method may allow custom overrides
+ * Accumulate inputs and periodically flush them using iterations.
+ * 
+ * A Batch task that iterate on flush.
+ * It's mainly an example task since it's not useful as-is, but the processInput method may allow custom overrides.
  *
+ * ##### Task reference
+ * 
+ * * **Service**: `CleverAge\ProcessBundle\Task\IterableBatchTask`
+ * * **Iterable task**
+ * * **Flushable task**
+ * * **Input**: `any`
+ * * **Output**: `any`, same type as input
+ * 
+ * ##### Options
+ * 
+ * * `batch_count` (`integer`, _defaults to_ `10`): Accumulated batch size
+ * 
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  */
 class IterableBatchTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
@@ -38,9 +52,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     protected $logger;
 
     /**
-     * IterableBatchTask constructor.
-     *
-     * @param LoggerInterface $logger
+     * @internal
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -48,7 +60,9 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
+     *
+     * @internal
      */
     public function initialize(ProcessState $state)
     {
@@ -58,7 +72,9 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
 
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
+     *
+     * @internal
      */
     public function flush(ProcessState $state)
     {
@@ -71,10 +87,9 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws ExceptionInterface
-     * @throws \InvalidArgumentException
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -99,9 +114,9 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @return bool
+     * @internal
      */
     public function next(ProcessState $state)
     {
@@ -114,9 +129,9 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritDoc}
      *
-     * @throws AccessException
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

@@ -1,0 +1,17 @@
+{% set interfaces_str =  include("components/recursive_iterfaces.html.twig", {'class': class}) %}
+
+{% if "IterableTaskInterface" in interfaces_str %}
+    iterable
+{% endif %}
+
+{% if "FlushableTaskInterface" in interfaces_str %}
+    flushable
+{% endif %}
+
+{% if "BlockingTaskInterface" in interfaces_str %}
+    blocking
+{% endif %}
+
+{% if "TaskInterface" in interfaces_str %}
+    task
+{% endif %}

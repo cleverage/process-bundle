@@ -9,8 +9,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
+ * Groups input, using some value as a unique key.
+ *
  * Attempt to aggregate inputs in an associative array with a key formed by configurable fields of the input.
  * This task could be used to remove duplicates from the aggregate.
+ *
+ * The values from the options must be able to be converted to strings. The character `-` is used as a delimiter.
+ *
+ * ##### Task reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\GroupByAggregateIterableTask`
+ * * **Blocking task**
+ * * **Input**: `array` or `object` that can be used by the [PropertyAccess component](https://symfony.com/components/PropertyAccess)
+ * * **Output**: `array` containing the list of unique input (last one wins)
+ *
+ * ##### Options
+ *
+ * * `group_by_accessors` (`type`, _required_, _defaults to_ `value`): description
  *
  * @author Alix Mauro <amauro@clever-age.com>
  */
@@ -26,7 +41,7 @@ class GroupByAggregateIterableTask extends AbstractConfigurableTask implements B
     protected $accessor;
 
     /**
-     * @param PropertyAccessorInterface $accessor
+     * @internal
      */
     public function __construct(PropertyAccessorInterface $accessor)
     {
@@ -36,6 +51,7 @@ class GroupByAggregateIterableTask extends AbstractConfigurableTask implements B
 
     /**
      * {@inheritDoc}
+     * @internal
      */
     public function execute(ProcessState $state): void
     {
@@ -61,6 +77,7 @@ class GroupByAggregateIterableTask extends AbstractConfigurableTask implements B
 
     /**
      * {@inheritDoc}
+     * @internal
      */
     public function proceed(ProcessState $state): void
     {
@@ -73,6 +90,7 @@ class GroupByAggregateIterableTask extends AbstractConfigurableTask implements B
 
     /**
      * {@inheritDoc}
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver): void
     {

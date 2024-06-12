@@ -22,8 +22,22 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * Skip inputs under given matching conditions
- * - equality is softly checked
- * - unexisting key is the same as null
+ *
+ * Matching use the following rules
+ * * equality is softly checked
+ * * missing key is the same as `null`
+ *
+ * ##### Task reference
+ *
+ * * **Service**: `CleverAge\ProcessBundle\Task\FilterTask`
+ * * **Input**: `array` or `object` that can be used by the [PropertyAccess component](https://symfony.com/components/PropertyAccess)
+ * * **Output**: the same as input, unmodified
+ *
+ * ##### Options
+ *
+ * The list of options is the same than the {@see \CleverAge\ProcessBundle\Transformer\ConditionTrait}.
+ *
+ * @example "Resources/tests/task/filter_task.yml" Some basic examples
  */
 class FilterTask extends AbstractConfigurableTask
 {
@@ -32,6 +46,8 @@ class FilterTask extends AbstractConfigurableTask
 
     /**
      * {@inheritDoc}
+     *
+     * @internal
      */
     public function initialize(ProcessState $state)
     {
@@ -42,11 +58,7 @@ class FilterTask extends AbstractConfigurableTask
     /**
      * {@inheritDoc}
      *
-     * @throws ExceptionInterface
-     * @throws UnexpectedTypeException
-     * @throws InvalidArgumentException
-     * @throws AccessException
-     * @throws \InvalidArgumentException
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -63,6 +75,8 @@ class FilterTask extends AbstractConfigurableTask
 
     /**
      * {@inheritDoc}
+     *
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

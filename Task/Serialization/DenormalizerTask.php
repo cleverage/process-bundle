@@ -27,6 +27,18 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 /**
  * Denormalize input to output with configurable class and format
  *
+ * ##### Task reference
+ * 
+ * * **Service**: `CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask`
+ * * **Input**: `array`
+ * * **Output**: `object`, instance of `class`, as a product of the denormalization
+ * 
+ * ##### Options
+ *
+ * * `class` (`string`, _required_): Destination class for denormalization
+ * * `format` (`string`, _defaults to_ `null`): Format for denormalization ("json", "xml", ... an empty string should also work)
+ * * `context` (`array`, _defaults to_ `[]`): Will be passed directly to the 4th parameter of the denormalize method
+ *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
@@ -36,7 +48,7 @@ class DenormalizerTask extends AbstractConfigurableTask
     protected $denormalizer;
 
     /**
-     * @param DenormalizerInterface $denormalizer
+     * @internal
      */
     public function __construct(DenormalizerInterface $denormalizer)
     {
@@ -44,15 +56,9 @@ class DenormalizerTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
      *
-     * @throws UnexpectedValueException
-     * @throws RuntimeException
-     * @throws LogicException
-     * @throws InvalidArgumentException
-     * @throws ExtraAttributesException
-     * @throws BadMethodCallException
-     * @throws ExceptionInterface
+     * @internal
      */
     public function execute(ProcessState $state)
     {
@@ -67,10 +73,9 @@ class DenormalizerTask extends AbstractConfigurableTask
     }
 
     /**
-     * @param OptionsResolver $resolver
+     * {@inheritDoc}
      *
-     * @throws AccessException
-     * @throws UndefinedOptionsException
+     * @internal
      */
     protected function configureOptions(OptionsResolver $resolver)
     {

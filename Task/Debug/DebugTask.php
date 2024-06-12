@@ -17,13 +17,24 @@ use Symfony\Component\VarDumper\VarDumper;
 /**
  * Dump the content of the input
  *
+ * Dumps the input value to the console, obviously for debug purposes.
+ * Only usable in dev environment (where the [VarDumper Component](https://symfony.com/doc/current/components/var_dumper.html) is enabled)
+ *
+ * ##### Task reference
+ *
+ *  * **Service**: `CleverAge\ProcessBundle\Task\Debug\DebugTask`
+ *  * **Input**: `any`
+ *  * **Output**: `any`, re-output given input
+ *
  * @author Valentin Clavreul <vclavreul@clever-age.com>
  * @author Vincent Chalnot <vchalnot@clever-age.com>
  */
 class DebugTask implements TaskInterface
 {
     /**
-     * @param ProcessState $state
+     * {@inheritDoc}
+     *
+     * @internal
      */
     public function execute(ProcessState $state)
     {

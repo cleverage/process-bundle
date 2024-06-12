@@ -1,0 +1,22 @@
+{% if class is defined and class %}
+    {% for interface in class.interfaces %}
+        {{ interface.name }}
+        {% if interface.parent|length > 0 %}
+            {% for parent_interface in interface.parent %}
+                {% include "components/recursive_iterfaces.html.twig" with {'interface': parent_interface, 'class': false, 'known_interfaces': known_interfaces} %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+
+    {% if class.parent %}
+        {% include "components/recursive_iterfaces.html.twig" with {'class': class.parent, 'known_interfaces': known_interfaces} %}
+    {% endif %}
+{% endif %}
+
+
+{% if interface is defined %}
+    {{ interface.name }}
+    {% for parent_interface in interface.parent %}
+        {% include "components/recursive_iterfaces.html.twig" with {'interface': parent_interface, 'known_interfaces': known_interfaces} %}
+    {% endfor %}
+{% endif %}

@@ -1,0 +1,5 @@
+# Task configuration level
+my_xml_reader:
+    service: '@CleverAge\ProcessBundle\Task\File\Xml\XmlReaderTask'
+    options:
+        file_path: '%kernel.project_dir%/var/data/file.xml'

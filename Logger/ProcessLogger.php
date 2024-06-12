@@ -12,6 +12,8 @@ namespace CleverAge\ProcessBundle\Logger;
 
 /**
  * @author Madeline Veyrenc <mveyrenc@clever-age.com>
+ *
+ * @internal
  */
 class ProcessLogger extends AbstractLogger
 {
