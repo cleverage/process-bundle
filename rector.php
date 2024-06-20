@@ -2,25 +2,20 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the CleverAge/ProcessBundle package.
+ *
+ * Copyright (c) 2017-2024 Clever-Age
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use Rector\Config\RectorConfig;
-use Rector\Core\ValueObject\PhpVersion;
-use Rector\Set\ValueObject\LevelSetList;
-use Rector\Set\ValueObject\SetList;
-use Rector\Symfony\Set\SymfonyLevelSetList;
 
-return static function (RectorConfig $rectorConfig): void {
-    $rectorConfig->parallel();
-    $rectorConfig->importNames();
-    $rectorConfig->importShortClasses();
-
-    $rectorConfig->paths([__DIR__.'/src']);
-    $rectorConfig->skip([__DIR__.'/src/Resources/tests']);
-
-    $rectorConfig->sets([
-        SetList::TYPE_DECLARATION,
-        LevelSetList::UP_TO_PHP_81,
-        SymfonyLevelSetList::UP_TO_SYMFONY_63,
-    ]);
-
-    $rectorConfig->phpVersion(PhpVersion::PHP_81);
-};
+return RectorConfig::configure()
+    ->withPaths([__DIR__.'/src', __DIR__.'/tests'])
+    ->withPhpSets(php82: true)
+    ->withAttributesSets(symfony: true)
+    ->withImportNames(removeUnusedImports: true)
+;
