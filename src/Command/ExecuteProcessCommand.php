@@ -16,7 +16,9 @@ namespace CleverAge\ProcessBundle\Command;
 use CleverAge\ProcessBundle\Event\ConsoleProcessEvent;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
+use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -40,7 +42,8 @@ class ExecuteProcessCommand extends Command
 
     public function __construct(
         protected ProcessManager $processManager,
-        protected EventDispatcherInterface $eventDispatcher
+        protected EventDispatcherInterface $eventDispatcher,
+        protected ProcessConfigurationRegistry $processRegistry,
     ) {
         parent::__construct();
     }
@@ -86,6 +89,10 @@ class ExecuteProcessCommand extends Command
         $this->eventDispatcher->dispatch(new ConsoleProcessEvent($input, $output, $inputData, $context));
 
         foreach ($input->getArgument('processCodes') as $code) {
+            if (!$this->processRegistry->hasProcessConfiguration($code)) {
+                throw new InvalidConfigurationException("Unknown process {$code}");
+            }
+            
             if (!$output->isQuiet()) {
                 $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
