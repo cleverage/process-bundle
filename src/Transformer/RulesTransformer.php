@@ -128,7 +128,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
     /**
      * Test if a value match a rule.
      */
-    protected function matchRule(mixed $value, string|ParsedExpression $rule, bool $useValueAsVariable): bool
+    protected function matchRule(mixed $value, array $rule, bool $useValueAsVariable): bool
     {
         if (null !== $rule['condition']) {
             $expressionValues = $useValueAsVariable ? $value : [
