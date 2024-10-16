@@ -47,15 +47,6 @@
       "CleverAge\\ProcessBundle\\Tests\\": "tests/"
     }
   },
-  "replace": {
-    "symfony/polyfill-ctype": "*",
-    "symfony/polyfill-iconv": "*",
-    "symfony/polyfill-php72": "*",
-    "symfony/polyfill-php73": "*",
-    "symfony/polyfill-php74": "*",
-    "symfony/polyfill-php80": "*",
-    "symfony/polyfill-php81": "*"
-  },
   "require": {
     "php": ">=8.1",
     "ext-json": "*",
@@ -94,10 +85,14 @@
   },
   "suggest": {
     "cleverage/doctrine-process-bundle": "Dedicated bundle for Doctrine dependencies for the process bundle",
-    "cleverage/flysystem-process-bundle": "Dedicated bundle for Flysystem dependencies for the process bundle",
-    "cleverage/rest-process-bundle": "Dedicated bundle for Rest dependencies for the process bundle",
+    "cleverage/eav-process-bundle": "Dedicated bundle for EAV dependencies for the process bundle",
     "cleverage/soap-process-bundle": "Dedicated bundle for Soap dependencies for the process bundle",
-    "cleverage/enqueue-process-bundle": "Manage asynchronous events within the process bundle"
+    "cleverage/process-soap-bundle": "Another dedicated bundle for Soap dependencies for the process bundle",
+    "cleverage/rest-process-bundle": "Dedicated bundle for Rest dependencies for the process bundle",
+    "cleverage/enqueue-process-bundle": "Manage asynchronous events within the process bundle",
+    "cleverage/flysystem-process-bundle": "Dedicated bundle for Flysystem dependencies for the process bundle",
+    "cleverage/cache-process-bundle": "Dedicated bundle for cache handling for the process bundle",
+    "cleverage/processuibundle": "A simple UX for cleverage/processbundle using EasyAdmin\n\n"
   },
   "config": {
     "allow-plugins": {
