@@ -3,7 +3,6 @@ parameters:
     paths:
         - src
     excludePaths:
-        - ecs.php
         - vendor/*
         - tests/*
         - rector.php
