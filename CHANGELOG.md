@@ -1,3 +1,53 @@
+v4.0
+------
+
+### Changes
+
+* Update Makefile & .docker for local standalone usage
+* Update rector, phpstan & php-cs-fixer configurations & apply it.
+
+### Fixes
+
+* [#129](https://github.com/cleverage/process-bundle/issues/129) Remove wrong replace configuration on composer.json. Add missing suggest.
+* Miscellaneous fixes, show full diff : https://github.com/cleverage/process-bundle/compare/v4.0.0-rc2...v4.0.0
+
+v4.0-RC2
+------
+
+## BC breaks
+
+* Bump php version to >=8.2
+* Bump symfony version to ^6.4|^7.1
+
+### Fixes
+
+* Miscellaneous fixes, show full diff : https://github.com/cleverage/process-bundle/compare/v4.0.0-rc1...v4.0.0-rc2
+
+v4.0-RC1
+------
+
+## BC breaks
+
+* Bump php version to >=8.1
+* Bump symfony version to ^6.3
+
+## Changes
+* Add some phpunit tests
+* Apply Rector & Phpstan
+* Add StopwatchTask
+* Change directory structure. Move Symfony code to /src, documentation to /doc, and tests to /tests.
+
+### Fixes
+
+* Miscellaneous fixes, show full diff : https://github.com/cleverage/process-bundle/compare/v3.2.9...v4.0.0-rc1
+
+v3.2.9
+------
+
+### Fixes
+
+https://github.com/cleverage/process-bundle/compare/v3.2.8...v3.2.9
+
 v3.2.8
 ------
 
