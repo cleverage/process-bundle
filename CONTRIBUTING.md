@@ -14,5 +14,4 @@ When a feature should be deprecated, or when you have a breaking change for a fu
 * Trigger a deprecation error: `@trigger_error('This feature will be deprecated in v4.0', E_USER_DEPRECATED);`
 
 You can check which deprecation notice is triggered in tests
-* `make shell`
 * `SYMFONY_DEPRECATIONS_HELPER=0 ./vendor/bin/phpunit`
