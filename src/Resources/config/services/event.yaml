@@ -1,8 +1,4 @@
 services:
-    Symfony\Contracts\EventDispatcher\EventDispatcherInterface:
-        public: false
-        autowire: true
-        
     CleverAge\ProcessBundle\EventListener\DataQueueEventListener:
         public: false
         tags:

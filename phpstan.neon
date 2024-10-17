@@ -2,11 +2,8 @@ parameters:
     level: 6
     paths:
         - src
+        - tests
     excludePaths:
-        - vendor/*
-        - tests/*
-        - rector.php
-        - var/*
         - src/Resources/tests/*
     ignoreErrors:
         - '#type has no value type specified in iterable type#'

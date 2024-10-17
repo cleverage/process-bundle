@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Task\Event;
 use CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**

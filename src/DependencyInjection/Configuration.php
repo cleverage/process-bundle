@@ -81,7 +81,7 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('transformers')
             ->prototype('variable')
             ->end()
-            ?->end();
+            ->end();
     }
 
     /**
@@ -113,19 +113,19 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('end_point')
             ->defaultNull()
             ->end()
-            ?->scalarNode('description')
+            ->scalarNode('description')
             ->defaultValue('')
             ->end()
-            ?->scalarNode('help')
+            ->scalarNode('help')
             ->defaultValue('')
             ->end()
-            ?->scalarNode('public')
+            ->scalarNode('public')
             ->defaultTrue()
             ->end()
-            ?->arrayNode('options')
+            ->arrayNode('options')
             ->prototype('variable')
             ->end()
-            ?->end();
+            ->end();
 
         /** @var ArrayNodeDefinition $tasksArrayDefinition */
         $tasksArrayDefinition = $definition

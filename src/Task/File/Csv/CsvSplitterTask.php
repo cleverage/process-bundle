@@ -72,7 +72,7 @@ class CsvSplitterTask extends InputCsvReaderTask
         }
     }
 
-    protected function splitCsv(CsvFile $csv, int $maxLines): string
+    protected function splitCsv(CsvResource $csv, int $maxLines): string
     {
         $tmpFilePath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_'.uniqid('process', false).'.csv';
         $tmpFile = fopen($tmpFilePath, 'wb+');

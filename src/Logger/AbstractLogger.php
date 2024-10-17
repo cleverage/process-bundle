@@ -28,7 +28,7 @@ abstract class AbstractLogger extends BaseAbstractLogger
     ) {
     }
 
-    public function log($level, $message, array $context = []): void
+    public function log($level, string|\Stringable $message, array $context = []): void
     {
         $this->logger->log($level, $message, $context);
     }

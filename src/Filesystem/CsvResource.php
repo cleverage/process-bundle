@@ -40,7 +40,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     protected bool $seekCalled = false;
 
     public function __construct(
-        $resource,
+        mixed $resource,
         protected string $delimiter = ',',
         protected string $enclosure = '"',
         protected string $escape = '\\',
