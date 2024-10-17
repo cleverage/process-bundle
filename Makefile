@@ -41,7 +41,7 @@ phpstan: #[Quality] Run PHPStan
 	$(DOCKER_RUN_PHP) "vendor/bin/phpstan --no-progress --memory-limit=1G analyse"
 
 php-cs-fixer: #[Quality] Run PHP-CS-Fixer
-	$(DOCKER_RUN_PHP) "vendor/bin/php-cs-fixer fix --diff --dry-run --verbose"
+	$(DOCKER_RUN_PHP) "vendor/bin/php-cs-fixer fix --diff --verbose"
 
 rector: #[Quality] Run Rector
 	$(DOCKER_RUN_PHP) "vendor/bin/rector"

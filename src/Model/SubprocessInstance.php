@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -40,7 +40,7 @@ class SubprocessInstance
         protected string $processCode,
         protected ?string $input,
         protected array $context = [],
-        array $options = []
+        array $options = [],
     ) {
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
@@ -81,7 +81,7 @@ class SubprocessInstance
         }
 
         foreach ($this->context as $key => $value) {
-            $arguments[] = sprintf('--context=%s:%s', $key, $value);
+            $arguments[] = \sprintf('--context=%s:%s', $key, $value);
         }
 
         $arguments[] = $this->processCode;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -69,7 +69,7 @@ class ProcessState
 
     public function __construct(
         protected ProcessConfiguration $processConfiguration,
-        protected ProcessHistory $processHistory
+        protected ProcessHistory $processHistory,
     ) {
     }
 
@@ -163,7 +163,7 @@ class ProcessState
         return $this->hasErrorOutput;
     }
 
-    public function stop(\Throwable $e = null): void
+    public function stop(?\Throwable $e = null): void
     {
         if ($e instanceof \Throwable) {
             $this->setException($e);
@@ -186,7 +186,7 @@ class ProcessState
         return $this->exception;
     }
 
-    public function setException(\Throwable $exception = null): void
+    public function setException(?\Throwable $exception = null): void
     {
         $this->exception = $exception;
     }

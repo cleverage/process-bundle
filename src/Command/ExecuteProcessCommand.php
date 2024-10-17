@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -92,7 +92,7 @@ class ExecuteProcessCommand extends Command
             if (!$this->processRegistry->hasProcessConfiguration($code)) {
                 throw new InvalidConfigurationException("Unknown process {$code}");
             }
-            
+
             if (!$output->isQuiet()) {
                 $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
@@ -123,7 +123,7 @@ class ExecuteProcessCommand extends Command
             preg_match($pattern, (string) $contextValue, $parts);
             if (3 !== \count($parts)
                 || $parts[0] !== $contextValue) {
-                throw new \InvalidArgumentException(sprintf('Invalid context %s', $contextValue));
+                throw new \InvalidArgumentException(\sprintf('Invalid context %s', $contextValue));
             }
             $context[$parts[1]] = $parser->parse($parts[2]);
         }
@@ -148,7 +148,7 @@ class ExecuteProcessCommand extends Command
                 } elseif (self::OUTPUT_FORMAT_JSON === $input->getOption('output-format')) {
                     $output->writeln(json_encode($data, \JSON_THROW_ON_ERROR));
                 } else {
-                    throw new \InvalidArgumentException(sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
+                    throw new \InvalidArgumentException(\sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
                 }
             }
         } elseif (self::OUTPUT_FORMAT_JSON === $input->getOption('output-format')) {
@@ -160,10 +160,10 @@ class ExecuteProcessCommand extends Command
             }
 
             if (isset($outputFile) && $output->isVerbose()) {
-                $output->writeln(sprintf("Output stored in '%s'", $input->getOption('output')));
+                $output->writeln(\sprintf("Output stored in '%s'", $input->getOption('output')));
             }
         } else {
-            throw new \InvalidArgumentException(sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
+            throw new \InvalidArgumentException(\sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
         }
     }
 }

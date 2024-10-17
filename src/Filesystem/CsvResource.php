@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -44,7 +44,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         protected string $delimiter = ',',
         protected string $enclosure = '"',
         protected string $escape = '\\',
-        array $headers = null
+        ?array $headers = null,
     ) {
         if (!\is_resource($resource)) {
             $type = \gettype($resource);
@@ -149,7 +149,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /**
      * Warning, this function will return exactly the same value as the fgetcsv() function.
      */
-    public function readRaw(int $length = null): array|false
+    public function readRaw(?int $length = null): array|false
     {
         $this->assertOpened();
         ++$this->lineNumber;
@@ -157,7 +157,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         return fgetcsv($this->handler, $length, $this->delimiter, $this->enclosure, $this->escape);
     }
 
-    public function readLine(int $length = null): ?array
+    public function readLine(?int $length = null): ?array
     {
         $filePosition = $this->seekCalled ? "at position {$this->tell()}" : "on line {$this->getLineNumber()}";
         $values = $this->readRaw($length);
@@ -286,7 +286,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         }
     }
 
-    protected function parseHeaders(array $headers = null): array
+    protected function parseHeaders(?array $headers = null): array
     {
         // If headers are not passed in the constructor but file is readable, try to read headers from file
         if (null === $headers) {

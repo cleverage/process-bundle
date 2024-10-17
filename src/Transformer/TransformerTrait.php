@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -52,7 +52,7 @@ trait TransformerTrait
     protected function applyTransformers(array $transformers, mixed $value): mixed
     {
         // Quick return for better perfs
-        if ($transformers === []) {
+        if ([] === $transformers) {
             return $value;
         }
 
@@ -92,7 +92,7 @@ trait TransformerTrait
 
     protected function configureTransformersOptions(
         OptionsResolver $resolver,
-        string $optionName = 'transformers'
+        string $optionName = 'transformers',
     ): void {
         $resolver->setDefault($optionName, []);
         $resolver->setAllowedTypes($optionName, ['array']);

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -37,7 +37,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
     protected array $matchingFiles = [];
 
     public function __construct(
-        protected ?MountManager $mountManager = null
+        protected ?MountManager $mountManager = null,
     ) {
     }
 
@@ -121,7 +121,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
         }
 
         if ($removeSource) {
-            $this->sourceFS->delete(sprintf('%s://%s', $prefixFrom, $filename));
+            $this->sourceFS->delete(\sprintf('%s://%s', $prefixFrom, $filename));
         }
 
         return $result ? $filename : null;

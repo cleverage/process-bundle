@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -64,7 +64,7 @@ class ProcessManager
         protected TaskLogger $taskLogger,
         protected ProcessConfigurationRegistry $processConfigurationRegistry,
         protected ContextualOptionResolver $contextualOptionResolver,
-        protected EventDispatcherInterface $eventDispatcher
+        protected EventDispatcherInterface $eventDispatcher,
     ) {
     }
 
@@ -225,7 +225,7 @@ class ProcessManager
         $this->taskConfiguration = $taskConfiguration;
 
         if (TaskConfiguration::STRATEGY_STOP === $taskConfiguration->getErrorStrategy()
-            && $taskConfiguration->getErrorOutputs() !== []) {
+            && [] !== $taskConfiguration->getErrorOutputs()) {
             $m = "Task configuration {$taskConfiguration->getCode()} has error outputs ";
             $m .= "but it's error strategy 'stop' implies they will never be reached.";
             $this->taskLogger->debug($m);
@@ -460,7 +460,7 @@ class ProcessManager
 
     protected function initializeStates(
         ProcessConfiguration $processConfiguration,
-        array $context = []
+        array $context = [],
     ): ProcessHistory {
         $processHistory = new ProcessHistory($processConfiguration, $context);
 
@@ -479,7 +479,7 @@ class ProcessManager
     protected function prepareNextProcess(
         TaskConfiguration $previousTaskConfiguration,
         TaskConfiguration $nextTaskConfiguration,
-        bool $isError = false
+        bool $isError = false,
     ): void {
         if ($isError) {
             $input = $previousTaskConfiguration->getState()

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -65,7 +65,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
      * Configure options about how to handle xpath query results.
      * Available at root and subquery level.
      */
-    public function configureQueryOptions(OptionsResolver $resolver, Options $parentOptions = null): void
+    public function configureQueryOptions(OptionsResolver $resolver, ?Options $parentOptions = null): void
     {
         $resolver->setDefault('single_result', $parentOptions instanceof Options ? $parentOptions['single_result'] : true);
         $resolver->setAllowedTypes('single_result', 'bool');
