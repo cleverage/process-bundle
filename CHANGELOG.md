@@ -1,14 +1,19 @@
 v4.0
 ------
 
+## BC breaks
+
+* Remove FileFetchTask, use cleverage/flysystem-process-bundle instead.
+
 ### Changes
 
 * Update Makefile & .docker for local standalone usage
-* Update rector, phpstan & php-cs-fixer configurations & apply it.
+* Update rector, phpstan & php-cs-fixer configurations & apply it
+* league/flysystem-bundle is not required anymore
 
 ### Fixes
 
-* [#129](https://github.com/cleverage/process-bundle/issues/129) Remove wrong replace configuration on composer.json. Add missing suggest.
+* [#129](https://github.com/cleverage/process-bundle/issues/129) Remove wrong replace configuration on composer.json. Add missing suggest
 * Miscellaneous fixes, show full diff : https://github.com/cleverage/process-bundle/compare/v4.0.0-rc2...v4.0.0
 
 v4.0-RC2
@@ -35,7 +40,7 @@ v4.0-RC1
 * Add some phpunit tests
 * Apply Rector & Phpstan
 * Add StopwatchTask
-* Change directory structure. Move Symfony code to /src, documentation to /doc, and tests to /tests.
+* Change directory structure. Move Symfony code to /src, documentation to /doc, and tests to /tests
 
 ### Fixes
 

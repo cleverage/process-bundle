@@ -54,7 +54,6 @@
     "ext-intl": "*",
     "ext-mbstring": "*",
     "psr/cache": "^1|^2|^3",
-    "league/flysystem-bundle": "^3.1",
     "symfony/config": "^6.4|^7.1",
     "symfony/console": "^6.4|^7.1",
     "symfony/dependency-injection": "^6.4|^7.1",
