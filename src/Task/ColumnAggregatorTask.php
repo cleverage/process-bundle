@@ -63,7 +63,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
             }
         }
 
-        if (!empty($missingColumns)) {
+        if ($missingColumns !== []) {
             $colStr = implode(', ', $missingColumns);
             $message = "Missing columns [{$colStr}] in input";
 

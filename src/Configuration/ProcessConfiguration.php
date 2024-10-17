@@ -164,12 +164,12 @@ class ProcessConfiguration
         $entryTask = $this->getEntryPoint();
 
         // If there's no entry point, we might use the end point
-        if (!$entryTask) {
+        if (!$entryTask instanceof TaskConfiguration) {
             $entryTask = $this->getEndPoint();
         }
 
         // By default use the first defined task
-        if (!$entryTask) {
+        if (!$entryTask instanceof TaskConfiguration) {
             $entryTask = reset($this->taskConfigurations);
         }
 

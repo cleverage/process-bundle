@@ -188,7 +188,7 @@ class TaskConfiguration
 
     public function isRoot(): bool
     {
-        return empty($this->getPreviousTasksConfigurations()) && !$this->isInErrorBranch();
+        return $this->getPreviousTasksConfigurations() === [] && !$this->isInErrorBranch();
     }
 
     /**

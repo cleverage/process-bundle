@@ -27,7 +27,7 @@ class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskI
 
     public function flush(ProcessState $state): void
     {
-        if (0 === \count($this->elements)) {
+        if ([] === $this->elements) {
             $state->setSkipped(true);
         } else {
             $state->setOutput($this->elements);

@@ -52,7 +52,7 @@ trait TransformerTrait
     protected function applyTransformers(array $transformers, mixed $value): mixed
     {
         // Quick return for better perfs
-        if (empty($transformers)) {
+        if ($transformers === []) {
             return $value;
         }
 

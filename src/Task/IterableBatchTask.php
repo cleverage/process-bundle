@@ -61,7 +61,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
         }
 
         // Detect flushing
-        if (null !== $batchCount && (null === $this->outputQueue ? 0 : \count($this->outputQueue)) >= $batchCount) {
+        if (null !== $batchCount && ($this->outputQueue instanceof \SplQueue ? \count($this->outputQueue) : 0) >= $batchCount) {
             $this->flushMode = true;
         }
 
@@ -76,7 +76,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     public function next(ProcessState $state): bool
     {
         // Stop flushing once over
-        if (!(null === $this->outputQueue ? 0 : \count($this->outputQueue))) {
+        if (($this->outputQueue instanceof \SplQueue ? \count($this->outputQueue) : 0) === 0) {
             $this->flushMode = false;
         }
 

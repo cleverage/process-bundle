@@ -159,11 +159,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
 
     public function readLine(int $length = null): ?array
     {
-        if ($this->seekCalled) {
-            $filePosition = "at position {$this->tell()}";
-        } else {
-            $filePosition = "on line {$this->getLineNumber()}";
-        }
+        $filePosition = $this->seekCalled ? "at position {$this->tell()}" : "on line {$this->getLineNumber()}";
         $values = $this->readRaw($length);
 
         if (false === $values) {
@@ -295,7 +291,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         // If headers are not passed in the constructor but file is readable, try to read headers from file
         if (null === $headers) {
             $autoHeaders = $this->readRaw();
-            if (false === $autoHeaders || 0 === \count($autoHeaders)) {
+            if (false === $autoHeaders || [] === $autoHeaders) {
                 throw new \UnexpectedValueException("Unable to read headers for {$this->getResourceName()}");
             }
             // Remove BOM if any
@@ -311,7 +307,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
             throw new \UnexpectedValueException("Invalid headers for {$this->getResourceName()}, you need to pass the headers manually");
         }
 
-        if (0 === \count($headers)) {
+        if ([] === $headers) {
             throw new \UnexpectedValueException("Empty headers for {$this->getResourceName()}, you need to pass the headers manually");
         }
 

@@ -23,7 +23,7 @@ class JsonStreamReaderTask implements IterableTaskInterface
 
     public function execute(ProcessState $state): void
     {
-        if (null === $this->file) {
+        if (!$this->file instanceof JsonStreamFile) {
             $this->file = new JsonStreamFile($this->getFilePath($state), 'rb');
         }
 

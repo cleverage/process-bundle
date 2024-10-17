@@ -26,7 +26,7 @@ class CsvSplitterTask extends InputCsvReaderTask
     public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
-        if (null === $this->csv) {
+        if (!$this->csv instanceof CsvResource) {
             $headers = $this->getHeaders($state, $options);
             $csv = new CsvFile(
                 $options['file_path'],

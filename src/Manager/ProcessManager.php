@@ -133,7 +133,7 @@ class ProcessManager
         }
 
         // If defined, set the input of a task
-        if ($processConfiguration->getEntryPoint()) {
+        if ($processConfiguration->getEntryPoint() instanceof TaskConfiguration) {
             $processConfiguration->getEntryPoint()
                 ->getState()
                 ->setInput($input);
@@ -159,7 +159,7 @@ class ProcessManager
 
         // If defined, return the output of a task
         $returnValue = null;
-        if ($processConfiguration->getEndPoint()) {
+        if ($processConfiguration->getEndPoint() instanceof TaskConfiguration) {
             $returnValue = $processConfiguration->getEndPoint()
                 ->getState()
                 ->getOutput();
@@ -225,7 +225,7 @@ class ProcessManager
         $this->taskConfiguration = $taskConfiguration;
 
         if (TaskConfiguration::STRATEGY_STOP === $taskConfiguration->getErrorStrategy()
-            && \count($taskConfiguration->getErrorOutputs()) > 0) {
+            && $taskConfiguration->getErrorOutputs() !== []) {
             $m = "Task configuration {$taskConfiguration->getCode()} has error outputs ";
             $m .= "but it's error strategy 'stop' implies they will never be reached.";
             $this->taskLogger->debug($m);
@@ -289,7 +289,7 @@ class ProcessManager
             }
             if ($state->isStopped()) {
                 $exception = $state->getException();
-                if ($exception) {
+                if ($exception instanceof \Throwable) {
                     $m = "Process {$state->getProcessConfiguration()
                         ->getCode()} has failed";
                     $m .= " during process {$state->getTaskConfiguration()
@@ -353,7 +353,7 @@ class ProcessManager
     protected function processExecution(TaskConfiguration $taskConfiguration, int $executionFlag): void
     {
         $task = $taskConfiguration->getTask();
-        if (null === $task) {
+        if (!$task instanceof TaskInterface) {
             throw new \RuntimeException("Missing task for configuration {$taskConfiguration->getCode()}");
         }
         $state = $taskConfiguration->getState();
@@ -393,7 +393,7 @@ class ProcessManager
         }
 
         // Manage exception catching and setting the same
-        if ($exception) {
+        if ($exception instanceof \Throwable) {
             $this->taskLogger->log(
                 $taskConfiguration->getLogLevel(),
                 $exception->getMessage(),

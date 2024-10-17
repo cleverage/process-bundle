@@ -165,7 +165,7 @@ class ProcessState
 
     public function stop(\Throwable $e = null): void
     {
-        if ($e) {
+        if ($e instanceof \Throwable) {
             $this->setException($e);
         }
         $this->setStopped(true);

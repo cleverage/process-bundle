@@ -35,7 +35,7 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
 
     protected function initFile(ProcessState $state): void
     {
-        if ($this->csv) {
+        if ($this->csv instanceof CsvResource) {
             return;
         }
         $options = $this->getOptions($state);

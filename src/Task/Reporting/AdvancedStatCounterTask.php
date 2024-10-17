@@ -39,7 +39,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
     public function execute(ProcessState $state): void
     {
         $now = new \DateTime();
-        if (!$this->startedAt) {
+        if (!$this->startedAt instanceof \DateTime) {
             $this->startedAt = $now;
             $this->lastUpdate = $now;
         }

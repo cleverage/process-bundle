@@ -67,13 +67,13 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
      */
     public function configureQueryOptions(OptionsResolver $resolver, Options $parentOptions = null): void
     {
-        $resolver->setDefault('single_result', $parentOptions ? $parentOptions['single_result'] : true);
+        $resolver->setDefault('single_result', $parentOptions instanceof Options ? $parentOptions['single_result'] : true);
         $resolver->setAllowedTypes('single_result', 'bool');
 
-        $resolver->setDefault('ignore_missing', $parentOptions ? $parentOptions['ignore_missing'] : true);
+        $resolver->setDefault('ignore_missing', $parentOptions instanceof Options ? $parentOptions['ignore_missing'] : true);
         $resolver->setAllowedTypes('ignore_missing', 'bool');
 
-        $resolver->setDefault('unwrap_value', $parentOptions ? $parentOptions['unwrap_value'] : true);
+        $resolver->setDefault('unwrap_value', $parentOptions instanceof Options ? $parentOptions['unwrap_value'] : true);
         $resolver->setAllowedTypes('unwrap_value', 'bool');
     }
 
@@ -137,15 +137,11 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
                 throw new \UnexpectedValueException("There is too much results for query '{$query}'");
             }
 
-            if (!$options['ignore_missing'] && 0 === \count($results)) {
+            if (!$options['ignore_missing'] && [] === $results) {
                 throw new \UnexpectedValueException("There is not enough results for query '{$query}'");
             }
 
-            if (1 === \count($results)) {
-                $results = $results[0];
-            } else {
-                $results = null;
-            }
+            $results = 1 === \count($results) ? $results[0] : null;
         }
 
         return $results;

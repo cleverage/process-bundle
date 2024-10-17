@@ -47,7 +47,7 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
      */
     public function next(ProcessState $state): bool
     {
-        if (!$this->iterator) {
+        if (!$this->iterator instanceof \Iterator) {
             return false;
         }
         $this->iterator->next();

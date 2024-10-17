@@ -61,7 +61,7 @@ class GroupByAggregateIterableTask extends AbstractConfigurableTask implements B
 
     public function proceed(ProcessState $state): void
     {
-        if (0 === \count($this->result)) {
+        if ([] === $this->result) {
             $state->setSkipped(true);
         } else {
             $state->setOutput($this->result);

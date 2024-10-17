@@ -83,13 +83,13 @@ class ProcessHelpCommand extends Command
         $output->writeln(str_repeat(' ', self::INDENT_SIZE).$processCode);
         $output->writeln('');
 
-        if ($process->getDescription()) {
+        if ($process->getDescription() !== '' && $process->getDescription() !== '0') {
             $output->writeln('<comment>Description:</comment>');
             $output->writeln(str_repeat(' ', self::INDENT_SIZE).$process->getDescription());
             $output->writeln('');
         }
 
-        if ($process->getHelp()) {
+        if ($process->getHelp() !== '' && $process->getHelp() !== '0') {
             $output->writeln('<comment>Help:</comment>');
             $helpLines = array_filter(explode("\n", $process->getHelp()));
             foreach ($helpLines as $helpLine) {
@@ -116,7 +116,7 @@ class ProcessHelpCommand extends Command
         }
 
         $branches = array_filter($branches);
-        if (!empty($branches)) {
+        if ($branches !== []) {
             $branchStr = '['.implode(', ', $branches).']';
             $output->writeln("<error>All branches are not resolved : {$branchStr}</error>");
         }
@@ -136,7 +136,7 @@ class ProcessHelpCommand extends Command
         $taskCandidates = [];
         foreach ($taskList as $taskCode) {
             $task = $process->getTaskConfiguration($taskCode);
-            if (empty($task->getPreviousTasksConfigurations())) {
+            if ($task->getPreviousTasksConfigurations() === []) {
                 return $taskCode;
             }
 
@@ -156,7 +156,7 @@ class ProcessHelpCommand extends Command
             }
         }
 
-        if (empty($taskCandidates)) {
+        if ($taskCandidates === []) {
             throw new \UnexpectedValueException('Cannot find a task to output');
         }
 
@@ -175,7 +175,7 @@ class ProcessHelpCommand extends Command
                 $weight += $key;
             }
 
-            if (!empty($task->getPreviousTasksConfigurations())) {
+            if ($task->getPreviousTasksConfigurations() !== []) {
                 $weight /= \count($task->getPreviousTasksConfigurations());
             }
 
@@ -194,7 +194,7 @@ class ProcessHelpCommand extends Command
 
         // If a few tasks have the same weight, return the tasks with the lowest number of children
         $childCounts = [];
-        foreach ($equalWeights as $taskCode => $weight) {
+        foreach (array_keys($equalWeights) as $taskCode) {
             $task = $process->getTaskConfiguration($taskCode);
             $childCounts[$taskCode] = $this->getTaskChildrenCount($task);
         }
@@ -243,7 +243,7 @@ class ProcessHelpCommand extends Command
         }
 
         // Check previous branches
-        if (empty($previousTasks)) {
+        if ($previousTasks === []) {
             $branches[] = $task->getCode();
         } elseif (1 === \count($previousTasks)) {
             $prevTask = current($previousTasks)
@@ -292,7 +292,7 @@ class ProcessHelpCommand extends Command
         }
 
         // Merge branches
-        if (!empty($branchesToMerge)) {
+        if ($branchesToMerge !== []) {
             $this->writeBranches($output, $branches);
 
             $this->writeBranches(
@@ -322,7 +322,7 @@ class ProcessHelpCommand extends Command
                 }
             );
 
-            foreach ($branches as $i => $branchTask) {
+            foreach (array_keys($branches) as $i) {
                 if (\in_array($i, $branchesToMerge, true)) {
                     $branches[$i] = null;
                 }
@@ -423,7 +423,7 @@ class ProcessHelpCommand extends Command
             );
         }
 
-        if (empty($nextTasks)) {
+        if ($nextTasks === []) {
             foreach ($branches as $i => $branchTask) {
                 if ($branchTask === $taskCode) {
                     $branches[$i] = null;
@@ -467,7 +467,7 @@ class ProcessHelpCommand extends Command
             }
 
             // Str_pad does not work with unicode ?
-            $noFormatStrLen = mb_strlen(preg_replace('/<[^>]*>/', '', (string) $str));
+            $noFormatStrLen = mb_strlen((string) preg_replace('/<[^>]*>/', '', (string) $str));
             for ($j = $noFormatStrLen; $j < self::BRANCH_SIZE; ++$j) {
                 $str .= ' ';
             }
@@ -499,15 +499,15 @@ class ProcessHelpCommand extends Command
             $subprocess[] = $task->getOption('process');
         }
 
-        if (\count($interfaces)) {
+        if ($interfaces !== []) {
             $description .= ' <info>('.implode(', ', $interfaces).')</info>';
         }
 
-        if (\count($subprocess)) {
+        if ($subprocess !== []) {
             $description .= ' <fire>{'.implode(', ', $subprocess).'}</fire>';
         }
 
-        if ($task->getDescription()) {
+        if ($task->getDescription() !== '' && $task->getDescription() !== '0') {
             $description .= " <comment>{$task->getDescription()}</comment>";
         }
 

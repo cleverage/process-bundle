@@ -80,10 +80,8 @@ class SubprocessInstance
             $arguments = [...$arguments, '--output='.$this->bufferPath, '--output-format=json-stream'];
         }
 
-        if (!empty($this->context)) {
-            foreach ($this->context as $key => $value) {
-                $arguments[] = sprintf('--context=%s:%s', $key, $value);
-            }
+        foreach ($this->context as $key => $value) {
+            $arguments[] = sprintf('--context=%s:%s', $key, $value);
         }
 
         $arguments[] = $this->processCode;

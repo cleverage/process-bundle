@@ -120,7 +120,7 @@ class ProcessHistory implements \Stringable
      */
     public function getDuration(): ?int
     {
-        if ($this->getEndDate()) {
+        if ($this->getEndDate() instanceof \DateTimeInterface) {
             return $this->getEndDate()
                 ->getTimestamp() - $this->getStartDate()
                 ->getTimestamp();

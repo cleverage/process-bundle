@@ -32,7 +32,7 @@ class TypeSetterTransformer implements ConfigurableTransformerInterface
     {
         $return = settype($value, $options['type']);
 
-        if (true === $return) {
+        if ($return) {
             return $value;
         }
 

@@ -46,7 +46,7 @@ class TransformerException extends \RuntimeException implements ProcessException
         } else {
             $m = sprintf("Transformation '%s' have failed", $this->transformerCode);
         }
-        if ($this->getPrevious()) {
+        if ($this->getPrevious() instanceof \Throwable) {
             $m .= ": {$this->getPrevious()
                 ->getMessage()}";
         }

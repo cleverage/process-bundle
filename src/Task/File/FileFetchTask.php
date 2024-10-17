@@ -43,7 +43,7 @@ class FileFetchTask extends AbstractConfigurableTask implements IterableTaskInte
 
     public function initialize(ProcessState $state): void
     {
-        if (!$this->mountManager) {
+        if (!$this->mountManager instanceof MountManager) {
             throw new ServiceNotFoundException('MountManager service not found, you need to install FlySystemBundle');
         }
         // Configure options

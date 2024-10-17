@@ -28,7 +28,7 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
         $string = $transliterator->transliterate($value);
 
         return trim(
-            preg_replace(
+            (string) preg_replace(
                 $options['replace'],
                 (string) $options['separator'],
                 strtolower(trim(strip_tags($string)))

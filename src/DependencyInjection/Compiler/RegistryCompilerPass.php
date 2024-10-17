@@ -41,7 +41,7 @@ class RegistryCompilerPass implements CompilerPassInterface
         $definition = $container->findDefinition($this->registry);
         $taggedServices = $container->findTaggedServiceIds($this->tag);
 
-        foreach ($taggedServices as $id => $tags) {
+        foreach (array_keys($taggedServices) as $id) {
             $definition->addMethodCall($this->method, [new Reference($id)]);
         }
     }

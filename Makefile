@@ -44,7 +44,7 @@ php-cs-fixer: #[Quality] Run PHP-CS-Fixer
 	$(DOCKER_RUN_PHP) "vendor/bin/php-cs-fixer fix --diff --dry-run --verbose"
 
 rector: #[Quality] Run Rector
-	$(DOCKER_RUN_PHP) "vendor/bin/rector --dry-run"
+	$(DOCKER_RUN_PHP) "vendor/bin/rector"
 
 phpunit: #[Tests] Run PHPUnit
 	$(DOCKER_RUN_PHP) "vendor/bin/phpunit"

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
+use CleverAge\ProcessBundle\Filesystem\CsvResource;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -25,7 +26,7 @@ abstract class AbstractCsvTask extends AbstractCsvResourceTask
 {
     protected function initFile(ProcessState $state): void
     {
-        if ($this->csv) {
+        if ($this->csv instanceof CsvResource) {
             return;
         }
         $options = $this->getOptions($state);

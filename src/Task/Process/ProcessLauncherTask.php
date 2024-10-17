@@ -78,7 +78,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         }
 
         // After dequeue, stop flush
-        if ($this->finishedBuffers->isEmpty() && !\count($this->launchedProcesses)) {
+        if ($this->finishedBuffers->isEmpty() && $this->launchedProcesses === []) {
             $this->flushMode = false;
         }
     }
@@ -96,7 +96,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
 
         // if we are in flush mode, we should wait for process to finish
         if ($this->flushMode) {
-            return \count($this->launchedProcesses) > 0;
+            return $this->launchedProcesses !== [];
         }
 
         usleep($this->getOption($state, 'sleep_on_finalize_interval'));
