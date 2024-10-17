@@ -244,7 +244,7 @@ class ProcessConfiguration
         }
 
         $midOffset = round(\count($dependencies) / 2);
-        $midTaskCode = $dependencies[(int)$midOffset];
+        $midTaskCode = $dependencies[(int) $midOffset];
         $midTask = $this->getTaskConfiguration($midTaskCode);
 
         $previousTasks = [];
