@@ -3,19 +3,20 @@ v4.0
 
 ## BC breaks
 
-* Remove FileFetchTask, use `cleverage/flysystem-process-bundle` instead.
-* YamlReaderTask & YamlWriterTask namespaces changed to `CleverAge\ProcessBundle\Task\File\Yaml`
-* Array***Transformers namespaces changed to `CleverAge\ProcessBundle\Transformer\Array`
-* NormalizeTransformer & DenormalizeTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Serialization`
-* DateFormatTransformer & DateParserTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Date`
-* ExplodeTransformer, HashTransformer, ImplodeTransformer, SlugifyTransformer, SprintfTransformer & TrimTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\String`
-* InstantiateTransformer, PropertyAccessorTransformer RecursivePropertySetterTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Object`
+* [#142](https://github.com/cleverage/process-bundle/issues/142) Remove FileFetchTask, use `cleverage/flysystem-process-bundle` instead.
+* [#142](https://github.com/cleverage/process-bundle/issues/142) YamlReaderTask & YamlWriterTask namespaces changed to `CleverAge\ProcessBundle\Task\File\Yaml`
+* [#142](https://github.com/cleverage/process-bundle/issues/142) Array***Transformers namespaces changed to `CleverAge\ProcessBundle\Transformer\Array`
+* [#142](https://github.com/cleverage/process-bundle/issues/142) NormalizeTransformer & DenormalizeTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Serialization`
+* [#142](https://github.com/cleverage/process-bundle/issues/142) DateFormatTransformer & DateParserTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Date`
+* [#142](https://github.com/cleverage/process-bundle/issues/142) ExplodeTransformer, HashTransformer, ImplodeTransformer, SlugifyTransformer, SprintfTransformer & TrimTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\String`
+* [#142](https://github.com/cleverage/process-bundle/issues/142) InstantiateTransformer, PropertyAccessorTransformer RecursivePropertySetterTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Object`
 
 ### Changes
 
-* Update Makefile & .docker for local standalone usage
-* Update rector, phpstan & php-cs-fixer configurations & apply it
-* `league/flysystem-bundle` is not required anymore
+* [#139](https://github.com/cleverage/process-bundle/issues/139Update) Makefile & .docker for local standalone usage
+* [#139](https://github.com/cleverage/process-bundle/issues/139Update) Update rector, phpstan & php-cs-fixer configurations & apply it
+* [#141](https://github.com/cleverage/process-bundle/issues/141) `league/flysystem-bundle` is not required anymore
+* [#130](https://github.com/cleverage/process-bundle/issues/130) EventDispatcherInterface service declaration breaks dependency injection
 
 ### Fixes
 
