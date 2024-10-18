@@ -11,7 +11,7 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Transformer;
+namespace CleverAge\ProcessBundle\Tests\Transformer;
 
 use CleverAge\ProcessBundle\Transformer\ConstantTransformer;
 use PHPUnit\Framework\TestCase;

@@ -3,13 +3,19 @@ v4.0
 
 ## BC breaks
 
-* Remove FileFetchTask, use cleverage/flysystem-process-bundle instead.
+* Remove FileFetchTask, use `cleverage/flysystem-process-bundle` instead.
+* YamlReaderTask & YamlWriterTask namespaces changed to `CleverAge\ProcessBundle\Task\File\Yaml`
+* Array***Transformers namespaces changed to `CleverAge\ProcessBundle\Transformer\Array`
+* NormalizeTransformer & DenormalizeTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Serialization`
+* DateFormatTransformer & DateParserTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Date`
+* ExplodeTransformer, HashTransformer, ImplodeTransformer, SlugifyTransformer, SprintfTransformer & TrimTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\String`
+* InstantiateTransformer, PropertyAccessorTransformer RecursivePropertySetterTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Object`
 
 ### Changes
 
 * Update Makefile & .docker for local standalone usage
 * Update rector, phpstan & php-cs-fixer configurations & apply it
-* league/flysystem-bundle is not required anymore
+* `league/flysystem-bundle` is not required anymore
 
 ### Fixes
 
