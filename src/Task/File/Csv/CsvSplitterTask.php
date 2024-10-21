@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -26,7 +26,7 @@ class CsvSplitterTask extends InputCsvReaderTask
     public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
-        if (null === $this->csv) {
+        if (!$this->csv instanceof CsvResource) {
             $headers = $this->getHeaders($state, $options);
             $csv = new CsvFile(
                 $options['file_path'],
@@ -72,7 +72,7 @@ class CsvSplitterTask extends InputCsvReaderTask
         }
     }
 
-    protected function splitCsv(CsvFile $csv, int $maxLines): string
+    protected function splitCsv(CsvResource $csv, int $maxLines): string
     {
         $tmpFilePath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_'.uniqid('process', false).'.csv';
         $tmpFile = fopen($tmpFilePath, 'wb+');

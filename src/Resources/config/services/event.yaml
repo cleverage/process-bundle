@@ -1,9 +1,0 @@
-services:
-    Symfony\Contracts\EventDispatcher\EventDispatcherInterface:
-        public: false
-        autowire: true
-        
-    CleverAge\ProcessBundle\EventListener\DataQueueEventListener:
-        public: false
-        tags:
-            - { name: kernel.event_listener, event: cleverage_process.data_queue, method: pushData }

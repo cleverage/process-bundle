@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -33,7 +33,7 @@ class ProcessConfiguration
         protected ?string $endPoint = null,
         protected string $description = '',
         protected string $help = '',
-        protected bool $public = true
+        protected bool $public = true,
     ) {
     }
 
@@ -164,12 +164,12 @@ class ProcessConfiguration
         $entryTask = $this->getEntryPoint();
 
         // If there's no entry point, we might use the end point
-        if (!$entryTask) {
+        if (!$entryTask instanceof TaskConfiguration) {
             $entryTask = $this->getEndPoint();
         }
 
         // By default use the first defined task
-        if (!$entryTask) {
+        if (!$entryTask instanceof TaskConfiguration) {
             $entryTask = reset($this->taskConfigurations);
         }
 
@@ -244,7 +244,7 @@ class ProcessConfiguration
         }
 
         $midOffset = round(\count($dependencies) / 2);
-        $midTaskCode = $dependencies[(int)$midOffset];
+        $midTaskCode = $dependencies[(int) $midOffset];
         $midTask = $this->getTaskConfiguration($midTaskCode);
 
         $previousTasks = [];

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -58,7 +58,7 @@ class TaskConfiguration
         protected array $outputs = [],
         protected array $errorOutputs = [],
         protected string $errorStrategy = self::STRATEGY_SKIP,
-        protected string $logLevel = LogLevel::CRITICAL
+        protected string $logLevel = LogLevel::CRITICAL,
     ) {
         $this->logErrors = LogLevel::DEBUG !== $logLevel; // @deprecated, remove me in next version
     }
@@ -188,7 +188,7 @@ class TaskConfiguration
 
     public function isRoot(): bool
     {
-        return empty($this->getPreviousTasksConfigurations()) && !$this->isInErrorBranch();
+        return [] === $this->getPreviousTasksConfigurations() && !$this->isInErrorBranch();
     }
 
     /**

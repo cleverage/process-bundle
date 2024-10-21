@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -27,7 +27,7 @@ class ContextualOptionResolver
         }
 
         if (\is_string($value)) {
-            $pattern = sprintf('/{{[ ]*(%s){1}[ ]*}}/', implode('|', array_keys($context)));
+            $pattern = \sprintf('/{{[ ]*(%s){1}[ ]*}}/', implode('|', array_keys($context)));
 
             $matches = [];
             $result = preg_match($pattern, $value, $matches);

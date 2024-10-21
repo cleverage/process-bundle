@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -13,19 +13,21 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Logger;
 
+use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
+use CleverAge\ProcessBundle\Model\ProcessHistory;
 use Monolog\LogRecord;
 
 class AbstractProcessor
 {
     public function __construct(
-        protected ProcessManager $processManager
+        protected ProcessManager $processManager,
     ) {
     }
 
     public function __invoke(LogRecord $record): LogRecord
     {
-        if (!empty($record->context)) {
+        if ([] !== $record->context) {
             $context = $this->normalizeRecordData($record->context);
             $record = new LogRecord(
                 $record->datetime,
@@ -58,7 +60,7 @@ class AbstractProcessor
     protected function addProcessInfoToRecord(array &$record): void
     {
         $processHistory = $this->processManager->getProcessHistory();
-        if (!$processHistory) {
+        if (!$processHistory instanceof ProcessHistory) {
             return;
         }
 
@@ -70,7 +72,7 @@ class AbstractProcessor
     protected function addTaskInfoToRecord(array &$record): void
     {
         $taskConfiguration = $this->processManager->getTaskConfiguration();
-        if (!$taskConfiguration) {
+        if (!$taskConfiguration instanceof TaskConfiguration) {
             return;
         }
         $this->addToRecord($record, 'task_code', $taskConfiguration->getCode());
@@ -82,7 +84,7 @@ class AbstractProcessor
             $this->addToRecord($record, 'error', $state->getErrorOutput());
         }
 
-        if ($state->getException()) {
+        if ($state->getException() instanceof \Throwable) {
             $this->addToRecord($record, 'exception', $state->getException());
         }
     }

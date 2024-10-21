@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -32,14 +32,14 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
     protected int $preInitCounter = 0;
 
     public function __construct(
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
     ) {
     }
 
     public function execute(ProcessState $state): void
     {
         $now = new \DateTime();
-        if (!$this->startedAt) {
+        if (!$this->startedAt instanceof \DateTime) {
             $this->startedAt = $now;
             $this->lastUpdate = $now;
         }

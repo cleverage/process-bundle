@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -24,7 +24,7 @@ class InvalidProcessConfigurationException extends \UnexpectedValueException imp
     public static function createNotInMain(
         ProcessConfiguration $processConfiguration,
         TaskConfiguration $taskConfig,
-        array $mainTaskList
+        array $mainTaskList,
     ): self {
         $taskListStr = '['.implode(', ', $mainTaskList).']';
 
@@ -35,7 +35,7 @@ class InvalidProcessConfigurationException extends \UnexpectedValueException imp
 
     public static function createEntryPointHasAncestors(
         ProcessConfiguration $processConfiguration,
-        TaskConfiguration $taskConfig
+        TaskConfiguration $taskConfig,
     ): self {
         return new self(
             "The entry-point '{$taskConfig->getCode()}' cannot have an ancestor (from process: {$processConfiguration->getCode()})"

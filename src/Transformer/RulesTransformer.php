@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -28,7 +28,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
 
     public function __construct(
         TransformerRegistry $transformerRegistry,
-        protected ExpressionLanguage $language
+        protected ExpressionLanguage $language,
     ) {
         $this->transformerRegistry = $transformerRegistry;
     }
@@ -93,7 +93,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
     /**
      * Configure options for one "rule" block.
      */
-    public function configureRuleOptions(OptionsResolver $resolver, array $expressionVariables = null): void
+    public function configureRuleOptions(OptionsResolver $resolver, ?array $expressionVariables = null): void
     {
         $resolver->setDefaults([
             'condition' => null,
