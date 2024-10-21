@@ -16,7 +16,6 @@ namespace CleverAge\ProcessBundle;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\CheckSerializerCompilerPass;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
-use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -30,11 +29,14 @@ class CleverAgeProcessBundle extends Bundle
         parent::build($container);
 
         $container->addCompilerPass(
-            new RegistryCompilerPass(TransformerRegistry::class, 'cleverage.transformer', 'addTransformer'),
-            PassConfig::TYPE_BEFORE_OPTIMIZATION,
-            0
+            new RegistryCompilerPass(TransformerRegistry::class, 'cleverage.transformer', 'addTransformer')
         );
 
-        $container->addCompilerPass(new CheckSerializerCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 0);
+        $container->addCompilerPass(new CheckSerializerCompilerPass());
+    }
+
+    public function getPath(): string
+    {
+        return \dirname(__DIR__);
     }
 }

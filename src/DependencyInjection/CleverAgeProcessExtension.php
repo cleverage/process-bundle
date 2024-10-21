@@ -25,16 +25,14 @@ use Symfony\Component\Finder\Finder;
 /**
  * This is the class that loads and manages your bundle configuration.
  *
- * @see    http://symfony.com/doc/current/cookbook/bundles/extension.html
+ * @see https://symfony.com/doc/current/bundles/extension.html
  */
 class CleverAgeProcessExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
         // Get the path of the service folder wherever the bundle is installed
-        $reflection = new \ReflectionClass($this);
-        $serviceFolderPath = \dirname($reflection->getFileName(), 2).'/Resources/config/services';
-        $this->findServices($container, $serviceFolderPath);
+        $this->findServices($container, __DIR__.'/../../config/services');
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
