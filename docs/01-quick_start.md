@@ -20,13 +20,16 @@ The most common example is the ETL. It's a kind of application whose main purpos
 
 ## Installation
 
-This bundle requires Symfony 6.3 minimum. You can install it using composer:
+Make sure Composer is installed globally, as explained in the [installation chapter](https://getcomposer.org/doc/00-intro.md)
+of the Composer documentation.
+
+Open a command console, enter your project directory and install it using composer:
 
 ```bash
 composer require cleverage/process-bundle
 ```
 
-Remember to add the following line to bundles.php (not required if Symfony Flex is used)
+Remember to add the following line to config/bundles.php (not required if Symfony Flex is used)
 
 ```php
 CleverAge\ProcessBundle\CleverAgeProcessBundle::class => ['all' => true],
@@ -97,11 +100,11 @@ Then you can add tasks in this array. They consist of a `service`, optionally co
 ```
 
 Below you can see a minimal working ETL example. It consist of 3 tasks:
-- the first *extract* some data (the [constant output task](./reference/tasks/constant_output_task.md) outputs... a constant value): it's an array with 3 
+- the first *extract* some data (the [constant output task](reference/tasks/constant_output_task.md) outputs... a constant value): it's an array with 3 
 keys/values
-- the second *transform* the given value (the [transformer task](./reference/tasks/transformer_task.md) is one of the most important!): the output is then an 
+- the second *transform* the given value (the [transformer task](reference/tasks/transformer_task.md) is one of the most important!): the output is then an 
 array with 2 keys/values, created using the value from previous task
-- finally, the last will just display the result (it's a cheap *load*, using the [debug task](./reference/tasks/debug_task.md), only for development 
+- finally, the last will just display the result (it's a cheap *load*, using the [debug task](reference/tasks/debug_task.md), only for development 
 purpose!)
 
 ```yaml
@@ -193,4 +196,4 @@ Once everything is working fine, you may want to automate your processes. The st
 
 To check if everything went fine, logs are stored in database:
 - `clever_process_history`: logs process started, with `process_code`, `start_date`, `end_date` and `statut`
-- `clever_task_history`: logs custom tasks logs (see [logging]()), with `task_code`, `message`, `logged_at` date, `level`, a `reference` and `context`
+- `clever_task_history`: logs custom tasks logs (see [logging]), with `task_code`, `message`, `logged_at` date, `level`, a `reference` and `context`

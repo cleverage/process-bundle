@@ -37,6 +37,8 @@ bash: #[Docker] Connect to php container with current host user
 logs: #[Docker] Show logs
 	$(DOCKER_COMPOSE) logs -f
 
+quality: phpstan php-cs-fixer rector #[Quality] Run all quality checks
+
 phpstan: #[Quality] Run PHPStan
 	$(DOCKER_RUN_PHP) "vendor/bin/phpstan --no-progress --memory-limit=1G analyse"
 
@@ -45,6 +47,8 @@ php-cs-fixer: #[Quality] Run PHP-CS-Fixer
 
 rector: #[Quality] Run Rector
 	$(DOCKER_RUN_PHP) "vendor/bin/rector"
+
+tests: phpunit #[Tests] Run all tests
 
 phpunit: #[Tests] Run PHPUnit
 	$(DOCKER_RUN_PHP) "vendor/bin/phpunit"

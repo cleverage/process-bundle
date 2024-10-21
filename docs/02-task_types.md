@@ -81,7 +81,7 @@ Transformers are a special subset of this bundle. They're not tasks strictly spe
 point for Transformers is the `CleverAge\ProcessBundle\Task\TransformerTask`, whose only purpose is to take some input, 
 pass it to a transformer and transfer the output to next task.
 
-The idea is to allow a great flexibility (especially using the [MappingTransformer]()), without using too much code.
+The idea is to allow a great flexibility (especially using the [MappingTransformer]), without using too much code.
 
 They implement `CleverAge\ProcessBundle\Transformer\TransformerInterface` or 
 `CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface`.
