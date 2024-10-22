@@ -2,7 +2,7 @@ services:
     _defaults:
         bind:
             $language: '@cleverage_process.expression_language'
-            $transformerRegistry: '@process_bundle.registry.transformer'
+            $transformerRegistry: '@cleverage_process.registry.transformer'
 
     CleverAge\ProcessBundle\Transformer\:
         resource: '../../src/Transformer/*'

@@ -11,13 +11,15 @@ v4.0
 * [#142](https://github.com/cleverage/process-bundle/issues/142) ExplodeTransformer, HashTransformer, ImplodeTransformer, SlugifyTransformer, SprintfTransformer & TrimTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\String`
 * [#142](https://github.com/cleverage/process-bundle/issues/142) InstantiateTransformer, PropertyAccessorTransformer RecursivePropertySetterTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Object`
 * [#147](https://github.com/cleverage/process-bundle/issues/147) Replace `Symfony\Component\Form\Exception\InvalidConfigurationException` by `Symfony\Component\Config\Definition\Exception\InvalidConfigurationException`
-
+* [#148](https://github.com/cleverage/process-bundle/issues/148) Update services (step 1) according to Symfony best practices. Services should not use autowiring or autoconfiguration. Instead, all services should be defined explicitly. 
+Services must be prefixed with the bundle alias instead of using fully qualified class names => `cleverage_process`
 ### Changes
 
 * [#139](https://github.com/cleverage/process-bundle/issues/139Update) Makefile & .docker for local standalone usage
 * [#139](https://github.com/cleverage/process-bundle/issues/139Update) Update rector, phpstan & php-cs-fixer configurations & apply it
 * [#141](https://github.com/cleverage/process-bundle/issues/141) `league/flysystem-bundle` is not required anymore
 * [#130](https://github.com/cleverage/process-bundle/issues/130) EventDispatcherInterface service declaration breaks dependency injection
+* [#147](https://github.com/cleverage/process-bundle/issues/147) Add missing dependencies on `symfony/dotenv` and `symfony/runtime`
 * [#147](https://github.com/cleverage/process-bundle/issues/147) Remove dependencies on `symfony/form`, `symfony/messenger` & `symfony/scheduler` 
 
 ### Fixes

@@ -1,11 +1,11 @@
 services:
-    process_bundle.registry.process_configuration:
+    cleverage_process.registry.process_configuration:
         class: CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry
         public: false
         arguments:
             - ~
             - ~
 
-    process_bundle.registry.transformer:
+    cleverage_process.registry.transformer:
         class: CleverAge\ProcessBundle\Registry\TransformerRegistry
         public: false

@@ -1,9 +1,9 @@
 services:
     _defaults:
         bind:
-            $processManager: '@process_bundle.manager.process'
-            $processRegistry: '@process_bundle.registry.process_configuration'
-            $transformerRegistry: '@process_bundle.registry.transformer'
+            $processManager: '@cleverage_process.manager.process'
+            $processRegistry: '@cleverage_process.registry.process_configuration'
+            $transformerRegistry: '@cleverage_process.registry.transformer'
 
     CleverAge\ProcessBundle\Task\:
         resource: '../../src/Task/*'

@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
-use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Transformer\GenericTransformer;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -37,7 +36,7 @@ class CleverAgeProcessExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $processConfigurationRegistry = $container->getDefinition('process_bundle.registry.process_configuration');
+        $processConfigurationRegistry = $container->getDefinition('cleverage_process.registry.process_configuration');
         $processConfigurationRegistry->replaceArgument(0, $config['configurations']);
         $processConfigurationRegistry->replaceArgument(1, $config['default_error_strategy']);
 

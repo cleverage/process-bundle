@@ -5,7 +5,7 @@ services:
         tags:
             - { name: monolog.processor, channel: cleverage_process }
         arguments:
-            - '@process_bundle.manager.process'
+            - '@cleverage_process.manager.process'
 
     cleverage_process.logger.task_processor:
         class: CleverAge\ProcessBundle\Logger\TaskProcessor
@@ -13,7 +13,7 @@ services:
         tags:
             - { name: monolog.processor, channel: cleverage_process_task }
         arguments:
-            - '@process_bundle.manager.process'
+            - '@cleverage_process.manager.process'
 
     cleverage_process.logger.transformer_processor:
         class: CleverAge\ProcessBundle\Logger\TransformerProcessor
@@ -21,7 +21,7 @@ services:
         tags:
             - { name: monolog.processor, channel: cleverage_process_transformer }
         arguments:
-            - '@process_bundle.manager.process'
+            - '@cleverage_process.manager.process'
 
     cleverage_process.logger.process_logger:
         class: CleverAge\ProcessBundle\Logger\ProcessLogger
