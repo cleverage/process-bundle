@@ -20,7 +20,8 @@ Services must be prefixed with the bundle alias instead of using fully qualified
 * [#141](https://github.com/cleverage/process-bundle/issues/141) `league/flysystem-bundle` is not required anymore
 * [#130](https://github.com/cleverage/process-bundle/issues/130) EventDispatcherInterface service declaration breaks dependency injection
 * [#147](https://github.com/cleverage/process-bundle/issues/147) Add missing dependencies on `symfony/dotenv` and `symfony/runtime`
-* [#147](https://github.com/cleverage/process-bundle/issues/147) Remove dependencies on `symfony/form`, `symfony/messenger` & `symfony/scheduler` 
+* [#147](https://github.com/cleverage/process-bundle/issues/147) Remove dependencies on `symfony/form`, `symfony/messenger` & `symfony/scheduler`
+* [#146](https://github.com/cleverage/process-bundle/issues/146) eav-process-bundle, enqueue-process-bundle, cache-process-bundle and process-soap-bundle were deprecated / archived.
 
 ### Fixes
 
