@@ -1,9 +1,12 @@
 services:
-    CleverAge\ProcessBundle\ExpressionLanguage\PhpFunctionProvider:
+    cleverage_process.expression_language.php_function_provider:
+        class: CleverAge\ProcessBundle\ExpressionLanguage\PhpFunctionProvider
+        public: false
         arguments:
             - [ 'preg_match' ]
 
     cleverage_process.expression_language:
         class: Symfony\Component\ExpressionLanguage\ExpressionLanguage
+        public: false
         calls:
-            - ['registerProvider', ['@CleverAge\ProcessBundle\ExpressionLanguage\PhpFunctionProvider']]
+            - ['registerProvider', ['@cleverage_process.expression_language.php_function_provider']]

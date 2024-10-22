@@ -1,7 +1,27 @@
 services:
-    CleverAge\ProcessBundle\Command\:
-        resource: '../../../Command/*'
-        autowire: true
-        autoconfigure: true
-        bind:
-            $container: '@service_container'
+    cleverage_process.command.execute_process:
+        class: CleverAge\ProcessBundle\Command\ExecuteProcessCommand
+        public: false
+        tags:
+            - { name: console.command }
+        arguments:
+            - '@process_bundle.manager.process'
+            - '@event_dispatcher'
+            - '@process_bundle.registry.process_configuration'
+
+    cleverage_process.command.list_process:
+        class: CleverAge\ProcessBundle\Command\ListProcessCommand
+        public: false
+        tags:
+            - { name: console.command }
+        arguments:
+            - '@process_bundle.registry.process_configuration'
+
+    cleverage_process.command.process_help:
+        class: CleverAge\ProcessBundle\Command\ProcessHelpCommand
+        public: false
+        tags:
+            - { name: console.command }
+        arguments:
+            - '@process_bundle.registry.process_configuration'
+            - '@service_container'

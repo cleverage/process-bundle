@@ -1,6 +1,12 @@
 services:
+    _defaults:
+        bind:
+            $processManager: '@process_bundle.manager.process'
+            $processRegistry: '@process_bundle.registry.process_configuration'
+            $transformerRegistry: '@process_bundle.registry.transformer'
+
     CleverAge\ProcessBundle\Task\:
-        resource: '../../../Task/*'
+        resource: '../../src/Task/*'
         autowire: true
         public: true
         shared: false

@@ -1,9 +1,15 @@
 services:
-    CleverAge\ProcessBundle\Manager\ProcessManager:
-        autowire: true
+    process_bundle.manager.process:
+        class: CleverAge\ProcessBundle\Manager\ProcessManager
         public: false
         arguments:
-            $container: '@service_container'
+            - '@service_container'
+            - '@cleverage_process.logger.process_logger'
+            - '@cleverage_process.logger.task_logger'
+            - '@process_bundle.registry.process_configuration'
+            - '@process_bundle.context.contextual_option_resolver'
+            - '@event_dispatcher'
 
-    CleverAge\ProcessBundle\Context\ContextualOptionResolver:
+    process_bundle.context.contextual_option_resolver:
+        class: CleverAge\ProcessBundle\Context\ContextualOptionResolver
         public: false
