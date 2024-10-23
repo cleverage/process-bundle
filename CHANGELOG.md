@@ -15,8 +15,8 @@ v4.0
 Services must be prefixed with the bundle alias instead of using fully qualified class names => `cleverage_process`
 ### Changes
 
-* [#139](https://github.com/cleverage/process-bundle/issues/139Update) Makefile & .docker for local standalone usage
-* [#139](https://github.com/cleverage/process-bundle/issues/139Update) Update rector, phpstan & php-cs-fixer configurations & apply it
+* [#139](https://github.com/cleverage/process-bundle/issues/139) Update Makefile & .docker for local standalone usage
+* [#139](https://github.com/cleverage/process-bundle/issues/139) Update rector, phpstan & php-cs-fixer configurations & apply it
 * [#141](https://github.com/cleverage/process-bundle/issues/141) `league/flysystem-bundle` is not required anymore
 * [#130](https://github.com/cleverage/process-bundle/issues/130) EventDispatcherInterface service declaration breaks dependency injection
 * [#147](https://github.com/cleverage/process-bundle/issues/147) Add missing dependencies on `symfony/dotenv` and `symfony/runtime`
