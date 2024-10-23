@@ -40,12 +40,6 @@ make quality
 make tests
 ```
 
-which will execute all tests inside the docker.
-
-```bash
-make test TEST="Tests/Util/FilenameUtilsTest.php"
-```
-
 ## Deprecations notices
 
 When a feature should be deprecated, or when you have a breaking change for a future version, please :
