@@ -2,20 +2,29 @@
 
 declare(strict_types=1);
 
-/*
- * This file is part of the CleverAge/ProcessBundle package.
- *
- * Copyright (c) 2017-2024 Clever-Age
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 use Rector\Config\RectorConfig;
+use Rector\Set\ValueObject\LevelSetList;
+use Rector\Symfony\Set\SymfonySetList;
+use Rector\ValueObject\PhpVersion;
 
 return RectorConfig::configure()
-    ->withPaths([__DIR__.'/src', __DIR__.'/tests'])
+    ->withPhpVersion(PhpVersion::PHP_82)
+    ->withPaths([
+        __DIR__.'/src',
+        __DIR__.'/tests',
+    ])
     ->withPhpSets(php82: true)
-    ->withAttributesSets(symfony: true)
-    ->withImportNames(removeUnusedImports: true)
+    // here we can define, what prepared sets of rules will be applied
+    ->withPreparedSets(
+        deadCode: true,
+        codeQuality: true
+    )
+    ->withSets([
+        LevelSetList::UP_TO_PHP_82,
+        SymfonySetList::SYMFONY_64,
+        SymfonySetList::SYMFONY_71,
+        SymfonySetList::SYMFONY_CODE_QUALITY,
+        SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
+        SymfonySetList::ANNOTATIONS_TO_ATTRIBUTES,
+    ])
 ;

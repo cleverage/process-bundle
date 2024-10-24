@@ -1,8 +1,0 @@
-services:
-    CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry:
-        arguments:
-            - ~
-            - ~
-
-    CleverAge\ProcessBundle\Registry\TransformerRegistry:
-        public: false

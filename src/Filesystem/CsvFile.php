@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -29,13 +29,13 @@ class CsvFile extends CsvResource
         string $delimiter = ',',
         string $enclosure = '"',
         string $escape = '\\',
-        array $headers = null,
-        string $mode = 'rb'
+        ?array $headers = null,
+        string $mode = 'rb',
     ) {
         if (!\in_array($filePath, ['php://stdin', 'php://stdout', 'php://stderr'], true)) {
             $dirname = \dirname($this->filePath);
-            if (!@mkdir($dirname, 0755, true) && !is_dir($dirname)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $dirname));
+            if (!@mkdir($dirname, 0o755, true) && !is_dir($dirname)) {
+                throw new \RuntimeException(\sprintf('Directory "%s" was not created', $dirname));
             }
         }
 

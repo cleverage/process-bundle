@@ -1,9 +1,0 @@
-services:
-    CleverAge\ProcessBundle\Manager\ProcessManager:
-        autowire: true
-        public: false
-        arguments:
-            $container: '@service_container'
-
-    CleverAge\ProcessBundle\Context\ContextualOptionResolver:
-        public: false

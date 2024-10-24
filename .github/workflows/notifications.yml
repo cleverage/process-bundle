@@ -13,10 +13,10 @@ jobs:
     steps:
       - name: Get the tag short reference
         id: get_tag
-        run: echo ::set-output name=TAG::${GITHUB_REF/refs\/tags\//}
+        run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
       - name: Rocket.Chat Notification
-        uses: RocketChat/Rocket.Chat.GitHub.Action.Notification@1.1.1
+        uses: madalozzo/Rocket.Chat.GitHub.Action.Notification@master
         with:
           type: success
           job_name: "[cleverage/process-bundle](https://github.com/cleverage/process-bundle) : ${{ steps.get_tag.outputs.TAG }} has been released"

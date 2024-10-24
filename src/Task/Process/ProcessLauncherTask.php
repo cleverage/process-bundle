@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -42,7 +42,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     public function __construct(
         protected LoggerInterface $logger,
         protected ProcessConfigurationRegistry $processRegistry,
-        protected KernelInterface $kernel
+        protected KernelInterface $kernel,
     ) {
         $this->finishedBuffers = new \SplQueue();
     }
@@ -78,7 +78,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         }
 
         // After dequeue, stop flush
-        if ($this->finishedBuffers->isEmpty() && !\count($this->launchedProcesses)) {
+        if ($this->finishedBuffers->isEmpty() && [] === $this->launchedProcesses) {
             $this->flushMode = false;
         }
     }
@@ -96,7 +96,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
 
         // if we are in flush mode, we should wait for process to finish
         if ($this->flushMode) {
-            return \count($this->launchedProcesses) > 0;
+            return [] !== $this->launchedProcesses;
         }
 
         usleep($this->getOption($state, 'sleep_on_finalize_interval'));

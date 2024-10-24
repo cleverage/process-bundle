@@ -1,0 +1,15 @@
+services:
+    cleverage_process.manager.process:
+        class: CleverAge\ProcessBundle\Manager\ProcessManager
+        public: false
+        arguments:
+            - '@service_container'
+            - '@cleverage_process.logger.process_logger'
+            - '@cleverage_process.logger.task_logger'
+            - '@cleverage_process.registry.process_configuration'
+            - '@cleverage_process.context.contextual_option_resolver'
+            - '@event_dispatcher'
+
+    cleverage_process.context.contextual_option_resolver:
+        class: CleverAge\ProcessBundle\Context\ContextualOptionResolver
+        public: false

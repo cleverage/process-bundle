@@ -1,0 +1,14 @@
+x-build-args: &build-args
+  UID: "${UID:-1000}"
+  GID: "${GID:-1000}"
+
+name: cleverage-process-bundle
+
+services:
+  php:
+    build:
+      context: php
+      args:
+        <<: *build-args
+    volumes:
+      - ../:/var/www
