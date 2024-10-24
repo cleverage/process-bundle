@@ -11,7 +11,7 @@ Demo project can be found on [there](https://github.com/cleverage/process-bundle
 ## Documentation
 
 For usage documentation, see:
-[docs/index.md](doc/index.md)
+[docs/index.md](docs/index.md)
 
 ## Support & Contribution
 

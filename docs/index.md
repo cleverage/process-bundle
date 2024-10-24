@@ -133,4 +133,4 @@
         - [Rest](https://github.com/cleverage/rest-process-bundle)
         - [Flysystem](https://github.com/cleverage/flysystem-process-bundle)
     - [Generic transformers definition](reference/03-generic_transformers_definition.md)
-- [UI](https://github.com/cleverage/processuibundle)
+- [UI](https://github.com/cleverage/ui-process-bundle)
