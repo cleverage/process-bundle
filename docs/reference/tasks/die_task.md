@@ -22,4 +22,11 @@ None
 Example
 ----------------
 
-https://github.com/cleverage/process-bundle-ui-demo/blob/main/config/packages/process/demo.die.yaml
+```yaml
+clever_age_process:
+  configurations:
+    project_prefix.die_example:
+      tasks:
+        die_example:
+          service: '@CleverAge\ProcessBundle\Task\Debug\DieTask'
+```

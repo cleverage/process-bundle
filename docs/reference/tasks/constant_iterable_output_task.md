@@ -21,7 +21,26 @@ Possible outputs
 Options
 -------
 
-| Code | Type | Required | Default | Description |
-| ---- | ---- | :------: | ------- | ----------- |
-| `output` | `array` | **X** |  | Array of values to iterate onto |
+| Code     | Type    | Required | Default | Description                     |
+|----------|---------|:--------:|---------|---------------------------------|
+| `output` | `array` |  **X**   |         | Array of values to iterate onto |
 
+Example
+-------
+
+```yaml
+clever_age_process:
+  configurations:
+    project_prefix.constant_iterable_output_example:
+      tasks:
+        constant_iterable_output_example:
+          service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+          options:
+            output:
+              id: 123
+              firstname: Test1
+              lastname: Test2
+          outputs: [debug]
+        debug:
+          service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
+```

@@ -22,8 +22,24 @@ Possible outputs
 Options
 -------
 
-| Code | Type | Required | Default | Description |
-| ---- | ---- | :------: | ------- | ----------- |
-| `event_name` | `string` | **X** | | Format for normalization ("json", "xml", ... an empty string should also work) |
-| `passive` | `bool` | | `true` | Pass input to output |
+| Code         | Type     | Required  | Default  | Description          |
+|--------------|----------|:---------:|----------|----------------------|
+| `event_name` | `string` |   **X**   |          |                      |
+| `passive`    | `bool`   |           | `true`   | Pass input to output |
 
+Example
+-------
+
+```yaml
+clever_age_process:
+  configurations:
+    project_prefix.event_dispatcher_example:
+      tasks:
+        event_dispatcher_example:
+          service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
+          options:
+            event_name: 'myapp.myevent'
+          outputs: [debug]
+        debug:
+          service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
+```

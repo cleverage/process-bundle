@@ -15,20 +15,16 @@ namespace CleverAge\ProcessBundle\Task\Debug;
 
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
-use Symfony\Component\Console\Helper\Helper;
 
 /**
  * Class DieTask.
  *
  * Stops the process brutally
- *
- * @example https://github.com/cleverage/process-bundle-ui-demo/blob/main/config/packages/process/demo.die.yaml
  */
 class DieTask implements TaskInterface
 {
     public function execute(ProcessState $state): never
     {
-        var_dump(Helper::formatMemory(memory_get_peak_usage(true)));
         exit;
     }
 }

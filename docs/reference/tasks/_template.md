@@ -20,9 +20,8 @@ _Description of possible types_
 
 Options
 -------
-
-| Code | Type | Required | Default | Description |
-| ---- | ---- | :------: | ------- | ----------- |
+| Code   | Type   | Required           | Default                        | Description   |
+|--------|--------|--------------------|--------------------------------|---------------|
 | `code` | `type` | **X** _or nothing_ | `default value` _if available_ | _description_ |
 
 Examples

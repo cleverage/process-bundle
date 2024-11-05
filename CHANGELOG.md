@@ -23,6 +23,7 @@ Services must be prefixed with the bundle alias instead of using fully qualified
 * [#147](https://github.com/cleverage/process-bundle/issues/147) Add missing dependencies on `symfony/dotenv` and `symfony/runtime`
 * [#147](https://github.com/cleverage/process-bundle/issues/147) Remove dependencies on `symfony/form`, `symfony/messenger` & `symfony/scheduler`
 * [#146](https://github.com/cleverage/process-bundle/issues/146) eav-process-bundle, enqueue-process-bundle, cache-process-bundle and process-soap-bundle were deprecated / archived.
+* [#141](https://github.com/cleverage/process-bundle/issues/141) Add a default value to the node "default_error_strategy"
 
 ### Fixes
 

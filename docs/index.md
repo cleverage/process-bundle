@@ -22,13 +22,13 @@
     - Basic and debug
         - [ConstantOutputTask](reference/tasks/constant_output_task.md)
         - [ConstantIterableOutputTask](reference/tasks/constant_iterable_output_task.md)
-        - [CounterTask]
+        - [CounterTask](reference/tasks/counter_task.md)
         - [DebugTask](reference/tasks/debug_task.md)
         - [DieTask](reference/tasks/die_task.md)
         - [DummyTask](reference/tasks/dummy_task.md)
-        - [ErrorForwarderTask]
+        - [ErrorForwarderTask](reference/tasks/error_forwarder_task.md)
         - [EventDispatcherTask](reference/tasks/event_dispatcher_task.md)
-        - [StopwatchTask]
+        - [StopwatchTask](reference/tasks/stopwatch_task.md)
     - Data manipulation and transformations
         - [DenormalizerTask](reference/tasks/denormalizer_task.md)
         - [NormalizerTask](reference/tasks/normalizer_task.md)
