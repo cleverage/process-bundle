@@ -28,7 +28,6 @@
         - [DummyTask](reference/tasks/dummy_task.md)
         - [ErrorForwarderTask]
         - [EventDispatcherTask](reference/tasks/event_dispatcher_task.md)
-        - [MemInfoDumpTask]
         - [StopwatchTask]
     - Data manipulation and transformations
         - [DenormalizerTask](reference/tasks/denormalizer_task.md)

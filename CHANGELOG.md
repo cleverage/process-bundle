@@ -13,6 +13,7 @@ v4.0
 * [#147](https://github.com/cleverage/process-bundle/issues/147) Replace `Symfony\Component\Form\Exception\InvalidConfigurationException` by `Symfony\Component\Config\Definition\Exception\InvalidConfigurationException`
 * [#148](https://github.com/cleverage/process-bundle/issues/148) Update services (step 1) according to Symfony best practices. Services should not use autowiring or autoconfiguration. Instead, all services should be defined explicitly. 
 Services must be prefixed with the bundle alias instead of using fully qualified class names => `cleverage_process`
+* [#150](https://github.com/cleverage/process-bundle/issues/150) The class `\CleverAge\ProcessBundle\Task\Debug\MemInfoDumpTask` has been deleted without suggested replacement
 ### Changes
 
 * [#139](https://github.com/cleverage/process-bundle/issues/139) Update Makefile & .docker for local standalone usage
