@@ -40,7 +40,7 @@ class Configuration implements ConfigurationInterface
         // Default error strategy
         $definition->enumNode('default_error_strategy')
             ->values([TaskConfiguration::STRATEGY_SKIP, TaskConfiguration::STRATEGY_STOP])
-            ->isRequired();
+            ->defaultValue(TaskConfiguration::STRATEGY_STOP);
 
         $this->appendRootProcessConfigDefinition($definition);
         $this->appendRootTransformersConfigDefinition($definition);
