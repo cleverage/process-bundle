@@ -19,6 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -45,6 +46,10 @@ class CleverAgeProcessExtension extends Extension
             $transformerDefinition = new Definition(GenericTransformer::class);
             $transformerDefinition->setAutowired(true);
             $transformerDefinition->setPublic(false);
+            $transformerDefinition->setArguments([
+                new Reference('cleverage_process.context.contextual_option_resolver'),
+                new Reference('cleverage_process.registry.transformer'),
+            ]);
             $transformerDefinition->addMethodCall('initialize', [$transformerCode, $transformerConfig]);
             $transformerDefinition->addTag('cleverage.transformer');
 
