@@ -87,7 +87,7 @@
     "cleverage/soap-process-bundle": "Dedicated bundle for Soap dependencies for the process bundle",
     "cleverage/rest-process-bundle": "Dedicated bundle for Rest dependencies for the process bundle",
     "cleverage/flysystem-process-bundle": "Dedicated bundle for Flysystem dependencies for the process bundle",
-    "cleverage/processuibundle": "A simple UX for cleverage/processbundle using EasyAdmin\n\n"
+    "cleverage/ui-process-bundle": "UI for the process bundle"
   },
   "config": {
     "allow-plugins": {
