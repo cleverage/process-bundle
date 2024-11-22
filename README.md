@@ -6,7 +6,7 @@ Basically, it will greatly ease the configuration of import and exports but can 
 
 Compatible with [Symfony stable version and latest Long-Term Support (LTS) release](https://symfony.com/releases).
 
-Demo project can be found on [there](https://github.com/cleverage/process-bundle-ui-demo).
+Demo project can be found on [there](https://github.com/cleverage/process-bundle-demo).
 
 ## Documentation
 
