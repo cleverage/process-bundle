@@ -123,7 +123,7 @@
             - [ImplodeTransformer]
             - [SlugifyTransformer]
             - [SprintfTransformer]
-            - [TrimTransformer]
+            - [TrimTransformer](reference/transformers/trim_transformer.md)
         - XML
             - [XpathEvaluatorTransformer](reference/transformers/xpath_evaluator.md)
     - Other bridges
