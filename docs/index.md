@@ -44,7 +44,7 @@
         - [CsvReaderTask](reference/tasks/csv_reader_task.md)
         - [CsvWriterTask](reference/tasks/csv_writer_task.md)
         - [CSVSplitterTask]
-        - [InputCsvReaderTask]
+        - [InputCsvReaderTask](reference/tasks/input_csv_reader_task.md)
     - File/JsonStream
         - [JsonStreamReaderTask]
     - File/XML
@@ -79,7 +79,7 @@
         - [ProcessLauncherTask]
     - Reporting
         - [AdvancedStatCounterTask]
-        - [LoggerTask]
+        - [LoggerTask](reference/tasks/logger_task.md)
         - [StatCounterTask]
     - Transformers
         - Basic and debug
@@ -120,8 +120,8 @@
         - String
             - [ExplodeTransformer]
             - [HashTransformer]
-            - [ImplodeTransformer]
-            - [SlugifyTransformer]
+            - [ImplodeTransformer](reference/transformers/implode_transformer.md)
+            - [SlugifyTransformer](reference/transformers/slugify_transformer.md)
             - [SprintfTransformer]
             - [TrimTransformer](reference/transformers/trim_transformer.md)
         - XML

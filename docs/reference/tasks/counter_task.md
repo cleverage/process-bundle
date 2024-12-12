@@ -13,7 +13,7 @@ Task reference
 Accepted inputs
 ---------------
 
-`any`
+`any`, must implement IterableTaskInterface
 
 Possible outputs
 ----------------
@@ -31,26 +31,9 @@ Example
 -------
 
 ```yaml
-clever_age_process:
-  configurations:
-    project_prefix.counter_example:
-      tasks:
-        counter_example:
-          service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
-          options:
-            output:
-              test1: test1
-              test2: test2
-              test3: test3
-              test4: test4
-              test5: test5
-              test6: test6
-          outputs: [counter]
-        counter:
-          service: '@CleverAge\ProcessBundle\Task\CounterTask'
-          options:
-            flush_every: 2
-          outputs: [ debug ]
-        debug:
-          service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
+# Task configuration level
+code:
+  service: '@CleverAge\ProcessBundle\Task\CounterTask'
+  options:
+    flush_every: 2
 ```

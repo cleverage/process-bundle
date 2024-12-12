@@ -20,22 +20,21 @@ Possible outputs
 
 `any`: re-output given input
 
+Options
+-------
+
+None
+
 Example
 ----------------
 
 ```yaml
-clever_age_process:
-  configurations:
-    project_prefix.debug_example:
-      tasks:
-        debug_example:
-          service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
-          options:
-            output:
-              id: 123
-              firstname: Test1
-              lastname: Test2
-          outputs: [debug]
-        debug:
-          service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
+# Task configuration level
+code:
+  service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+  options:
+    output:
+      id: 123
+      firstname: Test1
+      lastname: Test2
 ```
