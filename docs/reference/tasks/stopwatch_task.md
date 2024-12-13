@@ -13,14 +13,21 @@ Accepted inputs
 
 `any`
 
+Possible outputs
+----------------
+
+None
+
+Options
+-------
+
+None
+
 Example
 -------
 
 ```yaml
-clever_age_process:
-  configurations:
-    project_prefix.stopwatch_example:
-      tasks:
-        stopwatch_example:
-          service: '@CleverAge\ProcessBundle\Task\Debug\StopwatchTask'
+# Task configuration level
+code:
+  service: '@CleverAge\ProcessBundle\Task\Debug\StopwatchTask'
 ```

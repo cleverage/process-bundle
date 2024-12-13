@@ -29,23 +29,23 @@ Possible outputs
 Options
 -------
 
-| Code | Type | Required | Default | Description |
-| ---- | ---- | :------: | ------- | ----------- |
-| `mapping` | `array` | **X** | | List of property => sub-mapping options. The property code can be a single string to be used as an array index, or a writable property path |
-| `ignore_missing` | `bool` | | `false` | Ignore property accessor errors for the whole mapping |
-| `keep_input` | `bool` | | `false` | Use input as the mapping destination (takes precedence on `initial_value`). Keep in mind that due to PHP behavior, arrays are cloned while objects are passed by reference |
-| `initial_value` | `any` | | `[]` | Set the mapping destination |
-| `merge_callback` | `callable` or `null` | | `null` | Allow to change how a property can be set in the destination |
+| Code             | Type                 | Required  | Default | Description                                                                                                                                                                |
+|------------------|----------------------|:---------:|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `mapping`        | `array`              |   **X**   |         | List of property => sub-mapping options. The property code can be a single string to be used as an array index, or a writable property path                                |
+| `ignore_missing` | `bool`               |           | `false` | Ignore property accessor errors for the whole mapping                                                                                                                      |
+| `keep_input`     | `bool`               |           | `false` | Use input as the mapping destination (takes precedence on `initial_value`). Keep in mind that due to PHP behavior, arrays are cloned while objects are passed by reference |
+| `initial_value`  | `any`                |           | `[]`    | Set the mapping destination                                                                                                                                                |
+| `merge_callback` | `callable` or `null` |           | `null`  | Allow to change how a property can be set in the destination                                                                                                               |
 
 Foreach property there is the following options.
 
-| Code | Type | Required | Default | Description |
-| ---- | ---- | :------: | ------- | ----------- |
-| `code` | `string` or `array` or `null` | | `null` | A property path, or a list of property path. By default it would be the same as the destination property. Will be used as a source. The special value '.' access the whole object. |
-| `constant` | `any` | | `null` | If not `null`, will be directly used as a source (takes precedence on `code`) |
-| `set_null` | `bool` | | `false` | If `true`, `null` will be directly used as a source (takes precedence on `code`) |
-| `ignore_missing` | `bool` | | `false` | Ignore property accessor errors for this source |
-| `transformers` | `array` | | `[]` | List of sub-transformers, see [TransformerTrait](../traits/transformer_trait.md) |
+| Code             | Type                          | Required  | Default | Description                                                                                                                                                                        |
+|------------------|-------------------------------|:---------:|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `code`           | `string` or `array` or `null` |           | `null`  | A property path, or a list of property path. By default it would be the same as the destination property. Will be used as a source. The special value '.' access the whole object. |
+| `constant`       | `any`                         |           | `null`  | If not `null`, will be directly used as a source (takes precedence on `code`)                                                                                                      |
+| `set_null`       | `bool`                        |           | `false` | If `true`, `null` will be directly used as a source (takes precedence on `code`)                                                                                                   |
+| `ignore_missing` | `bool`                        |           | `false` | Ignore property accessor errors for this source                                                                                                                                    |
+| `transformers`   | `array`                       |           | `[]`    | List of sub-transformers, see [TransformerTrait](../traits/transformer_trait.md)                                                                                                   |
 
 Examples
 --------
@@ -55,43 +55,39 @@ Examples
   - output: an array with keys "code", "label", "type", "reference", "required" and "slug"
 
 ```yaml
-transform_data:                                                              # Task level
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
-    options:
-        transformers:
-            mapping:
-                mapping:
-                    code:                                                   # Simple mapping from "Code" to "code"
-                        code: '[Code]'
-                    "[label]": ~                                            # Value from "label" will be kept with the same name
-                    type:                                                   # Get value from "type" and map values (with a default)
-                        code: '[Type]'
-                        transformers:
-                            convert_value:
-                                ignore_missing: true
-                                map:
-                                    TEXTE:            text
-                                    NUMERIQUE:        number
-                                    LISTE_DEROULANTE: simpleselect
-                                    CHOIX_MULTIPLES:  multiselect
-                                    DATE:             date
-                            default:
-                                value: unknown
-                    reference:                                              # "null" column
-                        set_null: true
-                    required:                                               # "true" column
-                        constant: true
-                    slug:                                                   # Get multiple sources, slugify them, and merge them
-                        code:
-                            name: '[Name]'
-                            id:   '[ID]'
-                        transformers:
-                            array_map: 
-                                transformers:
-                                    slugify: ~
-                            implode:
-                                separator: '_'
-    outputs: [next_task]
+# Transformer options level
+mapping:
+  mapping:
+    code:                                                   # Simple mapping from "Code" to "code"
+      code: '[Code]'
+    "[label]": ~                                            # Value from "label" will be kept with the same name
+    type:                                                   # Get value from "type" and map values (with a default)
+      code: '[Type]'
+      transformers:
+        convert_value:
+          ignore_missing: true
+          map:
+            TEXTE:            text
+            NUMERIQUE:        number
+            LISTE_DEROULANTE: simpleselect
+            CHOIX_MULTIPLES:  multiselect
+            DATE:             date
+          default:
+            value: unknown
+    reference:                                              # "null" column
+      set_null: true
+    required:                                               # "true" column
+      constant: true
+    slug:                                                   # Get multiple sources, slugify them, and merge them
+      code:
+        name: '[Name]'
+        id:   '[ID]'
+      transformers:
+        array_map: 
+          transformers:
+            slugify: ~
+        implode:
+          separator: '_'
 ```
 
 * Mapping in depth, using objects
@@ -99,23 +95,18 @@ transform_data:                                                              # T
   - output: an array with key "items", containing a list of array with key "name"
 
 ```yaml
-transform_data:                                                             # Task level
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
-    options:
-        transformers:                                                       # TransformerTask options
-            mapping:                                                        # Transformer code
-                mapping:                                                    # MappingTransformer options
-                    items:                                                  # property code
-                        code: 'productItems'                                # property options
-                        transformers:                                       # property options
-                            array_map:                                      # Transformer code
-                                transformers:                               # ArrayMapTransformer options
-                                    mapping:                                # Transformer code
-                                        mapping:                            # MappingTransformer options
-                                            name:                           # property code
-                                                code: 'longName'            # property options
-                        
-    outputs: [next_task]
+# Transformer options level
+mapping:                                         # Transformer code
+  mapping:                                    # MappingTransformer options
+    items:                                    # property code
+      code: 'productItems'                    # property options
+      transformers:                           
+        array_map:                            # Transformer code
+          transformers:                       # ArrayMapTransformer options
+            mapping:                          # Transformer code
+              mapping:                        # MappingTransformer options
+                name:                         # property code
+                  code: 'longName'            # property options
 ```
 
 * Advanced property setter
@@ -123,21 +114,17 @@ transform_data:                                                             # Ta
   - output: same object, with a modified "address.customer.hasFlag"
 
 ```yaml
-transform_data:                                                             # Task level
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
-    options:
-        transformers:
-            mapping:
-                keep_input: true
-                mapping:
-                    address.customer.hasFlag:
-                        code: address.postCode
-                        transformers:
-                            convert_value:
-                                ignore_missing: true
-                                map:
-                                    69005: true
-                            default:
-                                value: false
-    outputs: [next_task]
+# Transformer options level
+mapping:
+  keep_input: true
+  mapping:
+    address.customer.hasFlag:
+      code: address.postCode
+      transformers:
+        convert_value:
+          ignore_missing: true
+          map:
+            69005: true
+        default:
+          value: false
 ```

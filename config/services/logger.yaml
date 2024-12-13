@@ -29,7 +29,7 @@ services:
         tags:
             - { name: monolog.logger, channel: cleverage_process }
         arguments:
-            - '@monolog.logger'
+            - '@logger'
 
     cleverage_process.logger.task_logger:
         class: CleverAge\ProcessBundle\Logger\TaskLogger
@@ -37,4 +37,4 @@ services:
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }
         arguments:
-            - '@monolog.logger'
+            - '@logger'

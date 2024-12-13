@@ -31,15 +31,9 @@ Example
 -------
 
 ```yaml
-clever_age_process:
-  configurations:
-    project_prefix.event_dispatcher_example:
-      tasks:
-        event_dispatcher_example:
-          service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
-          options:
-            event_name: 'myapp.myevent'
-          outputs: [debug]
-        debug:
-          service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
+# Task configuration level
+code:
+  service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
+  options:
+    event_name: 'myapp.myevent'
 ```

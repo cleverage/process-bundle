@@ -23,7 +23,18 @@ Possible outputs
 Options
 -------
 
-| Code | Type | Required | Default | Description |
-| ---- | ---- | :------: | ------- | ----------- |
-| `transformers` | `array` | **X** | | List of transformers, see [TransformerTrait](../traits/transformer_trait.md) |
+| Code           | Type    | Required  | Default  | Description                                                                  |
+|----------------|---------|:---------:|----------|------------------------------------------------------------------------------|
+| `transformers` | `array` |   **X**   |          | List of transformers, see [TransformerTrait](../traits/transformer_trait.md) |
 
+Example
+-------
+
+```yaml
+# Task configuration level
+code:
+  service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+  options:
+    transformers:
+      slugify: ~
+```
