@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Filesystem;
 
-use function count;
-
 /**
  * Read and write CSV resources through a simple API.
  */
@@ -302,10 +300,6 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         }
 
         $this->manualHeaders = true;
-
-        if (!\is_array($headers)) {
-            throw new \UnexpectedValueException("Invalid headers for {$this->getResourceName()}, you need to pass the headers manually");
-        }
 
         if ([] === $headers) {
             throw new \UnexpectedValueException("Empty headers for {$this->getResourceName()}, you need to pass the headers manually");

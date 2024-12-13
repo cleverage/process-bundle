@@ -14,7 +14,7 @@ parameters:
         - '#process\(\) has no return type specified#'
         - '#should return Iterator but returns Traversable#'
         - '#Negated boolean expression is always false#'
-    checkGenericClassInNonGenericObjectType: false
+        - identifier: missingType.generics
     reportUnmatchedIgnoredErrors: false
     inferPrivatePropertyTypeFromConstructor: true
     treatPhpDocTypesAsCertain: false

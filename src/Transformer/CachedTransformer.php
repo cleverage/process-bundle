@@ -65,7 +65,7 @@ class CachedTransformer implements ConfigurableTransformerInterface
     public function transform(mixed $value, array $options = []): mixed
     {
         $cacheKey = $this->generateCacheKey($options['cache_key'], $value, $options);
-        if ($cacheKey && $this->cache instanceof CacheItemPoolInterface) {
+        if ($cacheKey) {
             try {
                 $cacheItem = $this->cache->getItem($cacheKey);
                 if ($cacheItem->isHit()) {
