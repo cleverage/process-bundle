@@ -14,6 +14,7 @@ v4.0
 * [#148](https://github.com/cleverage/process-bundle/issues/148) Update services (step 1) according to Symfony best practices. Services should not use autowiring or autoconfiguration. Instead, all services should be defined explicitly. 
 Services must be prefixed with the bundle alias instead of using fully qualified class names => `cleverage_process`
 * [#150](https://github.com/cleverage/process-bundle/issues/150) The class `\CleverAge\ProcessBundle\Task\Debug\MemInfoDumpTask` has been deleted without suggested replacement
+* [#115](https://github.com/cleverage/process-bundle/issues/115) New mandatory configuration `default_error_strategy` on `clever_age_process` level. See [Quick Start/Global configuration](docs/01-quick_start.md#global-configuration)
 ### Changes
 
 * [#139](https://github.com/cleverage/process-bundle/issues/139) Update Makefile & .docker for local standalone usage
