@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -32,7 +32,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
 
     public function __construct(
         PropertyAccessorInterface $accessor,
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
     ) {
         $this->accessor = $accessor;
     }
@@ -63,7 +63,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
             }
         }
 
-        if (!empty($missingColumns)) {
+        if ([] !== $missingColumns) {
             $colStr = implode(', ', $missingColumns);
             $message = "Missing columns [{$colStr}] in input";
 
@@ -84,7 +84,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         mixed $column,
         mixed $input,
         string $referenceKey,
-        string $aggregationKey
+        string $aggregationKey,
     ): void {
         if (!isset($this->result[$column])) {
             $this->result[$column] = [

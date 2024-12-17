@@ -5,15 +5,13 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
 
 namespace CleverAge\ProcessBundle\Filesystem;
-
-use function count;
 
 /**
  * Read and write CSV resources through a simple API.
@@ -40,11 +38,11 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     protected bool $seekCalled = false;
 
     public function __construct(
-        $resource,
+        mixed $resource,
         protected string $delimiter = ',',
         protected string $enclosure = '"',
         protected string $escape = '\\',
-        array $headers = null
+        ?array $headers = null,
     ) {
         if (!\is_resource($resource)) {
             $type = \gettype($resource);
@@ -149,7 +147,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /**
      * Warning, this function will return exactly the same value as the fgetcsv() function.
      */
-    public function readRaw(int $length = null): array|false
+    public function readRaw(?int $length = null): array|false
     {
         $this->assertOpened();
         ++$this->lineNumber;
@@ -157,13 +155,9 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         return fgetcsv($this->handler, $length, $this->delimiter, $this->enclosure, $this->escape);
     }
 
-    public function readLine(int $length = null): ?array
+    public function readLine(?int $length = null): ?array
     {
-        if ($this->seekCalled) {
-            $filePosition = "at position {$this->tell()}";
-        } else {
-            $filePosition = "on line {$this->getLineNumber()}";
-        }
+        $filePosition = $this->seekCalled ? "at position {$this->tell()}" : "on line {$this->getLineNumber()}";
         $values = $this->readRaw($length);
 
         if (false === $values) {
@@ -290,12 +284,12 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         }
     }
 
-    protected function parseHeaders(array $headers = null): array
+    protected function parseHeaders(?array $headers = null): array
     {
         // If headers are not passed in the constructor but file is readable, try to read headers from file
         if (null === $headers) {
             $autoHeaders = $this->readRaw();
-            if (false === $autoHeaders || 0 === \count($autoHeaders)) {
+            if (false === $autoHeaders || [] === $autoHeaders) {
                 throw new \UnexpectedValueException("Unable to read headers for {$this->getResourceName()}");
             }
             // Remove BOM if any
@@ -307,11 +301,7 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
 
         $this->manualHeaders = true;
 
-        if (!\is_array($headers)) {
-            throw new \UnexpectedValueException("Invalid headers for {$this->getResourceName()}, you need to pass the headers manually");
-        }
-
-        if (0 === \count($headers)) {
+        if ([] === $headers) {
             throw new \UnexpectedValueException("Empty headers for {$this->getResourceName()}, you need to pass the headers manually");
         }
 

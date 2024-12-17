@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -26,7 +26,7 @@ class ConsoleProcessEvent extends Event
         private readonly InputInterface $consoleInput,
         private readonly OutputInterface $consoleOutput,
         private readonly mixed $processInput,
-        private readonly array $processContext
+        private readonly array $processContext,
     ) {
     }
 

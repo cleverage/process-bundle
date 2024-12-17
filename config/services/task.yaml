@@ -1,0 +1,14 @@
+services:
+    _defaults:
+        bind:
+            $processManager: '@cleverage_process.manager.process'
+            $processRegistry: '@cleverage_process.registry.process_configuration'
+            $transformerRegistry: '@cleverage_process.registry.transformer'
+
+    CleverAge\ProcessBundle\Task\:
+        resource: '../../src/Task/*'
+        autowire: true
+        public: true
+        shared: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process_task }

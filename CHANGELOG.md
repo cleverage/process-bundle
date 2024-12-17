@@ -1,3 +1,73 @@
+v4.0
+------
+
+## BC breaks
+
+* [#142](https://github.com/cleverage/process-bundle/issues/142) Remove FileFetchTask, use `cleverage/flysystem-process-bundle` instead.
+* [#142](https://github.com/cleverage/process-bundle/issues/142) YamlReaderTask & YamlWriterTask namespaces changed to `CleverAge\ProcessBundle\Task\File\Yaml`
+* [#142](https://github.com/cleverage/process-bundle/issues/142) Array***Transformers namespaces changed to `CleverAge\ProcessBundle\Transformer\Array`
+* [#142](https://github.com/cleverage/process-bundle/issues/142) NormalizeTransformer & DenormalizeTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Serialization`
+* [#142](https://github.com/cleverage/process-bundle/issues/142) DateFormatTransformer & DateParserTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Date`
+* [#142](https://github.com/cleverage/process-bundle/issues/142) ExplodeTransformer, HashTransformer, ImplodeTransformer, SlugifyTransformer, SprintfTransformer & TrimTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\String`
+* [#142](https://github.com/cleverage/process-bundle/issues/142) InstantiateTransformer, PropertyAccessorTransformer RecursivePropertySetterTransformer namespaces changed to `CleverAge\ProcessBundle\Transformer\Object`
+* [#147](https://github.com/cleverage/process-bundle/issues/147) Replace `Symfony\Component\Form\Exception\InvalidConfigurationException` by `Symfony\Component\Config\Definition\Exception\InvalidConfigurationException`
+* [#148](https://github.com/cleverage/process-bundle/issues/148) Update services (step 1) according to Symfony best practices. Services should not use autowiring or autoconfiguration. Instead, all services should be defined explicitly. 
+Services must be prefixed with the bundle alias instead of using fully qualified class names => `cleverage_process`
+* [#150](https://github.com/cleverage/process-bundle/issues/150) The class `\CleverAge\ProcessBundle\Task\Debug\MemInfoDumpTask` has been deleted without suggested replacement
+* [#115](https://github.com/cleverage/process-bundle/issues/115) New mandatory configuration `default_error_strategy` on `clever_age_process` level. See [Quick Start/Global configuration](docs/01-quick_start.md#global-configuration)
+### Changes
+
+* [#139](https://github.com/cleverage/process-bundle/issues/139) Update Makefile & .docker for local standalone usage
+* [#139](https://github.com/cleverage/process-bundle/issues/139) Update rector, phpstan & php-cs-fixer configurations & apply it
+* [#141](https://github.com/cleverage/process-bundle/issues/141) `league/flysystem-bundle` is not required anymore
+* [#130](https://github.com/cleverage/process-bundle/issues/130) EventDispatcherInterface service declaration breaks dependency injection
+* [#147](https://github.com/cleverage/process-bundle/issues/147) Add missing dependencies on `symfony/dotenv` and `symfony/runtime`
+* [#147](https://github.com/cleverage/process-bundle/issues/147) Remove dependencies on `symfony/form`, `symfony/messenger` & `symfony/scheduler`
+* [#146](https://github.com/cleverage/process-bundle/issues/146) eav-process-bundle, enqueue-process-bundle, cache-process-bundle and process-soap-bundle were deprecated / archived.
+* [#141](https://github.com/cleverage/process-bundle/issues/141) Add a default value to the node "default_error_strategy"
+
+### Fixes
+
+* [#129](https://github.com/cleverage/process-bundle/issues/129) Remove wrong replace configuration on composer.json. Add missing suggest
+* Miscellaneous fixes, show full diff : https://github.com/cleverage/process-bundle/compare/v4.0.0-rc2...v4.0.0
+
+v4.0-RC2
+------
+
+## BC breaks
+
+* Bump php version to >=8.2
+* Bump symfony version to ^6.4|^7.1
+
+### Fixes
+
+* Miscellaneous fixes, show full diff : https://github.com/cleverage/process-bundle/compare/v4.0.0-rc1...v4.0.0-rc2
+
+v4.0-RC1
+------
+
+## BC breaks
+
+* Bump php version to >=8.1
+* Bump symfony version to ^6.3
+
+## Changes
+* Add some phpunit tests
+* Apply Rector & Phpstan
+* Add StopwatchTask
+* Change directory structure. Move Symfony code to /src, documentation to /doc, and tests to /tests
+
+### Fixes
+
+* Miscellaneous fixes, show full diff : https://github.com/cleverage/process-bundle/compare/v3.2.9...v4.0.0-rc1
+
+v3.2.9
+------
+
+### Fixes
+
+https://github.com/cleverage/process-bundle/compare/v3.2.8...v3.2.9
+
 v3.2.8
 ------
 

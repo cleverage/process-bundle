@@ -1,0 +1,62 @@
+name: Quality
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install PHP with extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+      - name: Install Composer dependencies (locked)
+        uses: ramsey/composer-install@v3
+      - name: PHPStan
+        run: vendor/bin/phpstan --no-progress --memory-limit=1G analyse --error-format=github
+
+  php-cs-fixer:
+    name: PHP-CS-Fixer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install PHP with extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+      - name: Install Composer dependencies (locked)
+        uses: ramsey/composer-install@v3
+      - name: PHP-CS-Fixer
+        run: vendor/bin/php-cs-fixer fix --diff --dry-run --show-progress=none
+
+  rector:
+    name: Rector
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Install PHP with extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: composer:v2
+      - name: Install Composer dependencies (locked)
+        uses: ramsey/composer-install@v3
+      - name: Rector
+        run: vendor/bin/rector --no-progress-bar --dry-run

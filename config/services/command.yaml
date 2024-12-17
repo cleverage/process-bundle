@@ -1,0 +1,27 @@
+services:
+    cleverage_process.command.execute_process:
+        class: CleverAge\ProcessBundle\Command\ExecuteProcessCommand
+        public: false
+        tags:
+            - { name: console.command }
+        arguments:
+            - '@cleverage_process.manager.process'
+            - '@event_dispatcher'
+            - '@cleverage_process.registry.process_configuration'
+
+    cleverage_process.command.list_process:
+        class: CleverAge\ProcessBundle\Command\ListProcessCommand
+        public: false
+        tags:
+            - { name: console.command }
+        arguments:
+            - '@cleverage_process.registry.process_configuration'
+
+    cleverage_process.command.process_help:
+        class: CleverAge\ProcessBundle\Command\ProcessHelpCommand
+        public: false
+        tags:
+            - { name: console.command }
+        arguments:
+            - '@cleverage_process.registry.process_configuration'
+            - '@service_container'

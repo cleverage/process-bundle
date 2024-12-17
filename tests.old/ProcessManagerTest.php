@@ -21,7 +21,7 @@ use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Prophecy\Argument\Token\TypeToken;
 use Prophecy\Prophecy\MethodProphecy;
-use Psr\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class ProcessManagerTest extends AbstractProcessTest
 {

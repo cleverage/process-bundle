@@ -1,0 +1,40 @@
+services:
+    cleverage_process.logger.process_processor:
+        class: CleverAge\ProcessBundle\Logger\ProcessProcessor
+        public: false
+        tags:
+            - { name: monolog.processor, channel: cleverage_process }
+        arguments:
+            - '@cleverage_process.manager.process'
+
+    cleverage_process.logger.task_processor:
+        class: CleverAge\ProcessBundle\Logger\TaskProcessor
+        public: false
+        tags:
+            - { name: monolog.processor, channel: cleverage_process_task }
+        arguments:
+            - '@cleverage_process.manager.process'
+
+    cleverage_process.logger.transformer_processor:
+        class: CleverAge\ProcessBundle\Logger\TransformerProcessor
+        public: false
+        tags:
+            - { name: monolog.processor, channel: cleverage_process_transformer }
+        arguments:
+            - '@cleverage_process.manager.process'
+
+    cleverage_process.logger.process_logger:
+        class: CleverAge\ProcessBundle\Logger\ProcessLogger
+        public: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process }
+        arguments:
+            - '@logger'
+
+    cleverage_process.logger.task_logger:
+        class: CleverAge\ProcessBundle\Logger\TaskLogger
+        public: false
+        tags:
+            - { name: monolog.logger, channel: cleverage_process_task }
+        arguments:
+            - '@logger'

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -28,7 +28,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 class Configuration implements ConfigurationInterface
 {
     public function __construct(
-        protected string $root = 'clever_age_process'
+        protected string $root = 'clever_age_process',
     ) {
     }
 
@@ -40,7 +40,7 @@ class Configuration implements ConfigurationInterface
         // Default error strategy
         $definition->enumNode('default_error_strategy')
             ->values([TaskConfiguration::STRATEGY_SKIP, TaskConfiguration::STRATEGY_STOP])
-            ->isRequired();
+            ->defaultValue(TaskConfiguration::STRATEGY_STOP);
 
         $this->appendRootProcessConfigDefinition($definition);
         $this->appendRootTransformersConfigDefinition($definition);
@@ -77,11 +77,11 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('contextual_options')
             ->prototype('variable')
             ->end()
-            ?->end()
+            ->end()
             ->arrayNode('transformers')
             ->prototype('variable')
             ->end()
-            ?->end();
+            ->end();
     }
 
     /**
@@ -110,22 +110,22 @@ class Configuration implements ConfigurationInterface
             ->scalarNode('entry_point')
             ->defaultNull()
             ->end()
-            ?->scalarNode('end_point')
+            ->scalarNode('end_point')
             ->defaultNull()
             ->end()
-            ?->scalarNode('description')
+            ->scalarNode('description')
             ->defaultValue('')
             ->end()
-            ?->scalarNode('help')
+            ->scalarNode('help')
             ->defaultValue('')
             ->end()
-            ?->scalarNode('public')
+            ->scalarNode('public')
             ->defaultTrue()
             ->end()
-            ?->arrayNode('options')
+            ->arrayNode('options')
             ->prototype('variable')
             ->end()
-            ?->end();
+            ->end();
 
         /** @var ArrayNodeDefinition $tasksArrayDefinition */
         $tasksArrayDefinition = $definition

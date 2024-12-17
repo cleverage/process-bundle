@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -54,7 +54,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
             $state->setOutput($this->inputs);
             $keepInputs = $this->getOption($state, 'keep_inputs');
             // Only clear inputs that are not in the keep_inputs option
-            foreach ($this->inputs as $inputCode => $value) {
+            foreach (array_keys($this->inputs) as $inputCode) {
                 if (null !== $keepInputs && \in_array($inputCode, $keepInputs, true)) {
                     continue;
                 }
@@ -83,7 +83,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
     protected function getInputCode(ProcessState $state): string
     {
         $previousState = $state->getPreviousState();
-        if (!$previousState) {
+        if (!$previousState instanceof ProcessState) {
             throw new \RuntimeException('No previous state for current task');
         }
         $previousTaskCode = $previousState->getTaskConfiguration()

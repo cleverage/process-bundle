@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        bind:
+            $language: '@cleverage_process.expression_language'
+            $transformerRegistry: '@cleverage_process.registry.transformer'
+
+    CleverAge\ProcessBundle\Transformer\:
+        resource: '../../src/Transformer/*'
+        exclude: '../../src/Transformer/GenericTransformer.php'
+        autowire: true
+        autoconfigure: true
+        public: true
+        tags:
+            - { name: cleverage.transformer }
+            - { name: monolog.logger, channel: cleverage_process_transformer }

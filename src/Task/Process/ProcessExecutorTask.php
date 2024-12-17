@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -18,7 +18,7 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Form\Exception\InvalidConfigurationException;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -32,7 +32,7 @@ class ProcessExecutorTask extends AbstractConfigurableTask
     public function __construct(
         protected ProcessManager $processManager,
         protected ProcessConfigurationRegistry $processRegistry,
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
     ) {
     }
 

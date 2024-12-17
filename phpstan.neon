@@ -2,12 +2,8 @@ parameters:
     level: 6
     paths:
         - src
+        - tests
     excludePaths:
-        - ecs.php
-        - vendor/*
-        - tests/*
-        - rector.php
-        - var/*
         - src/Resources/tests/*
     ignoreErrors:
         - '#type has no value type specified in iterable type#'
@@ -18,7 +14,7 @@ parameters:
         - '#process\(\) has no return type specified#'
         - '#should return Iterator but returns Traversable#'
         - '#Negated boolean expression is always false#'
-    checkGenericClassInNonGenericObjectType: false
+        - identifier: missingType.generics
     reportUnmatchedIgnoredErrors: false
     inferPrivatePropertyTypeFromConstructor: true
     treatPhpDocTypesAsCertain: false

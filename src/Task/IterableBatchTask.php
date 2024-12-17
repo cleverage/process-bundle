@@ -5,7 +5,7 @@ declare(strict_types=1);
 /*
  * This file is part of the CleverAge/ProcessBundle package.
  *
- * Copyright (c) 2017-2024 Clever-Age
+ * Copyright (c) Clever-Age
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -31,7 +31,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     protected bool $flushMode = false;
 
     public function __construct(
-        protected LoggerInterface $logger
+        protected LoggerInterface $logger,
     ) {
     }
 
@@ -61,7 +61,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
         }
 
         // Detect flushing
-        if (null !== $batchCount && (null === $this->outputQueue ? 0 : \count($this->outputQueue)) >= $batchCount) {
+        if (null !== $batchCount && ($this->outputQueue instanceof \SplQueue ? \count($this->outputQueue) : 0) >= $batchCount) {
             $this->flushMode = true;
         }
 
@@ -76,7 +76,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     public function next(ProcessState $state): bool
     {
         // Stop flushing once over
-        if (!(null === $this->outputQueue ? 0 : \count($this->outputQueue))) {
+        if (($this->outputQueue instanceof \SplQueue ? \count($this->outputQueue) : 0) === 0) {
             $this->flushMode = false;
         }
 
