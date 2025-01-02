@@ -55,11 +55,14 @@
         - [YamlWriterTask]
     - File
         - [FileMoverTask]
-        - [FileReaderTask]
+        - [FileReaderTask](reference/tasks/file_reader_task.md)
         - [FileRemoverTask]
         - [FileWriterTask]
-        - [FolderBrowserTask]
-        - [InputFolderBrowserTask]
+        - [FolderBrowserTask](reference/tasks/folder_browser_task.md)
+        - [InputFileReaderTask](reference/tasks/input_file_reader_task.md)
+        - [InputFolderBrowserTask](reference/tasks/input_folder_browser_task.md)
+        - [InputLineReaderTask](reference/tasks/input_line_reader_task.md)
+        - [LineReaderTask](reference/tasks/line_reader_task.md)
     - Flow manipulation
         - [AggregateIterableTask](reference/tasks/aggregate_iterable_task.md)
         - [InputAggregatorTask](reference/tasks/input_aggregator_task.md)
