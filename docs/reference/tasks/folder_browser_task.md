@@ -23,11 +23,11 @@ Underlying method is [Symfony Finder component](https://symfony.com/doc/current/
 Options
 -------
 
-| Code              | Type                          | Required  | Default                   | Description                        |
-|-------------------|-------------------------------|:---------:|---------------------------|------------------------------------|
-| `folder_path`     | `string`                      |   **X**   |                           | Path of the directory to read from |
-| `name_pattern`    | `null` or `string` or `array` |           | null                      | Restrict files using a pattern     |
-| `empty_log_level` | `string`                      |           | Psr\Log\LogLevel::WARNING | From Psr\Log\LogLevel constants    |
+| Code              | Type                        | Required  | Default                   | Description                                                                            |
+|-------------------|-----------------------------|:---------:|---------------------------|----------------------------------------------------------------------------------------|
+| `folder_path`     | `string`                    |   **X**   |                           | Path of the directory to read from                                                     |
+| `name_pattern`    | `null`, `string` or `array` |           | null                      | Restrict files using a pattern (a regexp, a glob, or a string) or an array of patterns |
+| `empty_log_level` | `string`                    |           | Psr\Log\LogLevel::WARNING | From Psr\Log\LogLevel constants                                                        |
 
 Example
 -------
