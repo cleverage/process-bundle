@@ -1,3 +1,9 @@
+v4.1
+-----
+
+### Add
+* [#155](https://github.com/cleverage/process-bundle/issues/155) Add InputFileReaderTask (Reads the whole input file and outputs its content), InputLineReaderTask (Reads an input file line by line and outputs each line.) and LineReaderTask (Reads a file line by line and outputs each line.)
+
 v4.0
 ------
 
