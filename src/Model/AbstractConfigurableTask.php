@@ -14,11 +14,12 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Model;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Allow the task to configure it's options, set default basic options for errors handling.
  */
-abstract class AbstractConfigurableTask implements InitializableTaskInterface
+abstract class AbstractConfigurableTask implements InitializableTaskInterface, ResetInterface
 {
     protected ?array $options = null;
 
@@ -28,6 +29,11 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface
     public function initialize(ProcessState $state): void
     {
         $this->getOptions($state);
+    }
+
+    public function reset(): void
+    {
+        $this->options = null;
     }
 
     protected function getOptions(ProcessState $state): ?array

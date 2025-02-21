@@ -70,7 +70,8 @@
     "symfony/serializer": "^6.4|^7.1",
     "symfony/stopwatch": "^6.4|^7.1",
     "symfony/validator": "^6.4|^7.1",
-    "symfony/yaml": "^6.4|^7.1"
+    "symfony/yaml": "^6.4|^7.1",
+    "symfony/service-contracts": ">=1.0.0"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "*",
