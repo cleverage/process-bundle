@@ -1,3 +1,10 @@
+v4.1.1
+-----
+
+### Fixes
+
+* [#158](https://github.com/cleverage/process-bundle/issues/158) Add dependency to symfony/service-contract
+
 v4.1
 -----
 
