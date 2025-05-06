@@ -35,6 +35,11 @@
       "email": "xmarchegay@clever-age.com",
       "homepage": "https://github.com/xaviermarchegay",
       "role": "Lead Developer"
+    },
+    {
+      "name": "Nicolas Joubert",
+      "email": "njoubert@clever-age.com",
+      "role": "Lead Developer"
     }
   ],
   "autoload": {
@@ -84,6 +89,7 @@
     "symfony/test-pack": "^1.1"
   },
   "suggest": {
+    "cleverage/archive-process-bundle": "Dedicated bundle for Archive dependencies for the Process Bundle",
     "cleverage/doctrine-process-bundle": "Dedicated bundle for Doctrine dependencies for the process bundle",
     "cleverage/soap-process-bundle": "Dedicated bundle for Soap dependencies for the process bundle",
     "cleverage/rest-process-bundle": "Dedicated bundle for Rest dependencies for the process bundle",
