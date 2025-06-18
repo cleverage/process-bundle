@@ -59,6 +59,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
                 [
                     '{date}' => date('Ymd'),
                     '{date_time}' => date('Ymd_His'),
+                    '{timestamp}' => time(),
                     '{unique_token}' => uniqid('', true),
                 ]
             )
