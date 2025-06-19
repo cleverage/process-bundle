@@ -90,6 +90,7 @@
   },
   "suggest": {
     "cleverage/archive-process-bundle": "Dedicated bundle for Archive dependencies for the Process Bundle",
+    "cleverage/cache-process-bundle": "Dedicated bundle for Cache dependencies for the Process Bundle",
     "cleverage/doctrine-process-bundle": "Dedicated bundle for Doctrine dependencies for the process bundle",
     "cleverage/soap-process-bundle": "Dedicated bundle for Soap dependencies for the process bundle",
     "cleverage/rest-process-bundle": "Dedicated bundle for Rest dependencies for the process bundle",
