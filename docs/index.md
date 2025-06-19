@@ -131,6 +131,7 @@
             - [XpathEvaluatorTransformer](reference/transformers/xpath_evaluator.md)
     - Other bridges
         - [Archive](https://github.com/cleverage/archive-process-bundle)
+        - [Cache](https://github.com/cleverage/cache-process-bundle)
         - [Doctrine](https://github.com/cleverage/doctrine-process-bundle)
         - [Flysystem](https://github.com/cleverage/flysystem-process-bundle)
         - [Rest](https://github.com/cleverage/rest-process-bundle)
