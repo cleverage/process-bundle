@@ -1,3 +1,11 @@
+v4.2
+-----
+
+### Add
+* [#cleverage/archive-process-bundle#1](https://github.com/cleverage/archive-process-bundle/issues/1) Add new bridge ArchiveProcessBundle
+* [#162](https://github.com/cleverage/process-bundle/issues/162) Add timestamp placeholder on file_path parameter of CsvWriterTask. Improve documentation.
+* [#164](https://github.com/cleverage/process-bundle/issues/164) Add cleverage/cache-process-bundle dependency
+
 v4.1.1
 -----
 
