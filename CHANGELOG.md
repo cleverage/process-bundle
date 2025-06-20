@@ -1,3 +1,9 @@
+v4.3
+-----
+
+### Add 
+* [#166](https://github.com/cleverage/process-bundle/issues/166) Add PregMatchTransformer
+
 v4.2
 -----
 
