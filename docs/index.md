@@ -124,6 +124,7 @@
             - [ExplodeTransformer]
             - [HashTransformer]
             - [ImplodeTransformer](reference/transformers/implode_transformer.md)
+            - [PregMatchTransformer](reference/transformers/preg_match_transformer.md)
             - [SlugifyTransformer](reference/transformers/slugify_transformer.md)
             - [SprintfTransformer]
             - [TrimTransformer](reference/transformers/trim_transformer.md)
