@@ -14,17 +14,25 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Task\File\JsonStream;
 
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
+use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class JsonStreamReaderTask implements IterableTaskInterface
+class JsonStreamReaderTask extends AbstractConfigurableTask implements IterableTaskInterface
 {
     protected ?JsonStreamFile $file = null;
 
     public function execute(ProcessState $state): void
     {
         if (!$this->file instanceof JsonStreamFile) {
-            $this->file = new JsonStreamFile($this->getFilePath($state), 'rb');
+            $options = $this->getOptions($state);
+            $this->file = new JsonStreamFile(
+                $this->getFilePath($state),
+                'rb',
+                $options['spl_file_object_flags'],
+                $options['json_flags'],
+            );
         }
 
         $line = $this->file->readLine();
@@ -48,5 +56,15 @@ class JsonStreamReaderTask implements IterableTaskInterface
     protected function getFilePath(ProcessState $state): string
     {
         return $state->getInput();
+    }
+
+    protected function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'spl_file_object_flags' => null,
+            'json_flags' => null,
+        ]);
+        $resolver->setAllowedTypes('spl_file_object_flags', ['array', 'null']);
+        $resolver->setAllowedTypes('json_flags', ['array', 'null']);
     }
 }
