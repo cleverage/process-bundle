@@ -47,6 +47,7 @@
         - [InputCsvReaderTask](reference/tasks/input_csv_reader_task.md)
     - File/JsonStream
         - [JsonStreamReaderTask]
+        - [JsonStreamWriterTask](reference/tasks/json_stream_writer_task.md)
     - File/XML
         - [XmlReaderTask](reference/tasks/xml_reader_task.md)
         - [XmlWriterTask](reference/tasks/xml_writer_task.md)
