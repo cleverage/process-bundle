@@ -28,8 +28,8 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
     {
         $this->file = new \SplFileObject($filename, $mode);
 
-        // Useful to skip empty trailing lines
-        $this->file->setFlags(\SplFileObject::READ_AHEAD | \SplFileObject::SKIP_EMPTY);
+        // Useful to skip empty trailing lines (doesn't work well on PHP 8, see readLine() code)
+        $this->file->setFlags(\SplFileObject::DROP_NEW_LINE | \SplFileObject::READ_AHEAD | \SplFileObject::SKIP_EMPTY);
     }
 
     /**
@@ -72,6 +72,10 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
         }
 
         $rawLine = $this->file->fgets();
+        // Fix issue on PHP 8 with empty line at the end, even if SKIP_EMPTY is set
+        if ('' === $rawLine) {
+            return null;
+        }
         ++$this->lineNumber;
 
         return json_decode($rawLine, true, 512, \JSON_THROW_ON_ERROR);
