@@ -26,9 +26,14 @@ class JsonStreamWriterTask extends AbstractConfigurableTask implements BlockingT
 
     public function execute(ProcessState $state): void
     {
-        $options = $this->getOptions($state);
         if (!$this->file instanceof JsonStreamFile) {
-            $this->file = new JsonStreamFile($options['file_path'], 'wb');
+            $options = $this->getOptions($state);
+            $this->file = new JsonStreamFile(
+                $options['file_path'],
+                'wb',
+                $options['spl_file_object_flags'],
+                $options['json_flags'],
+            );
         }
 
         $input = $state->getInput();
@@ -60,5 +65,11 @@ class JsonStreamWriterTask extends AbstractConfigurableTask implements BlockingT
                 ]
             )
         );
+        $resolver->setDefaults([
+            'spl_file_object_flags' => null,
+            'json_flags' => null,
+        ]);
+        $resolver->setAllowedTypes('spl_file_object_flags', ['array', 'null']);
+        $resolver->setAllowedTypes('json_flags', ['array', 'null']);
     }
 }

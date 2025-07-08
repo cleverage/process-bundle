@@ -20,16 +20,30 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
 {
     protected \SplFileObject $file;
 
+    private readonly int $jsonFlags;
+
     protected ?int $lineCount = null;
 
     protected int $lineNumber = 1;
 
-    public function __construct(string $filename, string $mode = 'rb')
-    {
+    public function __construct(
+        string $filename,
+        string $mode = 'rb',
+        ?array $splFileObjectFlags = null,
+        ?array $jsonFlags = null,
+    ) {
         $this->file = new \SplFileObject($filename, $mode);
 
         // Useful to skip empty trailing lines (doesn't work well on PHP 8, see readLine() code)
-        $this->file->setFlags(\SplFileObject::DROP_NEW_LINE | \SplFileObject::READ_AHEAD | \SplFileObject::SKIP_EMPTY);
+        $this->file->setFlags(null !== $splFileObjectFlags
+            ? array_sum($splFileObjectFlags)
+            : \SplFileObject::DROP_NEW_LINE | \SplFileObject::READ_AHEAD | \SplFileObject::SKIP_EMPTY
+        );
+
+        $this->jsonFlags = null !== $jsonFlags
+            ? array_sum($jsonFlags)
+            : \JSON_THROW_ON_ERROR
+        ;
     }
 
     /**
@@ -78,12 +92,12 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
         }
         ++$this->lineNumber;
 
-        return json_decode($rawLine, true, 512, \JSON_THROW_ON_ERROR);
+        return json_decode($rawLine, true, 512, $this->jsonFlags);
     }
 
     public function writeLine(array $fields): int
     {
-        $this->file->fwrite(json_encode($fields, \JSON_THROW_ON_ERROR).\PHP_EOL);
+        $this->file->fwrite(json_encode($fields, $this->jsonFlags).\PHP_EOL);
         ++$this->lineNumber;
 
         return $this->lineNumber;
