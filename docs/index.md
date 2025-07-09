@@ -58,6 +58,7 @@
         - [FileMoverTask]
         - [FileReaderTask](reference/tasks/file_reader_task.md)
         - [FileRemoverTask]
+        - [FileSplitterTask](reference/tasks/file_splitter_task.md)
         - [FileWriterTask]
         - [FolderBrowserTask](reference/tasks/folder_browser_task.md)
         - [InputFileReaderTask](reference/tasks/input_file_reader_task.md)
