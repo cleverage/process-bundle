@@ -1,3 +1,14 @@
+v4.4
+-----
+
+### Add 
+* [#168](https://github.com/cleverage/process-bundle/issues/168) Add JsonStreamWriterTask with related doc
+* [#172](https://github.com/cleverage/process-bundle/issues/172) Add spl_file_object_flags and json_flags options on JsonStream*Tasks. Update docs.
+* [#174](https://github.com/cleverage/process-bundle/issues/174) Add FileSplitterTask using Filesystem/SplFile. Add doc.
+
+### Fixes
+* [#169](https://github.com/cleverage/process-bundle/issues/169) Fix JsonStreamFile empty line at the end issue, even if SKIP_EMPTY is set. Add JsonStreamReaderTask doc.
+
 v4.3
 -----
 
