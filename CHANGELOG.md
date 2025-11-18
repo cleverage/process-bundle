@@ -2,7 +2,6 @@ v4.5
 -----
 
 ## Changes
-
 * [#176](https://github.com/cleverage/process-bundle/issues/176) Upgrade to Symfony 7.3 & PHP 8.4
 
 v4.4
