@@ -99,7 +99,7 @@
             - [EvaluatorTransformer]
             - [ExpressionLanguageMapTransformer]
             - [MappingTransformer](reference/transformers/mapping_transformer.md)
-            - [MultiReplaceTransformer]
+            - [MultiReplaceTransformer](reference/transformers/multi_replace_transformer.md)
             - [PregFilterTransformer]
             - [RulesTransformer](reference/transformers/rules_transformer.md)
             - [TypeSetterTransformer]
@@ -110,7 +110,7 @@
             - [ArrayFilterTransformer](reference/transformers/array_filter_transformer.md)
             - [ArrayFirstTransformer]
             - [ArrayLastTransformer]
-            - [ArrayMapTransformer]
+            - [ArrayMapTransformer](reference/transformers/array_map_transformer.md)
             - [ArrayUnsetTransformer]
         - Date
             - [DateFormatTransformer](reference/transformers/date_format.md)
@@ -128,7 +128,7 @@
             - [ImplodeTransformer](reference/transformers/implode_transformer.md)
             - [PregMatchTransformer](reference/transformers/preg_match_transformer.md)
             - [SlugifyTransformer](reference/transformers/slugify_transformer.md)
-            - [SprintfTransformer]
+            - [SprintfTransformer](reference/transformers/sprintf_transformer.md)
             - [TrimTransformer](reference/transformers/trim_transformer.md)
         - XML
             - [XpathEvaluatorTransformer](reference/transformers/xpath_evaluator.md)

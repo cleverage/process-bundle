@@ -32,7 +32,12 @@ Examples
 --------
 
 ```yaml
-# Transformer options level
-implode:
-  separator: '-'
+# Transformer mapping level
+sprintf_multiple:
+  code:
+    - '[firstname]'
+    - '[lastname]'
+  transformers:
+    implode:
+      separator: '-'
 ```

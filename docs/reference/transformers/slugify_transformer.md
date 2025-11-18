@@ -34,6 +34,10 @@ Examples
 --------
 
 ```yaml
-# Transformer options level
-slugify: ~
+# Transformer mapping level
+slug:
+  code:
+    - '[firstname]'
+  transformers:
+    slugify: ~
 ```
