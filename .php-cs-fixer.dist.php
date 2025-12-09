@@ -24,8 +24,8 @@ $fileHeaderComment = <<<'EOF'
 
 return (new PhpCsFixer\Config())
     ->setRules([
-        '@PHP82Migration' => true,
-        '@PHPUnit75Migration:risky' => true,
+        '@PHP8x2Migration' => true,
+        '@PHPUnit7x5Migration:risky' => true,
         '@Symfony' => true,
         '@Symfony:risky' => true,
         'protected_to_private' => false,
