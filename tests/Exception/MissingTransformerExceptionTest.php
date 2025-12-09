@@ -16,14 +16,10 @@ namespace Exception;
 use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Exception\MissingTransformerException
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(MissingTransformerException::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(MissingTransformerException::class, 'create')]
 class MissingTransformerExceptionTest extends TestCase
 {
-    /**
-     * @covers ::create
-     */
     public function testCreate(): void
     {
         $exception = MissingTransformerException::create('my_transformer');

@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\String\TrimTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\String\TrimTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(TrimTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(TrimTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(TrimTransformer::class, 'getCode')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(TrimTransformer::class, 'configureOptions')]
 class TrimTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransformTrimsStringWithDefaultCharlist(): void
     {
         $transformer = new TrimTransformer();
@@ -35,9 +33,6 @@ class TrimTransformerTest extends TestCase
         $this->assertEquals('trim me', $result);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformTrimsStringWithCustomCharlist(): void
     {
         $transformer = new TrimTransformer();
@@ -49,9 +44,6 @@ class TrimTransformerTest extends TestCase
         $this->assertEquals('trim me', $result);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformReturnsNullForNullValue(): void
     {
         $transformer = new TrimTransformer();
@@ -62,9 +54,6 @@ class TrimTransformerTest extends TestCase
         $this->assertNull($result);
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCodeReturnsCorrectCode(): void
     {
         $transformer = new TrimTransformer();
@@ -74,9 +63,6 @@ class TrimTransformerTest extends TestCase
         $this->assertEquals('trim', $code);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptionsSetsDefaultOptions(): void
     {
         $resolver = new OptionsResolver();

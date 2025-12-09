@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\String\ExplodeTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\String\ExplodeTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(ExplodeTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ExplodeTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ExplodeTransformer::class, 'getCode')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ExplodeTransformer::class, 'configureOptions')]
 class ExplodeTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransform(): void
     {
         $transformer = new ExplodeTransformer();
@@ -34,9 +32,6 @@ class ExplodeTransformerTest extends TestCase
         $this->assertEquals(['1', '2', '3'], $result);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformWithEmptyString(): void
     {
         $transformer = new ExplodeTransformer();
@@ -46,9 +41,6 @@ class ExplodeTransformerTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformWithNullValue(): void
     {
         $transformer = new ExplodeTransformer();
@@ -58,9 +50,6 @@ class ExplodeTransformerTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCode(): void
     {
         $transformer = new ExplodeTransformer();
@@ -70,9 +59,6 @@ class ExplodeTransformerTest extends TestCase
         $this->assertEquals('explode', $code);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptions(): void
     {
         $transformer = new ExplodeTransformer();

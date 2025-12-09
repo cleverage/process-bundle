@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\ConstantTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\ConstantTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(ConstantTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ConstantTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ConstantTransformer::class, 'configureOptions')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ConstantTransformer::class, 'getCode')]
 class ConstantTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransform(): void
     {
         $transformer = new ConstantTransformer();
@@ -36,9 +34,6 @@ class ConstantTransformerTest extends TestCase
         $this->assertEquals('default_value', $transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformWithNullValue(): void
     {
         $transformer = new ConstantTransformer();
@@ -50,9 +45,6 @@ class ConstantTransformerTest extends TestCase
         $this->assertEquals('default_value', $transformedValue);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptions(): void
     {
         $transformer = new ConstantTransformer();
@@ -63,9 +55,6 @@ class ConstantTransformerTest extends TestCase
         $this->assertTrue($resolver->isRequired('constant'));
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCodeReturnsCorrectCode(): void
     {
         $transformer = new ConstantTransformer();

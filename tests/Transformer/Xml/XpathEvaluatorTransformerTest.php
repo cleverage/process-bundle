@@ -16,16 +16,13 @@ namespace CleverAge\ProcessBundle\Tests\Transformer\Xml;
 use CleverAge\ProcessBundle\Transformer\Xml\XpathEvaluatorTransformer;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\Xml\XpathEvaluatorTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(XpathEvaluatorTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(XpathEvaluatorTransformer::class, 'buildXpath')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(XpathEvaluatorTransformer::class, 'query')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(XpathEvaluatorTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(XpathEvaluatorTransformer::class, 'getCode')]
 class XpathEvaluatorTransformerTest extends TestCase
 {
-    /**
-     * @covers ::buildXpath
-     * @covers ::query
-     * @covers ::transform
-     */
     public function testSimpleQuery(): void
     {
         $domDocument = new \DOMDocument();
@@ -45,11 +42,6 @@ class XpathEvaluatorTransformerTest extends TestCase
         $this->assertEquals('ok', $result);
     }
 
-    /**
-     * @covers ::buildXpath
-     * @covers ::query
-     * @covers ::transform
-     */
     public function testAttributeValueQuery(): void
     {
         $domDocument = new \DOMDocument();
@@ -62,11 +54,6 @@ class XpathEvaluatorTransformerTest extends TestCase
         $this->assertEquals('ok', $result);
     }
 
-    /**
-     * @covers ::buildXpath
-     * @covers ::query
-     * @covers ::transform
-     */
     public function testSubQuery(): void
     {
         $domDocument = new \DOMDocument();
@@ -80,11 +67,6 @@ class XpathEvaluatorTransformerTest extends TestCase
         $this->assertEquals('ok', $result);
     }
 
-    /**
-     * @covers ::buildXpath
-     * @covers ::query
-     * @covers ::transform
-     */
     public function testMultiResults(): void
     {
         $domDocument = new \DOMDocument();
@@ -99,11 +81,6 @@ class XpathEvaluatorTransformerTest extends TestCase
         $this->assertEquals(['ok1', 'ok2', 'ok3'], $result);
     }
 
-    /**
-     * @covers ::buildXpath
-     * @covers ::query
-     * @covers ::transform
-     */
     public function testMultiResultsAsNodeList(): void
     {
         $domDocument = new \DOMDocument();
@@ -122,9 +99,6 @@ class XpathEvaluatorTransformerTest extends TestCase
         self::assertEquals('ok3', $result[2]->textContent);
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCodeReturnsCorrectCode(): void
     {
         $transformer = new XpathEvaluatorTransformer();

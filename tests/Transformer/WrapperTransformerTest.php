@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\WrapperTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\WrapperTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(WrapperTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(WrapperTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(WrapperTransformer::class, 'getCode')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(WrapperTransformer::class, 'configureOptions')]
 class WrapperTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransform(): void
     {
         $transformer = new WrapperTransformer();
@@ -38,9 +36,6 @@ class WrapperTransformerTest extends TestCase
         $this->assertEquals(['key' => 'my_value'], $transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformWithIntegerWrapperKey(): void
     {
         $transformer = new WrapperTransformer();
@@ -54,9 +49,6 @@ class WrapperTransformerTest extends TestCase
         $this->assertEquals([1 => 'my_value'], $transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformWithNullValue(): void
     {
         $transformer = new WrapperTransformer();
@@ -70,9 +62,6 @@ class WrapperTransformerTest extends TestCase
         $this->assertEquals(['key' => null], $transformedValue);
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCodeReturnsCorrectCode(): void
     {
         $transformer = new WrapperTransformer();
@@ -82,9 +71,6 @@ class WrapperTransformerTest extends TestCase
         $this->assertEquals('wrapper', $code);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptionsSetsDefaultOptions(): void
     {
         $resolver = new OptionsResolver();
