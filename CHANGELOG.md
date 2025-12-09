@@ -1,3 +1,12 @@
+v5.0
+-----
+
+## Changes
+* [#179](https://github.com/cleverage/process-bundle/issues/179) Upgrade to Symfony 8 & PHP 8.5
+
+## BC breaks
+* [#179](https://github.com/cleverage/process-bundle/issues/179) Remove PHP 8.1
+
 v4.5
 -----
 
