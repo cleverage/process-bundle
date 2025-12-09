@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(MultiReplaceTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(MultiReplaceTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(MultiReplaceTransformer::class, 'configureOptions')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(MultiReplaceTransformer::class, 'getCode')]
 class MultiReplaceTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransform(): void
     {
         $transformer = new MultiReplaceTransformer();
@@ -41,9 +39,6 @@ class MultiReplaceTransformerTest extends TestCase
         $this->assertEquals('That is a test sentence.', $transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformWithEmptyReplaceMapping(): void
     {
         $transformer = new MultiReplaceTransformer();
@@ -57,9 +52,6 @@ class MultiReplaceTransformerTest extends TestCase
         $this->assertEquals('This is a test string.', $transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformWithNullValue(): void
     {
         $transformer = new MultiReplaceTransformer();
@@ -76,9 +68,6 @@ class MultiReplaceTransformerTest extends TestCase
         $this->assertEquals('', $transformedValue);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptions(): void
     {
         $transformer = new MultiReplaceTransformer();
@@ -93,9 +82,6 @@ class MultiReplaceTransformerTest extends TestCase
         $this->assertEquals(['replace_mapping'], array_keys($resolvedOptions));
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCodeReturnsCorrectCode(): void
     {
         $transformer = new MultiReplaceTransformer();

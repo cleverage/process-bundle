@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\Array\ArrayElementTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\Array\ArrayElementTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(ArrayElementTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ArrayElementTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ArrayElementTransformer::class, 'configureOptions')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ArrayElementTransformer::class, 'getCode')]
 class ArrayElementTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransformReturnsNthElementFromArray(): void
     {
         $transformer = new ArrayElementTransformer();
@@ -36,9 +34,6 @@ class ArrayElementTransformerTest extends TestCase
         $this->assertEquals('bar', $result);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptionsSetsRequiredOptions(): void
     {
         $resolver = new OptionsResolver();
@@ -52,9 +47,6 @@ class ArrayElementTransformerTest extends TestCase
         $this->assertEquals(['index'], array_keys($resolvedOptions));
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCodeReturnsCorrectCode(): void
     {
         $transformer = new ArrayElementTransformer();

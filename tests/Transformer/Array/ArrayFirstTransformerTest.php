@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\Array\ArrayFirstTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\Array\ArrayFirstTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(ArrayFirstTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ArrayFirstTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ArrayFirstTransformer::class, 'getCode')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ArrayFirstTransformer::class, 'configureOptions')]
 class ArrayFirstTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransformReturnsFirstElementIfIterableAndAllowed(): void
     {
         $transformer = new ArrayFirstTransformer();
@@ -36,9 +34,6 @@ class ArrayFirstTransformerTest extends TestCase
         $this->assertEquals(1, $result);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformReturnsValueIfNotIterableAndAllowed(): void
     {
         $this->expectException(\TypeError::class);
@@ -52,9 +47,6 @@ class ArrayFirstTransformerTest extends TestCase
         $this->assertEquals('not_iterable_value', $result);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformThrowsExceptionIfNotIterableAndNotAllowed(): void
     {
         $transformer = new ArrayFirstTransformer();
@@ -66,9 +58,6 @@ class ArrayFirstTransformerTest extends TestCase
         $this->assertEquals($value, $result);
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCodeReturnsCorrectCode(): void
     {
         $transformer = new ArrayFirstTransformer();
@@ -78,9 +67,6 @@ class ArrayFirstTransformerTest extends TestCase
         $this->assertEquals('array_first', $code);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptionsSetsDefaultOptions(): void
     {
         $resolver = new OptionsResolver();

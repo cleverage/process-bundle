@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\CastTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\CastTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(CastTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(CastTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(CastTransformer::class, 'configureOptions')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(CastTransformer::class, 'getCode')]
 class CastTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testCastToInt(): void
     {
         $transformer = new CastTransformer();
@@ -37,9 +35,6 @@ class CastTransformerTest extends TestCase
         $this->assertEquals(123, $transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCastToFloat(): void
     {
         $transformer = new CastTransformer();
@@ -52,9 +47,6 @@ class CastTransformerTest extends TestCase
         $this->assertEquals(123.45, $transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCastToString(): void
     {
         $transformer = new CastTransformer();
@@ -67,9 +59,6 @@ class CastTransformerTest extends TestCase
         $this->assertEquals('123', $transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCastToBool(): void
     {
         $transformer = new CastTransformer();
@@ -82,9 +71,6 @@ class CastTransformerTest extends TestCase
         $this->assertTrue($transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testCastToInvalidType(): void
     {
         $transformer = new CastTransformer();
@@ -96,9 +82,6 @@ class CastTransformerTest extends TestCase
         $transformer->transform($value, $options);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptionsSetsRequiredOptions(): void
     {
         $resolver = new OptionsResolver();
@@ -112,9 +95,6 @@ class CastTransformerTest extends TestCase
         $this->assertEquals(['type'], array_keys($resolvedOptions));
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCodeReturnsCorrectCode(): void
     {
         $transformer = new CastTransformer();

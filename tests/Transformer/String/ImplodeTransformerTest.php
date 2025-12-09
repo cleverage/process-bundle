@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\String\ImplodeTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\String\ImplodeTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(ImplodeTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ImplodeTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ImplodeTransformer::class, 'getCode')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(ImplodeTransformer::class, 'configureOptions')]
 class ImplodeTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransform(): void
     {
         $transformer = new ImplodeTransformer();
@@ -34,9 +32,6 @@ class ImplodeTransformerTest extends TestCase
         $this->assertEquals('1,2,3', $result);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformWithInvalidValue(): void
     {
         $this->expectException(\UnexpectedValueException::class);
@@ -46,9 +41,6 @@ class ImplodeTransformerTest extends TestCase
         $transformer->transform('invalid_value', ['separator' => ',']);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformWithDefaultSeparator(): void
     {
         $transformer = new ImplodeTransformer();
@@ -58,9 +50,6 @@ class ImplodeTransformerTest extends TestCase
         $this->assertEquals('1|2|3', $result);
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCode(): void
     {
         $transformer = new ImplodeTransformer();
@@ -70,9 +59,6 @@ class ImplodeTransformerTest extends TestCase
         $this->assertEquals('implode', $code);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptions(): void
     {
         $transformer = new ImplodeTransformer();

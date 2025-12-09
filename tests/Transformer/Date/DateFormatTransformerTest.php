@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\Date\DateFormatTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\Date\DateFormatTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(DateFormatTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(DateFormatTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(DateFormatTransformer::class, 'getCode')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(DateFormatTransformer::class, 'configureOptions')]
 class DateFormatTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransformValidDate(): void
     {
         $transformer = new DateFormatTransformer();
@@ -37,9 +35,6 @@ class DateFormatTransformerTest extends TestCase
         $this->assertEquals('2023-09-28', $transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformInvalidDate(): void
     {
         $transformer = new DateFormatTransformer();
@@ -51,9 +46,6 @@ class DateFormatTransformerTest extends TestCase
         $transformer->transform($value, $options);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformNullValue(): void
     {
         // Arrange
@@ -66,9 +58,6 @@ class DateFormatTransformerTest extends TestCase
         $this->assertNull($transformedValue);
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCode(): void
     {
         $transformer = new DateFormatTransformer();
@@ -78,9 +67,6 @@ class DateFormatTransformerTest extends TestCase
         $this->assertEquals('date_format', $code);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptions(): void
     {
         $transformer = new DateFormatTransformer();

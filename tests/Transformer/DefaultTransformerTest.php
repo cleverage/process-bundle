@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\DefaultTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\DefaultTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(DefaultTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(DefaultTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(DefaultTransformer::class, 'configureOptions')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(DefaultTransformer::class, 'getCode')]
 class DefaultTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransformWithNonNullValue(): void
     {
         $transformer = new DefaultTransformer();
@@ -36,9 +34,6 @@ class DefaultTransformerTest extends TestCase
         $this->assertSame($value, $transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformWithNullValue(): void
     {
         $transformer = new DefaultTransformer();
@@ -50,9 +45,6 @@ class DefaultTransformerTest extends TestCase
         $this->assertEquals('default_value', $transformedValue);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptions(): void
     {
         $resolver = new OptionsResolver();
@@ -66,9 +58,6 @@ class DefaultTransformerTest extends TestCase
         $this->assertEquals(['value'], array_keys($resolvedOptions));
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCodeReturnsCorrectCode(): void
     {
         $transformer = new DefaultTransformer();

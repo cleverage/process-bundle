@@ -17,14 +17,12 @@ use CleverAge\ProcessBundle\Transformer\Date\DateParserTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\Date\DateParserTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(DateParserTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(DateParserTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(DateParserTransformer::class, 'getCode')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(DateParserTransformer::class, 'configureOptions')]
 class DateParserTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransformValidDate(): void
     {
         $transformer = new DateParserTransformer();
@@ -37,9 +35,6 @@ class DateParserTransformerTest extends TestCase
         $this->assertEquals('2023-09-28', $transformedValue->format('Y-m-d'));
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformInvalidDate(): void
     {
         $transformer = new DateParserTransformer();
@@ -51,9 +46,6 @@ class DateParserTransformerTest extends TestCase
         $transformer->transform($value, $options);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformNullValue(): void
     {
         $transformer = new DateParserTransformer();
@@ -65,9 +57,6 @@ class DateParserTransformerTest extends TestCase
         $this->assertNull($transformedValue);
     }
 
-    /**
-     * @covers ::transform
-     */
     public function testTransformDateTimeObject(): void
     {
         // Arrange
@@ -80,9 +69,6 @@ class DateParserTransformerTest extends TestCase
         $this->assertSame($value, $transformedValue);
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCode(): void
     {
         $transformer = new DateParserTransformer();
@@ -92,9 +78,6 @@ class DateParserTransformerTest extends TestCase
         $this->assertEquals('date_parser', $code);
     }
 
-    /**
-     * @covers ::configureOptions
-     */
     public function testConfigureOptions(): void
     {
         $transformer = new DateParserTransformer();

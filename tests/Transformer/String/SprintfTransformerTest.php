@@ -16,14 +16,11 @@ namespace CleverAge\ProcessBundle\Tests\Transformer\String;
 use CleverAge\ProcessBundle\Transformer\String\SprintfTransformer;
 use PHPUnit\Framework\TestCase;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\String\SprintfTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(SprintfTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(SprintfTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(SprintfTransformer::class, 'getCode')]
 class SprintfTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransform(): void
     {
         $sprintfTransformer = new SprintfTransformer();
@@ -34,9 +31,6 @@ class SprintfTransformerTest extends TestCase
         $this->assertEquals('foo bar', $result);
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testCode(): void
     {
         $trimTransformer = new SprintfTransformer();

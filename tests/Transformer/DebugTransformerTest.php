@@ -17,14 +17,11 @@ use CleverAge\ProcessBundle\Transformer\DebugTransformer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\VarDumper\VarDumper;
 
-/**
- * @coversDefaultClass \CleverAge\ProcessBundle\Transformer\DebugTransformer
- */
+#[\PHPUnit\Framework\Attributes\CoversClass(DebugTransformer::class)]
+#[\PHPUnit\Framework\Attributes\CoversMethod(DebugTransformer::class, 'transform')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(DebugTransformer::class, 'getCode')]
 class DebugTransformerTest extends TestCase
 {
-    /**
-     * @covers ::transform
-     */
     public function testTransform(): void
     {
         $transformer = new DebugTransformer();
@@ -39,9 +36,6 @@ class DebugTransformerTest extends TestCase
         }
     }
 
-    /**
-     * @covers ::getCode
-     */
     public function testGetCodeReturnsCorrectCode(): void
     {
         $transformer = new DebugTransformer();
