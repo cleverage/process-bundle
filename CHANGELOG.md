@@ -2,10 +2,10 @@ v5.0
 -----
 
 ## Changes
-* [#179](https://github.com/cleverage/process-bundle/issues/179) Upgrade to Symfony 8 & PHP 8.5
+* [#179](https://github.com/cleverage/process-bundle/issues/179) Add support for PHP 8.5 and Symfony 8.* Update phpunit/phpunit to version >10.0
 
 ## BC breaks
-* [#179](https://github.com/cleverage/process-bundle/issues/179) Remove PHP 8.1
+* [#179](https://github.com/cleverage/process-bundle/issues/179) Remove support for PHP 8.1 and Symfony 7.3
 
 v4.5
 -----
