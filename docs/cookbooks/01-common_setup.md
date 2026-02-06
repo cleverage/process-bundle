@@ -45,3 +45,54 @@ monolog:
             max_files: 10
             channels: ['cleverage_process_task', 'cleverage_process_transformer']
 ```
+
+Example: lightweight file import
+--------------------------------
+
+To give more context on how configuration ties to the PHP code, here is a minimal file-import workflow built with classes already shipped in `src/Task/File` and `src/Task/Reporting`.
+
+```yaml
+clever_age_process:
+    configurations:
+        app.file_import:
+            default_error_strategy: stop
+            tasks:
+                read_csv:
+                    service: '@CleverAge\ProcessBundle\Task\File\InputFileReaderTask'
+                    options:
+                        file_path: '%kernel.project_dir%/data/products.csv'
+                        format: csv
+                    outputs: [split_rows]
+
+                split_rows:
+                    service: '@CleverAge\ProcessBundle\Task/File/Csv/CsvSplitterTask'
+                    options:
+                        delimiter: ';'
+                    outputs: [transform]
+
+                transform:
+                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    options:
+                        transformers:
+                            mapping:
+                                mapping:
+                                    id: { code: '[id]' }
+                                    slug:
+                                        code:
+                                            - '[name]'
+                                            - '[category]'
+                                        transformers:
+                                            implode:
+                                                separator: '-'
+                    outputs: [write_csv]
+
+                write_csv:
+                    service: '@CleverAge\ProcessBundle\Task\File/Csv/CsvWriterTask'
+                    options:
+                        file_path: '%kernel.project_dir%/var/output/products_prepared.csv'
+                        headers:
+                            - id
+                            - slug
+```
+
+Each task above maps to the concrete classes such as `InputFileReaderTask`, `CsvSplitterTask` and `CsvWriterTask` found under `src/Task/File`. Mentioning the `default_error_strategy` helps downstream code in `src/Configuration/ProcessConfiguration.php` know how to propagate failures.

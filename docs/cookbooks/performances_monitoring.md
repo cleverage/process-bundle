@@ -46,4 +46,15 @@ CPU Time        n/a
 Memory       5.35MB
 Network         n/a     n/a     n/a
 SQL             n/a     n/a
-``` 
+```
+
+Example: measuring CSV processing throughput
+------------------------------------------------
+
+When you run `cleverage:process:execute` you already benefit from the `ProcessLogger` that records task timing stats under `src/Logger`. To highlight actionable Blackfire runs, log the following steps:
+
+```bash
+blackfire run php bin/console --env=prod cleverage:process:execute app.file_import
+```
+
+After the JSON output, look for the `ProcessLogger` section (e.g., `timing.cleverage_process.task`) and correlate it with the CSV reader/writer tasks you configured in `docs/cookbooks/01-common_setup.md`. Use those duration metrics to decide whether to parallelize `CsvSplitterTask` with `TransformerTask`, or to revisit buffering logic in `CsvWriterTask`.

@@ -38,3 +38,8 @@ To graph the output of this process, use this Gnuplot command in your host envir
 ```bash
 $ gnuplot -e 'while(1) {plot "memory.dat" using 0:1 with lines; pause 1; reread}'
 ```
+
+Alternative: log memory per process phase
+-------------------------------------------
+
+If you want more granular analysis, add multiple `TransformerTask` steps that call `memory_get_usage` before and after a critical moment in your process (e.g., before and after the `TransformerTask` in the CSV import flow above). Dump each value to `memory_phase.dat` with a `CsvWriterTask` that adds `phase` and `memory_usage` columns so you can compare how much heap each phase consumes.
