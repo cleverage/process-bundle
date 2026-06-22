@@ -21,6 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class InputLineReaderTask extends LineReaderTask
 {
+    #[\Override]
     protected function getOptions(ProcessState $state): array
     {
         $options = parent::getOptions($state);
@@ -31,6 +32,7 @@ class InputLineReaderTask extends LineReaderTask
         return $options;
     }
 
+    #[\Override]
     protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

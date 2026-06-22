@@ -17,6 +17,7 @@ use Monolog\LogRecord;
 
 class TaskProcessor extends AbstractProcessor
 {
+    #[\Override]
     public function __invoke(LogRecord $record): LogRecord
     {
         $record = parent::__invoke($record);

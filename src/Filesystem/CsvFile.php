@@ -56,11 +56,13 @@ class CsvFile extends CsvResource
     /**
      * Will return a resource if the file was created using a resource.
      */
+    #[\Override]
     public function getFilePath(): string
     {
         return $this->filePath;
     }
 
+    #[\Override]
     protected function getResourceName(): string
     {
         return "CSV file '{$this->filePath}'";

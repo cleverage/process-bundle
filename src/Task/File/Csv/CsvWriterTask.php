@@ -43,6 +43,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         $state->setOutput($this->csv->getFilePath());
     }
 
+    #[\Override]
     protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
