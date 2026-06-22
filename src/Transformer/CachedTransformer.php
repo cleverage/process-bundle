@@ -44,7 +44,7 @@ class CachedTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('ttl', ['null', 'string', \DateTimeInterface::class]);
         $resolver->setNormalizer(
             'ttl',
-            function (Options $options, $value) {
+            static function (Options $options, $value) {
                 /*
                  * Best use is a relative date string like "+1 hour".
                  *
