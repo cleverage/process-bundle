@@ -114,7 +114,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
         };
 
         $resolver->setNormalizer('condition', $expressionNormalizer);
-        $resolver->setNormalizer('default', function (Options $options, $value) {
+        $resolver->setNormalizer('default', static function (Options $options, $value) {
             if ($value && $options['condition']) {
                 throw new \InvalidArgumentException('A rule cannot have a condition and be the default in the same time');
             }

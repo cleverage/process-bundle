@@ -209,7 +209,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $resolver->setAllowedTypes('sleep_interval', ['integer', 'double']);
         $resolver->setAllowedTypes('sleep_interval_after_launch', ['integer', 'double']);
         $resolver->setAllowedTypes('sleep_on_finalize_interval', ['integer', 'double']);
-        $microsecondNormalizer = fn (Options $options, $value): int => (int) ($value * 1_000_000);
+        $microsecondNormalizer = static fn (Options $options, $value): int => (int) ($value * 1_000_000);
         $resolver->setNormalizer('sleep_interval', $microsecondNormalizer);
         $resolver->setNormalizer('sleep_interval_after_launch', $microsecondNormalizer);
         $resolver->setNormalizer('sleep_on_finalize_interval', $microsecondNormalizer);
