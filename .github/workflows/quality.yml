@@ -23,7 +23,7 @@ jobs:
           coverage: none
           tools: composer:v2
       - name: Install Composer dependencies (locked)
-        uses: ramsey/composer-install@v3
+        uses: ramsey/composer-install@v4
       - name: PHPStan
         run: vendor/bin/phpstan --no-progress --memory-limit=1G analyse --error-format=github
 
@@ -40,7 +40,7 @@ jobs:
           coverage: none
           tools: composer:v2
       - name: Install Composer dependencies (locked)
-        uses: ramsey/composer-install@v3
+        uses: ramsey/composer-install@v4
       - name: PHP-CS-Fixer
         run: vendor/bin/php-cs-fixer fix --diff --dry-run --show-progress=none
 
@@ -57,6 +57,6 @@ jobs:
           coverage: none
           tools: composer:v2
       - name: Install Composer dependencies (locked)
-        uses: ramsey/composer-install@v3
+        uses: ramsey/composer-install@v4
       - name: Rector
         run: vendor/bin/rector --no-progress-bar --dry-run
