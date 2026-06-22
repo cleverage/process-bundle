@@ -31,11 +31,13 @@ class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskI
         $state->setSkipped(true);
     }
 
+    #[\Override]
     public function initialize(ProcessState $state): void
     {
         parent::getOptions($state);
     }
 
+    #[\Override]
     protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
@@ -47,6 +49,7 @@ class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskI
         $resolver->setAllowedTypes('base_folder_path', ['string']);
     }
 
+    #[\Override]
     protected function getOptions(ProcessState $state): array
     {
         $options = parent::getOptions($state);

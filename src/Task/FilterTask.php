@@ -28,6 +28,7 @@ class FilterTask extends AbstractConfigurableTask
 {
     use ConditionTrait;
 
+    #[\Override]
     public function initialize(ProcessState $state): void
     {
         parent::initialize($state);

@@ -34,6 +34,7 @@ class CleverAgeProcessBundle extends Bundle
         $container->addCompilerPass(new CheckSerializerCompilerPass());
     }
 
+    #[\Override]
     public function getPath(): string
     {
         return \dirname(__DIR__);

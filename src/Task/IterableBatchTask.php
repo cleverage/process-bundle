@@ -35,6 +35,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     ) {
     }
 
+    #[\Override]
     public function initialize(ProcessState $state): void
     {
         parent::initialize($state);

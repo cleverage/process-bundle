@@ -112,14 +112,7 @@ class ProcessConfiguration
         if (null === $this->dependencyGroups) {
             $this->dependencyGroups = [];
             foreach ($this->getTaskConfigurations() as $taskConfiguration) {
-                $isInBranch = false;
-                foreach ($this->dependencyGroups as $branch) {
-                    if (\in_array($taskConfiguration->getCode(), $branch, true)) {
-                        $isInBranch = true;
-                        break;
-                    }
-                }
-
+                $isInBranch = array_any($this->dependencyGroups, static fn ($branch) => \in_array($taskConfiguration->getCode(), $branch, true));
                 if (!$isInBranch) {
                     $dependencies = $this->buildDependencies($taskConfiguration);
                     $dependencies = $this->sortDependencies($dependencies);

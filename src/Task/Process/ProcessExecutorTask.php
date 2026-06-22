@@ -45,6 +45,7 @@ class ProcessExecutorTask extends AbstractConfigurableTask
         $state->setOutput($output);
     }
 
+    #[\Override]
     public function initialize(ProcessState $state): void
     {
         parent::initialize($state);

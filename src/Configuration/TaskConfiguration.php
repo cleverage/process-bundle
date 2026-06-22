@@ -112,9 +112,7 @@ class TaskConfiguration
         return $this->outputs;
     }
 
-    /**
-     * @deprecated Use getErrorOutputs method instead
-     */
+    #[\Deprecated(message: 'Use getErrorOutputs method instead')]
     public function getErrors(): array
     {
         @trigger_error('Deprecated method, use getErrorOutputs instead', \E_USER_DEPRECATED);

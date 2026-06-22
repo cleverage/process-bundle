@@ -23,6 +23,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CsvSplitterTask extends InputCsvReaderTask
 {
+    #[\Override]
     public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
@@ -49,6 +50,7 @@ class CsvSplitterTask extends InputCsvReaderTask
      * return true if the task has a next element
      * return false if the task has terminated it's iteration.
      */
+    #[\Override]
     public function next(ProcessState $state): bool
     {
         if (!$this->csv instanceof CsvResource) {
@@ -64,6 +66,7 @@ class CsvSplitterTask extends InputCsvReaderTask
         return !$endOfFile;
     }
 
+    #[\Override]
     public function finalize(ProcessState $state): void
     {
         if ($this->csv instanceof CsvResource) {
@@ -100,6 +103,7 @@ class CsvSplitterTask extends InputCsvReaderTask
         return $tmpFilePath;
     }
 
+    #[\Override]
     protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

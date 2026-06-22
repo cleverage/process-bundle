@@ -21,6 +21,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SplitJoinLineTask extends AbstractIterableOutputTask
 {
+    #[\Override]
     public function next(ProcessState $state): bool
     {
         $valid = parent::next($state);

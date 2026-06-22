@@ -82,6 +82,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         return $options['headers'];
     }
 
+    #[\Override]
     protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);

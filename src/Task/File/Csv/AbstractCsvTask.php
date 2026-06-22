@@ -24,6 +24,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 abstract class AbstractCsvTask extends AbstractCsvResourceTask
 {
+    #[\Override]
     protected function initFile(ProcessState $state): void
     {
         if ($this->csv instanceof CsvResource) {
@@ -41,6 +42,7 @@ abstract class AbstractCsvTask extends AbstractCsvResourceTask
         );
     }
 
+    #[\Override]
     protected function configureOptions(OptionsResolver $resolver): void
     {
         parent::configureOptions($resolver);
