@@ -27,11 +27,11 @@ Options
 
 | Code          | Type               | Required | Default                   | Description                                                                    |
 |---------------|--------------------|:--------:|---------------------------|--------------------------------------------------------------------------------|
-| `commandline` | `string\|array`    |  **X**   |                           | Command to run, as an array of arguments (recommended) or a string             |
+| `commandline` | `string\|array`    |  **X**   |                           | Command to run, as an array of arguments (recommended) or a string run by the shell (see Notes) |
 | `cwd`         | `string\|null`     |          | Symfony project directory | Working directory of the command                                               |
 | `env`         | `array\|null`      |          | `null`                    | Environment variables of the command (`null` inherits the current environment) |
 | `timeout`     | `int\|float\|null` |          | `60`                      | Timeout in seconds (`null` disables it)                                        |
-| `options`     | `mixed`            |          | `null`                    | Unused by the task itself, see Notes                                           |
+| `options`     | `array\|null`      |          | `null`                    | Passed to `Process::setOptions()`: `blocking_pipes`, `create_process_group`, `create_new_console` |
 
 Examples
 --------
@@ -48,10 +48,22 @@ count_lines:
   outputs: [next_task]
 ```
 
+* Use shell features (pipes, environment variables)
+
+```yaml
+# Task configuration level
+count_errors:
+  service: '@CleverAge\ProcessBundle\Task\Process\CommandRunnerTask'
+  options:
+    commandline: 'grep "$PATTERN" | wc -l'
+    env:
+      PATTERN: 'error'
+  outputs: [next_task]
+```
+
 Notes
 -----
 
-The task calls `Process::setOptions()` with **all** its resolved options (`commandline`, `cwd`, `env`, `timeout` and
-`options`). Recent versions of `symfony/process` only accept `blocking_pipes`, `create_process_group` and
-`create_new_console` there and throw a `LogicException` for any other key, which makes the task fail before the
-command is started.
+An array `commandline` is run with `new Process()`: each argument is escaped and no shell is involved. A string
+`commandline` is run with `Process::fromShellCommandline()`: it is interpreted by the shell, so never build it from
+untrusted input.
