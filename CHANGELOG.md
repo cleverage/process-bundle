@@ -5,6 +5,9 @@ Latest
 * [#190](https://github.com/cleverage/process-bundle/issues/190) Update quality stack: use Rector `withComposerBased()` sets (removed `SYMFONY_64` / `PHPUNIT_100` sets), declare used Symfony packages and PHPUnit range in composer.json, apply quality tools fixes
 * [#145](https://github.com/cleverage/process-bundle/issues/145) Add missing documentations: reference pages for every Task & Transformer, ConditionTrait & GenericTransformer, complete guides and cookbooks. Harmonize and fix existing documentation.
 
+## Fixes
+* [#192](https://github.com/cleverage/process-bundle/issues/192) Fix CommandRunnerTask: only pass the `options` option to `Process::setOptions()`, support string `commandline` through `Process::fromShellCommandline()`, validate option types. Update documentation, add tests.
+
 * v5.0
 -----
 

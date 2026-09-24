@@ -32,14 +32,18 @@ class CommandRunnerTask extends AbstractConfigurableTask
     public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
-        $process = new Process(
-            $options['commandline'],
+        $arguments = [
             $options['cwd'],
             $options['env'],
             $state->getInput(),
             $options['timeout'],
-        );
-        $process->setOptions($options);
+        ];
+        $process = \is_array($options['commandline'])
+            ? new Process($options['commandline'], ...$arguments)
+            : Process::fromShellCommandline($options['commandline'], ...$arguments);
+        if (null !== $options['options']) {
+            $process->setOptions($options['options']);
+        }
         $process->mustRun();
         $state->setOutput($process->getOutput());
     }
@@ -56,5 +60,9 @@ class CommandRunnerTask extends AbstractConfigurableTask
                 'options' => null,
             ]
         );
+        $resolver->setAllowedTypes('cwd', ['null', 'string']);
+        $resolver->setAllowedTypes('env', ['null', 'array']);
+        $resolver->setAllowedTypes('timeout', ['null', 'int', 'float']);
+        $resolver->setAllowedTypes('options', ['null', 'array']);
     }
 }
