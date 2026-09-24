@@ -39,14 +39,14 @@ class EventDispatcherTask extends AbstractConfigurableTask
 
         $event = new EventDispatcherTaskEvent($state);
 
-        $this->eventDispatcher->dispatch($event);
+        $this->eventDispatcher->dispatch($event, $options['event_name']);
     }
 
     protected function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(['event_name']);
+        $resolver->setDefault('event_name', null);
         $resolver->setDefault('passive', true);
-        $resolver->setAllowedTypes('event_name', ['string']);
+        $resolver->setAllowedTypes('event_name', ['null', 'string']);
         $resolver->setAllowedTypes('passive', ['boolean']);
     }
 }
