@@ -1,12 +1,11 @@
 ImplodeTransformer
-=========================
+==================
 
-Join array elements with a string
+Join the elements of an array into a string, using PHP's [implode](https://www.php.net/manual/en/function.implode.php)
+function.
 
-This transformer uses the php internal function: https://www.php.net/manual/en/function.implode.php
-
-Task reference
---------------
+Transformer reference
+---------------------
 
 * **Service**: `CleverAge\ProcessBundle\Transformer\String\ImplodeTransformer`
 * **Transformer code**: `implode`
@@ -14,7 +13,7 @@ Task reference
 Accepted inputs
 ---------------
 
-`array`
+`array` of values that can be cast to `string`. Any other input throws an `\UnexpectedValueException`.
 
 Possible outputs
 ----------------
@@ -24,20 +23,31 @@ Possible outputs
 Options
 -------
 
-| Code        | Type     | Required | Default | Description |
-|-------------|----------|:--------:|---------|-------------|
-| `separator` | `string` |  **X**   | `|`     |             |
+| Code        | Type     | Required | Default | Description                              |
+|-------------|----------|:--------:|---------|------------------------------------------|
+| `separator` | `string` |          | `'\|'`  | String inserted between each element     |
 
 Examples
 --------
 
+* `['1', '2', '3']` becomes `'1|2|3'`
+
+```yaml
+# Transformer options level
+implode: ~
+```
+
+* Concatenate then slugify several fields
+
 ```yaml
 # Transformer mapping level
-sprintf_multiple:
+slug:
   code:
+    - '[id]'
     - '[firstname]'
     - '[lastname]'
   transformers:
     implode:
       separator: '-'
+    slugify: ~
 ```

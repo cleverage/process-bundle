@@ -1,8 +1,9 @@
 DieTask
-=========
+=======
 
-Stops the process brutally
-
+Stops the process brutally by calling PHP `exit`. The whole PHP script ends immediately: no following task, flush,
+blocking task or process end handling is executed. Intended for debugging only; use [StopTask](stop_task.md) to stop a
+process cleanly.
 
 Task reference
 --------------
@@ -12,23 +13,30 @@ Task reference
 Accepted inputs
 ---------------
 
-`any`
+Input is ignored
 
 Possible outputs
 ----------------
 
-None
+None, the script is terminated
 
 Options
 -------
 
-None
+This task has no option.
 
-Example
-----------------
+Examples
+--------
+
+* Terminate right after the first task
 
 ```yaml
 # Task configuration level
-code:
+entry:
+  service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+  options:
+    output: { id: 123 }
+  outputs: [die]
+die:
   service: '@CleverAge\ProcessBundle\Task\Debug\DieTask'
 ```

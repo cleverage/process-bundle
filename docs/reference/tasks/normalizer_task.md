@@ -1,7 +1,7 @@
 NormalizerTask
 ==============
 
-Normalize data from the input and pass it to the output
+Normalizes the input (usually an object) using the Symfony Serializer `NormalizerInterface`.
 
 Task reference
 --------------
@@ -11,18 +11,34 @@ Task reference
 Accepted inputs
 ---------------
 
-Any normalizable object.
+`mixed`: any value supported by the normalizers for the given `format`. If no normalizer supports it, an
+`\UnexpectedValueException` is thrown.
 
 Possible outputs
 ----------------
 
-A normalized value as an array.
+`array|string|int|float|bool|\ArrayObject|null`: result of `NormalizerInterface::normalize()` (usually an `array`).
 
 Options
 -------
 
-| Code | Type | Required | Default | Description |
-| ---- | ---- | :------: | ------- | ----------- |
-| `format` | `string` | **X** | | Format for normalization ("json", "xml", ... an empty string should also work) |
-| `context` | `array` | | `[]` | Will be passed directly to the third parameter of the normalize method |
+| Code      | Type     | Required | Default | Description                                                    |
+|-----------|----------|:--------:|---------|----------------------------------------------------------------|
+| `format`  | `string` |  **X**   |         | Format passed to the normalizer (`json`, `xml`, ...)           |
+| `context` | `array`  |          | `[]`    | Normalization context, passed as 3rd argument of `normalize()` |
 
+Examples
+--------
+
+* Normalize entities read from Doctrine into arrays, restricted to a serialization group
+
+```yaml
+# Task configuration level
+normalize:
+  service: '@CleverAge\ProcessBundle\Task\Serialization\NormalizerTask'
+  options:
+    format: json
+    context:
+      groups: [export]
+  outputs: [write]
+```

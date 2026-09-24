@@ -1,7 +1,8 @@
 InputLineReaderTask
-=============
+===================
 
-Reads a file and iterate on each line, returning content as string. Skips empty lines.
+Reads a file, whose path is given as input, and iterates over its lines, outputting each line as a string.
+Same behaviour as [LineReaderTask](line_reader_task.md), except for the file path.
 
 Task reference
 --------------
@@ -12,21 +13,25 @@ Task reference
 Accepted inputs
 ---------------
 
-`string`: file path
+`string`: path of the file to read. An `\UnexpectedValueException` is thrown if the file does not exist or is not
+readable. When a different path is received, the previous file is dropped and the new one is opened.
 
 Possible outputs
 ----------------
 
-`string`: foreach line, it will return content as string.
-Underlying method is [SplFileObject](https://www.php.net/manual/en/class.splfileobject.php).
+`string`: for each line, its raw content. The line break is not removed.
+Underlying class is [SplFileObject](https://www.php.net/manual/en/class.splfileobject.php), with the `READ_AHEAD` and
+`SKIP_EMPTY` flags.
 
 Options
 -------
 
-None
+This task has no option.
 
-Example
--------
+Examples
+--------
+
+* Read every line of every file of a folder
 
 ```yaml
 # Task configuration level
@@ -34,9 +39,8 @@ entry:
   service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
   options:
     folder_path: '%kernel.project_dir%/var/data'
-  outputs: read
+  outputs: [read]
 read:
   service: '@CleverAge\ProcessBundle\Task\File\InputLineReaderTask'
+  outputs: [log_line]
 ```
-
-

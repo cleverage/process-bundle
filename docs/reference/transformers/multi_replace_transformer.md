@@ -1,12 +1,11 @@
 MultiReplaceTransformer
-=========================
+=======================
 
-Quickly replace a list of values in a string.
+Replace a list of substrings in a string, using PHP
+[`str_replace()`](https://www.php.net/manual/en/function.str-replace.php) once per entry of the replacement map.
 
-This transformer uses the php internal function: https://www.php.net/manual/en/function.str-replace.php
-
-Task reference
---------------
+Transformer reference
+---------------------
 
 * **Service**: `CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer`
 * **Transformer code**: `multi_replace`
@@ -19,26 +18,33 @@ Any value that can be cast to string.
 Possible outputs
 ----------------
 
-`string`
+`string`: the input with all replacements applied. If `replace_mapping` is empty, the input is returned unchanged
+(not cast).
 
 Options
 -------
 
-| Code              | Type    | Required | Default | Description                       |
-|-------------------|---------|:--------:|---------|-----------------------------------|
-| `replace_mapping` | `array` |  **X**   |         | $search as key, $replace as value |
+| Code              | Type    | Required | Default | Description                                                                              |
+|-------------------|---------|:--------:|---------|------------------------------------------------------------------------------------------|
+| `replace_mapping` | `array` |  **X**   |         | Searched string as key, replacement as value. Entries are applied sequentially, in order |
 
 Examples
 --------
 
 ```yaml
-# Transformer mapping level
+# Transformer options level
 multi_replace:
-  code:
-    - '[firstname]'
+  replace_mapping:
+    ' ': '!'
+    'name': ''
+```
+
+```yaml
+# Transformer mapping level
+firstname:
+  code: '[firstname]'
   transformers:
     multi_replace:
-    replace_mapping:
-      ' ': '!'
-      'name': ''
+      replace_mapping:
+        ' ': '-'
 ```

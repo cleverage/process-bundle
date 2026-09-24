@@ -4,21 +4,21 @@
 - [Task types](02-task_types.md)
 - [Custom tasks and development](03-custom_tasks.md)
 - [Advanced workflow](04-advanced_workflow.md)
+- [Good practices](05-good_practices.md)
+- [Testing](06-testing.md)
 - Cookbooks
     - [Common Setup](cookbooks/01-common_setup.md)
-    - [Transformations]
-    - [Flow manipulation]
-    - [Dummy tasks]
-    - [Debugging]
-    - [Logging]
-    - [Subprocess]
-    - [File manipulation]
-    - [Direct call (in controller)]
+    - [File synchronization ETL](cookbooks/etl_file_sync.md)
+    - [ETL report aggregation](cookbooks/etl_aggregate_reports.md)
     - [Performances monitoring](cookbooks/performances_monitoring.md)
     - [Memory usage analysis](cookbooks/memory_usage_graph.md)
 - Reference
     - [Process definition](reference/01-process_definition.md)
     - [Task definition](reference/02-task_definition.md)
+    - [Generic transformers definition](reference/03-generic_transformers_definition.md)
+    - Traits
+        - [ConditionTrait](reference/traits/condition_trait.md)
+        - [TransformerTrait](reference/traits/transformer_trait.md)
     - Basic and debug
         - [ConstantOutputTask](reference/tasks/constant_output_task.md)
         - [ConstantIterableOutputTask](reference/tasks/constant_iterable_output_task.md)
@@ -32,18 +32,18 @@
     - Data manipulation and transformations
         - [DenormalizerTask](reference/tasks/denormalizer_task.md)
         - [NormalizerTask](reference/tasks/normalizer_task.md)
-        - [DeserializerTask]
-        - [SerializerTask]
+        - [DeserializerTask](reference/tasks/deserializer_task.md)
+        - [SerializerTask](reference/tasks/serializer_task.md)
         - [PropertyGetterTask](reference/tasks/property_getter_task.md)
         - [PropertySetterTask](reference/tasks/property_setter_task.md)
-        - [ObjectUpdaterTask]
-        - [SplitJoinLineTask]
+        - [ObjectUpdaterTask](reference/tasks/object_updater_task.md)
+        - [SplitJoinLineTask](reference/tasks/split_join_line_task.md)
         - [TransformerTask](reference/tasks/transformer_task.md)
-        - [ValidatorTask]
+        - [ValidatorTask](reference/tasks/validator_task.md)
     - File/CSV
         - [CsvReaderTask](reference/tasks/csv_reader_task.md)
         - [CsvWriterTask](reference/tasks/csv_writer_task.md)
-        - [CSVSplitterTask]
+        - [CsvSplitterTask](reference/tasks/csv_splitter_task.md)
         - [InputCsvReaderTask](reference/tasks/input_csv_reader_task.md)
     - File/JsonStream
         - [JsonStreamReaderTask](reference/tasks/json_stream_reader_task.md)
@@ -52,14 +52,14 @@
         - [XmlReaderTask](reference/tasks/xml_reader_task.md)
         - [XmlWriterTask](reference/tasks/xml_writer_task.md)
     - File/Yaml
-        - [YamlReaderTask]
-        - [YamlWriterTask]
+        - [YamlReaderTask](reference/tasks/yaml_reader_task.md)
+        - [YamlWriterTask](reference/tasks/yaml_writer_task.md)
     - File
-        - [FileMoverTask]
+        - [FileMoverTask](reference/tasks/file_mover_task.md)
         - [FileReaderTask](reference/tasks/file_reader_task.md)
-        - [FileRemoverTask]
+        - [FileRemoverTask](reference/tasks/file_remover_task.md)
         - [FileSplitterTask](reference/tasks/file_splitter_task.md)
-        - [FileWriterTask]
+        - [FileWriterTask](reference/tasks/file_writer_task.md)
         - [FolderBrowserTask](reference/tasks/folder_browser_task.md)
         - [InputFileReaderTask](reference/tasks/input_file_reader_task.md)
         - [InputFolderBrowserTask](reference/tasks/input_folder_browser_task.md)
@@ -69,69 +69,69 @@
         - [AggregateIterableTask](reference/tasks/aggregate_iterable_task.md)
         - [InputAggregatorTask](reference/tasks/input_aggregator_task.md)
         - [InputIteratorTask](reference/tasks/input_iterator_task.md)
-        - [ArrayMergeTask]
-        - [ColumnAggregatorTask]
-        - [RowAggregatorTask]
-        - [FilterTask]
-        - [GroupByAggregateIterableTask]
-        - [SimpleBatchTask]
-        - [IterableBatchTask]
-        - [SkipEmptyTask]
-        - [StopTask]
+        - [ArrayMergeTask](reference/tasks/array_merge_task.md)
+        - [ColumnAggregatorTask](reference/tasks/column_aggregator_task.md)
+        - [RowAggregatorTask](reference/tasks/row_aggregator_task.md)
+        - [FilterTask](reference/tasks/filter_task.md)
+        - [GroupByAggregateIterableTask](reference/tasks/group_by_aggregate_iterable_task.md)
+        - [SimpleBatchTask](reference/tasks/simple_batch_task.md)
+        - [IterableBatchTask](reference/tasks/iterable_batch_task.md)
+        - [SkipEmptyTask](reference/tasks/skip_empty_task.md)
+        - [StopTask](reference/tasks/stop_task.md)
     - Process
-        - [CommandRunnerTask]
-        - [ProcessExecutorTask]
-        - [ProcessLauncherTask]
+        - [CommandRunnerTask](reference/tasks/command_runner_task.md)
+        - [ProcessExecutorTask](reference/tasks/process_executor_task.md)
+        - [ProcessLauncherTask](reference/tasks/process_launcher_task.md)
     - Reporting
-        - [AdvancedStatCounterTask]
+        - [AdvancedStatCounterTask](reference/tasks/advanced_stat_counter_task.md)
         - [LoggerTask](reference/tasks/logger_task.md)
-        - [StatCounterTask]
+        - [StatCounterTask](reference/tasks/stat_counter_task.md)
     - Transformers
         - Basic and debug
-            - [CachedTransformer]
-            - [CallbackTransformer]
-            - [CastTransformer]
-            - [ConstantTransformer]
-            - [ConvertValueTransformer]
-            - [DebugTransformer]
-            - [DefaultTransformer]
-            - [GenericTransformer]
-            - [EvaluatorTransformer]
-            - [ExpressionLanguageMapTransformer]
+            - [CachedTransformer](reference/transformers/cached_transformer.md)
+            - [CallbackTransformer](reference/transformers/callback_transformer.md)
+            - [CastTransformer](reference/transformers/cast_transformer.md)
+            - [ConstantTransformer](reference/transformers/constant_transformer.md)
+            - [ConvertValueTransformer](reference/transformers/convert_value_transformer.md)
+            - [DebugTransformer](reference/transformers/debug_transformer.md)
+            - [DefaultTransformer](reference/transformers/default_transformer.md)
+            - [GenericTransformer](reference/transformers/generic_transformer.md)
+            - [EvaluatorTransformer](reference/transformers/evaluator_transformer.md)
+            - [ExpressionLanguageMapTransformer](reference/transformers/expression_language_map_transformer.md)
             - [MappingTransformer](reference/transformers/mapping_transformer.md)
             - [MultiReplaceTransformer](reference/transformers/multi_replace_transformer.md)
-            - [PregFilterTransformer]
+            - [PregFilterTransformer](reference/transformers/preg_filter_transformer.md)
             - [RulesTransformer](reference/transformers/rules_transformer.md)
-            - [TypeSetterTransformer]
-            - [UnsetTransformer]
-            - [WrapperTransformer]
+            - [TypeSetterTransformer](reference/transformers/type_setter_transformer.md)
+            - [UnsetTransformer](reference/transformers/unset_transformer.md)
+            - [WrapperTransformer](reference/transformers/wrapper_transformer.md)
         - Array
-            - [ArrayElementTransformer]
+            - [ArrayElementTransformer](reference/transformers/array_element_transformer.md)
             - [ArrayFilterTransformer](reference/transformers/array_filter_transformer.md)
-            - [ArrayFirstTransformer]
-            - [ArrayLastTransformer]
+            - [ArrayFirstTransformer](reference/transformers/array_first_transformer.md)
+            - [ArrayLastTransformer](reference/transformers/array_last_transformer.md)
             - [ArrayMapTransformer](reference/transformers/array_map_transformer.md)
-            - [ArrayUnsetTransformer]
+            - [ArrayUnsetTransformer](reference/transformers/array_unset_transformer.md)
         - Date
-            - [DateFormatTransformer](reference/transformers/date_format.md)
-            - [DateParserTransformer](reference/transformers/date_parser.md)
+            - [DateFormatTransformer](reference/transformers/date_format_transformer.md)
+            - [DateParserTransformer](reference/transformers/date_parser_transformer.md)
         - Object
-            - [InstantiateTransformer]
-            - [PropertyAccessorTransformer]
-            - [RecursivePropertySetterTransformer]
+            - [InstantiateTransformer](reference/transformers/instantiate_transformer.md)
+            - [PropertyAccessorTransformer](reference/transformers/property_accessor_transformer.md)
+            - [RecursivePropertySetterTransformer](reference/transformers/recursive_property_setter_transformer.md)
         - Serialization
-            - [DenormalizeTransformer]
-            - [NormalizeTransformer]
+            - [DenormalizeTransformer](reference/transformers/denormalize_transformer.md)
+            - [NormalizeTransformer](reference/transformers/normalize_transformer.md)
         - String
-            - [ExplodeTransformer]
-            - [HashTransformer]
+            - [ExplodeTransformer](reference/transformers/explode_transformer.md)
+            - [HashTransformer](reference/transformers/hash_transformer.md)
             - [ImplodeTransformer](reference/transformers/implode_transformer.md)
             - [PregMatchTransformer](reference/transformers/preg_match_transformer.md)
             - [SlugifyTransformer](reference/transformers/slugify_transformer.md)
             - [SprintfTransformer](reference/transformers/sprintf_transformer.md)
             - [TrimTransformer](reference/transformers/trim_transformer.md)
         - XML
-            - [XpathEvaluatorTransformer](reference/transformers/xpath_evaluator.md)
+            - [XpathEvaluatorTransformer](reference/transformers/xpath_evaluator_transformer.md)
     - Other bridges
         - [Archive](https://github.com/cleverage/archive-process-bundle)
         - [Cache](https://github.com/cleverage/cache-process-bundle)
@@ -139,5 +139,4 @@
         - [Flysystem](https://github.com/cleverage/flysystem-process-bundle)
         - [Rest](https://github.com/cleverage/rest-process-bundle)
         - [Soap](https://github.com/cleverage/soap-process-bundle)
-    - [Generic transformers definition](reference/03-generic_transformers_definition.md)
 - [UI](https://github.com/cleverage/ui-process-bundle)

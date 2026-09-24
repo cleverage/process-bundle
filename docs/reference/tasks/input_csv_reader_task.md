@@ -1,7 +1,8 @@
 InputCsvReaderTask
-=============
+==================
 
-Reads a CSV file and iterate on each line, returning an array of key -> values. Skips empty lines.
+Reads a CSV file whose path is given as input and iterates over its lines, outputting each line as an associative array
+indexed by the CSV headers. Same behaviour as [CsvReaderTask](csv_reader_task.md), except for the file path.
 
 Task reference
 --------------
@@ -12,35 +13,59 @@ Task reference
 Accepted inputs
 ---------------
 
-`string`: file path
+`string`: path of the file to read, prefixed by the `base_path` option if set.
+When a different path is received, the previous file is dropped and the new one is opened.
 
 Possible outputs
 ----------------
 
-`array`: foreach line, it will return a php array where key comes from headers and values are strings.
-Underlying method is [fgetcsv](https://secure.php.net/manual/en/function.fgetcsv.php).
+`array`: for each line, an associative array whose keys are the headers and values are strings.
+Underlying method is [fgetcsv](https://www.php.net/manual/en/function.fgetcsv.php).
+
+When no line can be read (typically the trailing empty line at the end of the file), no output is produced and the
+task is skipped for this iteration.
 
 Options
 -------
 
-Same as [CsvReaderTask](reference/tasks/csv_reader_task.md) except following :
+| Code              | Type          | Required | Default | Description                                                                                                                       |
+|-------------------|---------------|:--------:|---------|-----------------------------------------------------------------------------------------------------------------------------------|
+| `base_path`       | `string`      |          | `''`    | Prepended (with a `/` separator) to the input path. If empty, the input path is used as is                                        |
+| `delimiter`       | `string`      |          | `;`     | CSV delimiter                                                                                                                     |
+| `enclosure`       | `string`      |          | `"`     | CSV enclosure character                                                                                                           |
+| `escape`          | `string`      |          | `\`     | CSV escape character                                                                                                              |
+| `headers`         | `array\|null` |          | `null`  | Static list of CSV headers. If `null`, headers are read from the first line of the file; otherwise the first line is read as data |
+| `mode`            | `string`      |          | `rb`    | File open mode (see [fopen mode parameter](https://www.php.net/manual/en/function.fopen.php))                                     |
+| `log_empty_lines` | `bool`        |          | `false` | Log a warning when a line cannot be read (empty line)                                                                             |
 
-| Code        | Type     | Required | Default | Description                |
-|-------------|----------|:--------:|---------|----------------------------|
-| `file_path` |          |          |         | Removed, use input instead |
-| `base_path` | `string` |          | ``      |                            |
+The `file_path` option of [CsvReaderTask](csv_reader_task.md) is removed: the path comes from the input.
 
-Example
--------
+Examples
+--------
+
+* Read every CSV file of a folder
 
 ```yaml
-clever_age_process:
-  configurations:
-    process.name:
-      entry_point: entrypoint # for upload_and_run process entry_point is required
-      tasks:
-        entrypoint:
-          service: '@CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask'
-          options:
-            delimiter: '{{ delimiter }}' ## delimiter is contextualized you must add -c delimiter:";" on console execute
+# Task configuration level
+entry:
+  service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
+  options:
+    folder_path: '%kernel.project_dir%/var/data'
+    name_pattern: '*.csv'
+  outputs: [read]
+read:
+  service: '@CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask'
+  outputs: [dump]
+```
+
+* Read an uploaded file (process entry point), with a contextualized delimiter
+  - the delimiter must be passed on execution: `-c delimiter:";"`
+
+```yaml
+# Task configuration level
+read:
+  service: '@CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask'
+  options:
+    delimiter: '{{ delimiter }}'
+  outputs: [dump]
 ```

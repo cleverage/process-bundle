@@ -1,9 +1,8 @@
 DebugTask
 =========
 
-Dumps the input value to the console, obviously for debug purposes.
-Only usable in dev environment (where the [VarDumper Component](https://symfony.com/doc/current/components/var_dumper.html) is enabled)
-
+Dumps the input using the [VarDumper Component](https://symfony.com/doc/current/components/var_dumper.html), then
+passes it to the output. If VarDumper is not installed, nothing is dumped and the input is simply forwarded.
 
 Task reference
 --------------
@@ -18,23 +17,27 @@ Accepted inputs
 Possible outputs
 ----------------
 
-`any`: re-output given input
+`any`: the input, unchanged
 
 Options
 -------
 
-None
+This task has no option.
 
-Example
-----------------
+Examples
+--------
+
+* Dump a constant value
 
 ```yaml
 # Task configuration level
-code:
+entry:
   service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
   options:
     output:
       id: 123
       firstname: Test1
-      lastname: Test2
+  outputs: [debug]
+debug:
+  service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
 ```

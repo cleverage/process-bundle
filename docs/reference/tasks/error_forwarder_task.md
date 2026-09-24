@@ -1,9 +1,8 @@
-CounterTask
+ErrorForwarderTask
 ==================
 
-This is a dummy task mostly intended for testing purpose.
-
-Forward any input to the error output.
+Forwards any input to the error output and skips the normal output. Mostly intended for testing purposes (e.g. to
+test error branches).
 
 Task reference
 --------------
@@ -18,18 +17,30 @@ Accepted inputs
 Possible outputs
 ----------------
 
-`any`: directly error_output given `output` option
+None on the normal output (the task is always skipped).
+
+Error output: `any`, the input, unchanged
 
 Options
 -------
 
-None
+This task has no option.
 
-Example
--------
+Examples
+--------
+
+* Send every item to an error branch
 
 ```yaml
 # Task configuration level
-code:
+entry:
+  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  options:
+    output: [Error 1, Error 2, Error 3]
+  outputs: [error_forwarder]
+error_forwarder:
   service: '@CleverAge\ProcessBundle\Task\Debug\ErrorForwarderTask'
+  error_outputs: [debug]
+debug:
+  service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
 ```

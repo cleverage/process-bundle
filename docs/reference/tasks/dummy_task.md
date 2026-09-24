@@ -1,7 +1,8 @@
 DummyTask
 =========
 
-Passes the input to the output, can be used as an entry point allow multiple tasks to be run at the entry point
+Passes the input to the output without any change. Useful as an entry point to start several branches from the same
+input, or as a placeholder / junction task.
 
 Task reference
 --------------
@@ -16,33 +17,29 @@ Accepted inputs
 Possible outputs
 ----------------
 
-`any`: re-output given input
+`any`: the input, unchanged
 
 Options
 -------
 
-None
+This task has no option.
 
-Example
--------
+Examples
+--------
+
+* Use as an entry point to run two branches
 
 ```yaml
 # Task configuration level
-dummy:
+entry:
   service: '@CleverAge\ProcessBundle\Task\DummyTask'
   outputs: [output1, output2]
 output1:
   service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
   options:
-    output:
-      id: 123
-      firstname: Test1
-      lastname: Test2
+    output: { id: 123 }
 output2:
   service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
   options:
-    output:
-      id: 456
-      firstname: Test3
-      lastname: Test4
+    output: { id: 456 }
 ```

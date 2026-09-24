@@ -1,7 +1,8 @@
 StopwatchTask
 =============
 
-Log all the __root__ events of the Stopwatch component.
+Logs (at `info` level, on the `cleverage_process_task` channel) every event of the `__root__` section of the Symfony
+[Stopwatch component](https://symfony.com/doc/current/components/stopwatch.html). Useful to profile a process.
 
 Task reference
 --------------
@@ -11,23 +12,25 @@ Task reference
 Accepted inputs
 ---------------
 
-`any`
+Input is ignored
 
 Possible outputs
 ----------------
 
-None
+`null`: no output is set
 
 Options
 -------
 
-None
+This task has no option.
 
-Example
--------
+Examples
+--------
+
+* Log stopwatch events
 
 ```yaml
 # Task configuration level
-code:
+stopwatch:
   service: '@CleverAge\ProcessBundle\Task\Debug\StopwatchTask'
 ```
