@@ -24,10 +24,10 @@ Possible outputs
 Options
 -------
 
-| Code         | Type     | Required | Default | Description                                                   |
-|--------------|----------|:--------:|---------|---------------------------------------------------------------|
-| `event_name` | `string` |  **X**   |         | Name of the event (see Notes: currently not used to dispatch) |
-| `passive`    | `bool`   |          | `true`  | If `true`, the input is passed to the output before dispatch  |
+| Code         | Type           | Required | Default | Description                                                                |
+|--------------|----------------|:--------:|---------|----------------------------------------------------------------------------|
+| `event_name` | `string\|null` |          | `null`  | Name of the dispatched event, `null` to use the event class name (see Notes) |
+| `passive`    | `bool`         |          | `true`  | If `true`, the input is passed to the output before dispatch               |
 
 Examples
 --------
@@ -50,6 +50,18 @@ push_data_event:
 Notes
 -----
 
-The event is dispatched without an explicit name (`$eventDispatcher->dispatch($event)`), so its name is the event
-class name. Listeners must therefore subscribe to `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`; the
-`event_name` option is required and validated but not used for dispatching.
+The event is dispatched with `$eventDispatcher->dispatch($event, $eventName)`:
+
+* when `event_name` is set, listeners must subscribe to that name:
+
+```php
+#[AsEventListener(event: 'myapp.data_queue')]
+public function onDataQueue(EventDispatcherTaskEvent $event): void
+{
+    $input = $event->getState()->getInput();
+}
+```
+
+* when `event_name` is `null`, the event name is the event class name, so listeners must subscribe to
+  `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`. Every `EventDispatcherTask` without `event_name` then
+  triggers the same listeners.
