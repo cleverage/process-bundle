@@ -7,8 +7,9 @@ Latest
 
 ## Fixes
 * [#192](https://github.com/cleverage/process-bundle/issues/192) Fix CommandRunnerTask: only pass the `options` option to `Process::setOptions()`, support string `commandline` through `Process::fromShellCommandline()`, validate option types. Update documentation, add tests.
+* [#194](https://github.com/cleverage/process-bundle/issues/194) Fix ProcessLauncherTask: the `process_options` normalizer returned an array despite its scalar return type, so the task always failed with a `TypeError`. Update documentation, add tests.
 
-* v5.0
+v5.0
 -----
 
 ## Changes

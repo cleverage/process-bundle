@@ -32,8 +32,7 @@ A process with dozens of tasks is hard to read, to debug and to test. Split it i
   its output
 - sub-processes that should not be launched directly can be marked `public: false`
 - the same small process can be reused by several parent processes, or parallelized with the
-  [ProcessLauncherTask](reference/tasks/process_launcher_task.md) (currently broken by a known bug, see the
-  [Notes](reference/tasks/process_launcher_task.md#notes) of its reference page)
+  [ProcessLauncherTask](reference/tasks/process_launcher_task.md)
 
 Use `description` and `help` on processes and tasks: they are displayed by `cleverage:process:list` and
 `cleverage:process:help`.

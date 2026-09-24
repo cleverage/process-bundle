@@ -41,7 +41,7 @@ Options
 | `sleep_on_finalize_interval`  | `int\|float` |          | `1`     | Time (in seconds) to wait when the task has no finished result to output at the end of an iteration |
 | `context`                     | `array`      |          | `[]`    | Context values passed to each sub-process (as `--context=key:value`, values must be scalars)        |
 | `json_buffering`              | `bool`       |          | `false` | Store each sub-process output in a JSON stream file and output its path                             |
-| `process_options`             | `array`      |          | `[]`    | **Deprecated**: any non-empty value throws an `\InvalidArgumentException` (see Notes)              |
+| `process_options`             | `array`      |          | `[]`    | **Deprecated**: any non-empty value throws an `\InvalidArgumentException`                           |
 
 Examples
 --------
@@ -66,7 +66,3 @@ Notes
 
 * Sub-processes are run with the same Symfony environment as the current one (`--env`).
 * The incremental error output (stderr) of the running sub-processes is echoed directly.
-* **Known issue**: the normalizer of the deprecated `process_options` option declares a scalar return type
-  (`int|float|string|bool|null`) but returns the option value, which is always an array (`[]` by default). Resolving
-  the options therefore raises a `\TypeError`, which is caught at initialization (logged as critical) and makes the
-  process fail as soon as this task is reached.

@@ -244,10 +244,6 @@ event dispatcher.
 
 ## Parallelization
 
-> **Warning**: in the current version, the `ProcessLauncherTask` and the `CommandRunnerTask` fail when their options
-> are resolved, because of known bugs: see the Notes of the [ProcessLauncherTask](reference/tasks/process_launcher_task.md#notes)
-> and [CommandRunnerTask](reference/tasks/command_runner_task.md#notes) reference pages.
-
 PHP executes a process in a single thread. To use several CPU cores, the
 [ProcessLauncherTask](reference/tasks/process_launcher_task.md) launches a process in a separate system process
 (`bin/console cleverage:process:execute --input-from-stdin ...`, in the same environment) for each input it receives:
