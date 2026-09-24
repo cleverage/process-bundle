@@ -86,12 +86,10 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
         string $referenceKey,
         string $aggregationKey,
     ): void {
-        if (!isset($this->result[$column])) {
-            $this->result[$column] = [
-                $referenceKey => $column,
-                $aggregationKey => [],
-            ];
-        }
+        $this->result[$column] ??= [
+            $referenceKey => $column,
+            $aggregationKey => [],
+        ];
 
         $this->result[$column][$aggregationKey][] = $input;
     }

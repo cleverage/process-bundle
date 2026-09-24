@@ -54,8 +54,6 @@ class SubprocessInstance
 
     /**
      * Prepare the process before start.
-     *
-     * @return $this
      */
     public function buildProcess(): static
     {
@@ -94,8 +92,6 @@ class SubprocessInstance
 
     /**
      * Start the process.
-     *
-     * @return $this
      */
     public function start(): static
     {
@@ -106,8 +102,6 @@ class SubprocessInstance
 
     /**
      * Stop the process.
-     *
-     * @return $this
      */
     public function stop(float $timeout = 10): static
     {

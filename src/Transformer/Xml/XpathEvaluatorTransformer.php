@@ -87,15 +87,13 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
 
         $query = $options['query'];
         if (\is_array($query)) {
-            $result = array_map(
+            return array_map(
                 fn ($subquery): mixed => $this->query($xpath, $subquery['subquery'], $value, $subquery),
                 $query
             );
-        } else {
-            $result = $this->query($xpath, $query, $value, $options);
         }
 
-        return $result;
+        return $this->query($xpath, $query, $value, $options);
     }
 
     public function getCode(): string

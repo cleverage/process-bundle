@@ -1,3 +1,9 @@
+Latest
+------
+
+## Changes
+* [#190](https://github.com/cleverage/process-bundle/issues/190) Update quality stack: use Rector `withComposerBased()` sets (removed `SYMFONY_64` / `PHPUNIT_100` sets), declare used Symfony packages and PHPUnit range in composer.json, apply quality tools fixes
+
 v5.0
 -----
 
