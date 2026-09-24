@@ -1,7 +1,8 @@
 DenormalizerTask
 ================
 
-Denormalize data from the input and pass it to the output
+Denormalizes the input (usually an array) into an object of the configured class, using the Symfony Serializer
+`DenormalizerInterface`.
 
 Task reference
 --------------
@@ -11,19 +12,44 @@ Task reference
 Accepted inputs
 ---------------
 
-`array`
+`mixed`: any data supported by the configured denormalizers for the given `class` (typically an `array`).
 
 Possible outputs
 ----------------
 
-`object`, instance of `class`, as a product of the denormalization
+`mixed`: result of `DenormalizerInterface::denormalize()`, usually an instance of `class` (or an array of instances when
+`class` ends with `[]`).
 
 Options
 -------
 
-| Code | Type | Required | Default | Description |
-| ---- | ---- | :------: | ------- | ----------- |
-| `class` | `string` | **X** | | Destination class for denormalization |
-| `format` | `string` | | `null` | Format for denormalization ("json", "xml", ... an empty string should also work) |
-| `context` | `array` | | `[]` | Will be passed directly to the 4th parameter of the denormalize method |
+| Code      | Type           | Required | Default | Description                                                                  |
+|-----------|----------------|:--------:|---------|------------------------------------------------------------------------------|
+| `class`   | `string`       |  **X**   |         | Target type of the denormalization (FQCN, or `FQCN[]` for a list of objects) |
+| `format`  | `string\|null` |          | `null`  | Format passed to the denormalizer (`json`, `xml`, ...)                       |
+| `context` | `array`        |          | `[]`    | Denormalization context, passed as 4th argument of `denormalize()`           |
 
+Examples
+--------
+
+* Denormalize an array into an entity
+
+```yaml
+# Task configuration level
+denormalize:
+  service: '@CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask'
+  options:
+    class: App\Entity\Author
+  outputs: [save]
+```
+
+* Denormalize a decoded JSON list into an array of DTOs
+
+```yaml
+# Task configuration level
+dto:
+  service: '@CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask'
+  options:
+    class: 'App\Dto\Commune[]'
+  outputs: [debug]
+```

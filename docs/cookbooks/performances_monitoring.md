@@ -1,7 +1,8 @@
 Performances Monitoring
 =======================
 
-For heavy work there is multiple solutions to improve speed (_TODO add link to multithreading cookbook_) and memory consumption.
+For heavy work there are multiple solutions to improve speed (see [parallelization](../04-advanced_workflow.md#parallelization))
+and memory consumption (see [memory usage analysis](memory_usage_graph.md)).
 
 While developing custom tasks you might want to see how well your PHP code behaves, and one solution is to use [Blackfire](https://blackfire.io)
 to analyse call graphs with timings & memory analysis.
@@ -46,4 +47,25 @@ CPU Time        n/a
 Memory       5.35MB
 Network         n/a     n/a     n/a
 SQL             n/a     n/a
-``` 
+```
+
+## Built-in timing information
+
+Before profiling, the process logs already give some timing information:
+- on success, the process manager logs `Process <process_code> succeed` (level `info`, channel `cleverage_process`)
+  with the total `duration` of the process, in seconds, in the record context
+- at `debug` level, the same channel logs each task execution (`Processing task <task_code>`, `Proceeding task ...`,
+  `Flushing task ...`): with a formatter displaying milliseconds, it shows where the time is spent. With the Monolog
+  console handler of the Symfony recipe, `-vvv` displays debug records in the console:
+
+```bash
+$ ./bin/console cleverage:process:execute app.file_import -vvv
+```
+
+For a precise analysis of a heavy task (e.g. a CSV reader or writer, or a custom task doing database or API calls),
+profile the process with Blackfire as shown above, preferably with a production-like data set and in the `prod`
+environment:
+
+```bash
+$ blackfire run php bin/console --env=prod cleverage:process:execute app.file_import
+```

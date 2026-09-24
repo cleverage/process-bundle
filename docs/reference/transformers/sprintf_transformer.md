@@ -1,12 +1,10 @@
 SprintfTransformer
-=========================
+==================
 
-Return a formatted string.
+Return a formatted string, using PHP's [vsprintf](https://www.php.net/manual/en/function.vsprintf.php) function.
 
-This transformer uses the php internal function: https://www.php.net/manual/en/function.vsprintf.php
-
-Task reference
---------------
+Transformer reference
+---------------------
 
 * **Service**: `CleverAge\ProcessBundle\Transformer\String\SprintfTransformer`
 * **Transformer code**: `sprintf`
@@ -14,7 +12,8 @@ Task reference
 Accepted inputs
 ---------------
 
-Any value that can be cast to `string` | `int` | `float` or `array`
+* `array`: each element is used as an argument of the format, in order
+* any other value (scalar, `null`, `\Stringable`): used as the single argument of the format
 
 Possible outputs
 ----------------
@@ -24,20 +23,36 @@ Possible outputs
 Options
 -------
 
-| Code     | Type     | Required | Default | Description                                                                                                          |
-|----------|----------|:--------:|---------|----------------------------------------------------------------------------------------------------------------------|
-| `format` | `string` |  **X**   | `%s`    | The format string is composed of zero or more directives. Escape % with another %% due to ParameterBag restrictions. |
+| Code     | Type     | Required | Default | Description                                                                                          |
+|----------|----------|:--------:|---------|------------------------------------------------------------------------------------------------------|
+| `format` | `string` |          | `'%s'`  | The [format string](https://www.php.net/manual/en/function.sprintf.php); see [Notes](#notes) for `%` |
 
 Examples
 --------
 
+* `'bar'` becomes `'foo bar'`
+
+```yaml
+# Transformer options level
+sprintf:
+  format: 'foo %%s'
+```
+
+* Format one value
+
 ```yaml
 # Transformer mapping level
 sprintf_one:
-  code: '[firstname]'
+  code: '[id]'
   transformers:
     sprintf:
       format: 'one/%%d'
+```
+
+* Format several values
+
+```yaml
+# Transformer mapping level
 sprintf_multiple:
   code:
     - '[firstname]'
@@ -46,3 +61,9 @@ sprintf_multiple:
     sprintf:
       format: 'multiple/%%s/%%s'
 ```
+
+Notes
+-----
+
+In Symfony YAML configuration files, `%` is used for container parameters: escape it as `%%` (`'%%s'` is resolved as
+`'%s'`). A format with more placeholders than arguments throws a `\ValueError`.

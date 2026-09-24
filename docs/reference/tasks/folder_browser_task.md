@@ -1,7 +1,8 @@
 FolderBrowserTask
-=============
+=================
 
-Reads a folder and iterate on each file, returning absolute path as string.
+Browses a folder, whose path is set in the options, recursively and iterates over each file found (sorted by name),
+outputting its path.
 
 Task reference
 --------------
@@ -17,27 +18,39 @@ Input is ignored
 Possible outputs
 ----------------
 
-`string`: absolute path of the file.
-Underlying method is [Symfony Finder component](https://symfony.com/doc/current/components/finder.html).
+`string`: path of the file (`folder_path` followed by the path of the file relative to it).
+Underlying component is [Symfony Finder](https://symfony.com/doc/current/components/finder.html).
+
+If no file is found, a message is logged with the `empty_log_level` level, the task is skipped and the folder path is
+set as error output.
 
 Options
 -------
 
-| Code              | Type                        | Required  | Default                   | Description                                                                            |
-|-------------------|-----------------------------|:---------:|---------------------------|----------------------------------------------------------------------------------------|
-| `folder_path`     | `string`                    |   **X**   |                           | Path of the directory to read from                                                     |
-| `name_pattern`    | `null`, `string` or `array` |           | null                      | Restrict files using a pattern (a regexp, a glob, or a string) or an array of patterns |
-| `empty_log_level` | `string`                    |           | Psr\Log\LogLevel::WARNING | From Psr\Log\LogLevel constants                                                        |
+| Code              | Type                  | Required | Default   | Description                                                                                                    |
+|-------------------|-----------------------|:--------:|-----------|----------------------------------------------------------------------------------------------------------------|
+| `folder_path`     | `string`              |  **X**   |           | Path of the folder to browse. Must be an existing readable directory (checked at initialization)               |
+| `name_pattern`    | `string\|array\|null` |          | `null`    | Restrict files by name using a pattern (glob, regexp or string) or an array of patterns (see `Finder::name()`) |
+| `empty_log_level` | `string`              |          | `warning` | Log level used when no file is found, one of the `Psr\Log\LogLevel` constants                                  |
 
-Example
--------
+Examples
+--------
+
+* Browse all CSV files of a folder
 
 ```yaml
 # Task configuration level
-code:
+entry:
   service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
   options:
     folder_path: '%kernel.project_dir%/var/data'
+    name_pattern: '*.csv'
+    empty_log_level: info
+  outputs: [read]
 ```
 
+Notes
+-----
 
+* `current_file_path` is added to the error context of the process.
+* See also [InputFolderBrowserTask](input_folder_browser_task.md) to browse a folder path given as input.

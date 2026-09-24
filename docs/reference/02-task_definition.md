@@ -11,30 +11,35 @@ YAML Configuration
     help: <multiline string>
     options: <task options>
     outputs: <list of following task codes>
-    errors: <list of following task codes>
+    error_outputs: <list of following task codes>
+    errors: <list of following task codes> # Deprecated, use error_outputs
     error_strategy: <skip|stop>
-    log_errors: <true|false> # Deprecated
     log_level: <emergency|alert|critical|error|warning|notice|info|debug>
 ```
 
-Process attributes
-------------------
+Task attributes
+---------------
 
-**service**: reference service used for the task, must implement `CleverAge\ProcessBundle\Model\TaskInterface`
+**service**: required, reference to the service used for the task, with or without a leading `@`. The service must be
+public and implement `CleverAge\ProcessBundle\Model\TaskInterface`.
 
-**description**: optional string to describe a task, displayed in process help (should not exceed one line)
+**description**: optional string to describe a task, displayed in process help (should not exceed one line).
 
-**help**: optional string to describe in depth a task, displayed in verbose process help (can be multiline)
+**help**: optional string to describe in depth a task (can be multiline).
 
-**options**: optional list of parameters to pass to a task
+**options**: optional list of parameters to pass to the task. String values can contain `{{ key }}` placeholders that
+are replaced by the process [contextual values](../01-quick_start.md#contextual-values).
 
-**outputs**: optional list of following tasks, it can be a simple string
+**outputs**: optional list of following tasks, receiving the output of this task. It can be a simple string.
 
-**errors**: optional list of following tasks, in case of error, it can be a simple string
+**error_outputs**: optional list of following tasks, receiving the error output of this task (by default its input when
+an error occurs). It can be a simple string. See [errors and skips](../04-advanced_workflow.md#errors-and-skips).
 
-**error_strategy**: either *skip* (default) or *stop*, defines if a task can be continued or not
+**errors**: deprecated alias of `error_outputs`. Defining both on the same task throws an exception.
 
-**log_errors**: DEPRECATED: use log_level instead. Optional boolean (defaults to true), to allow logging thrown errors
+**error_strategy**: optional, either *skip* or *stop*. Defines if the process continues with the next input or stops
+when the task fails. When not defined, the global `default_error_strategy` is used (*stop* by default).
 
-**log_level**: rfc5424 severity (emergency, alert, critical, error, warning, notice, info, debug) for error logged when
-an exception is thrown by a task. Default 'critical'. Case-independant.
+**log_level**: optional [RFC 5424](https://datatracker.ietf.org/doc/html/rfc5424) severity (emergency, alert, critical,
+error, warning, notice, info, debug) of the log record written on the `cleverage_process_task` channel when the task
+fails. Default is *critical*.

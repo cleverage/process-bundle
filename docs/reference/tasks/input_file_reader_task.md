@@ -1,7 +1,8 @@
 InputFileReaderTask
-=============
+===================
 
-Reads a file and return raw content as a string
+Reads the whole content of a file, whose path is given as input, and outputs it as a string.
+Same behaviour as [FileReaderTask](file_reader_task.md), except for the file path.
 
 Task reference
 --------------
@@ -11,7 +12,8 @@ Task reference
 Accepted inputs
 ---------------
 
-`string`: file path
+`string`: path of the file to read. An `\UnexpectedValueException` is thrown if the file does not exist or is not
+readable.
 
 Possible outputs
 ----------------
@@ -22,10 +24,12 @@ Underlying method is [file_get_contents](https://www.php.net/manual/en/function.
 Options
 -------
 
-None
+This task has no option.
 
-Example
--------
+Examples
+--------
+
+* Read every file of a folder
 
 ```yaml
 # Task configuration level
@@ -33,9 +37,8 @@ entry:
   service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
   options:
     folder_path: '%kernel.project_dir%/var/data'
-  outputs: read
+  outputs: [read]
 read:
   service: '@CleverAge\ProcessBundle\Task\File\InputFileReaderTask'
+  outputs: [debug]
 ```
-
-

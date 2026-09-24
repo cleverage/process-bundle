@@ -1,43 +1,47 @@
 TaskName
 ========
 
-_Describe main goal an use cases of the task_
+_Describe the main goal and use cases of the task._
 
 Task reference
 --------------
 
-* **Service**: `ClassName`
+* **Service**: `Fully\Qualified\ClassName`
+* **Iterable task** _(only if it implements `IterableTaskInterface`)_
+* **Blocking task** _(only if it implements `BlockingTaskInterface`)_
+* **Flushable task** _(only if it implements `FlushableTaskInterface`)_
 
 Accepted inputs
 ---------------
 
-_Description of allowed types_
+_Description of allowed types, or "Input is ignored"._
 
 Possible outputs
 ----------------
 
-_Description of possible types_
+_Description of possible types._
 
 Options
 -------
-| Code   | Type   | Required           | Default                        | Description   |
-|--------|--------|--------------------|--------------------------------|---------------|
-| `code` | `type` | **X** _or nothing_ | `default value` _if available_ | _description_ |
+
+| Code   | Type   | Required | Default         | Description   |
+|--------|--------|:--------:|-----------------|---------------|
+| `code` | `type` |  **X**   | `default value` | _description_ |
+
+_If the task has no option, replace the table with "This task has no option."._
 
 Examples
 --------
 
-_YAML samples and explanations_ 
-
 * Example 1
   - details
-  - details
-  
+
 ```yaml
 # Task configuration level
 code:
-    service: '@service_ref'
-    options: 
-        a: 1
-        b: 2
+  service: '@Fully\Qualified\ClassName'
+  options:
+    a: 1
+    b: 2
+  outputs: [next_task]
 ```

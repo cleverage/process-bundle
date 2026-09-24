@@ -1,12 +1,15 @@
 SlugifyTransformer
-=========================
+==================
 
-Strip whitespace (or other characters) from the beginning and end of a string
+Convert a string into a slug. The value is transliterated with a
+[\Transliterator](https://www.php.net/manual/en/class.transliterator.php) (by default, accents are removed), HTML
+tags are stripped, the result is trimmed and lowercased, every sequence of characters matching `replace` is replaced by
+`separator`, and leading and trailing separators are removed.
 
-This transformer uses the php internal function: https://www.php.net/manual/en/class.transliterator.php
+Requires the `intl` PHP extension.
 
-Task reference
---------------
+Transformer reference
+---------------------
 
 * **Service**: `CleverAge\ProcessBundle\Transformer\String\SlugifyTransformer`
 * **Transformer code**: `slugify`
@@ -14,7 +17,7 @@ Task reference
 Accepted inputs
 ---------------
 
-Any value that can be cast to string.
+`string`
 
 Possible outputs
 ----------------
@@ -24,20 +27,27 @@ Possible outputs
 Options
 -------
 
-| Code             | Type     | Required  | Default                                | Description                    |
-|------------------|----------|:---------:|----------------------------------------|--------------------------------|
-| `transliterator` | `string` |           | `NFD; [:Nonspacing Mark:] Remove; NFC` | Used to create \Transliterator |
-| `replace`        | `string` |           | `/[^a-z0-9]+/`                         | Used on preg_replace           |
-| `separator`      | `string` |           | `_`                                    | Used on preg_replace           |
+| Code             | Type     | Required | Default                                  | Description                                                                             |
+|------------------|----------|:--------:|------------------------------------------|-----------------------------------------------------------------------------------------|
+| `transliterator` | `string` |          | `'NFD; [:Nonspacing Mark:] Remove; NFC'` | Transliterator identifier, passed to `\Transliterator::create()`                        |
+| `replace`        | `string` |          | `'/[^a-z0-9]+/'`                         | Regular expression of the characters to replace (applied on the lowercased string)      |
+| `separator`      | `string` |          | `'_'`                                    | Replacement string, also trimmed from both ends of the result                           |
 
 Examples
 --------
 
+* `'Hélène Dupont'` becomes `'helene_dupont'`
+
 ```yaml
-# Transformer mapping level
-slug:
-  code:
-    - '[firstname]'
-  transformers:
-    slugify: ~
+# Transformer options level
+slugify: ~
+```
+
+* Use a dash as separator, and also transliterate non-latin characters: `'Привет мир'` becomes `'privet-mir'`
+
+```yaml
+# Transformer options level
+slugify:
+  transliterator: 'Any-Latin; Latin-ASCII'
+  separator: '-'
 ```

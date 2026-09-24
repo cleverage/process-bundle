@@ -1,7 +1,8 @@
 ConstantOutputTask
 ==================
 
-Simply outputs the same configured value all the time, ignores any input
+Always outputs the same configured value, regardless of the input. Commonly used as an entry point to feed a
+process with static data.
 
 Task reference
 --------------
@@ -16,25 +17,28 @@ Input is ignored
 Possible outputs
 ----------------
 
-`any`: directly output given `output` option
+`any`: the value of the `output` option, as is
 
 Options
 -------
 
 | Code     | Type  | Required | Default | Description     |
-|----------|-------|:---------|---------|-----------------|
-| `output` | `any` | **X**    |         | Value to output |
+|----------|-------|:--------:|---------|-----------------|
+| `output` | `any` |  **X**   |         | Value to output |
 
-Example
--------
+Examples
+--------
+
+* Output a static array, then dump it
 
 ```yaml
 # Task configuration level
-code:
+entry:
   service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
   options:
     output:
       id: 123
       firstname: Test1
       lastname: Test2
+  outputs: [debug]
 ```

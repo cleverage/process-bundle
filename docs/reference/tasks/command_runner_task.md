@@ -1,0 +1,57 @@
+CommandRunnerTask
+=================
+
+Runs a system command (with the Symfony Process component) for each input. The input is passed to the command as
+stdin, and the command standard output becomes the task output.
+
+Task reference
+--------------
+
+* **Service**: `CleverAge\ProcessBundle\Task\Process\CommandRunnerTask`
+
+Accepted inputs
+---------------
+
+`string|int|float|bool|resource|\Traversable|null`: passed as stdin to the command (see `Process::setInput()`).
+
+Possible outputs
+----------------
+
+`string`: the standard output of the command.
+
+The command is run with `Process::mustRun()`: a non-zero exit code or a timeout throws an exception, handled
+according to the task `error_strategy`.
+
+Options
+-------
+
+| Code          | Type               | Required | Default                   | Description                                                                    |
+|---------------|--------------------|:--------:|---------------------------|--------------------------------------------------------------------------------|
+| `commandline` | `string\|array`    |  **X**   |                           | Command to run, as an array of arguments (recommended) or a string             |
+| `cwd`         | `string\|null`     |          | Symfony project directory | Working directory of the command                                               |
+| `env`         | `array\|null`      |          | `null`                    | Environment variables of the command (`null` inherits the current environment) |
+| `timeout`     | `int\|float\|null` |          | `60`                      | Timeout in seconds (`null` disables it)                                        |
+| `options`     | `mixed`            |          | `null`                    | Unused by the task itself, see Notes                                           |
+
+Examples
+--------
+
+* Count the lines of the input
+
+```yaml
+# Task configuration level
+count_lines:
+  service: '@CleverAge\ProcessBundle\Task\Process\CommandRunnerTask'
+  options:
+    commandline: ['wc', '-l']
+    timeout: 30
+  outputs: [next_task]
+```
+
+Notes
+-----
+
+The task calls `Process::setOptions()` with **all** its resolved options (`commandline`, `cwd`, `env`, `timeout` and
+`options`). Recent versions of `symfony/process` only accept `blocking_pipes`, `create_process_group` and
+`create_new_console` there and throw a `LogicException` for any other key, which makes the task fail before the
+command is started.

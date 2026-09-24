@@ -1,20 +1,16 @@
 RulesTransformer
 ================
 
-Uses a set of rules to apply some set of transformers on a value. Basically behaves like a `if/elseif/else` block.
+Use an ordered set of rules to conditionally transform a value. Behaves like an `if / elseif / else` block: the first
+rule whose condition matches is applied, and the input is returned unchanged if no rule matches.
 
-By default a rule uses a variable named `value` containing anything you passed in input (`array`, `string`, ...). But this 
-can be overridden using options `use_value_as_variables` as `true` and setting `expression_variables` to a static list of
-input variables.
+Conditions are [ExpressionLanguage](https://symfony.com/doc/current/components/expression_language.html) expressions.
+By default, the input is available as the `value` variable. With `use_value_as_variables: true`, the input (which
+must then be an array) is used as the set of variables; `expression_variables` must then list these variable names.
+`expression_variables` can also be set to `null` to disable parsing at initialization (more flexible, but slower).
 
-Note that `expression_variables` can also be set to `null` for more flexibility, but this disable initial parsing and decrease
-performances.
-
-See [The ExpressionLanguage Component Reference](https://symfony.com/doc/current/components/expression_language.html) for
-more information.
-
-Task reference
---------------
+Transformer reference
+---------------------
 
 * **Service**: `CleverAge\ProcessBundle\Transformer\RulesTransformer`
 * **Transformer code**: `rules`
@@ -22,59 +18,55 @@ Task reference
 Accepted inputs
 ---------------
 
-`any` or an `array` of `variable code => value` injectable into an expression
+`any`, or an `array` of `variable name => value` when `use_value_as_variables` is `true`.
 
 Possible outputs
 ----------------
 
-`any` resulting from a transformation set.
-
-Without any matching rules, the value itself is returned. 
+`any`: the result of the matching rule (`null`, a constant, or the result of its transformers), or the input itself
+if no rule matches.
 
 Options
 -------
 
-| Code                     | Type              | Required | Default   | Description                                                         |
-|--------------------------|-------------------|:--------:|-----------|---------------------------------------------------------------------|
-| `rules_set`              | `array`           |  **X**   |           | Ordered list of rules, see bellow for details                       |
-| `use_value_as_variables` | `bool`            |          | `false`   | Use given value as an array of variable to inject in expression     |
-| `expression_variables`   | `array` or `null` |          | `[value]` | Name of variables injected in the expression at initialization time |
+| Code                     | Type          | Required | Default   | Description                                                                                            |
+|--------------------------|---------------|:--------:|-----------|--------------------------------------------------------------------------------------------------------|
+| `rules_set`              | `array`       |  **X**   |           | Ordered list of rules, see below                                                                       |
+| `use_value_as_variables` | `bool`        |          | `false`   | Use the input array as the expression variables, instead of a single `value` variable                  |
+| `expression_variables`   | `array\|null` |          | `[value]` | Variable names used to parse conditions when options are resolved. `null` defers parsing to evaluation |
 
-Foreach rule there is the following options.
+Each rule of `rules_set` has the following options:
 
-| Code           | Type               | Required  | Default | Description                                                                                                                                  |
-|----------------|--------------------|:---------:|---------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| `condition`    | `string` or `null` |           | `null`  | An expression used to match a value                                                                                                          |
-| `default`      | `bool`             |           | `false` | Mark this rule as a default rule. The given rule must be the last, cannot have a condition, and there cannot have 2 default in the same time |
-| `transformers` | `array`            |           | `[]`    | List of sub-transformers, see [TransformerTrait](../traits/transformer_trait.md)                                                             |
-| `constant`     | `any`              |           | `null`  | If not `null`, given value will be directly output (takes precedence on `transformers`)                                                      |
-| `set_null`     | `bool`             |           | `false` | If `true`, `null` will be directly output (takes precedence on `constant`)                                                                   |
+| Code           | Type           | Required | Default | Description                                                                                                                           |
+|----------------|----------------|:--------:|---------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `condition`    | `string\|null` |          | `null`  | Expression; the rule matches if it is truthy                                                                                          |
+| `default`      | `bool`         |          | `false` | Mark the rule as the default one (always matches). It cannot have a `condition`, no conditional rule may follow it, only one allowed  |
+| `set_null`     | `bool`         |          | `false` | If `true`, return `null` (takes precedence on `constant` and `transformers`)                                                          |
+| `constant`     | `any`          |          | `null`  | If not `null`, return this value (takes precedence on `transformers`)                                                                 |
+| `transformers` | `array`        |          | `[]`    | Transformers applied on the input, see [TransformerTrait](../traits/transformer_trait.md). With no transformer, the input is returned |
+
+A rule without `condition` and without `default: true` never matches.
 
 Examples
 --------
 
-* Simple rules with default value
-  - input value is an array containing an `order` object and a `customer` object
-  - output will be either a value from customer, or a numeric constant, or null
+* Rules on the `value` variable, with a default rule
 
 ```yaml
 # Transformer options level
 rules:
   rules_set:
-    - condition: 'value["order"].origin === "marketplace"'
+    - condition: 'value["order"]["origin"] === "marketplace"'
       transformers:
         property_accessor:
-          property_path: '[customer].id'
-    - condition: 'value["order"].origin === "e-commerce"'
-      constant: 1234
+          property_path: '[customer][id]'
+    - condition: 'value["order"]["origin"] === "e-commerce"'
+      constant: value1234
     - default: true
       set_null: true
 ```
 
-* Use value as variables
-  - same example as above
-  - can be useful for more verbose expression
-  - transformers still get the input as the initial array 
+* Same rules, using the input keys as variables (transformers still receive the whole input)
 
 ```yaml
 # Transformer options level
@@ -82,12 +74,18 @@ rules:
   use_value_as_variables: true
   expression_variables: [order, customer]
   rules_set:
-    - condition: 'order.origin === "marketplace"'
+    - condition: 'order["origin"] === "marketplace"'
       transformers:
         property_accessor:
-          property_path: '[customer].id'
-    - condition: 'order.origin === "e-commerce"'
-      constant: 1234
+          property_path: '[customer][id]'
+    - condition: 'order["origin"] === "e-commerce"'
+      constant: variable1234
     - default: true
       set_null: true
 ```
+
+Notes
+-----
+
+Conditions are parsed with the bundle's `cleverage_process.expression_language` service, which also exposes the PHP
+`preg_match` function.
