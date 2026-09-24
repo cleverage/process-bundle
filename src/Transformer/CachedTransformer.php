@@ -51,7 +51,7 @@ class CachedTransformer implements ConfigurableTransformerInterface
                  * @see https://www.php.net/manual/en/datetime.formats.relative.php
                  */
                 if (\is_string($value)) {
-                    $value = new \DateTime($value);
+                    return new \DateTime($value);
                 }
 
                 return $value;
