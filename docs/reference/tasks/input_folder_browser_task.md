@@ -17,7 +17,9 @@ Accepted inputs
 `string`: path of the folder to browse, prefixed by the `base_folder_path` option. It must be an existing readable
 directory.
 
-Receiving a different folder path before the task has been flushed throws a `\LogicException`.
+The folder path is released once its files have all been iterated, so each input (the same path again or a different
+one) is browsed from the start. Receiving a different folder path while an iteration is in progress throws a
+`\LogicException`.
 
 Possible outputs
 ----------------

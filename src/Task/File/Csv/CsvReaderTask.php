@@ -74,7 +74,14 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         $state->removeErrorContext('csv_file');
         $state->removeErrorContext('csv_line');
 
-        return !$this->csv->isEndOfFile();
+        $endOfFile = $this->csv->isEndOfFile();
+        if ($endOfFile) {
+            // Release the file to allow the following iteration to read it again
+            $this->csv->close();
+            $this->csv = null;
+        }
+
+        return !$endOfFile;
     }
 
     protected function getHeaders(ProcessState $state, array $options): ?array
