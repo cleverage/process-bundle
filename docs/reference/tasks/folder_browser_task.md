@@ -53,4 +53,6 @@ Notes
 -----
 
 * `current_file_path` is added to the error context of the process.
+* The iteration is reset once all files have been output: if the task is executed again (e.g. for a new input), the
+  folder is browsed again from the start.
 * See also [InputFolderBrowserTask](input_folder_browser_task.md) to browse a folder path given as input.

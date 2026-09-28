@@ -59,7 +59,13 @@ class LineReaderTask extends AbstractConfigurableTask implements IterableTaskInt
             throw new \LogicException('No File initialized');
         }
 
-        return !$this->file->eof();
+        $endOfFile = $this->file->eof();
+        if ($endOfFile) {
+            // Release the file to allow the following iteration to read it again
+            $this->file = null;
+        }
+
+        return !$endOfFile;
     }
 
     protected function configureOptions(OptionsResolver $resolver): void

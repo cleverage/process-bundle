@@ -51,4 +51,6 @@ trim:
 Notes
 -----
 
+* The file is released once fully read: if the task is executed again (e.g. for a new input), the file is read again
+  from its beginning.
 * See also [InputLineReaderTask](input_line_reader_task.md) to read a file path given as input.

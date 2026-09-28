@@ -14,7 +14,8 @@ Accepted inputs
 ---------------
 
 `string`: path of the file to read, prefixed by the `base_path` option if set.
-When a different path is received, the previous file is dropped and the new one is opened.
+The file is closed once fully read, so each input (the same path again or a different one) is read from its
+beginning.
 
 Possible outputs
 ----------------

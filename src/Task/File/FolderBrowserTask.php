@@ -80,7 +80,14 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
         $this->files->next();
         $state->removeErrorContext('current_file_path');
 
-        return $this->files->valid();
+        if (!$this->files->valid()) {
+            // Reset the iterator to allow the following iteration
+            $this->files = null;
+
+            return false;
+        }
+
+        return true;
     }
 
     protected function configureOptions(OptionsResolver $resolver): void

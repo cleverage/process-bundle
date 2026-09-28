@@ -14,7 +14,8 @@ Accepted inputs
 ---------------
 
 `string`: path of the file to read. An `\UnexpectedValueException` is thrown if the file does not exist or is not
-readable. When a different path is received, the previous file is dropped and the new one is opened.
+readable. The file is released once fully read, so each input (the same path again or a different one) is read from
+its beginning.
 
 Possible outputs
 ----------------
