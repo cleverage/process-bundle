@@ -66,7 +66,7 @@ class ImplodeTransformerTest extends TestCase
 
         $transformer->configureOptions($resolver);
 
-        $this->assertTrue($resolver->isRequired('separator'));
+        $this->assertFalse($resolver->isRequired('separator'));
 
         $resolvedOptions = $resolver->resolve();
         $this->assertEquals(['separator'], array_keys($resolvedOptions));

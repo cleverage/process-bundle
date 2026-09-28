@@ -79,7 +79,8 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
             return $value;
         }
         if (!$options['ignore_missing']) {
-            throw new \UnexpectedValueException("No expression accepting value '{$value}' in map");
+            $printableValue = \is_scalar($value) || $value instanceof \Stringable ? (string) $value : get_debug_type($value);
+            throw new \UnexpectedValueException("No expression accepting value '{$printableValue}' in map");
         }
 
         return null;

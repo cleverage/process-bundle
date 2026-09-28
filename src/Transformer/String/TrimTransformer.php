@@ -11,8 +11,6 @@ declare(strict_types=1);
  * file that was distributed with this source code.
  */
 
-namespace Transformer;
-
 namespace CleverAge\ProcessBundle\Transformer\String;
 
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
