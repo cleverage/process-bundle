@@ -262,6 +262,9 @@ Once everything is working fine, you may want to automate your processes. The st
 0 */2 * * * /path/to/project/bin/console cleverage:process:execute <my_process> --env=prod
 ```
 
+When a process fails, the command exits with a non-zero code, so failures can be detected by the scheduler (or by a
+CI job, a supervisor...).
+
 This bundle does not store any execution history in database. Process and task logs are sent to dedicated Monolog
 channels (`cleverage_process`, `cleverage_process_task` and `cleverage_process_transformer`, see
 [logging](03-custom_tasks.md#logging)), so you can route them to any handler. Each record is enriched with the

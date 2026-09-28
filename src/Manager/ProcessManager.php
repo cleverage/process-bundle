@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Event\ProcessEvent;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
+use CleverAge\ProcessBundle\Exception\ProcessFailedException;
 use CleverAge\ProcessBundle\Logger\ProcessLogger;
 use CleverAge\ProcessBundle\Logger\TaskLogger;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
@@ -30,7 +31,6 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -290,12 +290,7 @@ class ProcessManager
             if ($state->isStopped()) {
                 $exception = $state->getException();
                 if ($exception instanceof \Throwable) {
-                    $m = "Process {$state->getProcessConfiguration()
-                        ->getCode()} has failed";
-                    $m .= " during process {$state->getTaskConfiguration()
-                        ->getCode()}";
-                    $m .= " with message: '{$exception->getMessage()}'.\n";
-                    throw new FatalError($m, -1, ['file' => $exception->getFile(), 'line' => $exception->getLine(), 'type' => 500, 'message' => $exception->getMessage()]);
+                    throw ProcessFailedException::create($state->getProcessConfiguration()->getCode(), $state->getTaskConfiguration()->getCode(), $exception);
                 }
 
                 return;

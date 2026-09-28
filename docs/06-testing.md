@@ -102,10 +102,10 @@ public function execute(string $processCode, mixed $input = null, array $context
 
 `$input` is given to the process `entry_point`, `$context` is the same as the `--context` option of the command, and
 the returned value is the last output of the process `end_point` (`null` if there is none). If the process fails, the
-exception is rethrown; but a task error handled by the `stop` error strategy is thrown as a new
-`Symfony\Component\ErrorHandler\Error\FatalError` (an `\Error`), which only keeps the original message (the original
-exception is not attached as `previous`). Test it with `expectException(FatalError::class)` and
-`expectExceptionMessageMatches()` rather than with the original exception class.
+exception is rethrown; but a task error handled by the `stop` error strategy is thrown as a
+`CleverAge\ProcessBundle\Exception\ProcessFailedException`, the original exception being available with
+`getPrevious()`. Test it with `expectException(ProcessFailedException::class)`, and check the original exception with
+`getPrevious()` if needed.
 
 ```yaml
 # config/packages/test/clever_age_process.yaml
