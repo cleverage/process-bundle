@@ -1,3 +1,11 @@
+---
+name: Feature request / other
+about: Propose an enhancement, a refactoring or any other change
+title: ''
+labels: ''
+assignees: ''
+---
+
 ## Description
 
 <!-- Please describe the issue here -->
