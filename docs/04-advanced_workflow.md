@@ -12,7 +12,8 @@ When a process is executed (with the `cleverage:process:execute` command or with
 3. **initializes** every task, in the order they are configured: the service is fetched from the container and
    `initialize` is called on [initializable tasks](02-task_types.md#initializable-tasks) (for configurable tasks, this is
    where options are validated). An exception thrown by `initialize` is logged as critical and flags the task as
-   stopped, but does not abort the process: it only fails when this task is first executed
+   stopped, but does not abort the process: it only fails when this task is first executed. This is deprecated since v5
+   (an `E_USER_DEPRECATED` error is triggered): in v6.0, the process will fail at this step, before any task is executed
 4. gives the process input to the `entry_point` task, if one is defined (otherwise the input is ignored and a warning is
    logged)
 5. **resolves** the tasks of the main branch (see below)

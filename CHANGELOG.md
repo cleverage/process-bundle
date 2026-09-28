@@ -23,6 +23,7 @@ Latest
 
 ## Deprecated
 * [#189](https://github.com/cleverage/process-bundle/issues/189) EventDispatcherTask: when `event_name` is set, listening to `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent` is deprecated (the event is still dispatched under its class name, with an `E_USER_DEPRECATED` error, if it has listeners). Listen to the configured `event_name` instead: the BC layer will be removed in v6.0.
+* [#222](https://github.com/cleverage/process-bundle/issues/222) ProcessManager: going on with the process after an exception thrown by a task `initialize()` is deprecated (an `E_USER_DEPRECATED` error is triggered). In v6.0, the process will fail before executing any task.
 
 v5.0
 -----
