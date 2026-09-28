@@ -82,8 +82,8 @@ Sometimes, when you execute a task, you need to change how the process continues
   `error_strategy` is then applied (throwing an exception from `execute` has the same effect)
 * `ProcessState::setErrorOutput($value)`: send a value to the error branch of your workflow (the tasks listed in
   `error_outputs`)
-* `ProcessState::addErrorContextValue($key, $value)` / `removeErrorContext($key)`: add information to the log record
-  written when an error occurs
+* `ProcessState::addErrorContextValue($key, $value)` / `removeErrorContext($key)`: add information (any value) to the
+  log record written when an error occurs
 
 ## Options
 

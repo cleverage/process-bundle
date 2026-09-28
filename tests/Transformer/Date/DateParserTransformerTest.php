@@ -69,6 +69,19 @@ class DateParserTransformerTest extends TestCase
         $this->assertSame($value, $transformedValue);
     }
 
+    public function testTransformDateTimeImmutableObject(): void
+    {
+        $transformer = new DateParserTransformer();
+        $value = new \DateTimeImmutable('2023-09-28 12:34:56', new \DateTimeZone('Europe/Paris'));
+        $options = ['format' => 'Y-m-d'];
+
+        $transformedValue = $transformer->transform($value, $options);
+
+        $this->assertInstanceOf(\DateTime::class, $transformedValue);
+        $this->assertEquals($value, \DateTimeImmutable::createFromMutable($transformedValue));
+        $this->assertSame('Europe/Paris', $transformedValue->getTimezone()->getName());
+    }
+
     public function testGetCode(): void
     {
         $transformer = new DateParserTransformer();

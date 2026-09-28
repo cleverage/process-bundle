@@ -13,7 +13,6 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
-use CleverAge\ProcessBundle\Exception\TransformerException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class TypeSetterTransformer implements ConfigurableTransformerInterface
@@ -30,13 +29,9 @@ class TypeSetterTransformer implements ConfigurableTransformerInterface
 
     public function transform(mixed $value, array $options = []): mixed
     {
-        $return = settype($value, $options['type']);
+        settype($value, $options['type']);
 
-        if ($return) {
-            return $value;
-        }
-
-        throw new TransformerException("Failed to change value type in {$options['type']}");
+        return $value;
     }
 
     public function getCode(): string
