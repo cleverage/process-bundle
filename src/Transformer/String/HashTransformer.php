@@ -29,6 +29,7 @@ class HashTransformer implements ConfigurableTransformerInterface
 
         $resolver->setDefined('raw_output');
         $resolver->setDefault('raw_output', false);
+        $resolver->setAllowedTypes('raw_output', 'bool');
     }
 
     public function transform(mixed $value, array $options = []): string

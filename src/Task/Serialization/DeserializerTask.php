@@ -45,5 +45,6 @@ class DeserializerTask extends AbstractConfigurableTask
         $resolver->setDefaults([
             'context' => [],
         ]);
+        $resolver->setAllowedTypes('context', ['array']);
     }
 }
