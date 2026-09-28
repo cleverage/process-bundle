@@ -28,8 +28,9 @@ class XmlFile
     public function read(): \DOMDocument
     {
         $this->file->rewind();
-        $fileSize = $this->file->getSize();
-        if (false === $fileSize || 0 === $fileSize) {
+        // fstat() on the open handle, as getSize() may return a stale size from the stat cache
+        $fileSize = $this->file->fstat()['size'];
+        if (0 === $fileSize) {
             throw new \UnexpectedValueException(\sprintf('XML file "%s" is empty', $this->file->getPathname()));
         }
 
