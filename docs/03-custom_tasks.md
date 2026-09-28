@@ -173,7 +173,9 @@ memory footprint.
 [notice about blocking tasks](02-task_types.md#blocking-tasks) about memory usage.
 
 Tasks should not be both Iterable and Blocking. If you need to buffer data and output it by chunks, look at
-`CleverAge\ProcessBundle\Model\FlushableTaskInterface` (see [flushable tasks](02-task_types.md#flushable-tasks)).
+`CleverAge\ProcessBundle\Model\FlushableTaskInterface` (see [flushable tasks](02-task_types.md#flushable-tasks)). As
+`flush` may be called several times on the same task, it must be idempotent: once the buffer is flushed, a new call
+must skip the state (`ProcessState::setSkipped(true)`) instead of outputting the same data again.
 
 ## Transformers
 

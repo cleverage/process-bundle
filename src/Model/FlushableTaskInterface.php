@@ -15,6 +15,10 @@ namespace CleverAge\ProcessBundle\Model;
 
 /**
  * When iterations are over, this allows task that have some inner buffer to flush it to the output.
+ *
+ * flush() may be called several times on the same task during a process (once for each resolved ancestor, and each time
+ * an upstream iterable task finishes its iterations): implementations must be idempotent, and skip the state
+ * (ProcessState::setSkipped(true)) when there is nothing new to output.
  */
 interface FlushableTaskInterface extends TaskInterface
 {
