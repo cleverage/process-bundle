@@ -121,6 +121,9 @@ goes on. The failure only surfaces when the task is first reached: for [configur
 the options are resolved again and the process fails at that point (upstream tasks may already have run); for other
 tasks, the branch stops after this first execution. If the task is never reached, the process ends normally.
 
+This behaviour is deprecated since v5 (an `E_USER_DEPRECATED` error is triggered for each initialization failure): in
+v6.0, an initialization failure will make the process fail before any task is executed.
+
 ## Configurable tasks and options
 
 Most tasks aim to have a generic behavior. This provides reusability, but each usage needs a slightly different

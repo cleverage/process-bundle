@@ -255,6 +255,16 @@ class ProcessManager
                 ];
                 $this->taskLogger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
+                // @deprecated since v5, in v6.0 the process will fail right away, before any task is executed
+                @trigger_error(
+                    \sprintf(
+                        'The initialization of the task "%s" of the process "%s" has failed with message "%s". Going on with the process after an initialization failure is deprecated since v5: in v6.0, the process will fail before executing any task.',
+                        $taskConfiguration->getCode(),
+                        $state->getProcessConfiguration()->getCode(),
+                        $e->getMessage(),
+                    ),
+                    \E_USER_DEPRECATED
+                );
             }
         }
         $this->handleState($taskConfiguration->getState());
