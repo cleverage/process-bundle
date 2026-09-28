@@ -24,10 +24,10 @@ Possible outputs
 Options
 -------
 
-| Code         | Type           | Required | Default | Description                                                                |
-|--------------|----------------|:--------:|---------|----------------------------------------------------------------------------|
+| Code         | Type           | Required | Default | Description                                                                  |
+|--------------|----------------|:--------:|---------|------------------------------------------------------------------------------|
 | `event_name` | `string\|null` |          | `null`  | Name of the dispatched event, `null` to use the event class name (see Notes) |
-| `passive`    | `bool`         |          | `true`  | If `true`, the input is passed to the output before dispatch               |
+| `passive`    | `bool`         |          | `true`  | If `true`, the input is passed to the output before dispatch                 |
 
 Examples
 --------
@@ -65,3 +65,9 @@ public function onDataQueue(EventDispatcherTaskEvent $event): void
 * when `event_name` is `null`, the event name is the event class name, so listeners must subscribe to
   `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`. Every `EventDispatcherTask` without `event_name` then
   triggers the same listeners.
+
+**Deprecated since v5, removed in v6.0**: from v4.0 to v5.0, the `event_name` option was ignored and the event was
+always dispatched under its class name. To preserve backward compatibility, when `event_name` is set (and differs from the
+event class name) and listeners subscribe to `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`, the event is also
+dispatched under its class name and an `E_USER_DEPRECATED` error is triggered. In v6.0, listen to the configured
+`event_name` instead, or remove the `event_name` option.
