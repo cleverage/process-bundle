@@ -17,6 +17,7 @@ use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Event\ProcessEvent;
+use CleverAge\ProcessBundle\Exception\ProcessFailedException;
 use CleverAge\ProcessBundle\Logger\AbstractLogger;
 use CleverAge\ProcessBundle\Logger\ProcessLogger;
 use CleverAge\ProcessBundle\Logger\TaskLogger;
@@ -40,6 +41,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[\PHPUnit\Framework\Attributes\UsesClass(TaskConfiguration::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ContextualOptionResolver::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessEvent::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(ProcessFailedException::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(AbstractLogger::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessHistory::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
@@ -62,7 +64,7 @@ class ProcessManagerInitializationTest extends TestCase
         } catch (\Throwable $exception) {
         }
 
-        self::assertNotNull($exception, 'The process should fail when reaching the badly initialized task');
+        self::assertInstanceOf(ProcessFailedException::class, $exception, 'The process should fail when reaching the badly initialized task');
         self::assertStringContainsString('Invalid configuration', $exception->getMessage());
         self::assertSame(['entry', 'bad'], $this->executedTasks);
         self::assertSame([$this->getExpectedDeprecation()], $this->deprecations);
