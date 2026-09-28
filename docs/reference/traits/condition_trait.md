@@ -38,7 +38,9 @@ An invalid regular expression makes both `match_regexp` and `not_match_regexp` f
 * Call `ConditionTrait::checkCondition` with the input and the resolved conditions; it returns `true` if all
   conditions match
 
-The input must be an `array` or an `object` as soon as a condition is defined (a scalar input raises a `TypeError`).
+The input can be of any type: on a scalar input (e.g. the items of a list of strings in
+[ArrayFilterTransformer](../transformers/array_filter_transformer.md)), use the empty path `''` to test the whole value;
+any other path gives `null`, like a missing key.
 
 ## Examples
 

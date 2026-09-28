@@ -39,4 +39,6 @@ type_setter:
 Notes
 -----
 
-A `TransformerException` is thrown if `settype()` returns `false`.
+An unsupported `type` raises an `InvalidOptionsException` when the options are resolved. Conversion errors follow
+`settype()` semantics (e.g. converting an object to `int` emits a warning, converting an array to `string` gives
+`'Array'` with a warning).

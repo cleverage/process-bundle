@@ -102,5 +102,5 @@ Notes
 -----
 
 * Contextual options are transformer options, unrelated to the process context (`-c key:value`).
-* An option declared with `required: false` and no default is neither required nor defined, so it cannot be used:
-  always give such an option a `default` or `default_is_null: true`.
+* An option declared with `required: false` and no default may be omitted: its placeholders are then replaced by
+  `null`.

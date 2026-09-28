@@ -90,7 +90,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
             'batch_count' => 10,
         ]);
 
-        $resolver->setAllowedTypes('batch_count', 'integer');
+        $resolver->setAllowedTypes('batch_count', ['integer', 'null']);
     }
 
     /**

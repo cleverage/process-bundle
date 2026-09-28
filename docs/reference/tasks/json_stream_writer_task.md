@@ -26,7 +26,7 @@ Options
 
 | Code                    | Type          | Required | Default | Description                                                                                                                                                                                                                            |
 |-------------------------|---------------|:--------:|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `file_path`             | `string`      |  **X**   |         | Path of the file to write to, opened in `wb` mode (overwritten).<br/>Placeholders `{date}`, `{date_time}`, `{timestamp}` and `{unique_token}` are replaced in the path                                                                 |
+| `file_path`             | `string`      |  **X**   |         | Path of the file to write to, opened in `wb` mode (overwritten); missing parent directories are created.<br/>Placeholders `{date}`, `{date_time}`, `{timestamp}` and `{unique_token}` are replaced in the path |
 | `spl_file_object_flags` | `array\|null` |          | `null`  | List of `SplFileObject` flags, summed and passed to [SplFileObject::setFlags](https://www.php.net/manual/en/splfileobject.setflags.php).<br/>`null` means `DROP_NEW_LINE`, `READ_AHEAD` and `SKIP_EMPTY`; an empty array means no flag |
 | `json_flags`            | `array\|null` |          | `null`  | List of JSON flags, summed and passed to [json_encode](https://www.php.net/manual/en/function.json-encode.php).<br/>`null` means `JSON_THROW_ON_ERROR`; an empty array means no flag                                                   |
 
@@ -59,6 +59,6 @@ Notes
 
 * `{date}` is replaced by `Ymd`, `{date_time}` by `Ymd_His`, `{timestamp}` by the Unix timestamp and `{unique_token}`
   by a `uniqid()` value.
-* The parent directory of the file must exist.
+* The parent directory of the file is created (recursively) if it does not exist.
 * Using `JSON_PRETTY_PRINT` produces multi-line documents: the file can no longer be read by
   [JsonStreamReaderTask](json_stream_reader_task.md).
