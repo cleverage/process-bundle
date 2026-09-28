@@ -22,9 +22,7 @@ Possible outputs
 The input, with the configured values set.
 
 If a value cannot be set, the exception is set on the state (with `property` and `value` added to the error context)
-and handled according to the task `error_strategy`; the remaining values are not set. Note that only `string`, `int`
-and `array` values can be added to the error context: for other value types (`bool`, `float`, `null`, objects), a
-`\TypeError` is raised instead of the original exception (it is still handled according to `error_strategy`).
+and handled according to the task `error_strategy`; the remaining values are not set.
 
 Options
 -------

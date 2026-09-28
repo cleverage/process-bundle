@@ -13,6 +13,7 @@ Latest
 * [#199](https://github.com/cleverage/process-bundle/issues/199) Fix PregFilterTransformer: an array `replacement` is no longer cast to the string `"Array"`, and requires an array `pattern`. Update documentation, add tests.
 * [#200](https://github.com/cleverage/process-bundle/issues/200) Fix GenericTransformer: a contextual option declared with `required: false` and no default can now be used; its placeholders are replaced by `null` when omitted. Update documentation, add tests.
 * [#202](https://github.com/cleverage/process-bundle/issues/202) Fix XmlReaderTask: throw an explicit `\UnexpectedValueException` on an empty file or invalid XML (with the libxml error messages) instead of a `ValueError` or a silent empty `\DOMDocument`. Update documentation, add tests.
+* [#203](https://github.com/cleverage/process-bundle/issues/203) Fix `ProcessState::addErrorContextValue()`: accept any value type, so that iterable tasks on an empty iterable are skipped and PropertySetterTask reports the original exception instead of a `TypeError`. Update documentation, add tests.
 
 ## Deprecated
 * [#189](https://github.com/cleverage/process-bundle/issues/189) EventDispatcherTask: when `event_name` is set, listening to `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent` is deprecated (the event is still dispatched under its class name, with an `E_USER_DEPRECATED` error, if it has listeners). Listen to the configured `event_name` instead: the BC layer will be removed in v6.0.
