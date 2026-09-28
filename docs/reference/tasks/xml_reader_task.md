@@ -43,6 +43,7 @@ read_xml:
 Notes
 -----
 
-* The result of `loadXML()` is not checked: an invalid XML content raises libxml warnings (which may be converted to
-  exceptions by the Symfony error handler) and produces an empty or partial document.
-* An empty file raises a `\ValueError` (the file content is read with `fread()` using the file size as length).
+* An empty file throws an `\UnexpectedValueException`.
+* An invalid XML content (not well-formed, undefined namespace prefix...) throws an `\UnexpectedValueException` whose
+  message contains the libxml error(s) with their line and column. libxml warnings are tolerated. The libxml internal
+  errors setting is restored after loading.
