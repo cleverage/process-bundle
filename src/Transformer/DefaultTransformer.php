@@ -16,7 +16,7 @@ namespace CleverAge\ProcessBundle\Transformer;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * @todo vclavreul comment this class
+ * Return a default value when the input is falsy, otherwise return the input unchanged.
  */
 class DefaultTransformer implements ConfigurableTransformerInterface
 {

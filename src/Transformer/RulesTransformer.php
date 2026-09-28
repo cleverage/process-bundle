@@ -76,7 +76,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
             foreach ($rules as $rule) {
                 if ($rule['default']) {
                     if ($hasFoundDefault) {
-                        throw new \InvalidArgumentException('Rules set cannot have more than 2 default rules');
+                        throw new \InvalidArgumentException('Rules set cannot have more than one default rule');
                     }
                     $hasFoundDefault = true;
                 }

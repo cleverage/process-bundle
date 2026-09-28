@@ -23,7 +23,6 @@ class ImplodeTransformer implements ConfigurableTransformerInterface
 {
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired('separator');
         $resolver->setDefault('separator', '|');
         $resolver->setAllowedTypes('separator', 'string');
     }

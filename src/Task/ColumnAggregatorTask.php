@@ -22,7 +22,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * @todo   @vclavreul describe this task
+ * For each configured column, collect the input rows that contain this column (and match the optional condition), and
+ * output all the groups once all previous tasks are resolved.
  */
 class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {

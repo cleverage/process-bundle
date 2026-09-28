@@ -17,8 +17,7 @@ use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Transformer aiming to take a date as an input (object or string) and format it according to options.
- * In input it takes any value understood by \DateTime.
+ * Transformer aiming to take a date object (\DateTimeInterface) as an input and format it according to options.
  *
  * @example in YML config
  * transformers:

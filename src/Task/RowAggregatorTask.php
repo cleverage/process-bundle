@@ -21,10 +21,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Wait for defined inputs before passing an aggregated output.
- * Should have been a BlockingTask, but due to limitations in the current model, it's a hack using skips and finalize.
- *
- * @see README.md:Known issues
+ * Group input rows sharing the same value for the "aggregate_by" column. Each group is made of the first received row
+ * (without the "aggregate_columns"), plus a sub-array under "aggregation_key" listing the "aggregate_columns" values of
+ * every row of the group. The groups are output once all previous tasks are resolved.
  */
 class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {

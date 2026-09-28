@@ -23,7 +23,8 @@ use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Execute one or many processes while chaining inputs in a iterable way.
+ * Execute a process for each input: the input is passed to the process entry point, and the output of its end point
+ * becomes the task output.
  */
 class ProcessExecutorTask extends AbstractConfigurableTask
 {

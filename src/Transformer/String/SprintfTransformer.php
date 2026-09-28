@@ -40,7 +40,6 @@ class SprintfTransformer implements ConfigurableTransformerInterface
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired('format');
         $resolver->setDefault('format', '%s');
         $resolver->setAllowedTypes('format', 'string');
     }

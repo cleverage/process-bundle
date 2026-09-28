@@ -20,7 +20,8 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
- * Read a property from the input value and return it.
+ * Read an iterable from the input, then set one or more properties on each of its items, using values read from the
+ * input itself.
  */
 class RecursivePropertySetterTransformer implements ConfigurableTransformerInterface
 {
@@ -44,26 +45,26 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
             throw new TransformerException($options['iterator']);
         }
 
-        $protertiesToSet = [];
+        $propertiesToSet = [];
         foreach ($options['set_properties'] as $propertyName => $propertyValuePath) {
-            $protertiesValue = null;
+            $propertyValue = null;
             if (!$options['ignore_missing'] || $this->accessor->isReadable($value, $propertyValuePath)) {
-                $protertiesValue = $this->accessor->getValue($value, $propertyValuePath);
-                if (null === $protertiesValue && !$options['ignore_null']) {
+                $propertyValue = $this->accessor->getValue($value, $propertyValuePath);
+                if (null === $propertyValue && !$options['ignore_null']) {
                     throw new TransformerException($propertyValuePath);
                 }
             }
-            $protertiesToSet[$propertyName] = $protertiesValue;
+            $propertiesToSet[$propertyName] = $propertyValue;
         }
 
         foreach ($iterable as &$item) {
-            foreach ($protertiesToSet as $protertyName => $propertyValue) {
+            foreach ($propertiesToSet as $propertyPath => $propertyValue) {
                 try {
-                    $this->accessor->setValue($item, $protertyName, $propertyValue);
+                    $this->accessor->setValue($item, $propertyPath, $propertyValue);
                 } catch (NoSuchPropertyException $e) {
                     if ($item instanceof \stdClass) {
                         $item = (object) array_merge((array) $item, [
-                            $protertyName => $propertyValue,
+                            $propertyPath => $propertyValue,
                         ]);
                     } else {
                         throw $e;
