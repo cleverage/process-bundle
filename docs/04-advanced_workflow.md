@@ -238,9 +238,8 @@ class ProcessFailureListener
 
 You can also use the [EventDispatcherTask](reference/tasks/event_dispatcher_task.md) to trigger an event in the middle
 of a process: it dispatches a `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`, giving access to the current
-`ProcessState`. Note that in the current implementation the event is dispatched under its class name
-(`CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`): the `event_name` option is required but not passed to the
-event dispatcher.
+`ProcessState`. The event is dispatched under the `event_name` option or, when it is not set, under its class name
+(`CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`).
 
 ## Parallelization
 

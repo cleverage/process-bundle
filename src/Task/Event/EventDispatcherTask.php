@@ -39,14 +39,31 @@ class EventDispatcherTask extends AbstractConfigurableTask
 
         $event = new EventDispatcherTaskEvent($state);
 
-        $this->eventDispatcher->dispatch($event);
+        $this->eventDispatcher->dispatch($event, $options['event_name']);
+
+        // @deprecated BC layer since v5, remove me in v6.0: from v4.0 to v5.0, the event was only dispatched under its
+        // class name, even when event_name was set
+        if (null !== $options['event_name']
+            && EventDispatcherTaskEvent::class !== $options['event_name']
+            && $this->eventDispatcher->hasListeners(EventDispatcherTaskEvent::class)
+        ) {
+            @trigger_error(
+                \sprintf(
+                    'Listening to "%s" for an EventDispatcherTask with the "event_name" option set is deprecated since v5 and will not work anymore in v6.0, listen to "%s" instead.',
+                    EventDispatcherTaskEvent::class,
+                    $options['event_name'],
+                ),
+                \E_USER_DEPRECATED
+            );
+            $this->eventDispatcher->dispatch($event);
+        }
     }
 
     protected function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setRequired(['event_name']);
+        $resolver->setDefault('event_name', null);
         $resolver->setDefault('passive', true);
-        $resolver->setAllowedTypes('event_name', ['string']);
+        $resolver->setAllowedTypes('event_name', ['null', 'string']);
         $resolver->setAllowedTypes('passive', ['boolean']);
     }
 }
