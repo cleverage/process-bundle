@@ -54,7 +54,7 @@ class SlugifyTransformerTest extends TestCase
 
     public function testGetCodeReturnsCorrectCode(): void
     {
-        $this->assertSame('slugify', new SlugifyTransformer()->getCode());
+        $this->assertSame('slugify', (new SlugifyTransformer())->getCode());
     }
 
     /**

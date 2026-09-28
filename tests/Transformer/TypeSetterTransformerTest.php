@@ -70,7 +70,7 @@ class TypeSetterTransformerTest extends TestCase
 
     public function testGetCodeReturnsCorrectCode(): void
     {
-        $this->assertSame('type_setter', new TypeSetterTransformer()->getCode());
+        $this->assertSame('type_setter', (new TypeSetterTransformer())->getCode());
     }
 
     /**
