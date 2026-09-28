@@ -12,7 +12,8 @@ Task reference
 Accepted inputs
 ---------------
 
-`array` or `object`: values are read with the Symfony PropertyAccessor. A non-readable property is considered `null`.
+`any`: on an `array` or an `object`, values are read with the Symfony PropertyAccessor; a non-readable property is
+considered `null`. On a scalar input, use the empty path `''` to test the whole value (any other path gives `null`).
 
 Possible outputs
 ----------------

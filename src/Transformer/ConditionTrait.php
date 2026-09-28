@@ -107,7 +107,7 @@ trait ConditionTrait
      * Softly check if an input key match a value, or not.
      */
     protected function checkValue(
-        object|array $input,
+        mixed $input,
         string $key,
         mixed $value,
         bool $shouldMatch = true,
@@ -141,7 +141,7 @@ trait ConditionTrait
     /**
      * Check if the input property is empty or not.
      */
-    protected function checkEmpty(object|array $input, string $key): bool
+    protected function checkEmpty(mixed $input, string $key): bool
     {
         $currentValue = $this->getValue($input, $key);
 
@@ -150,12 +150,14 @@ trait ConditionTrait
 
     /**
      * Soft value getter (return the value or null).
+     *
+     * The empty key targets the whole input; any other key on a scalar input gives null (like a missing key).
      */
-    protected function getValue(object|array $input, string $key): mixed
+    protected function getValue(mixed $input, string $key): mixed
     {
         if ('' === $key) {
             $currentValue = $input;
-        } elseif ($this->accessor->isReadable($input, $key)) {
+        } elseif ((\is_array($input) || \is_object($input)) && $this->accessor->isReadable($input, $key)) {
             $currentValue = $this->accessor->getValue($input, $key);
         } else {
             $currentValue = null;
