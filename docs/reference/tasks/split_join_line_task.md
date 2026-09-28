@@ -19,7 +19,8 @@ Possible outputs
 ----------------
 
 `array`: one line per split value, iterated in the order of `split_columns`. Each line contains all the original columns
-except the `split_columns`, plus the `join_column` holding the split value (as a string).
+except the `split_columns`, plus the `join_column` holding the split value (as a string). If no line is produced (empty
+`split_columns`), the task is skipped.
 
 Options
 -------
