@@ -22,6 +22,9 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(GenericTransformer::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(ContextualOptionResolver::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TransformerRegistry::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(CallbackTransformer::class)]
 class GenericTransformerTest extends TestCase
 {
     public function testRequiredOptionMustBeProvided(): void
