@@ -14,6 +14,7 @@ Accepted inputs
 
 * `string`: a date matching the configured `format`
 * `\DateTime`, returned unchanged
+* `\DateTimeImmutable`, converted to a `\DateTime` (same date, time and timezone)
 * Any falsy value (`null`, `''`, `false`…), returned unchanged
 
 A string that cannot be parsed with the given format throws an `\UnexpectedValueException`.
@@ -55,5 +56,3 @@ Notes
 
 Fields missing from `format` are taken from the current time (e.g. with `Y-m-d`, the time part is the current time). Use
 the `!` or `|` format characters to reset them, e.g. `'!Y-m-d'`.
-
-A `\DateTimeImmutable` input is not returned unchanged: it is passed to `createFromFormat()` and throws a `\TypeError`.
