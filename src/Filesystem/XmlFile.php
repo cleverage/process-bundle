@@ -27,12 +27,38 @@ class XmlFile
 
     public function read(): \DOMDocument
     {
-        $dom = new \DOMDocument();
         $this->file->rewind();
         $fileSize = $this->file->getSize();
-        $fileContent = $this->file->fread($fileSize);
+        if (false === $fileSize || 0 === $fileSize) {
+            throw new \UnexpectedValueException(\sprintf('XML file "%s" is empty', $this->file->getPathname()));
+        }
 
-        $dom->loadXML($fileContent);
+        $fileContent = $this->file->fread($fileSize);
+        if (false === $fileContent) {
+            throw new \RuntimeException(\sprintf('Could not read content from XML file "%s"', $this->file->getPathname()));
+        }
+
+        $dom = new \DOMDocument();
+        $previousUseErrors = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+        try {
+            $loaded = $dom->loadXML($fileContent);
+            $errors = libxml_get_errors();
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousUseErrors);
+        }
+
+        // Warnings are tolerated, errors (e.g. undefined namespace prefix) and fatal errors are not
+        $errors = array_filter($errors, static fn (\LibXMLError $error): bool => \LIBXML_ERR_WARNING !== $error->level);
+        if (!$loaded || [] !== $errors) {
+            $messages = array_map(
+                static fn (\LibXMLError $error): string => \sprintf('%s (line %d, column %d)', trim($error->message), $error->line, $error->column),
+                $errors,
+            );
+
+            throw new \UnexpectedValueException(\sprintf('Invalid XML in file "%s": %s', $this->file->getPathname(), [] !== $messages ? implode('; ', $messages) : 'unknown error'));
+        }
 
         return $dom;
     }
