@@ -53,5 +53,6 @@ class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskI
         $resolver->setDefaults([
             'batch_count' => 10,
         ]);
+        $resolver->setAllowedTypes('batch_count', ['int', 'null']);
     }
 }

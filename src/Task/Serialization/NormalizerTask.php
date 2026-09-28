@@ -51,5 +51,6 @@ class NormalizerTask extends AbstractConfigurableTask
         $resolver->setDefaults([
             'context' => [],
         ]);
+        $resolver->setAllowedTypes('context', ['array']);
     }
 }

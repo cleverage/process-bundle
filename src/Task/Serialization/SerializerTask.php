@@ -39,5 +39,6 @@ class SerializerTask extends AbstractConfigurableTask
         $resolver->setDefaults([
             'context' => [],
         ]);
+        $resolver->setAllowedTypes('context', ['array']);
     }
 }

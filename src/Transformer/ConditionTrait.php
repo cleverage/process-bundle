@@ -99,6 +99,8 @@ trait ConditionTrait
         $resolver->setDefault('match_regexp', []);
         $resolver->setAllowedTypes('not_match', 'array');
         $resolver->setAllowedTypes('match', 'array');
+        $resolver->setAllowedTypes('not_empty', 'array');
+        $resolver->setAllowedTypes('empty', 'array');
         $resolver->setAllowedTypes('not_match_regexp', 'array');
         $resolver->setAllowedTypes('match_regexp', 'array');
     }

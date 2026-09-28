@@ -17,6 +17,7 @@ use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Takes an array containing an object and a value updates an object's property with this value, then return the object.
@@ -44,5 +45,6 @@ class ObjectUpdaterTask extends AbstractConfigurableTask
     protected function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setRequired(['property_path']);
+        $resolver->setAllowedTypes('property_path', ['string', PropertyPathInterface::class]);
     }
 }
