@@ -32,6 +32,18 @@ class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskI
     }
 
     #[\Override]
+    public function next(ProcessState $state): bool
+    {
+        $hasNext = parent::next($state);
+        if (!$hasNext) {
+            // Release the folder path to allow the following input to browse another folder
+            $this->folderPath = null;
+        }
+
+        return $hasNext;
+    }
+
+    #[\Override]
     public function initialize(ProcessState $state): void
     {
         parent::getOptions($state);

@@ -23,7 +23,8 @@ Underlying methods are [SplFileObject::fgets](https://www.php.net/manual/en/splf
 [json_decode](https://www.php.net/manual/en/function.json-decode.php).
 
 When a line is empty or decodes to `null`, no output is produced and the task is skipped for this iteration. Each
-line must be a JSON object or array: a line decoding to a scalar (e.g. `42` or `"foo"`) raises a `\TypeError`.
+line must be a JSON object or array: a line decoding to a scalar (e.g. `42` or `"foo"`) raises an
+`\UnexpectedValueException` giving the line number and the file path.
 
 Options
 -------

@@ -14,8 +14,8 @@ Transformer reference
 Accepted inputs
 ---------------
 
-`string`: the value is used both to build the cache key (after `key_transformers`) and as input of `transformers`.
-Any other type raises a `TypeError`.
+`any`: the value is used both to build the cache key (after `key_transformers`) and as input of `transformers`.
+The key value must be a `string` once `key_transformers` are applied, otherwise the cache is bypassed (see Notes).
 
 Possible outputs
 ----------------
@@ -56,5 +56,6 @@ Notes
   application). Items are saved with `saveDeferred()`, a warning is logged if the save fails.
 * A string `ttl` is converted to a date when the options are resolved (i.e. once, when the transformer is configured),
   not each time an item is saved: all items share the same absolute expiration date.
-* If the key value is not a string after `key_transformers`, or if the cache pool raises a PSR-6
-  `InvalidArgumentException` (logged as a warning), the transformers are applied without cache.
+* If the key value is not a string after `key_transformers` (e.g. an `int` input without a `cast` key transformer),
+  or if the cache pool raises a PSR-6 `InvalidArgumentException` (logged as a warning), the transformers are applied
+  without cache.

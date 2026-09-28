@@ -49,7 +49,8 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
 
             return;
         }
-        if ($this->counter > 0 && 0 === $this->counter % $this->getOption($state, 'show_every')) {
+        ++$this->counter;
+        if (0 === $this->counter % $this->getOption($state, 'show_every')) {
             $diff = $now->diff($this->lastUpdate);
             $fullText = "Last iteration {$diff->format('%H:%I:%S')} ago";
             $items = $this->getOption($state, 'num_items') * $this->counter;
@@ -67,7 +68,6 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
         } else {
             $state->setSkipped(true);
         }
-        ++$this->counter;
     }
 
     protected function configureOptions(OptionsResolver $resolver): void

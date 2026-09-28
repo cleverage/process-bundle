@@ -32,6 +32,13 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
         ?array $splFileObjectFlags = null,
         ?array $jsonFlags = null,
     ) {
+        if (!\in_array($filename, ['php://stdin', 'php://stdout', 'php://stderr'], true) && !str_starts_with($mode, 'r')) {
+            $dirname = \dirname($filename);
+            if (!@mkdir($dirname, 0o755, true) && !is_dir($dirname)) {
+                throw new \RuntimeException(\sprintf('Directory "%s" was not created', $dirname));
+            }
+        }
+
         $this->file = new \SplFileObject($filename, $mode);
 
         // Useful to skip empty trailing lines (doesn't work well on PHP 8, see readLine() code)
@@ -78,6 +85,8 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
 
     /**
      * Return an array containing current data and moving the file pointer.
+     *
+     * @throws \UnexpectedValueException if the line decodes to a scalar value
      */
     public function readLine(?int $length = null): ?array
     {
@@ -90,9 +99,14 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
         if ('' === $rawLine) {
             return null;
         }
-        ++$this->lineNumber;
+        $currentLineNumber = $this->lineNumber++;
 
-        return json_decode($rawLine, true, 512, $this->jsonFlags);
+        $data = json_decode($rawLine, true, 512, $this->jsonFlags);
+        if (null !== $data && !\is_array($data)) {
+            throw new \UnexpectedValueException(\sprintf('Line %d of file "%s" must be a JSON object or array, got %s', $currentLineNumber, $this->file->getPathname(), get_debug_type($data)));
+        }
+
+        return $data;
     }
 
     public function writeLine(array $fields): int

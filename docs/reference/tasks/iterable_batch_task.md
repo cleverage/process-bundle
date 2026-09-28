@@ -26,9 +26,9 @@ Possible outputs
 Options
 -------
 
-| Code          | Type  | Required | Default | Description                                 |
-|---------------|-------|:--------:|---------|---------------------------------------------|
-| `batch_count` | `int` |          | `10`    | Number of inputs to buffer before iterating |
+| Code          | Type        | Required | Default | Description                                                                                     |
+|---------------|-------------|:--------:|---------|-------------------------------------------------------------------------------------------------|
+| `batch_count` | `int\|null` |          | `10`    | Number of inputs to buffer before iterating; if `null`, all inputs are buffered until the flush |
 
 Examples
 --------

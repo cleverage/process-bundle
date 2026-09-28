@@ -13,8 +13,8 @@ Task reference
 Accepted inputs
 ---------------
 
-`array`: an associative array that should contain the configured `columns` (a column whose value is `null` is
-considered missing)
+`array`: an associative array that should contain the configured `columns` (a column is present as soon as its key
+exists, even if its value is `null`)
 
 Possible outputs
 ----------------

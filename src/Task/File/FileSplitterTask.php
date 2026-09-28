@@ -26,17 +26,27 @@ class FileSplitterTask extends AbstractConfigurableTask implements IterableTaskI
 {
     protected ?SplFile $file = null;
 
-    private ?array $splFileObjectFlags = null;
-
-    private int $lineCount;
+    /**
+     * Next line of the source file to write (read ahead to detect the end of the file), null when there is none.
+     */
+    private ?string $nextLine = null;
 
     public function execute(ProcessState $state): void
     {
         $options = $this->getMergedOptions($state);
-        $this->splFileObjectFlags = [\SplFileObject::READ_AHEAD, \SplFileObject::SKIP_EMPTY];
         if (!$this->file instanceof SplFile) {
-            $this->file = new SplFile($options['file_path'], 'rb', $this->splFileObjectFlags);
-            $this->lineCount = $this->file->getLineCount();
+            // No flag: lines are read with fgets(), which ignores DROP_NEW_LINE/SKIP_EMPTY and must not be preceded
+            // by a rewind() in READ_AHEAD mode (the first line would be skipped)
+            $this->file = new SplFile($options['file_path'], 'rb', []);
+            $this->nextLine = $this->file->readLine();
+        }
+
+        if (null === $this->nextLine) {
+            // Empty source file: nothing to split
+            $this->file = null;
+            $state->setSkipped(true);
+
+            return;
         }
 
         // Return a temporary file containing a limited number of lines
@@ -55,26 +65,26 @@ class FileSplitterTask extends AbstractConfigurableTask implements IterableTaskI
             return false;
         }
 
-        // Fix issue on PHP 8 with empty line at the end, even if SKIP_EMPTY is set
-        $endOfFile = $this->file->isEndOfFile() || $this->file->getLineNumber() > $this->lineCount;
-        if ($endOfFile) {
+        if (null === $this->nextLine) {
             $this->file = null;
+
+            return false;
         }
 
-        return !$endOfFile;
+        return true;
     }
 
     protected function splitFile(SplFile $file, int $maxLines): string
     {
         $tmpFilePath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_'.uniqid('process', false).'.tmp';
-        $splitFile = new SplFile($tmpFilePath, 'wb', $this->splFileObjectFlags);
+        $splitFile = new SplFile($tmpFilePath, 'wb', []);
 
-        while ($splitFile->getLineNumber() <= $maxLines && !$file->isEndOfFile()) {
-            $line = $file->readLine();
-            if ('' === $line || null === $line) {
-                continue; // This is probably an empty line, no harm to skip it
-            }
-            $splitFile->writeLine($line);
+        $writtenLines = 0;
+        while (null !== $this->nextLine && $writtenLines < $maxLines) {
+            // fgets() keeps the line break while writeLine() appends one
+            $splitFile->writeLine($this->stripLineBreak($this->nextLine));
+            ++$writtenLines;
+            $this->nextLine = $file->readLine();
         }
 
         return $tmpFilePath;
@@ -106,5 +116,17 @@ class FileSplitterTask extends AbstractConfigurableTask implements IterableTaskI
         // @var array<mixed> $input
 
         return array_merge($options, $input);
+    }
+
+    private function stripLineBreak(string $line): string
+    {
+        if (str_ends_with($line, "\r\n")) {
+            return substr($line, 0, -2);
+        }
+        if (str_ends_with($line, "\n")) {
+            return substr($line, 0, -1);
+        }
+
+        return $line;
     }
 }
