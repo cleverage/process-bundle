@@ -29,7 +29,7 @@ Options
 
 | Code             | Type     | Required | Default                                  | Description                                                                             |
 |------------------|----------|:--------:|------------------------------------------|-----------------------------------------------------------------------------------------|
-| `transliterator` | `string` |          | `'NFD; [:Nonspacing Mark:] Remove; NFC'` | Transliterator identifier, passed to `\Transliterator::create()`                        |
+| `transliterator` | `string` |          | `'NFD; [:Nonspacing Mark:] Remove; NFC'` | Transliterator identifier, passed to `\Transliterator::create()` (see Notes)            |
 | `replace`        | `string` |          | `'/[^a-z0-9]+/'`                         | Regular expression of the characters to replace (applied on the lowercased string)      |
 | `separator`      | `string` |          | `'_'`                                    | Replacement string, also trimmed from both ends of the result                           |
 
@@ -51,3 +51,10 @@ slugify:
   transliterator: 'Any-Latin; Latin-ASCII'
   separator: '-'
 ```
+
+Notes
+-----
+
+An invalid `transliterator` identifier (rejected by `\Transliterator::create()`) raises an
+`InvalidOptionsException` when the options are resolved, i.e. when the transformer is configured, not on the first
+transformed value.
