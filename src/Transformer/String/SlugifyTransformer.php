@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer\String;
 
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -58,7 +59,14 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
 
         $resolver->setNormalizer(
             'transliterator',
-            static fn (Options $options, $value): ?\Transliterator => \Transliterator::create($value)
+            static function (Options $options, $value): \Transliterator {
+                $transliterator = \Transliterator::create($value);
+                if (null === $transliterator) {
+                    throw new InvalidOptionsException(\sprintf('Invalid "transliterator" option: %s', intl_get_error_message()));
+                }
+
+                return $transliterator;
+            }
         );
     }
 }
