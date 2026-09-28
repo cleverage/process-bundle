@@ -11,6 +11,7 @@ Latest
 * [#189](https://github.com/cleverage/process-bundle/issues/189) Fix EventDispatcherTask: dispatch the event under the `event_name` option (regression since v4.0). `event_name` is now optional: when `null` (default), the event is dispatched under its class name. Update documentation, add tests.
 * [#198](https://github.com/cleverage/process-bundle/issues/198) Fix DateParserTransformer: a `\DateTimeImmutable` input is converted to a `\DateTime` instead of throwing a `TypeError`. Update documentation, add tests.
 * [#199](https://github.com/cleverage/process-bundle/issues/199) Fix PregFilterTransformer: an array `replacement` is no longer cast to the string `"Array"`, and requires an array `pattern`. Update documentation, add tests.
+* [#200](https://github.com/cleverage/process-bundle/issues/200) Fix GenericTransformer: a contextual option declared with `required: false` and no default can now be used; its placeholders are replaced by `null` when omitted. Update documentation, add tests.
 
 ## Deprecated
 * [#189](https://github.com/cleverage/process-bundle/issues/189) EventDispatcherTask: when `event_name` is set, listening to `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent` is deprecated (the event is still dispatched under its class name, with an `E_USER_DEPRECATED` error, if it has listeners). Listen to the configured `event_name` instead: the BC layer will be removed in v6.0.

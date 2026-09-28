@@ -79,6 +79,7 @@ class GenericTransformer implements ConfigurableTransformerInterface
     public function configureOptions(OptionsResolver $resolver): void
     {
         foreach ($this->contextualOptions as $option => $optionConfig) {
+            $resolver->setDefined($option);
             if (null !== $optionConfig['default'] || $optionConfig['default_is_null']) {
                 $resolver->setDefault($option, $optionConfig['default']);
             }
@@ -118,7 +119,10 @@ class GenericTransformer implements ConfigurableTransformerInterface
     {
         $contextualizedOptionValues = [];
         foreach ($this->contextualOptions as $contextualOption => $contextualOptionConfig) {
-            $contextualizedOptionValues[$contextualOption] = $options[$contextualOption];
+            // An optional contextual option without default value is replaced by null when not provided
+            $contextualizedOptionValues[$contextualOption] = $options->offsetExists($contextualOption)
+                ? $options[$contextualOption]
+                : null;
         }
 
         return $this->contextualOptionResolver->contextualizeOptions($transformerOptions, $contextualizedOptionValues);
