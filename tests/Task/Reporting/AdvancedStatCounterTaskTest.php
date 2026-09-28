@@ -34,9 +34,9 @@ class AdvancedStatCounterTaskTest extends TestCase
 {
     public function testEveryExecutionIsLoggedWithShowEveryOne(): void
     {
-        [$messages, $skipped] = $this->runTask(3, ['show_every' => 1]);
+        [$messages, $outputs] = $this->runTask(3, ['show_every' => 1]);
 
-        self::assertSame([false, false, false], $skipped);
+        self::assertSame([0, 1, 2], $outputs);
         self::assertCount(3, $messages);
         self::assertStringContainsString(' 1 items processed', $messages[0]);
         self::assertStringContainsString(' 2 items processed', $messages[1]);
@@ -45,9 +45,9 @@ class AdvancedStatCounterTaskTest extends TestCase
 
     public function testEveryNthExecutionIsLogged(): void
     {
-        [$messages, $skipped] = $this->runTask(7, ['show_every' => 3, 'num_items' => 10]);
+        [$messages, $outputs] = $this->runTask(7, ['show_every' => 3, 'num_items' => 10]);
 
-        self::assertSame([true, true, false, true, true, false, true], $skipped);
+        self::assertSame([0, 1, 2, 3, 4, 5, 6], $outputs);
         self::assertCount(2, $messages);
         self::assertStringContainsString(' 30 items processed', $messages[0]);
         self::assertStringContainsString(' 60 items processed', $messages[1]);
@@ -55,9 +55,9 @@ class AdvancedStatCounterTaskTest extends TestCase
 
     public function testSkipFirstExecutionsAreNotCounted(): void
     {
-        [$messages, $skipped] = $this->runTask(4, ['show_every' => 2, 'skip_first' => 1]);
+        [$messages, $outputs] = $this->runTask(4, ['show_every' => 2, 'skip_first' => 1]);
 
-        self::assertSame([true, true, false, true], $skipped);
+        self::assertSame([0, 1, 2, 3], $outputs);
         self::assertCount(1, $messages);
         self::assertStringContainsString(' 2 items processed', $messages[0]);
     }
@@ -65,7 +65,9 @@ class AdvancedStatCounterTaskTest extends TestCase
     /**
      * @param array<string, int> $options
      *
-     * @return array{list<string>, list<bool>}
+     * Execute the task $executions times with the inputs 0, 1, 2...
+     *
+     * @return array{list<string>, list<mixed>} logged messages, and outputs (null when skipped)
      */
     private function runTask(int $executions, array $options): array
     {
@@ -83,14 +85,15 @@ class AdvancedStatCounterTaskTest extends TestCase
         $task = new AdvancedStatCounterTask($logger);
         $task->initialize($state);
 
-        $skipped = [];
+        $outputs = [];
         for ($i = 0; $i < $executions; ++$i) {
             $state->reset(false);
+            $state->setInput($i);
             $task->execute($state);
-            $skipped[] = $state->isSkipped();
+            $outputs[] = $state->isSkipped() ? null : $state->getOutput();
         }
 
-        return [$logger->messages, $skipped];
+        return [$logger->messages, $outputs];
     }
 
     private function createState(string $class, array $options): ProcessState

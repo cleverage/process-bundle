@@ -2,7 +2,8 @@ AdvancedStatCounterTask
 =======================
 
 Logs performance statistics (`info` level) every N executions: time since the last log, processing rate, number of
-processed items and total elapsed time.
+processed items and total elapsed time. The input is passed to the output, so the task can be placed anywhere in a
+branch.
 
 Task reference
 --------------
@@ -12,13 +13,12 @@ Task reference
 Accepted inputs
 ---------------
 
-Input is ignored, only the number of executions matters.
+`any`: only the number of executions matters.
 
 Possible outputs
 ----------------
 
-`null` when statistics are logged (with `show_every: 1`, on every counted execution), otherwise the task is skipped (nothing is sent to the outputs). It is meant to be
-used as the last task of a branch.
+`any`: the input, unchanged, on every execution (whether statistics are logged or not).
 
 The logged message has the following format:
 

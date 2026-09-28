@@ -19,7 +19,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Count the time between 2 iterations.
+ * Count the time between 2 iterations, and log statistics every N executions. The input is passed to the output.
  */
 class AdvancedStatCounterTask extends AbstractConfigurableTask
 {
@@ -43,9 +43,10 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
             $this->startedAt = $now;
             $this->lastUpdate = $now;
         }
+        // The input is always passed to the output, the task only logs statistics
+        $state->setOutput($state->getInput());
         if ($this->preInitCounter < $this->getOption($state, 'skip_first')) {
             ++$this->preInitCounter;
-            $state->setSkipped(true);
 
             return;
         }
@@ -65,8 +66,6 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
 
             $this->lastUpdate = $now;
             $this->logger->info($fullText);
-        } else {
-            $state->setSkipped(true);
         }
     }
 
