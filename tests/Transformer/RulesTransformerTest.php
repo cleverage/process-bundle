@@ -23,6 +23,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(RulesTransformer::class)]
 #[\PHPUnit\Framework\Attributes\CoversTrait(TransformerTrait::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TransformerRegistry::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(ArrayLastTransformer::class)]
 class RulesTransformerTest extends TestCase
 {
     public function testTransform(): void
