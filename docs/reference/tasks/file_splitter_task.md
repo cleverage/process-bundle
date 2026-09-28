@@ -19,8 +19,8 @@ file path as input. Any other input is ignored.
 Possible outputs
 ----------------
 
-`string`: path of a temporary file (created in the system temporary directory, with a `.tmp` extension) containing a
-chunk of lines of the source file.
+`string`: path of a temporary file (created in the system temporary directory, with a `.tmp` extension) containing the
+next `max_lines` lines of the source file (the last file may contain fewer lines).
 
 Options
 -------
@@ -49,5 +49,8 @@ Notes
 -----
 
 * Values given as input are merged after option resolution, so they are not validated.
+* Every line of the source file is kept, in order, including empty lines. Line content is preserved, but each line
+  break (`\n` or `\r\n`) is written as `PHP_EOL`, and a missing line break on the last line is added.
+* An empty source file produces no output (the task is skipped).
 * Temporary files are not deleted by the task, use [FileRemoverTask](file_remover_task.md) if needed.
 * For CSV files, prefer [CsvSplitterTask](csv_splitter_task.md) which keeps the headers in each produced file.
