@@ -102,8 +102,7 @@ Examples:
 - [SimpleBatchTask](reference/tasks/simple_batch_task.md) groups inputs by batches of `batch_count` elements: each
   full batch is outputted during `execute`, and the last incomplete batch during `flush`.
 - [CounterTask](reference/tasks/counter_task.md) outputs the count every `flush_every` items, and the current count on
-  `flush` (unless it is a multiple of `flush_every`): as `flush` may be called several times, the same count can be
-  outputted more than once.
+  `flush` (unless it is a multiple of `flush_every`, or it was already outputted by a previous `flush`).
 
 ## Initializable tasks
 

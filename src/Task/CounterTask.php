@@ -26,6 +26,11 @@ class CounterTask extends AbstractConfigurableTask implements FlushableTaskInter
 {
     protected int $counter = 0;
 
+    /**
+     * Count already outputted by a flush, as flush() may be called several times.
+     */
+    protected ?int $flushedCounter = null;
+
     public function execute(ProcessState $state): void
     {
         ++$this->counter;
@@ -43,11 +48,14 @@ class CounterTask extends AbstractConfigurableTask implements FlushableTaskInter
     public function flush(ProcessState $state): void
     {
         $modulo = $this->getOption($state, 'flush_every');
-        if (0 === $this->counter % $modulo) {
+        if (0 === $this->counter % $modulo || $this->counter === $this->flushedCounter) {
             $state->setSkipped(true);
-        } else {
-            $state->setOutput($this->counter);
+
+            return;
         }
+
+        $this->flushedCounter = $this->counter;
+        $state->setOutput($this->counter);
     }
 
     protected function configureOptions(OptionsResolver $resolver): void

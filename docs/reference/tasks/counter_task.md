@@ -53,5 +53,4 @@ Notes
 
 * `flush()` can be called several times during a process (see
   [Advanced workflow](../../04-advanced_workflow.md)), e.g. once at the end of the upstream iteration and once when
-  the counter itself is resolved. Each call outputs the current count again (unless it is a multiple of `flush_every`),
-  so the final count may be sent more than once to the next tasks.
+  the counter itself is resolved. The final count is only outputted by the first call; the next ones are skipped.
