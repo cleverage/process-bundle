@@ -20,10 +20,13 @@ Latest
 * [#207](https://github.com/cleverage/process-bundle/issues/207) Fix JsonStreamReaderTask / JsonStreamWriterTask: throw an explicit `\UnexpectedValueException` when a line decodes to a scalar, create the missing parent directory when writing. Update documentation, add tests.
 * [#208](https://github.com/cleverage/process-bundle/issues/208) Fix FolderBrowserTask, InputFolderBrowserTask, CsvReaderTask and LineReaderTask (and their `Input*` variants): reset the state at the end of the iteration, so that a following input is read from its beginning. Update documentation, add tests.
 * [#201](https://github.com/cleverage/process-bundle/issues/201) Fix minor defects: error messages of TransformerTrait, RulesTransformer and ExpressionLanguageMapTransformer, useless `setRequired()` in ImplodeTransformer and SprintfTransformer, stray namespace in TrimTransformer, wrong or missing docblocks. Add tests.
+* [#220](https://github.com/cleverage/process-bundle/issues/220) Fix the stop error strategy: throw a `ProcessFailedException` (with the original exception as `previous`) instead of a `FatalError`, so that the command exits with a non-zero code when a process fails and `ProcessLauncherTask` detects failed sub-processes. Update documentation, add tests.
+* [#221](https://github.com/cleverage/process-bundle/issues/221) Fix CsvSplitterTask: each produced file contains `max_lines` data lines (instead of `max_lines - 2`), no infinite loop with `max_lines` <= 2 (`max_lines` must now be an integer greater than 0), no header-only file at the end. Update documentation, add tests.
 * [#223](https://github.com/cleverage/process-bundle/issues/223) Fix CounterTask: the final count is outputted once, as `flush()` may be called several times. Document that `flush()` implementations must be idempotent. Update documentation, add tests.
 
 ## Deprecated
 * [#189](https://github.com/cleverage/process-bundle/issues/189) EventDispatcherTask: when `event_name` is set, listening to `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent` is deprecated (the event is still dispatched under its class name, with an `E_USER_DEPRECATED` error, if it has listeners). Listen to the configured `event_name` instead: the BC layer will be removed in v6.0.
+* [#222](https://github.com/cleverage/process-bundle/issues/222) ProcessManager: going on with the process after an exception thrown by a task `initialize()` is deprecated (an `E_USER_DEPRECATED` error is triggered). In v6.0, the process will fail before executing any task.
 
 v5.0
 -----

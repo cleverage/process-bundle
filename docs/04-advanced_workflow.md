@@ -12,7 +12,8 @@ When a process is executed (with the `cleverage:process:execute` command or with
 3. **initializes** every task, in the order they are configured: the service is fetched from the container and
    `initialize` is called on [initializable tasks](02-task_types.md#initializable-tasks) (for configurable tasks, this is
    where options are validated). An exception thrown by `initialize` is logged as critical and flags the task as
-   stopped, but does not abort the process: it only fails when this task is first executed
+   stopped, but does not abort the process: it only fails when this task is first executed. This is deprecated since v5
+   (an `E_USER_DEPRECATED` error is triggered): in v6.0, the process will fail at this step, before any task is executed
 4. gives the process input to the `entry_point` task, if one is defined (otherwise the input is ignored and a warning is
    logged)
 5. **resolves** the tasks of the main branch (see below)
@@ -23,9 +24,8 @@ When a process is executed (with the `cleverage:process:execute` command or with
 
 If an exception is thrown at any point, the `cleverage_process.fail` event is dispatched and the exception is rethrown.
 Note that a task error handled by the `stop` strategy does not surface as the original exception: the process manager
-throws a new `Symfony\Component\ErrorHandler\Error\FatalError` (an `\Error`, not an `\Exception`), whose message
-contains the process code, the task code and the original message; the original exception is not attached as
-`previous` (it is only available in the task error log record).
+throws a `CleverAge\ProcessBundle\Exception\ProcessFailedException` (a `\RuntimeException`), whose message contains
+the process code, the task code and the original message. The original exception is available with `getPrevious()`.
 
 ### Executing a process from PHP
 
@@ -111,7 +111,7 @@ on the `cleverage_process_task` channel with the `log_level` of the task (`criti
 default):
 - `skip`: the current output is dropped, and the process continues with the next input (e.g. the next line of a CSV
   file)
-- `stop`: the whole process stops and fails (a `FatalError` is thrown by the process manager, see
+- `stop`: the whole process stops and fails (a `ProcessFailedException` is thrown by the process manager, see
   [process execution flow](#process-execution-flow))
 
 Before applying the strategy, the task input is sent to the tasks listed in `error_outputs` (unless the task already

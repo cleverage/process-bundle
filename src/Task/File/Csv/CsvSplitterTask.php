@@ -23,6 +23,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CsvSplitterTask extends InputCsvReaderTask
 {
+    /**
+     * Number of data lines written in the last produced file.
+     */
+    protected int $splitLineCount = 0;
+
     #[\Override]
     public function execute(ProcessState $state): void
     {
@@ -42,7 +47,15 @@ class CsvSplitterTask extends InputCsvReaderTask
         }
 
         // Return a temporary file containing a limited number of lines
-        $state->setOutput($this->splitCsv($this->csv, $options['max_lines']));
+        $splitFilePath = $this->splitCsv($this->csv, $options['max_lines']);
+        if (0 === $this->splitLineCount) {
+            // The end of the source file is only detected after trying to read past its last line: no empty file
+            unlink($splitFilePath);
+            $state->setSkipped(true);
+
+            return;
+        }
+        $state->setOutput($splitFilePath);
     }
 
     /**
@@ -91,12 +104,14 @@ class CsvSplitterTask extends InputCsvReaderTask
         );
         $splitCsv->writeHeaders();
 
-        while ($splitCsv->getLineNumber() < $maxLines && !$csv->isEndOfFile()) {
+        $this->splitLineCount = 0;
+        while ($this->splitLineCount < $maxLines && !$csv->isEndOfFile()) {
             $raw = $csv->readRaw();
             if (false === $raw) {
                 continue; // This is probably an empty line, no harm to skip it
             }
             $splitCsv->writeRaw($raw);
+            ++$this->splitLineCount;
         }
         $splitCsv->close();
 
@@ -110,5 +125,7 @@ class CsvSplitterTask extends InputCsvReaderTask
         $resolver->setDefaults([
             'max_lines' => 1000,
         ]);
+        $resolver->setAllowedTypes('max_lines', ['int']);
+        $resolver->setAllowedValues('max_lines', static fn (int $value): bool => $value >= 1);
     }
 }
