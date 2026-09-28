@@ -18,7 +18,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
 
 /**
- * Count the number of times the task was executed.
+ * Count the number of times the task was executed, and log it when the process ends. The input is passed to the output.
  */
 class StatCounterTask implements FinalizableTaskInterface
 {
@@ -37,5 +37,6 @@ class StatCounterTask implements FinalizableTaskInterface
     public function execute(ProcessState $state): void
     {
         ++$this->counter;
+        $state->setOutput($state->getInput());
     }
 }
