@@ -1,6 +1,6 @@
-name: Rocket chat notifications
+name: Google Chat notifications
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   push:
     tags:
@@ -11,13 +11,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get the tag short reference
-        id: get_tag
-        run: echo "TAG=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
-
-      - name: Rocket.Chat Notification
-        uses: madalozzo/Rocket.Chat.GitHub.Action.Notification@master
-        with:
-          type: success
-          job_name: "[cleverage/process-bundle](https://github.com/cleverage/process-bundle) : ${{ steps.get_tag.outputs.TAG }} has been released"
-          url: ${{ secrets.CLEVER_AGE_ROCKET_CHAT_WEBOOK_URL }}
+      - name: Google Chat Notification
+        env:
+          WEBHOOK_URL: ${{ secrets.CLEVER_AGE_GOOGLE_CHAT_WEBHOOK_URL }}
+          REPOSITORY: ${{ github.repository }}
+          SERVER_URL: ${{ github.server_url }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          jq -n --arg text "<${SERVER_URL}/${REPOSITORY}|${REPOSITORY}> : <${SERVER_URL}/${REPOSITORY}/tree/${TAG}|${TAG}> has been released" '{text: $text}' \
+            | curl --fail-with-body -sS -X POST -H 'Content-Type: application/json; charset=UTF-8' --data @- "$WEBHOOK_URL"
