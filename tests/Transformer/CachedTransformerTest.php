@@ -22,6 +22,8 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CachedTransformer::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TransformerRegistry::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(CastTransformer::class)]
 #[\PHPUnit\Framework\Attributes\CoversMethod(CachedTransformer::class, 'transform')]
 #[\PHPUnit\Framework\Attributes\CoversMethod(CachedTransformer::class, 'generateCacheKey')]
 #[\PHPUnit\Framework\Attributes\CoversMethod(CachedTransformer::class, 'configureOptions')]
