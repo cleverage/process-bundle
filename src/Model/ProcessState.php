@@ -201,7 +201,7 @@ class ProcessState
         $this->errorContext = $errorContext;
     }
 
-    public function addErrorContextValue(string|int $key, string|int|array $value): void
+    public function addErrorContextValue(string|int $key, mixed $value): void
     {
         $this->errorContext[$key] = $value;
     }

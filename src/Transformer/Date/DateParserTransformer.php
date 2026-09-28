@@ -17,7 +17,7 @@ use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Transformer aiming to take a date as an input (object or a format defined string) to strictly output aa \DateTime.
+ * Transformer aiming to take a date as an input (object or a format defined string) to strictly output a \DateTime.
  *
  * @example in YML config
  * transformers:
@@ -30,6 +30,10 @@ class DateParserTransformer implements ConfigurableTransformerInterface
     {
         if (!$value || $value instanceof \DateTime) {
             return $value;
+        }
+
+        if ($value instanceof \DateTimeImmutable) {
+            return \DateTime::createFromImmutable($value);
         }
 
         $date = \DateTime::createFromFormat($options['format'], $value);

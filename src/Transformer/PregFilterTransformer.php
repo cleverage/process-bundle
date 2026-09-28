@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class PregFilterTransformer implements ConfigurableTransformerInterface
@@ -22,7 +24,7 @@ class PregFilterTransformer implements ConfigurableTransformerInterface
         $pattern = $options['pattern'];
         $replacement = $options['replacement'];
 
-        return preg_filter($pattern, (string) $replacement, (string) $value);
+        return preg_filter($pattern, $replacement, (string) $value);
     }
 
     /**
@@ -38,5 +40,15 @@ class PregFilterTransformer implements ConfigurableTransformerInterface
         $resolver->setRequired(['pattern', 'replacement']);
         $resolver->setAllowedTypes('pattern', ['string', 'array']);
         $resolver->setAllowedTypes('replacement', ['string', 'array']);
+        $resolver->setNormalizer(
+            'replacement',
+            static function (Options $options, string|array $value): string|array {
+                if (\is_array($value) && !\is_array($options['pattern'])) {
+                    throw new InvalidOptionsException('The "replacement" option can only be an array when the "pattern" option is an array');
+                }
+
+                return $value;
+            }
+        );
     }
 }
