@@ -45,7 +45,8 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
 
         $missingColumns = [];
         foreach ($columns as $column) {
-            if (!isset($input[$column])) {
+            $hasColumn = \is_array($input) ? \array_key_exists($column, $input) : isset($input[$column]);
+            if (!$hasColumn) {
                 $missingColumns[] = $column;
                 continue;
             }

@@ -27,7 +27,7 @@ Options
 | Code          | Type            | Required | Default | Description                                                                                           |
 |---------------|-----------------|:--------:|---------|-------------------------------------------------------------------------------------------------------|
 | `pattern`     | `string\|array` |  **X**   |         | Pattern, or list of patterns, to search                                                               |
-| `replacement` | `string\|array` |  **X**   |         | Replacement string. The value is cast to string, so an array is not supported in practice (see Notes) |
+| `replacement` | `string\|array` |  **X**   |         | Replacement string, or list of replacements (only when `pattern` is an array)                         |
 
 Examples
 --------
@@ -37,6 +37,15 @@ Examples
 preg_filter:
   pattern: '/[^a-z0-9]/'
   replacement: ''
+```
+
+* Replace several patterns at once: each pattern is replaced by the replacement at the same position
+
+```yaml
+# Transformer options level
+preg_filter:
+  pattern: ['/a/', '/b/']
+  replacement: ['1', '2']
 ```
 
 * Reformat a date, `null` if the input does not match
@@ -51,5 +60,6 @@ preg_filter:
 Notes
 -----
 
-Although `replacement` accepts an `array`, it is cast to string before calling `preg_filter()`, which results in the
-literal `Array` (and a PHP warning).
+An array `replacement` requires an array `pattern` (as in `preg_filter()`): otherwise an `InvalidOptionsException` is
+thrown when resolving the options. If `replacement` has fewer elements than `pattern`, the missing replacements are
+empty strings.

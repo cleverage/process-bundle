@@ -28,8 +28,8 @@ Options
 | `condition` | `array` |          | `[]`    | Conditions each element must match, see [ConditionTrait](../traits/condition_trait.md)        |
 
 The `condition` option accepts the following keys, each one being a map of `property_path: value`. Properties are read
-from each element with the Symfony PropertyAccessor (an empty path `''` targets the element itself); an unreadable
-property is considered `null`.
+from each element with the Symfony PropertyAccessor (an empty path `''` targets the element itself, which is the way
+to filter a list of scalars); an unreadable property, or any non-empty path on a scalar element, is considered `null`.
 
 | Code               | Type    | Required | Default | Description                                                        |
 |--------------------|---------|:--------:|---------|--------------------------------------------------------------------|
@@ -65,4 +65,14 @@ array_filter:
       '[email]': ~
     match_regexp:
       '[sku]': '/^A/'
+```
+
+* Keep only the `a` values of a list of strings: `[a, b, a]` gives `{0: a, 2: a}`
+
+```yaml
+# Transformer options level
+array_filter:
+  condition:
+    match:
+      '': a
 ```

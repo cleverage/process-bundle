@@ -17,7 +17,7 @@ Input is ignored, only the number of executions matters.
 Possible outputs
 ----------------
 
-`null` when statistics are logged, otherwise the task is skipped (nothing is sent to the outputs). It is meant to be
+`null` when statistics are logged (with `show_every: 1`, on every counted execution), otherwise the task is skipped (nothing is sent to the outputs). It is meant to be
 used as the last task of a branch.
 
 The logged message has the following format:
@@ -33,7 +33,7 @@ Options
 |--------------|-------|:--------:|---------|---------------------------------------------------------------------------------------|
 | `num_items`  | `int` |          | `1`     | Number of items represented by one execution (multiplier of the counter)              |
 | `skip_first` | `int` |          | `0`     | Number of first executions to ignore (the elapsed time still starts at the first one) |
-| `show_every` | `int` |          | `1`     | Log the statistics every N executions (the first counted execution is never logged)   |
+| `show_every` | `int` |          | `1`     | Log the statistics every N counted executions (the N-th, 2N-th, ...)                  |
 
 Examples
 --------
