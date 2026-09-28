@@ -19,15 +19,15 @@ Accepted inputs
 Possible outputs
 ----------------
 
-`string`: path of a temporary CSV file (created in the system temporary directory) containing the headers and a chunk
-of lines of the source file.
+`string`: path of a temporary CSV file (created in the system temporary directory) containing the headers and the next
+`max_lines` data lines of the source file (the last file may contain fewer lines).
 
 Options
 -------
 
 | Code              | Type          | Required | Default | Description                                                                                          |
 |-------------------|---------------|:--------:|---------|------------------------------------------------------------------------------------------------------|
-| `max_lines`       | `int`         |          | `1000`  | Maximum number of lines per produced file (see notes)                                                |
+| `max_lines`       | `int`         |          | `1000`  | Maximum number of data lines (headers excluded) per produced file, must be greater than 0            |
 | `base_path`       | `string`      |          | `''`    | Prepended (with a `/` separator) to the input path. If empty, the input path is used as is           |
 | `delimiter`       | `string`      |          | `;`     | CSV delimiter (used for both the source and the produced files)                                      |
 | `enclosure`       | `string`      |          | `"`     | CSV enclosure character                                                                              |
@@ -65,5 +65,5 @@ Notes
 
 * Lines are copied as is: they are not checked against the headers.
 * Temporary files are not deleted by the task, use [FileRemoverTask](file_remover_task.md) if needed.
-* The line counter of the produced file includes the header line and starts at 1, so each produced file actually
-  contains `max_lines - 2` data lines.
+* Empty lines of the source file are copied and counted like the other lines.
+* No empty file is produced: when the source file has no (more) data line, the task is skipped.
