@@ -33,7 +33,8 @@ For each contextual option, you can define
 | `default_is_null` | `bool` | | `false` | If you need `null` to be the default value, use this option |
 
 Note that an option with a default value is still required by default, which has no effect since the default is used:
-set `required: false` for an option without default value that may be omitted.
+set `required: false` for an option without default value that may be omitted: when omitted, its placeholders are
+replaced by `null`.
 
 The `transformers` list uses the same syntax as any other transformer using a sub-list of transformers (see
 [TransformerTrait](traits/transformer_trait.md)).
