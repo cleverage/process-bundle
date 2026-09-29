@@ -72,16 +72,19 @@ trait TransformerTrait
      * keys This way you can chain multiple times the same transformer. Without this, it would silently call only the
      * 1st one.
      *
+     * Any non-empty suffix starting with "#" is accepted (digits, or a name describing the step): the part before the
+     * first "#" is used as the transformer code if it is registered.
+     *
      * @example
      *     transformers:
      *       callback#1:
      *         callback: array_filter
-     *       callback#2:
+     *       callback#reverse:
      *         callback: array_reverse
      */
     protected function getCleanedTransfomerCode(string $transformerCode): string
     {
-        $match = preg_match('/([^#]+)(#[\d]+)?/', $transformerCode, $parts);
+        $match = preg_match('/^([^#]+)#.+$/', $transformerCode, $parts);
 
         if (1 === $match && $this->transformerRegistry->hasTransformer($parts[1])) {
             return $parts[1];
