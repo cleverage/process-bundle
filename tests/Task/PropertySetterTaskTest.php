@@ -67,6 +67,16 @@ class PropertySetterTaskTest extends TestCase
         self::assertNull($state->getOutput());
     }
 
+    public function testScalarInputFailureKeepsErrorContext(): void
+    {
+        // The PropertyAccessor throws a \TypeError (not an \Exception) on a scalar input
+        $state = $this->execute(['[name]' => 'Foo'], 'not an array');
+
+        self::assertInstanceOf(\TypeError::class, $state->getException());
+        self::assertSame(['property' => '[name]', 'value' => 'Foo'], $state->getErrorContext());
+        self::assertNull($state->getOutput());
+    }
+
     private function execute(array $values, mixed $input): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

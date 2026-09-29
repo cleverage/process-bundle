@@ -67,6 +67,9 @@ class XmlFile
     public function write(\DOMDocument $dom): void
     {
         $content = $dom->saveXML();
+        if (false === $content) {
+            throw new \RuntimeException('Could not generate the XML content');
+        }
         $result = $this->file->fwrite($content);
 
         if (false === $result) {

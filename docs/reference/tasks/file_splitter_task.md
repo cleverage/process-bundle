@@ -25,10 +25,10 @@ next `max_lines` lines of the source file (the last file may contain fewer lines
 Options
 -------
 
-| Code        | Type     | Required | Default | Description                               |
-|-------------|----------|:--------:|---------|-------------------------------------------|
-| `file_path` | `string` |  **X**   |         | Path of the file to split                 |
-| `max_lines` | `int`    |          | `1000`  | Maximum number of lines per produced file |
+| Code        | Type     | Required | Default | Description                                                       |
+|-------------|----------|:--------:|---------|-------------------------------------------------------------------|
+| `file_path` | `string` |  **X**   |         | Path of the file to split                                         |
+| `max_lines` | `int`    |          | `1000`  | Maximum number of lines per produced file, must be greater than 0 |
 
 Examples
 --------
@@ -48,7 +48,7 @@ read_chunk:
 Notes
 -----
 
-* Values given as input are merged after option resolution, so they are not validated.
+* Values given as input (`file_path`, `max_lines`) are validated like the options; other input keys are ignored.
 * Every line of the source file is kept, in order, including empty lines. Line content is preserved, but each line
   break (`\n` or `\r\n`) is written as `PHP_EOL`, and a missing line break on the last line is added.
 * An empty source file produces no output (the task is skipped).

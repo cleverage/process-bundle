@@ -43,3 +43,4 @@ Notes
 -----
 
 * The file is opened on each execution: with the default `wb` mode, each input overwrites the file.
+* If the XML content cannot be generated (`\DOMDocument::saveXML()` fails) or written, a `\RuntimeException` is thrown.

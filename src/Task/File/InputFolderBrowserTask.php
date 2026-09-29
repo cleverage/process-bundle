@@ -73,6 +73,9 @@ class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskI
             $this->folderPath = $folderPath;
         }
 
+        if (null === $this->folderPath) {
+            throw new \UnexpectedValueException('No folder path given as input');
+        }
         if (!is_dir($this->folderPath)) {
             throw new InvalidConfigurationException("Folder path does not exists or is not a folder: '{$this->folderPath}'");
         }

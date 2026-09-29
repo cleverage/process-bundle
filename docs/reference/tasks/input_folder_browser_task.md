@@ -19,7 +19,8 @@ directory.
 
 The folder path is released once its files have all been iterated, so each input (the same path again or a different
 one) is browsed from the start. Receiving a different folder path while an iteration is in progress throws a
-`\LogicException`.
+`\LogicException`, and an empty input (`null`, `''`) when no folder is being browsed throws an
+`\UnexpectedValueException`.
 
 Possible outputs
 ----------------
