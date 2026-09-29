@@ -52,6 +52,27 @@ class SlugifyTransformerTest extends TestCase
         $this->resolveOptions($transformer, ['transliterator' => 'Not-A-Real-Transliterator']);
     }
 
+    /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function provideInvalidOptionTypes(): iterable
+    {
+        yield 'transliterator' => [['transliterator' => 123]];
+        yield 'replace' => [['replace' => ['/a/']]];
+        yield 'separator' => [['separator' => []]];
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidOptionTypes')]
+    public function testConfigureOptionsRejectsInvalidOptionTypes(array $options): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+
+        $this->resolveOptions(new SlugifyTransformer(), $options);
+    }
+
     public function testGetCodeReturnsCorrectCode(): void
     {
         $this->assertSame('slugify', (new SlugifyTransformer())->getCode());

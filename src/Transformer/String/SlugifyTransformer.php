@@ -56,6 +56,9 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
                 'separator' => '_',
             ]
         );
+        $resolver->setAllowedTypes('transliterator', ['string']);
+        $resolver->setAllowedTypes('replace', ['string']);
+        $resolver->setAllowedTypes('separator', ['string']);
 
         $resolver->setNormalizer(
             'transliterator',

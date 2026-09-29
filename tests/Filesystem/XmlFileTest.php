@@ -105,6 +105,21 @@ class XmlFileTest extends TestCase
         }
     }
 
+    public function testWriteThrowsWhenTheXmlCannotBeGenerated(): void
+    {
+        $dom = new class extends \DOMDocument {
+            public function saveXML(?\DOMNode $node = null, int $options = 0): string|false
+            {
+                return false;
+            }
+        };
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Could not generate the XML content');
+
+        (new XmlFile($this->path, 'wb'))->write($dom);
+    }
+
     public function testWriteThenRead(): void
     {
         $dom = new \DOMDocument();

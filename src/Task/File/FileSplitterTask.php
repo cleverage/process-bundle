@@ -98,6 +98,7 @@ class FileSplitterTask extends AbstractConfigurableTask implements IterableTaskI
             'max_lines' => 1000,
         ]);
         $resolver->setAllowedTypes('max_lines', ['int']);
+        $resolver->setAllowedValues('max_lines', static fn (int $value): bool => $value >= 1);
     }
 
     /**
@@ -115,7 +116,11 @@ class FileSplitterTask extends AbstractConfigurableTask implements IterableTaskI
         }
         // @var array<mixed> $input
 
-        return array_merge($options, $input);
+        // Options given as input are validated like the task options
+        $resolver = new OptionsResolver();
+        $this->configureOptions($resolver);
+
+        return $resolver->resolve(array_merge($options, array_intersect_key($input, $options)));
     }
 
     private function stripLineBreak(string $line): string

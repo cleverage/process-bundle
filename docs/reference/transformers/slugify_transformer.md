@@ -55,6 +55,6 @@ slugify:
 Notes
 -----
 
-An invalid `transliterator` identifier (rejected by `\Transliterator::create()`) raises an
-`InvalidOptionsException` when the options are resolved, i.e. when the transformer is configured, not on the first
-transformed value.
+An invalid `transliterator` identifier (rejected by `\Transliterator::create()`), or an option that is not a string,
+raises an `InvalidOptionsException` when the options are resolved, i.e. when the transformer is configured, not on the
+first transformed value.

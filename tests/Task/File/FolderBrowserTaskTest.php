@@ -97,6 +97,18 @@ class FolderBrowserTaskTest extends TestCase
         self::assertSame([$this->tmpDir.'/dirB/b1.txt'], $this->iterate($task, $state, $this->tmpDir.'/dirB'));
     }
 
+    public function testInputFolderBrowserRequiresAFolderPathAsInput(): void
+    {
+        $task = new InputFolderBrowserTask(new NullLogger());
+        $state = $this->createState([]);
+        $task->initialize($state);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('No folder path given as input');
+
+        $this->iterate($task, $state);
+    }
+
     /**
      * Mimics the ProcessManager loop over an iterable task and returns the non-skipped outputs.
      *

@@ -21,7 +21,8 @@ Possible outputs
 
 The input, with the configured values set.
 
-If a value cannot be set, the exception is set on the state (with `property` and `value` added to the error context)
+If a value cannot be set (including a `\TypeError` of the property accessor, e.g. on a scalar input), the exception
+is set on the state (with `property` and `value` added to the error context)
 and handled according to the task `error_strategy`; the remaining values are not set.
 
 Options

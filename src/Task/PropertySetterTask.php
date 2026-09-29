@@ -37,7 +37,7 @@ class PropertySetterTask extends AbstractConfigurableTask
         foreach ($options['values'] as $key => $value) {
             try {
                 $this->accessor->setValue($input, $key, $value);
-            } catch (\Exception $e) {
+            } catch (\Throwable $e) {
                 $state->addErrorContextValue('property', $key);
                 $state->addErrorContextValue('value', $value);
                 $state->setException($e);

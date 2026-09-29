@@ -22,6 +22,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Task\File\FileSplitterTask;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(FileSplitterTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(SplFile::class)]
@@ -100,6 +101,31 @@ class FileSplitterTaskTest extends TestCase
         );
 
         $this->assertSame(['a'.\PHP_EOL.'b'.\PHP_EOL, 'c'.\PHP_EOL], $chunks);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, mixed}>
+     */
+    public static function provideInvalidMaxLines(): iterable
+    {
+        yield 'zero as option' => [['max_lines' => 0], null];
+        yield 'negative as option' => [['max_lines' => -1], null];
+        yield 'zero as input' => [[], ['max_lines' => 0]];
+        yield 'string as input' => [[], ['max_lines' => 'abc']];
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    #[DataProvider('provideInvalidMaxLines')]
+    public function testInvalidMaxLinesIsRejected(array $options, mixed $input): void
+    {
+        $filePath = $this->createSourceFile("a\nb\n");
+
+        // max_lines lower than 1 used to loop forever, a string one to throw a TypeError
+        $this->expectException(InvalidOptionsException::class);
+
+        $this->runTask(new FileSplitterTask(), ['file_path' => $filePath, ...$options], $input);
     }
 
     public function testTaskCanBeReusedAfterIteration(): void
