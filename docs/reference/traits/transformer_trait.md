@@ -16,14 +16,15 @@ Allow to hold a list of sub-transformers, configure their options at initializat
   - any error thrown by a transformer is wrapped in a `TransformerException` ("Transformation '<code>' have failed:
     <original message>"), the original exception being available as previous exception
   - as YAML keys must be unique, a suffix starting with `#` can be added to the code to use the same transformer
-    several times. The convention is `#` followed by digits; the part before the first `#` is used as the transformer
-    code if it is registered. Example:
+    several times. Any non-empty suffix is accepted: digits (`callback#1`) or a name describing the step
+    (`callback#reverse`). The part before the first `#` is used as the transformer code if it is registered (otherwise
+    the whole code is looked up, and a `MissingTransformerException` is thrown if it is unknown). Example:
 
 ```yaml
 transformers:
   callback#1:
     callback: array_filter
-  callback#2:
+  callback#reverse:
     callback: array_reverse
 ```
 
