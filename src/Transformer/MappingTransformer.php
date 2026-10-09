@@ -114,8 +114,14 @@ class MappingTransformer implements ConfigurableTransformerInterface
             } elseif ($this->accessor->isWritable($result, $targetProperty)) {
                 $this->accessor->setValue($result, $targetProperty, $transformedValue);
             } elseif (\is_array($result)) {
+                if (!$this->isSimplePropertyName($targetProperty)) {
+                    @trigger_error(
+                        "Setting the target property '{$targetProperty}' as a literal key of an array destination is deprecated, it will throw an \\UnexpectedValueException in v6.0. Use '[{$targetProperty}]' to keep a literal key, or the index notation for nested arrays (e.g. '[a][b]').",
+                        \E_USER_DEPRECATED
+                    );
+                }
                 $result[$targetProperty] = $transformedValue;
-            } elseif ($result instanceof \stdClass && 1 === preg_match('/^[^.[\]]+$/', $targetProperty)) {
+            } elseif ($result instanceof \stdClass && $this->isSimplePropertyName($targetProperty)) {
                 // Only a simple property name can be added to a \stdClass, nested paths are not created
                 $result->{$targetProperty} = $transformedValue;
             } else {
@@ -193,6 +199,15 @@ class MappingTransformer implements ConfigurableTransformerInterface
         }
 
         return $this->accessor->getValue($input, $sourceProperty);
+    }
+
+    /**
+     * A simple property name (e.g. "name") is neither a nested path (e.g. "address.city") nor an index notation (e.g.
+     * "[name]").
+     */
+    private function isSimplePropertyName(string $property): bool
+    {
+        return 1 === preg_match('/^[^.[\]]+$/', $property);
     }
 
     /**
