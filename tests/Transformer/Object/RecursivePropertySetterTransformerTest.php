@@ -84,6 +84,39 @@ class RecursivePropertySetterTransformerTest extends TestCase
         self::assertEquals([(object) ['label' => 'A', 'parentId' => 7]], $result);
     }
 
+    public function testMissingPropertyIsAddedInPlaceToStdClassItems(): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, [
+            'iterator' => 'items',
+            'set_properties' => ['parentId' => 'id'],
+        ]);
+        $item = (object) ['label' => 'A'];
+
+        $result = $transformer->transform((object) ['id' => 7, 'items' => [$item]], $options);
+
+        self::assertIsArray($result);
+        self::assertSame($item, $result[0]);
+        self::assertSame(7, $item->parentId);
+    }
+
+    public function testMissingNestedPropertyPathIsAddedAsPropertyToStdClassItems(): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, [
+            'iterator' => 'items',
+            'set_properties' => ['parent.id' => 'id'],
+        ]);
+
+        $item = (object) ['label' => 'A'];
+
+        $result = $transformer->transform((object) ['id' => 7, 'items' => [$item]], $options);
+
+        self::assertIsArray($result);
+        self::assertSame($item, $result[0]);
+        self::assertEquals((object) ['label' => 'A', 'parent.id' => 7], $item);
+    }
+
     public function testTraversableCollectionIsSupported(): void
     {
         $transformer = $this->createTransformer();
