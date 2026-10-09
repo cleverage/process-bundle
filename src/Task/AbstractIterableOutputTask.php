@@ -29,10 +29,14 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
     public function execute(ProcessState $state): void
     {
         $this->handleIteratorFromInput($state);
+        $iterator = $this->iterator;
+        if (!$iterator instanceof \Iterator) {
+            throw new \LogicException('No iterator initialized');
+        }
 
-        if ($this->iterator->valid()) {
-            $state->addErrorContextValue('iterator_key', $this->iterator->key());
-            $state->setOutput($this->iterator->current());
+        if ($iterator->valid()) {
+            $state->addErrorContextValue('iterator_key', $iterator->key());
+            $state->setOutput($iterator->current());
         } else {
             $state->setSkipped(true);
             $this->iterator = null;

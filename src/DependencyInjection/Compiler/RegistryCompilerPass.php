@@ -34,6 +34,10 @@ class RegistryCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
+        if (\in_array(null, [$this->registry, $this->tag, $this->method], true)) {
+            throw new \LogicException('The registry, tag and method of the RegistryCompilerPass must be defined');
+        }
+
         if (!$container->has($this->registry)) {
             return;
         }

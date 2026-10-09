@@ -109,6 +109,8 @@ class CachedTransformer implements ConfigurableTransformerInterface
 
     /**
      * @param array<string, mixed> $options
+     *
+     * @return string|false
      */
     protected function generateCacheKey(string $cacheKeyRoot, mixed $value, array $options): bool|string
     {

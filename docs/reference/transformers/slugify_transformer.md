@@ -58,3 +58,5 @@ Notes
 An invalid `transliterator` identifier (rejected by `\Transliterator::create()`), or an option that is not a string,
 raises an `InvalidOptionsException` when the options are resolved, i.e. when the transformer is configured, not on the
 first transformed value.
+
+A value that cannot be transliterated (e.g. invalid UTF-8) throws an `\UnexpectedValueException`.

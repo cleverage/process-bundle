@@ -76,5 +76,6 @@ Notes
 * `{date}` is replaced by `Ymd`, `{date_time}` by `Ymd_His`, `{timestamp}` by the Unix timestamp and `{unique_token}`
   by a `uniqid()` value.
 * The parent directory of the file is created if needed.
+* An input that is not an `array` throws an `\UnexpectedValueException`.
 * Each input must contain every header key (extra keys are not allowed: the number of columns must match the number of
   headers), otherwise an `\UnexpectedValueException` is thrown. Columns are written in the headers order.
