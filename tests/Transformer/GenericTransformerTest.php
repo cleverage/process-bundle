@@ -71,6 +71,23 @@ class GenericTransformerTest extends TestCase
         $this->assertSame('ello', $transformer->transform('hello', $options));
     }
 
+    public function testTransformersCanBeGivenAsAList(): void
+    {
+        $registry = new TransformerRegistry();
+        $registry->addTransformer(new CallbackTransformer());
+
+        $transformer = new GenericTransformer(new ContextualOptionResolver(), $registry);
+        $transformer->initialize('substr_upper', [
+            'contextual_options' => ['offset' => ['required' => true]],
+            'transformers' => [
+                ['callback' => ['callback' => 'substr', 'right_parameters' => ['{{ offset }}']]],
+                ['callback' => ['callback' => 'strtoupper']],
+            ],
+        ]);
+
+        $this->assertSame('LLO', $transformer->transform('hello', $this->resolveOptions($transformer, ['offset' => 2])));
+    }
+
     public function testGetCodeRequiresInitialization(): void
     {
         $transformer = new GenericTransformer(new ContextualOptionResolver(), new TransformerRegistry());

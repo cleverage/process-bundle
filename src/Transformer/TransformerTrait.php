@@ -26,16 +26,30 @@ trait TransformerTrait
     /**
      * Transform the list of transformer codes + options into a list of Closure (better performances).
      *
-     * @param Options<array<string, mixed>>            $options
-     * @param array<string, array<string, mixed>|null> $transformers
+     * The list is either a map of "transformer code => options", or a list whose items are a transformer code (without
+     * options) or a single "transformer code => options" map. In a list, the closures are keyed by the transformer code
+     * followed by "#" and the item position, to keep the keys unique.
+     *
+     * @param Options<array<string, mixed>> $options
+     * @param array<int|string, mixed>      $transformers
      *
      * @return array<string, \Closure>
      */
     public function normalizeTransformers(Options $options, array $transformers): array
     {
         $transformerClosures = [];
+        $isList = array_is_list($transformers);
 
-        foreach ($transformers as $origTransformerCode => $transformerOptions) {
+        foreach ($transformers as $key => $transformerDefinition) {
+            if ($isList && \is_int($key)) {
+                [$origTransformerCode, $transformerOptions] = $this->parseListedTransformer($transformerDefinition, $key);
+                $closureKey = "{$origTransformerCode}#{$key}";
+            } else {
+                $origTransformerCode = (string) $key;
+                $transformerOptions = $transformerDefinition;
+                $closureKey = $origTransformerCode;
+            }
+
             $transformerOptionsResolver = new OptionsResolver();
             $transformerCode = $this->getCleanedTransfomerCode($origTransformerCode);
             $transformer = $this->getTransformerRegistry()->getTransformer($transformerCode);
@@ -48,7 +62,7 @@ trait TransformerTrait
             }
 
             $closure = static fn ($value) => $transformer->transform($value, $transformerOptions);
-            $transformerClosures[$origTransformerCode] = $closure;
+            $transformerClosures[$closureKey] = $closure;
         }
 
         return $transformerClosures;
@@ -127,6 +141,29 @@ trait TransformerTrait
         $type = get_debug_type($transformerOptions);
 
         throw new \InvalidArgumentException("Options for transformer {$transformerCode} are invalid : found {$type}, expected array or null");
+    }
+
+    /**
+     * Read the code and the options of an item of a transformer list: either a transformer code (without options), or
+     * a single "transformer code => options" map.
+     *
+     * @return array{string, mixed}
+     */
+    private function parseListedTransformer(mixed $transformerDefinition, int $position): array
+    {
+        if (\is_string($transformerDefinition) && '' !== $transformerDefinition) {
+            return [$transformerDefinition, null];
+        }
+        if (\is_array($transformerDefinition) && 1 === \count($transformerDefinition)) {
+            $transformerCode = array_key_first($transformerDefinition);
+            if (\is_string($transformerCode)) {
+                return [$transformerCode, $transformerDefinition[$transformerCode]];
+            }
+        }
+
+        $type = get_debug_type($transformerDefinition);
+
+        throw new \InvalidArgumentException("Transformer at position {$position} is invalid : found {$type}, expected a transformer code or a single \"code: options\" map");
     }
 
     private function getTransformerRegistry(): TransformerRegistry
