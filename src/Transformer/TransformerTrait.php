@@ -38,7 +38,7 @@ trait TransformerTrait
         foreach ($transformers as $origTransformerCode => $transformerOptions) {
             $transformerOptionsResolver = new OptionsResolver();
             $transformerCode = $this->getCleanedTransfomerCode($origTransformerCode);
-            $transformer = $this->transformerRegistry->getTransformer($transformerCode);
+            $transformer = $this->getTransformerRegistry()->getTransformer($transformerCode);
             $transformerOptions = $this->checkTransformerOptions($transformerOptions, $origTransformerCode);
             if ($transformer instanceof ConfigurableTransformerInterface) {
                 $transformer->configureOptions($transformerOptionsResolver);
@@ -94,7 +94,7 @@ trait TransformerTrait
     {
         $match = preg_match('/^([^#]+)#.+$/', $transformerCode, $parts);
 
-        if (1 === $match && $this->transformerRegistry->hasTransformer($parts[1])) {
+        if (1 === $match && $this->getTransformerRegistry()->hasTransformer($parts[1])) {
             return $parts[1];
         }
 
@@ -127,5 +127,14 @@ trait TransformerTrait
         $type = get_debug_type($transformerOptions);
 
         throw new \InvalidArgumentException("Options for transformer {$transformerCode} are invalid : found {$type}, expected array or null");
+    }
+
+    private function getTransformerRegistry(): TransformerRegistry
+    {
+        if (!$this->transformerRegistry instanceof TransformerRegistry) {
+            throw new \LogicException('No transformer registry defined');
+        }
+
+        return $this->transformerRegistry;
     }
 }

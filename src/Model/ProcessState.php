@@ -280,7 +280,7 @@ class ProcessState
      */
     public function getContext(): array
     {
-        return $this->context;
+        return $this->context ?? [];
     }
 
     /**
@@ -303,9 +303,10 @@ class ProcessState
         if (!$this->contextualizedOptions) {
             $options = $this->getTaskConfiguration()
                 ->getOptions();
+            $this->contextualOptionResolver ??= new ContextualOptionResolver();
             $this->contextualizedOptions = $this->contextualOptionResolver->contextualizeOptions(
                 $options,
-                $this->context
+                $this->getContext()
             );
         }
 

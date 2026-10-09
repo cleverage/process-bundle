@@ -156,6 +156,8 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     /**
      * Warning, this function will return exactly the same value as the fgetcsv() function.
      *
+     * @param int<0, max>|null $length
+     *
      * @return list<string|null>|false
      */
     public function readRaw(?int $length = null): array|false
@@ -167,6 +169,8 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     }
 
     /**
+     * @param int<0, max>|null $length
+     *
      * @return array<string, string|null>|null
      */
     public function readLine(?int $length = null): ?array
@@ -259,7 +263,12 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
     {
         $this->assertOpened();
 
-        return ftell($this->handler);
+        $position = ftell($this->handler);
+        if (false === $position) {
+            throw new \RuntimeException("Unable to get the position in {$this->getResourceName()}");
+        }
+
+        return $position;
     }
 
     public function seek(int $offset): int
@@ -313,12 +322,14 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         // If headers are not passed in the constructor but file is readable, try to read headers from file
         if (null === $headers) {
             $autoHeaders = $this->readRaw();
-            if (false === $autoHeaders || [] === $autoHeaders) {
+            // A blank line is read as [null]
+            if (false === $autoHeaders || [null] === $autoHeaders) {
                 throw new \UnexpectedValueException("Unable to read headers for {$this->getResourceName()}");
             }
+            $autoHeaders = array_map(strval(...), $autoHeaders);
             // Remove BOM if any
             $bom = pack('H*', 'EFBBBF');
-            $autoHeaders[0] = preg_replace("/^{$bom}/", '', (string) $autoHeaders[0]);
+            $autoHeaders[0] = (string) preg_replace("/^{$bom}/", '', $autoHeaders[0]);
 
             return $autoHeaders;
         }

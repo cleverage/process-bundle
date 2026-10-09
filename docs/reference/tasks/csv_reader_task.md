@@ -70,7 +70,8 @@ Notes
 -----
 
 * Each line must contain exactly as many columns as there are headers, otherwise an `\UnexpectedValueException` is thrown.
-* A UTF-8 BOM is removed from the first header when headers are read from the file.
+* A UTF-8 BOM is removed from the first header when headers are read from the file. If the first line is blank, an
+  `\UnexpectedValueException` is thrown.
 * `csv_file` and `csv_line` are added to the error context of the process.
 * The file is closed once fully read: if the task is executed again (e.g. for a new input), the file is read again
   from its beginning.

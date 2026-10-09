@@ -109,6 +109,9 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
     public function buildXpath(\DOMNode $node): \DOMXPath
     {
         $doc = $node instanceof \DOMDocument ? $node : $node->ownerDocument;
+        if (!$doc instanceof \DOMDocument) {
+            throw new \UnexpectedValueException('The node does not belong to a document');
+        }
 
         return new \DOMXPath($doc);
     }
@@ -118,12 +121,25 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
      */
     public function query(\DOMXPath $xpath, string $query, \DOMNode $node, array $options): mixed
     {
-        $nodeList = $xpath->query($query, $node);
+        $previousUseErrors = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+        try {
+            $nodeList = $xpath->query($query, $node);
+            $errors = libxml_get_errors();
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousUseErrors);
+        }
+        if (false === $nodeList) {
+            $messages = array_map(static fn (\LibXMLError $error): string => trim($error->message), $errors);
+
+            throw new \UnexpectedValueException(\sprintf("Invalid xpath query '%s': %s", $query, [] !== $messages ? implode('; ', $messages) : 'unknown error'));
+        }
         $results = iterator_to_array($nodeList);
 
         // Convert results to text
         if ($options['unwrap_value']) {
-            $results = array_map(static function (\DOMNode $item) use ($query): string {
+            $results = array_map(static function (\DOMNode|\DOMNameSpaceNode $item) use ($query): string {
                 if ($item instanceof \DOMAttr) {
                     return $item->value;
                 }
