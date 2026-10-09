@@ -296,9 +296,9 @@ class ProcessState
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return array<string, mixed>
      */
-    public function getContextualizedOptions(): ?array
+    public function getContextualizedOptions(): array
     {
         if (!$this->contextualizedOptions) {
             $options = $this->getTaskConfiguration()

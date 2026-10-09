@@ -16,6 +16,9 @@ Latest
 * [#242](https://github.com/cleverage/process-bundle/issues/242) Fix InputFileReaderTask: an input that is not a non-empty string (e.g. `null`) throws an explicit `\UnexpectedValueException` (`No file path given as input`) instead of a PHP warning followed by a `TypeError`. Update documentation, add tests.
 * [#244](https://github.com/cleverage/process-bundle/issues/244) Fix MappingTransformer: a missing target property of a `\stdClass` destination (`initial_value` or `keep_input`) threw `Property '...' is not writable`, it is now added when the target is a simple property name (nested paths still throw). Update documentation, add tests.
 
+## BC breaks
+* [#143](https://github.com/cleverage/process-bundle/issues/143) Narrow native types that were never `null` in practice: `AbstractConfigurableTask::getOptions()` and `ProcessState::getContextualizedOptions()` return `array` (instead of `?array`), `CsvResource::$lineNumber` is an `int` and `ProcessHistory::$startDate` a `\DateTimeInterface` (instead of nullable types). Overrides of `getOptions()` must declare an `array` return type (e.g. cleverage/archive-process-bundle >= v2.3). Improve PHPStan level from 7 to 8.
+
 v5.1
 -----
 
