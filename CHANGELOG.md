@@ -7,6 +7,7 @@ Latest
 
 ## Fixes
 * [#143](https://github.com/cleverage/process-bundle/issues/143) Fix InputIteratorTask: an `\IteratorAggregate` input whose `getIterator()` does not return an `\Iterator` (e.g. another `\IteratorAggregate`) is iterated instead of failing with a `TypeError`. Update documentation, add tests.
+* [#243](https://github.com/cleverage/process-bundle/issues/243) Fix RecursivePropertySetterTransformer: a `\stdClass` item without the property was replaced by a copy in the output, so the input object was not modified; the property is now added to the item itself. Update documentation, add tests.
 
 v5.1
 -----
