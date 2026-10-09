@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests\Model;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
+use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -22,6 +24,8 @@ use PHPUnit\Framework\TestCase;
 #[\PHPUnit\Framework\Attributes\CoversClass(ProcessState::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessConfiguration::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessHistory::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TaskConfiguration::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(ContextualOptionResolver::class)]
 class ProcessStateTest extends TestCase
 {
     /**
@@ -57,6 +61,20 @@ class ProcessStateTest extends TestCase
         $state->removeErrorContext(0);
 
         self::assertSame(['kept' => 'foo'], $state->getErrorContext());
+    }
+
+    public function testContextIsEmptyUntilDefined(): void
+    {
+        self::assertSame([], $this->createState()->getContext());
+    }
+
+    public function testContextualizedOptionsUseADefaultResolver(): void
+    {
+        $state = $this->createState();
+        $state->setContext(['bar' => 'baz']);
+        $state->setTaskConfiguration(new TaskConfiguration('task', 'service', ['foo' => '{{ bar }}']));
+
+        self::assertSame(['foo' => 'baz'], $state->getContextualizedOptions());
     }
 
     private function createState(): ProcessState
