@@ -34,7 +34,7 @@ Options
 | `headers`         | `array\|null` |          | `null`  | Static list of CSV headers. If `null`, the keys of the first input are used                                                                                                                 |
 | `mode`            | `string`      |          | `wb`    | File open mode (see [fopen mode parameter](https://www.php.net/manual/en/function.fopen.php))                                                                                               |
 | `split_character` | `string`      |          | `\|`    | Used to implode array values                                                                                                                                                                |
-| `write_headers`   | `bool`        |          | `true`  | Write the headers as first line, only if the file is empty (useful with an append `mode`)                                                                                                   |
+| `write_headers`   | `bool`        |          | `true`  | Write the headers as first line, only if the file is empty (useful with an append `mode`); cast to `bool`                                                                                   |
 
 Examples
 --------
