@@ -30,11 +30,13 @@ class ProcessConfigurationRegistry
     protected array $processConfigurations = [];
 
     /**
-     * @param array<string, array<string, mixed>> $rawConfiguration
+     * @param array<string, array<string, mixed>>                  $rawConfiguration
+     * @param array{success_level?: string, failed_level?: string} $defaultLogLevels
      */
     public function __construct(
         protected array $rawConfiguration,
         protected string $defaultErrorStrategy,
+        protected array $defaultLogLevels = [],
     ) {
     }
 
@@ -105,7 +107,9 @@ class ProcessConfigurationRegistry
             $rawProcessConfiguration['end_point'],
             $rawProcessConfiguration['description'],
             $rawProcessConfiguration['help'],
-            $rawProcessConfiguration['public']
+            $rawProcessConfiguration['public'],
+            $rawProcessConfiguration['logs']['success_level'] ?? $this->defaultLogLevels['success_level'] ?? LogLevel::INFO,
+            $rawProcessConfiguration['logs']['failed_level'] ?? $this->defaultLogLevels['failed_level'] ?? LogLevel::DEBUG
         );
 
         // Set links between tasks

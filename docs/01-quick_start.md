@@ -51,12 +51,14 @@ framework:
 
 You can use `./bin/console config:dump-reference clever_age_process` to have a summary of current configuration.
 
-The configuration has three root keys:
+The configuration has four root keys:
 - `configurations`: your processes (see [process definition](reference/01-process_definition.md))
 - `generic_transformers`: reusable transformers built from configuration (see
   [generic transformers definition](reference/03-generic_transformers_definition.md))
 - `default_error_strategy`: the behavior of a task that encounters an error when it does not define its own
   `error_strategy`. Allowed values are `stop` (the default) and `skip`.
+- `logs`: the levels of the logs written at the end of each process, `success_level` (`info` by default) and
+  `failed_level` (`debug` by default), see [process definition](reference/01-process_definition.md#global-attributes)
 
 We recommend keeping the `stop` default, and then specify task by task which one can be skipped:
 

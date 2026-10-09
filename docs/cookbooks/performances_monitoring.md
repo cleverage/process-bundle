@@ -52,8 +52,10 @@ SQL             n/a     n/a
 ## Built-in timing information
 
 Before profiling, the process logs already give some timing information:
-- on success, the process manager logs `Process <process_code> succeed` (level `info`, channel `cleverage_process`)
-  with the total `duration` of the process, in seconds, in the record context
+- at the end, the process manager logs `Process <process_code> succeed` (level `info` by default, channel
+  `cleverage_process`) or `Process <process_code> failed` (level `debug` by default), with the total `duration` of
+  the process, in seconds, in the record context. Both levels can be configured, see the `logs` option of the
+  [process definition](../reference/01-process_definition.md)
 - at `debug` level, the same channel logs each task execution (`Processing task <task_code>`, `Proceeding task ...`,
   `Flushing task ...`): with a formatter displaying milliseconds, it shows where the time is spent. With the Monolog
   console handler of the Symfony recipe, `-vvv` displays debug records in the console:

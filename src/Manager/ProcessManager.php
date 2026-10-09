@@ -129,44 +129,54 @@ class ProcessManager
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
         $processHistory = $this->initializeStates($processConfiguration, $context);
         $this->processHistory = $processHistory;
-        $this->checkProcess($processConfiguration);
 
-        // First initialize the whole stack in a linear way, tasks are initialized in the order they are configured
-        foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
-            $this->initialize($taskConfiguration);
-        }
+        try {
+            $this->checkProcess($processConfiguration);
 
-        // If defined, set the input of a task
-        if ($processConfiguration->getEntryPoint() instanceof TaskConfiguration) {
-            $processConfiguration->getEntryPoint()
-                ->getState()
-                ->setInput($input);
-        } elseif (null !== $input) {
-            $this->processLogger->warning('Process has no entry point for input');
-        }
-
-        // Resolve task from main branch, starting by the end
-        $taskList = array_reverse($processConfiguration->getTaskConfigurations());
-        $allowedTasks = $processConfiguration->getMainTaskGroup();
-        foreach ($taskList as $taskConfiguration) {
-            if (\in_array($taskConfiguration->getCode(), $allowedTasks, true)) {
-                $this->resolve($taskConfiguration);
+            // First initialize the whole stack in a linear way, tasks are initialized in the order they are configured
+            foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
+                $this->initialize($taskConfiguration);
             }
-        }
 
-        // Finalize the process in a linear way
-        foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
-            $this->finalize($taskConfiguration);
-        }
+            // If defined, set the input of a task
+            if ($processConfiguration->getEntryPoint() instanceof TaskConfiguration) {
+                $processConfiguration->getEntryPoint()
+                    ->getState()
+                    ->setInput($input);
+            } elseif (null !== $input) {
+                $this->processLogger->warning('Process has no entry point for input');
+            }
 
-        $this->endProcess($processHistory);
+            // Resolve task from main branch, starting by the end
+            $taskList = array_reverse($processConfiguration->getTaskConfigurations());
+            $allowedTasks = $processConfiguration->getMainTaskGroup();
+            foreach ($taskList as $taskConfiguration) {
+                if (\in_array($taskConfiguration->getCode(), $allowedTasks, true)) {
+                    $this->resolve($taskConfiguration);
+                }
+            }
 
-        // If defined, return the output of a task
-        $returnValue = null;
-        if ($processConfiguration->getEndPoint() instanceof TaskConfiguration) {
-            $returnValue = $processConfiguration->getEndPoint()
-                ->getState()
-                ->getOutput();
+            // Finalize the process in a linear way
+            foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
+                $this->finalize($taskConfiguration);
+            }
+
+            $this->endProcess($processHistory);
+
+            // If defined, return the output of a task
+            $returnValue = null;
+            if ($processConfiguration->getEndPoint() instanceof TaskConfiguration) {
+                $returnValue = $processConfiguration->getEndPoint()
+                    ->getState()
+                    ->getOutput();
+            }
+        } catch (\Throwable $error) {
+            if ($processHistory->isStarted()) {
+                $processHistory->setFailed();
+            }
+            $this->endProcess($processHistory);
+
+            throw $error;
         }
 
         $this->processHistory = $parentProcessHistory;
@@ -519,12 +529,23 @@ class ProcessManager
 
     protected function endProcess(ProcessHistory $history): void
     {
+        $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($history->getProcessCode());
+
         // Do not change state if already set
         if ($history->isStarted()) {
             $history->setSuccess();
 
-            $this->processLogger->info(
+            $this->processLogger->log(
+                $processConfiguration->getSuccessLogLevel(),
                 "Process {$history->getProcessCode()} succeed",
+                [
+                    'duration' => $history->getDuration(),
+                ]
+            );
+        } elseif ($history->isFailed()) {
+            $this->processLogger->log(
+                $processConfiguration->getFailedLogLevel(),
+                "Process {$history->getProcessCode()} failed",
                 [
                     'duration' => $history->getDuration(),
                 ]
