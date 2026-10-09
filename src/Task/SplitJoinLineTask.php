@@ -40,6 +40,7 @@ class SplitJoinLineTask extends AbstractIterableOutputTask
         $resolver->setDefaults([
             'split_character' => ',',
         ]);
+        $resolver->setAllowedTypes('split_character', ['string']);
     }
 
     protected function initializeIterator(ProcessState $state): \Iterator

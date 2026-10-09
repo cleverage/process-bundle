@@ -15,6 +15,7 @@ Latest
 * [#243](https://github.com/cleverage/process-bundle/issues/243) Fix RecursivePropertySetterTransformer: a `\stdClass` item without the property was replaced by a copy in the output, so the input object was not modified; the property is now added to the item itself. Update documentation, add tests.
 * [#242](https://github.com/cleverage/process-bundle/issues/242) Fix InputFileReaderTask: an input that is not a non-empty string (e.g. `null`) throws an explicit `\UnexpectedValueException` (`No file path given as input`) instead of a PHP warning followed by a `TypeError`. Update documentation, add tests.
 * [#244](https://github.com/cleverage/process-bundle/issues/244) Fix MappingTransformer: a missing target property of a `\stdClass` destination (`initial_value` or `keep_input`) threw `Property '...' is not writable`, it is now added when the target is a simple property name (nested paths still throw). Update documentation, add tests.
+* [#143](https://github.com/cleverage/process-bundle/issues/143) Type the remaining untyped task options: `split_character` of CsvWriterTask and SplitJoinLineTask must be a `string` (a wrong type used to fail later with a `TypeError`), `write_headers` of CsvWriterTask and `log_empty_lines` of CsvReaderTask are cast to `bool` (any value used to be evaluated as a boolean, so it is still accepted). Update documentation, add tests.
 
 v5.1
 -----

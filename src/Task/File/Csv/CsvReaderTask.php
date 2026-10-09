@@ -17,6 +17,7 @@ use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -105,5 +106,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         $resolver->setDefaults([
             'log_empty_lines' => false,
         ]);
+        // Any value used to be evaluated as a boolean: cast it instead of rejecting it
+        $resolver->setNormalizer('log_empty_lines', static fn (Options $options, mixed $value): bool => (bool) $value);
     }
 }

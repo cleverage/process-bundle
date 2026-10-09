@@ -52,6 +52,9 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
             'split_character' => '|',
             'write_headers' => true,
         ]);
+        $resolver->setAllowedTypes('split_character', ['string']);
+        // Any value used to be evaluated as a boolean: cast it instead of rejecting it
+        $resolver->setNormalizer('write_headers', static fn (Options $options, mixed $value): bool => (bool) $value);
 
         $resolver->setNormalizer(
             'file_path',

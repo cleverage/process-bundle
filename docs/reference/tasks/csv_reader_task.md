@@ -35,7 +35,7 @@ Options
 | `escape`          | `string`      |          | `\`     | CSV escape character                                                                                                              |
 | `headers`         | `array\|null` |          | `null`  | Static list of CSV headers. If `null`, headers are read from the first line of the file; otherwise the first line is read as data |
 | `mode`            | `string`      |          | `rb`    | File open mode (see [fopen mode parameter](https://www.php.net/manual/en/function.fopen.php))                                     |
-| `log_empty_lines` | `bool`        |          | `false` | Log a warning when a line cannot be read (empty line)                                                                             |
+| `log_empty_lines` | `bool`        |          | `false` | Log a warning when a line cannot be read (empty line); cast to `bool`                                                             |
 
 Examples
 --------

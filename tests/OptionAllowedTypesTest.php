@@ -19,17 +19,21 @@ use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask;
+use CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask;
 use CleverAge\ProcessBundle\Task\ObjectUpdaterTask;
 use CleverAge\ProcessBundle\Task\Serialization\DeserializerTask;
 use CleverAge\ProcessBundle\Task\Serialization\NormalizerTask;
 use CleverAge\ProcessBundle\Task\Serialization\SerializerTask;
 use CleverAge\ProcessBundle\Task\SimpleBatchTask;
+use CleverAge\ProcessBundle\Task\SplitJoinLineTask;
 use CleverAge\ProcessBundle\Transformer\Array\ArrayFilterTransformer;
 use CleverAge\ProcessBundle\Transformer\ConditionTrait;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use CleverAge\ProcessBundle\Transformer\String\HashTransformer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -47,6 +51,9 @@ use Symfony\Component\Serializer\Serializer;
 #[\PHPUnit\Framework\Attributes\CoversClass(SerializerTask::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(DeserializerTask::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(ObjectUpdaterTask::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(CsvReaderTask::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(CsvWriterTask::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(SplitJoinLineTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(AbstractConfigurableTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessConfiguration::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(TaskConfiguration::class)]
@@ -107,6 +114,8 @@ class OptionAllowedTypesTest extends TestCase
         yield 'serializer context' => [SerializerTask::class, ['format' => 'json', 'context' => 'groups']];
         yield 'deserializer context' => [DeserializerTask::class, ['type' => 'array', 'format' => 'json', 'context' => 'groups']];
         yield 'object updater property_path' => [ObjectUpdaterTask::class, ['property_path' => ['name']]];
+        yield 'csv writer split_character' => [CsvWriterTask::class, ['file_path' => 'file.csv', 'split_character' => 1]];
+        yield 'split join line split_character' => [SplitJoinLineTask::class, ['split_columns' => [], 'join_column' => 'value', 'split_character' => [',']]];
     }
 
     /**
@@ -133,6 +142,35 @@ class OptionAllowedTypesTest extends TestCase
         yield 'deserializer context' => [DeserializerTask::class, ['type' => 'array', 'format' => 'json', 'context' => []]];
         yield 'object updater string property_path' => [ObjectUpdaterTask::class, ['property_path' => 'name']];
         yield 'object updater PropertyPath property_path' => [ObjectUpdaterTask::class, ['property_path' => new PropertyPath('name')]];
+        yield 'csv writer split_character' => [CsvWriterTask::class, ['file_path' => 'file.csv', 'split_character' => ';']];
+        yield 'split join line split_character' => [SplitJoinLineTask::class, ['split_columns' => [], 'join_column' => 'value', 'split_character' => ';']];
+    }
+
+    /**
+     * @return iterable<string, array{class-string<AbstractConfigurableTask>, array<string, mixed>, string, bool}>
+     */
+    public static function booleanTaskOptionsProvider(): iterable
+    {
+        yield 'csv reader log_empty_lines true' => [CsvReaderTask::class, ['file_path' => 'file.csv', 'log_empty_lines' => true], 'log_empty_lines', true];
+        yield 'csv reader log_empty_lines 1' => [CsvReaderTask::class, ['file_path' => 'file.csv', 'log_empty_lines' => 1], 'log_empty_lines', true];
+        yield 'csv reader log_empty_lines empty string' => [CsvReaderTask::class, ['file_path' => 'file.csv', 'log_empty_lines' => ''], 'log_empty_lines', false];
+        yield 'csv writer write_headers false' => [CsvWriterTask::class, ['file_path' => 'file.csv', 'write_headers' => false], 'write_headers', false];
+        yield 'csv writer write_headers 0' => [CsvWriterTask::class, ['file_path' => 'file.csv', 'write_headers' => 0], 'write_headers', false];
+        yield 'csv writer write_headers yes' => [CsvWriterTask::class, ['file_path' => 'file.csv', 'write_headers' => 'yes'], 'write_headers', true];
+    }
+
+    /**
+     * Boolean options used to accept any value evaluated as a boolean: it is cast instead of being rejected.
+     *
+     * @param class-string<AbstractConfigurableTask> $class
+     * @param array<string, mixed>                   $options
+     */
+    #[DataProvider('booleanTaskOptionsProvider')]
+    public function testBooleanTaskOptionIsCast(string $class, array $options, string $option, bool $expected): void
+    {
+        [$task, $state] = $this->initializeTask($class, $options);
+
+        self::assertSame($expected, (new \ReflectionMethod($task, 'getOption'))->invoke($task, $state, $option));
     }
 
     /**
@@ -167,12 +205,15 @@ class OptionAllowedTypesTest extends TestCase
     /**
      * @param class-string<AbstractConfigurableTask> $class
      * @param array<string, mixed>                   $options
+     *
+     * @return array{AbstractConfigurableTask, ProcessState}
      */
-    private function initializeTask(string $class, array $options): void
+    private function initializeTask(string $class, array $options): array
     {
         $task = match ($class) {
             NormalizerTask::class, SerializerTask::class, DeserializerTask::class => new $class(new Serializer()),
             ObjectUpdaterTask::class => new ObjectUpdaterTask(PropertyAccess::createPropertyAccessor()),
+            CsvReaderTask::class => new CsvReaderTask(new NullLogger()),
             default => new $class(),
         };
 
@@ -182,5 +223,7 @@ class OptionAllowedTypesTest extends TestCase
         $state->setContext([]);
         $state->setTaskConfiguration(new TaskConfiguration('task', $class, $options));
         $task->initialize($state);
+
+        return [$task, $state];
     }
 }
