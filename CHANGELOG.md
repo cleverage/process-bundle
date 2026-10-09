@@ -13,6 +13,7 @@ Latest
 * [#241](https://github.com/cleverage/process-bundle/issues/241) Fix CsvWriterTask: a non-array input throws the documented `\UnexpectedValueException` instead of a `TypeError` when `headers` is `null`, and the CSV tasks release their file on `finalize()` so that the task can be executed again. Update documentation, add tests.
 * [#240](https://github.com/cleverage/process-bundle/issues/240) Fix FileMoverTask: with `autoincrement`, the suffix was computed on the whole path (a dot in a directory name was taken as the extension, making the move fail for a file without extension) and an existing numeric suffix of the file name was replaced (`report-2024.csv` became `report-1.csv`). The suffix is now appended to the file name only (`report-2024-1.csv`, `file-1`, `.env-1`). Update documentation, add tests.
 * [#243](https://github.com/cleverage/process-bundle/issues/243) Fix RecursivePropertySetterTransformer: a `\stdClass` item without the property was replaced by a copy in the output, so the input object was not modified; the property is now added to the item itself. Update documentation, add tests.
+* [#242](https://github.com/cleverage/process-bundle/issues/242) Fix InputFileReaderTask: an input that is not a non-empty string (e.g. `null`) throws an explicit `\UnexpectedValueException` (`No file path given as input`) instead of a PHP warning followed by a `TypeError`. Update documentation, add tests.
 
 v5.1
 -----
