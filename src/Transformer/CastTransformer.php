@@ -20,6 +20,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CastTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         settype($value, $options['type']);

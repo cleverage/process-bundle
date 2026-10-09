@@ -26,6 +26,8 @@ trait ConditionTrait
     /**
      * Test the input with the given set of conditions
      * True by default.
+     *
+     * @param array<string, mixed> $conditions
      */
     protected function checkCondition(mixed $input, array $conditions): bool
     {

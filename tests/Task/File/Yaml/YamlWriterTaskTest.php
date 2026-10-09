@@ -135,6 +135,9 @@ class YamlWriterTaskTest extends TestCase
         (new YamlWriterTask())->initialize($this->createState($options));
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function execute(array $options, mixed $input): ProcessState
     {
         $task = new YamlWriterTask();
@@ -146,6 +149,9 @@ class YamlWriterTaskTest extends TestCase
         return $state;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

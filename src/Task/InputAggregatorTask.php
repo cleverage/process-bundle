@@ -26,6 +26,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class InputAggregatorTask extends AbstractConfigurableTask
 {
+    /**
+     * @var array<string, mixed>
+     */
     protected array $inputs = [];
 
     /**
@@ -35,7 +38,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
     public function execute(ProcessState $state): void
     {
         $previousState = $state->getPreviousState();
-        if (!$previousState || !$previousState->getTaskConfiguration()) {
+        if (!$previousState instanceof ProcessState) {
             throw new \UnexpectedValueException('This task cannot be used without a previous task');
         }
 

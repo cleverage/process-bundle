@@ -73,6 +73,9 @@ class DenormalizeTransformerTest extends TestCase
     public function testClassFormatAndContextArePassedToTheDenormalizer(): void
     {
         $denormalizer = new class implements DenormalizerInterface {
+            /**
+             * @return array<mixed>
+             */
             public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): array
             {
                 return ['data' => $data, 'type' => $type, 'format' => $format, 'context' => $context];

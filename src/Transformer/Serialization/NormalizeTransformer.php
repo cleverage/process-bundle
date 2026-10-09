@@ -37,6 +37,9 @@ class NormalizeTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('context', ['array']);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         return $this->normalizer->normalize($value, $options['format'], $options['context']);

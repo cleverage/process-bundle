@@ -161,6 +161,9 @@ class InputAggregatorTaskTest extends TestCase
         yield 'keep_inputs not an array' => [['input_codes' => [], 'keep_inputs' => 'a']];
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     #[DataProvider('invalidOptionsProvider')]
     public function testInvalidOptionsAreRejected(array $options): void
     {
@@ -171,6 +174,9 @@ class InputAggregatorTaskTest extends TestCase
         $task->initialize($this->createState($options));
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function receive(InputAggregatorTask $task, array $options, string $previousTaskCode, mixed $input): ProcessState
     {
         $previousState = $this->createState([], $previousTaskCode);
@@ -184,6 +190,9 @@ class InputAggregatorTaskTest extends TestCase
         return $state;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options, string $code = 'aggregate'): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

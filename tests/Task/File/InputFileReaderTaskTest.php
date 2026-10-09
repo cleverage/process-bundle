@@ -125,6 +125,9 @@ class InputFileReaderTaskTest extends TestCase
         return $state->getOutput();
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

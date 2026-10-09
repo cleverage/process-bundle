@@ -27,6 +27,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
+    /**
+     * @var array<mixed>
+     */
     protected array $result = [];
 
     public function __construct(

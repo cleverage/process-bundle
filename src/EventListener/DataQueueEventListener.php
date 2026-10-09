@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\EventListener;
 
 use CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent;
+use CleverAge\ProcessBundle\Model\ProcessState;
 
 /**
  * Class DataQueueEventListener
@@ -23,7 +24,7 @@ use CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent;
 class DataQueueEventListener
 {
     /**
-     * @var \SplQueue[]
+     * @var array<string, \SplQueue<ProcessState>>
      */
     protected array $queues = [];
 
@@ -33,6 +34,9 @@ class DataQueueEventListener
         $queue->push(clone $event->getState());
     }
 
+    /**
+     * @return \SplQueue<ProcessState>
+     */
     public function getQueue(string $processName): \SplQueue
     {
         if (!\array_key_exists($processName, $this->queues)) {

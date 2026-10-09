@@ -130,6 +130,9 @@ class GroupByAggregateIterableTaskTest extends TestCase
         return [$task, $state];
     }
 
+    /**
+     * @param list<mixed> $inputs
+     */
     private function aggregate(GroupByAggregateIterableTask $task, ProcessState $state, array $inputs): mixed
     {
         foreach ($inputs as $input) {

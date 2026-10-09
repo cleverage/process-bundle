@@ -18,6 +18,8 @@ class ContextualOptionResolver
     /**
      * Basic value inference
      * Replaces "{{ key }}" by context[key].
+     *
+     * @param array<string, mixed> $context
      */
     public function contextualizeOption(mixed $value, array $context): mixed
     {
@@ -46,6 +48,11 @@ class ContextualOptionResolver
 
     /**
      * Replace all contextualized values from options.
+     *
+     * @param array<string, mixed> $options
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
      */
     public function contextualizeOptions(array $options, array $context): array
     {

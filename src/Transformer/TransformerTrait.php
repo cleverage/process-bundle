@@ -25,6 +25,11 @@ trait TransformerTrait
 
     /**
      * Transform the list of transformer codes + options into a list of Closure (better performances).
+     *
+     * @param Options<array<string, mixed>>            $options
+     * @param array<string, array<string, mixed>|null> $transformers
+     *
+     * @return array<string, \Closure>
      */
     public function normalizeTransformers(Options $options, array $transformers): array
     {
@@ -49,6 +54,9 @@ trait TransformerTrait
         return $transformerClosures;
     }
 
+    /**
+     * @param array<string, \Closure> $transformers
+     */
     protected function applyTransformers(array $transformers, mixed $value): mixed
     {
         // Quick return for better perfs
@@ -104,6 +112,8 @@ trait TransformerTrait
 
     /**
      * Check the options to always return an array, or fail on unexpected values.
+     *
+     * @return array<string, mixed>
      */
     private function checkTransformerOptions(mixed $transformerOptions, string $transformerCode): array
     {

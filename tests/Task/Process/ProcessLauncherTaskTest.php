@@ -75,6 +75,9 @@ class ProcessLauncherTaskTest extends TestCase
         return new ProcessLauncherTask(new NullLogger(), $registry, $this->createStub(KernelInterface::class));
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

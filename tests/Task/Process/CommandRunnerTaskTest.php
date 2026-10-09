@@ -114,6 +114,9 @@ class CommandRunnerTaskTest extends TestCase
         return new CommandRunnerTask($kernel);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

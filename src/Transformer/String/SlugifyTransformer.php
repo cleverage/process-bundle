@@ -23,6 +23,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SlugifyTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): string
     {
         /** @var \Transliterator $transliterator */

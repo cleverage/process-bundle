@@ -33,6 +33,10 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
 
     /**
      * Must return the transformed $value.
+     *
+     * @param array<string, mixed> $options
+     *
+     * @return array<mixed>
      */
     public function transform(mixed $value, array $options = []): array
     {

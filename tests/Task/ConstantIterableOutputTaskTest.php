@@ -130,6 +130,9 @@ class ConstantIterableOutputTaskTest extends TestCase
         return $outputs;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options, mixed $input = null): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

@@ -30,7 +30,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FolderBrowserTask extends AbstractConfigurableTask implements IterableTaskInterface
 {
     /**
-     * @var \Iterator|SplFileInfo[]|null
+     * @var \Iterator<string, SplFileInfo>|array<SplFileInfo>|null
      */
     protected \Iterator|array|null $files = null;
 

@@ -84,6 +84,8 @@ class ProcessManager
      * This method decorates the real execution to add event & error handling
      *
      * @see ProcessManager::doExecute
+     *
+     * @param array<string, mixed> $context
      */
     public function execute(string $processCode, mixed $input = null, array $context = []): mixed
     {
@@ -118,6 +120,8 @@ class ProcessManager
 
     /**
      * Real process execution, with a given input and context.
+     *
+     * @param array<string, mixed> $context
      */
     protected function doExecute(string $processCode, mixed $input = null, array $context = []): mixed
     {
@@ -463,6 +467,9 @@ class ProcessManager
         }
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     protected function initializeStates(
         ProcessConfiguration $processConfiguration,
         array $context = [],

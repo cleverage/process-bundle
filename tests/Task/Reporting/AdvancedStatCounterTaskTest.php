@@ -96,6 +96,9 @@ class AdvancedStatCounterTaskTest extends TestCase
         return [$logger->messages, $outputs];
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(string $class, array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

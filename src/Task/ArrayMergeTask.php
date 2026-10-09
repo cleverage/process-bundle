@@ -25,6 +25,9 @@ class ArrayMergeTask extends AbstractConfigurableTask implements BlockingTaskInt
 {
     protected const MERGE_FUNC = ['array_merge', 'array_merge_recursive', 'array_replace', 'array_replace_recursive'];
 
+    /**
+     * @var array<mixed>
+     */
     protected array $mergedOutput = [];
 
     public function execute(ProcessState $state): void

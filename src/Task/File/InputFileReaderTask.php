@@ -21,6 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class InputFileReaderTask extends FileReaderTask
 {
+    /**
+     * @return array<string, mixed>
+     */
     #[\Override]
     protected function getOptions(ProcessState $state): array
     {

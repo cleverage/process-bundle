@@ -19,10 +19,10 @@ namespace CleverAge\ProcessBundle\Filesystem;
 class CsvFile extends CsvResource
 {
     /**
-     * @param string $filePath  Also accept a resource
-     * @param string $delimiter CSV delimiter
-     * @param ?array $headers   Leave null to read the headers from the file
-     * @param string $mode      Same parameter as the mode in the fopen function (r, w, a, etc.)
+     * @param string            $filePath  Also accept a resource
+     * @param string            $delimiter CSV delimiter
+     * @param list<string>|null $headers   Leave null to read the headers from the file
+     * @param string            $mode      Same parameter as the mode in the fopen function (r, w, a, etc.)
      */
     public function __construct(
         protected $filePath,

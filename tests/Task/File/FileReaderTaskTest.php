@@ -109,6 +109,9 @@ class FileReaderTaskTest extends TestCase
         $this->execute(['filename' => 42]);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function execute(array $options, mixed $input = null): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

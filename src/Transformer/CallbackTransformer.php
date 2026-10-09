@@ -24,6 +24,8 @@ class CallbackTransformer implements ConfigurableTransformerInterface
 {
     /**
      * Must return the transformed $value.
+     *
+     * @param array<string, mixed> $options
      */
     public function transform(mixed $value, array $options = []): mixed
     {

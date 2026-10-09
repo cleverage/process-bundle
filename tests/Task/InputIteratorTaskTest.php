@@ -43,6 +43,23 @@ class InputIteratorTaskTest extends TestCase
         yield 'associative array' => [['a' => 1, 'b' => 2, 'c' => 3]];
         yield 'iterator' => [new \ArrayIterator(['a' => 1, 'b' => 2, 'c' => 3])];
         yield 'iterator aggregate' => [new \ArrayObject([1, 2, 3])];
+        yield 'generator aggregate' => [
+            new class implements \IteratorAggregate {
+                public function getIterator(): \Generator
+                {
+                    yield from [1, 2, 3];
+                }
+            },
+        ];
+        // getIterator() may return any \Traversable, such as another \IteratorAggregate
+        yield 'nested iterator aggregate' => [
+            new class implements \IteratorAggregate {
+                public function getIterator(): \Traversable
+                {
+                    return new \ArrayObject([1, 2, 3]);
+                }
+            },
+        ];
     }
 
     #[DataProvider('iterableInputProvider')]
@@ -114,6 +131,9 @@ class InputIteratorTaskTest extends TestCase
         $task->execute($state);
     }
 
+    /**
+     * @return list<mixed>
+     */
     private function iterate(InputIteratorTask $task, ProcessState $state, mixed $input): array
     {
         $outputs = [];

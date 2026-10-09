@@ -48,6 +48,9 @@ class ListProcessCommand extends Command
         return $a->getCode() <=> $b->getCode();
     }
 
+    /**
+     * @param array{output: string} $message
+     */
     public function maxMessageLengthFilter(int $max, array $message): int
     {
         return max($max, \strlen($this->filterOutTags($message['output'])));

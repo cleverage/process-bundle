@@ -27,8 +27,14 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
     protected ?string $transformerCode = null;
 
+    /**
+     * @var array<string, mixed>|null
+     */
     protected ?array $preconfiguredTransformerOptions = null;
 
+    /**
+     * @var array<string, mixed>|null
+     */
     protected ?array $contextualOptions = null;
 
     public function __construct(
@@ -40,6 +46,8 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
     /**
      * Register the generic options, and load the transformer list.
+     *
+     * @param array<string, mixed> $options
      */
     public function initialize(string $code, array $options = []): void
     {
@@ -102,6 +110,9 @@ class GenericTransformer implements ConfigurableTransformerInterface
         });
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         return $this->applyTransformers($options['transformers'], $value);
@@ -114,6 +125,11 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
     /**
      * Get the real transformer from contextual options + generic definitions.
+     *
+     * @param Options<array<string, mixed>> $options
+     * @param array<string, mixed>          $transformerOptions
+     *
+     * @return array<string, mixed>
      */
     public function normalizeTransformerOptions(Options $options, array $transformerOptions): array
     {

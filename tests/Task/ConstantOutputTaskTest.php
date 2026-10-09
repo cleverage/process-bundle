@@ -92,6 +92,10 @@ class ConstantOutputTaskTest extends TestCase
         $task->initialize($state);
     }
 
+    /**
+     * @param array<string, mixed> $context
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options, mixed $input = null, array $context = []): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

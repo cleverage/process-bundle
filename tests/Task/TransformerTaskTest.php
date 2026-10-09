@@ -193,6 +193,9 @@ class TransformerTaskTest extends TestCase
         $this->execute(['transformers' => 'trim'], 'value');
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function execute(array $options, mixed $input): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

@@ -67,6 +67,9 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         );
     }
 
+    /**
+     * @return array<mixed>
+     */
     protected function getInput(ProcessState $state): array
     {
         $input = $state->getInput();
@@ -84,6 +87,11 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         return $input;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return list<string>|null
+     */
     protected function getHeaders(ProcessState $state, array $options): ?array
     {
         $headers = $options['headers'];

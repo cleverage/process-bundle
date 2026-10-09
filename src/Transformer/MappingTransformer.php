@@ -37,6 +37,9 @@ class MappingTransformer implements ConfigurableTransformerInterface
         $this->transformerRegistry = $transformerRegistry;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (!empty($options['initial_value']) && $options['keep_input']) {
@@ -142,7 +145,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 $resolvedMapping = [];
                 $mappingResolver = new OptionsResolver();
                 $this->configureMappingOptions($mappingResolver);
-                /** @var array $value */
+                /** @var array<string, array<string, mixed>|null> $value */
                 foreach ($value as $property => $mappingConfig) {
                     $resolvedMapping[$property] = $mappingResolver->resolve($mappingConfig ?? []);
                 }

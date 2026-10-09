@@ -26,6 +26,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class IterableBatchTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
 {
+    /**
+     * @var \SplQueue<mixed>|null
+     */
     protected ?\SplQueue $outputQueue = null;
 
     protected bool $flushMode = false;

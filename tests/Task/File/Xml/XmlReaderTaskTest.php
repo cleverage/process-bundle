@@ -147,6 +147,9 @@ class XmlReaderTaskTest extends TestCase
         $this->execute(['file_path' => $this->tmpDir.'/file.xml', 'mode' => true]);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function execute(array $options, mixed $input = null): ProcessState
     {
         $task = $this->createTask();
@@ -174,6 +177,9 @@ class XmlReaderTaskTest extends TestCase
         });
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

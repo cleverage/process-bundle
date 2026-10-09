@@ -61,6 +61,9 @@ class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskI
         $resolver->setAllowedTypes('base_folder_path', ['string']);
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     #[\Override]
     protected function getOptions(ProcessState $state): array
     {

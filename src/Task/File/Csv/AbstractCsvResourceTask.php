@@ -63,5 +63,10 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
         $resolver->setAllowedTypes('headers', ['null', 'array']);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return list<string>|null
+     */
     abstract protected function getHeaders(ProcessState $state, array $options): ?array;
 }

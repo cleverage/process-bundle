@@ -53,6 +53,8 @@ class IterableBatchTaskTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $options
+     *
      * @return array{IterableBatchTask, ProcessState}
      */
     private function createTask(array $options): array
@@ -99,6 +101,9 @@ class IterableBatchTaskTest extends TestCase
         return $outputs;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(string $class, array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

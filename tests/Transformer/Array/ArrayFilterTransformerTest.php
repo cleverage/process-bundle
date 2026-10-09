@@ -43,6 +43,12 @@ class ArrayFilterTransformerTest extends TestCase
         self::assertSame([2 => ['other' => 'x']], $this->filter($items, ['empty' => ['[type]' => null]]));
     }
 
+    /**
+     * @param array<mixed>         $value
+     * @param array<string, mixed> $condition
+     *
+     * @return array<mixed>
+     */
     private function filter(array $value, array $condition): array
     {
         $transformer = new ArrayFilterTransformer(PropertyAccess::createPropertyAccessor());

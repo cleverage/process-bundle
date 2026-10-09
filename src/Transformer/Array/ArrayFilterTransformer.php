@@ -33,6 +33,8 @@ class ArrayFilterTransformer implements ConfigurableTransformerInterface
     }
 
     /**
+     * @param array<string, mixed> $options
+     *
      * @return array<int|string, mixed>
      */
     public function transform(mixed $value, array $options = []): array
