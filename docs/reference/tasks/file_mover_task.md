@@ -26,7 +26,7 @@ Options
 |-----------------|----------|:--------:|---------|--------------------------------------------------------------------------------------------------------------------------|
 | `destination`   | `string` |  **X**   |         | Destination path. If it is an existing directory, the original file name is kept                                         |
 | `overwrite`     | `bool`   |          | `false` | Allow overwriting an existing file at destination (otherwise an exception is thrown)                                     |
-| `autoincrement` | `bool`   |          | `false` | If the destination file exists, add or increment a numeric suffix before the extension (e.g. `file-1.csv`, `file-2.csv`) |
+| `autoincrement` | `bool`   |          | `false` | If the destination file exists, append the first free numeric suffix to the file name, before its extension (e.g. `file-1.csv`, `file-2.csv`) |
 
 Examples
 --------
@@ -46,3 +46,6 @@ Notes
 -----
 
 * Underlying method is Symfony `Filesystem::rename()`.
+* With `autoincrement`, only the file name is changed (never the directory part), and the suffix is always appended to
+  the original name: `report-2024.csv` becomes `report-2024-1.csv`, `file` becomes `file-1`, `archive.tar.gz` becomes
+  `archive.tar-1.gz` and a hidden file `.env` becomes `.env-1`.
