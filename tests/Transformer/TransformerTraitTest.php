@@ -14,8 +14,10 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests\Transformer;
 
 use CleverAge\ProcessBundle\Exception\MissingTransformerException;
+use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Transformer\CallbackTransformer;
+use CleverAge\ProcessBundle\Transformer\String\TrimTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +25,9 @@ use PHPUnit\Framework\TestCase;
 #[\PHPUnit\Framework\Attributes\CoversTrait(TransformerTrait::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(TransformerRegistry::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(CallbackTransformer::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TrimTransformer::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(MissingTransformerException::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TransformerException::class)]
 class TransformerTraitTest extends TestCase
 {
     /**
@@ -64,6 +68,68 @@ class TransformerTraitTest extends TestCase
         $this->expectException(MissingTransformerException::class);
 
         $this->createHolder()->resolve(['callback#' => ['callback' => 'trim']]);
+    }
+
+    public function testTransformersCanBeGivenAsAList(): void
+    {
+        $holder = $this->createHolder();
+
+        $transformers = $holder->resolve([
+            ['callback' => ['callback' => 'trim']],
+            ['callback' => ['callback' => 'strtoupper']],
+            ['callback#reverse' => ['callback' => 'strrev']],
+        ]);
+
+        self::assertSame(['callback#0', 'callback#1', 'callback#reverse#2'], array_keys($transformers));
+        self::assertSame('CBA', $holder->apply($transformers, ' abc '));
+    }
+
+    public function testListedTransformerCodeWithoutOptions(): void
+    {
+        $registry = new TransformerRegistry();
+        $registry->addTransformer(new CallbackTransformer());
+        $registry->addTransformer(new TrimTransformer());
+        $holder = new TransformerTraitHolder($registry);
+
+        $transformers = $holder->resolve(['trim', ['trim' => null], ['callback' => ['callback' => 'strrev']]]);
+
+        self::assertSame('cba', $holder->apply($transformers, ' abc '));
+    }
+
+    /**
+     * @return iterable<string, array{mixed, string}>
+     */
+    public static function invalidListedTransformerProvider(): iterable
+    {
+        yield 'integer' => [1, 'found int'];
+        yield 'null' => [null, 'found null'];
+        yield 'empty string' => ['', 'found string'];
+        yield 'empty map' => [[], 'found array'];
+        yield 'map with several codes' => [['callback' => null, 'trim' => null], 'found array'];
+        yield 'list' => [['callback'], 'found array'];
+    }
+
+    #[DataProvider('invalidListedTransformerProvider')]
+    public function testInvalidListedTransformerThrows(mixed $definition, string $found): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage("Transformer at position 1 is invalid : {$found}, expected a transformer code or a single \"code: options\" map");
+
+        $this->createHolder()->resolve([['callback' => ['callback' => 'trim']], $definition]);
+    }
+
+    public function testListedTransformerFailureReportsItsPosition(): void
+    {
+        $holder = $this->createHolder();
+        $transformers = $holder->resolve([
+            ['callback' => ['callback' => 'intval']],
+            ['callback' => ['callback' => 'intdiv', 'right_parameters' => [0]]],
+        ]);
+
+        $this->expectException(TransformerException::class);
+        $this->expectExceptionMessage("Transformation 'callback#1' have failed: Division by zero");
+
+        $holder->apply($transformers, ' 1 ');
     }
 
     public function testMissingRegistryThrows(): void

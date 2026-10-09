@@ -36,8 +36,8 @@ Note that an option with a default value is still required by default, which has
 set `required: false` for an option without default value that may be omitted: when omitted, its placeholders are
 replaced by `null`.
 
-The `transformers` list uses the same syntax as any other transformer using a sub-list of transformers (see
-[TransformerTrait](traits/transformer_trait.md)).
+The `transformers` list uses the same syntax as any other transformer using a sub-list of transformers, a map or a list
+(see [TransformerTrait](traits/transformer_trait.md)).
 You can use the syntax for contextual values (`{{ contextual_option_code }}`) to put placeholders that will be filled by
 those contextual options, with the values given when the generic transformer is used. If the whole value is a
 placeholder, the raw option value is injected (it can be an array, an integer...).

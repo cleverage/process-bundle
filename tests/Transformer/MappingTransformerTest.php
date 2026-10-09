@@ -304,6 +304,25 @@ class MappingTransformerTest extends TestCase
         self::assertSame(['field2' => [2, 4, 3]], $transformer->transform(['field' => [3, null, 4, 2]], $options));
     }
 
+    public function testSubTransformersCanBeGivenAsAList(): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, [
+            'mapping' => [
+                'field2' => [
+                    'code' => '[field]',
+                    'transformers' => [
+                        ['callback' => ['callback' => 'array_filter']],
+                        ['callback' => ['callback' => 'array_reverse']],
+                        ['callback' => ['callback' => 'array_values']],
+                    ],
+                ],
+            ],
+        ]);
+
+        self::assertSame(['field2' => [2, 4, 3]], $transformer->transform(['field' => [3, null, 4, 2]], $options));
+    }
+
     public function testFailingTransformerReportsTheTargetProperty(): void
     {
         $logger = $this->createCollectingLogger();
