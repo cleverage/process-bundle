@@ -17,7 +17,8 @@ Transformer reference
 Accepted inputs
 ---------------
 
-`\DOMNode` (including `\DOMDocument`). Any other value throws an `\UnexpectedValueException`.
+`\DOMNode` (including `\DOMDocument`). Any other value, a node that does not belong to a document or an invalid xpath
+query throws an `\UnexpectedValueException`.
 
 Possible outputs
 ----------------

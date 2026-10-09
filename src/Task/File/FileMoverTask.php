@@ -57,16 +57,26 @@ class FileMoverTask extends AbstractConfigurableTask
     protected function makeFilenameUnique(string $dest): string
     {
         $fs = new Filesystem();
-        $i = 1;
-        while ($fs->exists($dest)) {
-            if (preg_match('/^(.*?)(-\d+)?(\.[^.]*)$/', $dest, $matches)) {
-                $dest = $matches[1].'-'.$i.$matches[3];
-                ++$i;
-            } else {
-                $dest .= '-'.$i; // Fallback brutal mode
-            }
+        // Only the file name is changed, the directory part may contain dots
+        $basename = basename($dest);
+        $directory = substr($dest, 0, \strlen($dest) - \strlen($basename));
+        // A leading dot (hidden file) is not an extension separator
+        $dotPosition = strrpos($basename, '.');
+        if (false === $dotPosition || 0 === $dotPosition) {
+            $name = $basename;
+            $extension = '';
+        } else {
+            $name = substr($basename, 0, $dotPosition);
+            $extension = substr($basename, $dotPosition);
         }
 
-        return $dest;
+        $uniqueDest = $dest;
+        $i = 1;
+        while ($fs->exists($uniqueDest)) {
+            $uniqueDest = $directory.$name.'-'.$i.$extension;
+            ++$i;
+        }
+
+        return $uniqueDest;
     }
 }

@@ -222,8 +222,8 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $resolver->setAllowedTypes('process_options', ['array']);
         $resolver->setNormalizer(
             'process_options',
-            static function (Options $options, $value): array {
-                if (!empty($value)) {
+            static function (Options $options, array $value): array {
+                if ([] !== $value) {
                     // Todo deprecation trigger
                     throw new \InvalidArgumentException('Deprecated option, please contact support for help');
                 }

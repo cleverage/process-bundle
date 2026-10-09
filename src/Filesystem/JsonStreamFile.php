@@ -90,6 +90,8 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
     /**
      * Return an array containing current data and moving the file pointer.
      *
+     * @param int<0, max>|null $length
+     *
      * @return array<mixed>|null
      *
      * @throws \UnexpectedValueException if the line decodes to a scalar value

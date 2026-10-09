@@ -78,6 +78,16 @@ class SlugifyTransformerTest extends TestCase
         $this->assertSame('slugify', (new SlugifyTransformer())->getCode());
     }
 
+    public function testValueThatCannotBeTransliteratedThrows(): void
+    {
+        $transformer = new SlugifyTransformer();
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Unable to transliterate the value');
+
+        $transformer->transform("a\xff", $this->resolveOptions($transformer));
+    }
+
     /**
      * @param array<string, mixed> $options
      *

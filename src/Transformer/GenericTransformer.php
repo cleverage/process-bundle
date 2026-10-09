@@ -86,7 +86,7 @@ class GenericTransformer implements ConfigurableTransformerInterface
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        foreach ($this->contextualOptions as $option => $optionConfig) {
+        foreach ($this->contextualOptions ?? [] as $option => $optionConfig) {
             $resolver->setDefined($option);
             if (null !== $optionConfig['default'] || $optionConfig['default_is_null']) {
                 $resolver->setDefault($option, $optionConfig['default']);
@@ -104,7 +104,7 @@ class GenericTransformer implements ConfigurableTransformerInterface
                 throw new \InvalidArgumentException('Transformers option should not be used at this point');
             }
 
-            $transformerOptions = $this->normalizeTransformerOptions($options, $this->preconfiguredTransformerOptions);
+            $transformerOptions = $this->normalizeTransformerOptions($options, $this->preconfiguredTransformerOptions ?? []);
 
             return $this->normalizeTransformers($options, $transformerOptions);
         });
@@ -120,6 +120,10 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
     public function getCode(): string
     {
+        if (null === $this->transformerCode) {
+            throw new \LogicException('The generic transformer is not initialized');
+        }
+
         return $this->transformerCode;
     }
 
@@ -134,7 +138,7 @@ class GenericTransformer implements ConfigurableTransformerInterface
     public function normalizeTransformerOptions(Options $options, array $transformerOptions): array
     {
         $contextualizedOptionValues = [];
-        foreach ($this->contextualOptions as $contextualOption => $contextualOptionConfig) {
+        foreach ($this->contextualOptions ?? [] as $contextualOption => $contextualOptionConfig) {
             // An optional contextual option without default value is replaced by null when not provided
             $contextualizedOptionValues[$contextualOption] = $options->offsetExists($contextualOption)
                 ? $options[$contextualOption]

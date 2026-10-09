@@ -48,6 +48,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     public function flush(ProcessState $state): void
     {
         $this->flushMode = true;
+        $this->outputQueue ??= new \SplQueue();
         if ($this->outputQueue->isEmpty()) {
             $state->setSkipped(true);
         } else {
@@ -58,6 +59,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
     public function execute(ProcessState $state): void
     {
         $batchCount = $this->getOption($state, 'batch_count');
+        $this->outputQueue ??= new \SplQueue();
 
         // Register new input
         if (!$this->flushMode) {
@@ -65,7 +67,7 @@ class IterableBatchTask extends AbstractConfigurableTask implements FlushableTas
         }
 
         // Detect flushing
-        if (null !== $batchCount && ($this->outputQueue instanceof \SplQueue ? \count($this->outputQueue) : 0) >= $batchCount) {
+        if (null !== $batchCount && \count($this->outputQueue) >= $batchCount) {
             $this->flushMode = true;
         }
 

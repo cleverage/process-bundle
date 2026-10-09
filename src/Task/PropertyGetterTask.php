@@ -38,7 +38,7 @@ class PropertyGetterTask extends AbstractConfigurableTask
 
         try {
             $output = $this->accessor->getValue($input, $property);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $state->addErrorContextValue('property', $property);
             $state->setException($e);
 

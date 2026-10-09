@@ -45,6 +45,9 @@ class JsonStreamReaderTask extends AbstractConfigurableTask implements IterableT
 
     public function next(ProcessState $state): bool
     {
+        if (!$this->file instanceof JsonStreamFile) {
+            return false;
+        }
         $eof = $this->file->isEndOfFile();
         if ($eof) {
             $this->file = null;
