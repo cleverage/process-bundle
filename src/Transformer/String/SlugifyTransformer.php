@@ -31,6 +31,9 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
         /** @var \Transliterator $transliterator */
         $transliterator = $options['transliterator'];
         $string = $transliterator->transliterate($value);
+        if (false === $string) {
+            throw new \UnexpectedValueException("Unable to transliterate the value: {$transliterator->getErrorMessage()}");
+        }
 
         return trim(
             (string) preg_replace(

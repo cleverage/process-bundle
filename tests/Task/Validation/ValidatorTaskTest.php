@@ -261,8 +261,8 @@ class ValidatorTaskTest extends TestCase
 
     private function createTask(): ValidatorTask
     {
-        $logger = new class(function (array $record): void {
-            $this->records[] = $record;
+        $logger = new class(function (mixed $level, string $message, array $context): void {
+            $this->records[] = ['level' => $level, 'message' => $message, 'context' => $context];
         }) extends AbstractLogger {
             public function __construct(private readonly \Closure $onLog)
             {
@@ -270,7 +270,7 @@ class ValidatorTaskTest extends TestCase
 
             public function log($level, string|\Stringable $message, array $context = []): void
             {
-                ($this->onLog)(['level' => $level, 'message' => (string) $message, 'context' => $context]);
+                ($this->onLog)($level, (string) $message, $context);
             }
         };
 

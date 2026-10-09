@@ -71,6 +71,16 @@ class GenericTransformerTest extends TestCase
         $this->assertSame('ello', $transformer->transform('hello', $options));
     }
 
+    public function testGetCodeRequiresInitialization(): void
+    {
+        $transformer = new GenericTransformer(new ContextualOptionResolver(), new TransformerRegistry());
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The generic transformer is not initialized');
+
+        $transformer->getCode();
+    }
+
     /**
      * Generic transformer applying substr($value, {{ offset }}, {{ length }}).
      *
