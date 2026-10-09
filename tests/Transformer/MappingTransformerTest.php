@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Transformer\CallbackTransformer;
 use CleverAge\ProcessBundle\Transformer\MappingTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerTrait;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
@@ -362,6 +363,64 @@ class MappingTransformerTest extends TestCase
         $result = $transformer->transform(['field' => 'value'], $options);
 
         self::assertEquals((object) ['field2' => 'value'], $result);
+    }
+
+    public function testNewPropertyIsAddedToAStdClassInitialValue(): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, [
+            'initial_value' => new \stdClass(),
+            'mapping' => [
+                'field2' => ['code' => '[field]'],
+            ],
+        ]);
+
+        $result = $transformer->transform(['field' => 'value'], $options);
+
+        self::assertEquals((object) ['field2' => 'value'], $result);
+    }
+
+    public function testKeepInputAddsANewPropertyToAStdClassInput(): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, [
+            'keep_input' => true,
+            'mapping' => [
+                'field2' => ['code' => 'field'],
+            ],
+        ]);
+        $input = (object) ['field' => 'value'];
+
+        $result = $transformer->transform($input, $options);
+
+        self::assertSame($input, $result);
+        self::assertEquals((object) ['field' => 'value', 'field2' => 'value'], $input);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function nonSimpleTargetPropertyProvider(): iterable
+    {
+        yield 'nested path' => ['field2.child'];
+        yield 'index notation' => ['[field2]'];
+    }
+
+    #[DataProvider('nonSimpleTargetPropertyProvider')]
+    public function testMissingNonSimpleTargetPropertyOfAStdClassThrows(string $targetProperty): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, [
+            'initial_value' => new \stdClass(),
+            'mapping' => [
+                $targetProperty => ['constant' => 'value'],
+            ],
+        ]);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage("Property '{$targetProperty}' is not writable");
+
+        $transformer->transform([], $options);
     }
 
     public function testKeepInputCopiesAnArrayInput(): void

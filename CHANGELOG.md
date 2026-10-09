@@ -7,6 +7,7 @@ Latest
 
 ## Fixes
 * [#143](https://github.com/cleverage/process-bundle/issues/143) Fix InputIteratorTask: an `\IteratorAggregate` input whose `getIterator()` does not return an `\Iterator` (e.g. another `\IteratorAggregate`) is iterated instead of failing with a `TypeError`. Update documentation, add tests.
+* [#244](https://github.com/cleverage/process-bundle/issues/244) Fix MappingTransformer: a missing target property of a `\stdClass` destination (`initial_value` or `keep_input`) threw `Property '...' is not writable`, it is now added when the target is a simple property name (nested paths still throw). Update documentation, add tests.
 
 v5.1
 -----

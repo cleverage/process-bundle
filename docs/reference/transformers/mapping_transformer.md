@@ -9,7 +9,8 @@ The algorithm is:
 * for each target property of `mapping`:
   - get the source value (from `constant`, `set_null`, or the `code` property path(s))
   - apply the property `transformers` on this value
-  - write the result into the destination (with `merge_callback`, the property accessor, or as a simple array key)
+  - write the result into the destination (with `merge_callback`, the property accessor, as a simple array key, or as
+    a new property of a `\stdClass`)
 
 Transformer reference
 ---------------------
@@ -32,7 +33,7 @@ Options
 
 | Code             | Type             | Required | Default | Description                                                                                                                                                       |
 |------------------|------------------|:--------:|---------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `mapping`        | `array`          |  **X**   |         | List of `target property => property options` (see below). The target is a writable property path of the destination, or a plain array key                        |
+| `mapping`        | `array`          |  **X**   |         | List of `target property => property options` (see below). The target is a writable property path of the destination, a plain array key or a `\stdClass` property |
 | `ignore_missing` | `bool`           |          | `false` | Ignore property accessor read errors for the whole mapping (the property is then skipped)                                                                         |
 | `keep_input`     | `bool`           |          | `false` | Use the input as the destination. Cannot be combined with a non-empty `initial_value`. Due to PHP behavior, arrays are copied while objects are modified in place |
 | `initial_value`  | `any`            |          | `[]`    | The destination to fill                                                                                                                                           |
@@ -136,5 +137,8 @@ Notes
   instead of throwing for a missing array index (`framework.property_access.throw_exception_on_invalid_index`), so
   `ignore_missing` mostly matters for objects.
 * When a sub-transformer fails, the thrown `TransformerException` reports the target property.
+* A missing property of a `\stdClass` destination is added only for a simple target property name (e.g. `name`): a
+  nested path (e.g. `address.city`) or an index notation (e.g. `[name]`) that is not writable throws an
+  `\UnexpectedValueException` (`Property '...' is not writable`), as for any other object.
 * `merge_callback` receives the destination by value: to modify an array destination, the callable must take its
   first argument by reference.
