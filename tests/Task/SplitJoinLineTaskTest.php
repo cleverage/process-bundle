@@ -125,6 +125,7 @@ class SplitJoinLineTaskTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed>     $options
      * @param class-string<\Throwable> $exception
      */
     #[DataProvider('invalidOptionsProvider')]
@@ -136,6 +137,8 @@ class SplitJoinLineTaskTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed> $options
+     *
      * @return array{SplitJoinLineTask, ProcessState}
      */
     private function createTask(array $options): array
@@ -152,6 +155,9 @@ class SplitJoinLineTaskTest extends TestCase
         return [$task, $state];
     }
 
+    /**
+     * @return list<mixed>
+     */
     private function iterate(SplitJoinLineTask $task, ProcessState $state, mixed $input): array
     {
         $outputs = [];

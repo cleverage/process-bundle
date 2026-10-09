@@ -21,6 +21,9 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
  */
 class PhpFunctionProvider implements ExpressionFunctionProviderInterface
 {
+    /**
+     * @param list<string> $functions
+     */
     public function __construct(
         protected array $functions,
     ) {

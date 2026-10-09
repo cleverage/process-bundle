@@ -29,6 +29,9 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
 {
     use ConditionTrait;
 
+    /**
+     * @var array<mixed>
+     */
     protected array $result = [];
 
     public function __construct(

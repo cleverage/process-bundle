@@ -32,6 +32,9 @@ class HashTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('raw_output', 'bool');
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): string
     {
         return hash((string) $options['algo'], (string) $value, $options['raw_output']);

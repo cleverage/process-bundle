@@ -26,6 +26,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DateFormatTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (!$value) {

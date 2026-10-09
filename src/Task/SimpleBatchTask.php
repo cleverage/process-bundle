@@ -23,6 +23,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskInterface
 {
+    /**
+     * @var list<mixed>
+     */
     protected array $elements = [];
 
     public function flush(ProcessState $state): void

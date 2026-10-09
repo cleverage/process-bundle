@@ -126,6 +126,9 @@ class ProcessHelpCommand extends Command
 
     /**
      * Try to find a best candidate for next display.
+     *
+     * @param array<string|null> $branches
+     * @param list<string>       $taskList
      */
     protected function findBestNextTask(
         array $branches,
@@ -223,6 +226,8 @@ class ProcessHelpCommand extends Command
 
     /**
      * Merge needed branches, display a task node, split following needed branches.
+     *
+     * @param array<string|null> $branches
      */
     protected function resolveBranchOutput(
         array &$branches,
@@ -442,6 +447,10 @@ class ProcessHelpCommand extends Command
         $this->writeBranches($output, $branches);
     }
 
+    /**
+     * @param array<string|null>      $branches
+     * @param string|iterable<string> $comment
+     */
     protected function writeBranches(
         OutputInterface $output,
         array $branches,

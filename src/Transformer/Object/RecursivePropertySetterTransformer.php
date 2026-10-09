@@ -30,6 +30,9 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (null === $value && $options['ignore_null']) {

@@ -26,6 +26,10 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
 
     protected int $lineNumber = 1;
 
+    /**
+     * @param list<int>|null $splFileObjectFlags
+     * @param list<int>|null $jsonFlags
+     */
     public function __construct(
         string $filename,
         string $mode = 'rb',
@@ -86,6 +90,8 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
     /**
      * Return an array containing current data and moving the file pointer.
      *
+     * @return array<mixed>|null
+     *
      * @throws \UnexpectedValueException if the line decodes to a scalar value
      */
     public function readLine(?int $length = null): ?array
@@ -109,6 +115,9 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
         return $data;
     }
 
+    /**
+     * @param array<mixed> $fields
+     */
     public function writeLine(array $fields): int
     {
         $this->file->fwrite(json_encode($fields, $this->jsonFlags).\PHP_EOL);

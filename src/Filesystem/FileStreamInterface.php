@@ -27,6 +27,9 @@ interface FileStreamInterface
 
     public function isEndOfFile(): bool;
 
+    /**
+     * @return array<mixed>|null
+     */
     public function readLine(?int $length = null): ?array;
 
     /**

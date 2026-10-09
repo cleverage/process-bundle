@@ -25,6 +25,9 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
 
     protected ?int $lineCount = null;
 
+    /**
+     * @var list<string>
+     */
     protected array $headers;
 
     protected bool $manualHeaders = false;
@@ -37,6 +40,9 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
 
     protected bool $seekCalled = false;
 
+    /**
+     * @param list<string>|null $headers
+     */
     public function __construct(
         mixed $resource,
         protected string $delimiter = ',',
@@ -110,6 +116,9 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         return $this->lineCount;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getHeaders(): array
     {
         return $this->headers;
@@ -146,6 +155,8 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
 
     /**
      * Warning, this function will return exactly the same value as the fgetcsv() function.
+     *
+     * @return list<string|null>|false
      */
     public function readRaw(?int $length = null): array|false
     {
@@ -155,6 +166,9 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         return fgetcsv($this->handler, $length, $this->delimiter, $this->enclosure, $this->escape);
     }
 
+    /**
+     * @return array<string, string|null>|null
+     */
     public function readLine(?int $length = null): ?array
     {
         $filePosition = $this->seekCalled ? "at position {$this->tell()}" : "on line {$this->getLineNumber()}";
@@ -186,6 +200,8 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
 
     /**
      * Warning, this function will return exactly the same value as the fgetcsv() function.
+     *
+     * @param array<bool|float|int|string|null> $fields
      */
     public function writeRaw(array $fields): int|false
     {
@@ -195,6 +211,9 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         return fputcsv($this->handler, $fields, $this->delimiter, $this->enclosure, $this->escape);
     }
 
+    /**
+     * @param array<string, mixed> $fields
+     */
     public function writeLine(array $fields): int
     {
         $count = \count($fields);
@@ -284,6 +303,11 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
         }
     }
 
+    /**
+     * @param list<string>|null $headers
+     *
+     * @return list<string>
+     */
     protected function parseHeaders(?array $headers = null): array
     {
         // If headers are not passed in the constructor but file is readable, try to read headers from file

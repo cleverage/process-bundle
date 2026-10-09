@@ -28,6 +28,11 @@ class UnsetTransformer implements ConfigurableTransformerInterface
         $this->accessor = $accessor;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return array<mixed>
+     */
     public function transform(mixed $value, array $options = []): array
     {
         if (!\is_array($value)) {

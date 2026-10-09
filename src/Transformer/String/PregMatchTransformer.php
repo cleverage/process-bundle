@@ -21,6 +21,11 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class PregMatchTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return array<mixed>|null
+     */
     public function transform(mixed $value, array $options = []): ?array
     {
         if (null === $value || '' === $value) {

@@ -118,6 +118,7 @@ class RowAggregatorTaskTest extends TestCase
     }
 
     /**
+     * @param array<string, mixed>     $options
      * @param class-string<\Throwable> $exception
      */
     #[DataProvider('invalidOptionsProvider')]
@@ -130,6 +131,9 @@ class RowAggregatorTaskTest extends TestCase
         $task->initialize($this->createState($options));
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

@@ -198,6 +198,9 @@ class FileMoverTaskTest extends TestCase
         $this->execute($options, $this->tmpDir.'/src/file.csv');
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function execute(array $options, mixed $input): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

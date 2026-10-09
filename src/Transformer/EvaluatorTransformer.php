@@ -47,6 +47,9 @@ class EvaluatorTransformer implements ConfigurableTransformerInterface
         );
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         return $this->language->evaluate($options['expression'], $value);

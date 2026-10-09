@@ -27,6 +27,9 @@ class SubprocessInstance
 
     protected string $bufferPath;
 
+    /**
+     * @var array<string, mixed>
+     */
     protected array $options;
 
     protected string $consolePath;
@@ -35,6 +38,10 @@ class SubprocessInstance
 
     protected string $logDir;
 
+    /**
+     * @param array<string, mixed> $context
+     * @param array<string, mixed> $options
+     */
     public function __construct(
         KernelInterface $kernel,
         protected string $processCode,
@@ -125,11 +132,17 @@ class SubprocessInstance
         return $this->input;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array
     {
         return $this->options;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getContext(): array
     {
         return $this->context;

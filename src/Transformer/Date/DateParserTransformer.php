@@ -26,6 +26,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class DateParserTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (!$value || $value instanceof \DateTime) {

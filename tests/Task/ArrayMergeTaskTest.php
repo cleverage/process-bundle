@@ -67,7 +67,9 @@ class ArrayMergeTaskTest extends TestCase
     }
 
     /**
-     * @param list<array<mixed>> $inputs
+     * @param array<string, mixed> $options
+     * @param list<array<mixed>>   $inputs
+     * @param array<mixed>         $expected
      */
     #[DataProvider('mergeProvider')]
     public function testInputsAreMergedWithMergeFunction(array $options, array $inputs, array $expected): void
@@ -140,6 +142,9 @@ class ArrayMergeTaskTest extends TestCase
         $task->initialize($state);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

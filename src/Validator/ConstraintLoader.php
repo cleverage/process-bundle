@@ -27,6 +27,10 @@ class ConstraintLoader extends AbstractLoader
      * Build constraints from textual data.
      *
      * @see \Symfony\Component\Validator\Mapping\Loader\YamlFileLoader::parseNodes
+     *
+     * @param array<mixed> $nodes
+     *
+     * @return array<mixed>
      */
     public function buildConstraints(array $nodes): array
     {

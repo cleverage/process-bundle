@@ -49,6 +49,11 @@ class TaskConfiguration
 
     protected bool $logErrors;
 
+    /**
+     * @param array<string, mixed> $options
+     * @param list<string>         $outputs
+     * @param list<string>         $errorOutputs
+     */
     public function __construct(
         protected string $code,
         protected string $serviceReference,
@@ -93,6 +98,9 @@ class TaskConfiguration
         return $this->help;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array
     {
         return $this->options;
@@ -107,11 +115,17 @@ class TaskConfiguration
         return $default;
     }
 
+    /**
+     * @return list<string>
+     */
     public function getOutputs(): array
     {
         return $this->outputs;
     }
 
+    /**
+     * @return list<string>
+     */
     #[\Deprecated(message: 'Use getErrorOutputs method instead')]
     public function getErrors(): array
     {
@@ -120,6 +134,9 @@ class TaskConfiguration
         return $this->getErrorOutputs();
     }
 
+    /**
+     * @return list<string>
+     */
     public function getErrorOutputs(): array
     {
         return $this->errorOutputs;

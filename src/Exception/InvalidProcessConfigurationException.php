@@ -21,6 +21,9 @@ use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
  */
 class InvalidProcessConfigurationException extends \UnexpectedValueException implements ProcessExceptionInterface
 {
+    /**
+     * @param list<string> $mainTaskList
+     */
     public static function createNotInMain(
         ProcessConfiguration $processConfiguration,
         TaskConfiguration $taskConfig,

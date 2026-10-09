@@ -64,6 +64,9 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
         );
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         $input = [

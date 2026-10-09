@@ -36,6 +36,9 @@ class ProcessHistory implements \Stringable
 
     protected string $state = self::STATE_STARTED;
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function __construct(
         ProcessConfiguration $processConfiguration,
         protected array $context = [],
@@ -64,6 +67,9 @@ class ProcessHistory implements \Stringable
         return $this->processCode;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getContext(): array
     {
         return $this->context;

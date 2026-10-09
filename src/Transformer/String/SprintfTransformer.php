@@ -21,6 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class SprintfTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): string
     {
         if (!\is_array($value)) {

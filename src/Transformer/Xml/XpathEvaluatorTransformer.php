@@ -64,6 +64,8 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
     /**
      * Configure options about how to handle xpath query results.
      * Available at root and subquery level.
+     *
+     * @param Options<array<string, mixed>>|null $parentOptions
      */
     public function configureQueryOptions(OptionsResolver $resolver, ?Options $parentOptions = null): void
     {
@@ -77,6 +79,9 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('unwrap_value', 'bool');
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (!$value instanceof \DOMNode) {
@@ -108,6 +113,9 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         return new \DOMXPath($doc);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function query(\DOMXPath $xpath, string $query, \DOMNode $node, array $options): mixed
     {
         $nodeList = $xpath->query($query, $node);

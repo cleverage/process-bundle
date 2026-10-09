@@ -24,6 +24,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class MultiReplaceTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         foreach ($options['replace_mapping'] as $pattern => $replacement) {

@@ -51,16 +51,25 @@ class ProcessState
 
     protected ?\Throwable $exception = null;
 
+    /**
+     * @var array<int|string, mixed>
+     */
     protected array $errorContext = [];
 
     protected ?int $returnCode = null;
 
     protected bool $skipped;
 
+    /**
+     * @var array<string, mixed>|null
+     */
     protected ?array $context = null;
 
     protected ?ContextualOptionResolver $contextualOptionResolver = null;
 
+    /**
+     * @var array<string, mixed>|null
+     */
     protected ?array $contextualizedOptions = null;
 
     protected ?ProcessState $previousState = null;
@@ -191,11 +200,17 @@ class ProcessState
         $this->exception = $exception;
     }
 
+    /**
+     * @return array<int|string, mixed>
+     */
     public function getErrorContext(): array
     {
         return $this->errorContext;
     }
 
+    /**
+     * @param array<int|string, mixed> $errorContext
+     */
     public function setErrorContext(array $errorContext): void
     {
         $this->errorContext = $errorContext;
@@ -260,11 +275,17 @@ class ProcessState
         return self::STATUS_RESOLVED === $this->status;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getContext(): array
     {
         return $this->context;
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function setContext(array $context): void
     {
         if ($this->context) {
@@ -274,6 +295,9 @@ class ProcessState
         $this->context = $context;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getContextualizedOptions(): ?array
     {
         if (!$this->contextualizedOptions) {

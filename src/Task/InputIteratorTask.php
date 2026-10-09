@@ -27,7 +27,16 @@ class InputIteratorTask extends AbstractIterableOutputTask
             return $input;
         }
         if ($input instanceof \IteratorAggregate) {
-            return $input->getIterator();
+            $iterator = $input->getIterator();
+            if ($iterator instanceof \Iterator) {
+                return $iterator;
+            }
+
+            // getIterator() may return any \Traversable, such as another \IteratorAggregate
+            $iterator = new \IteratorIterator($iterator);
+            $iterator->rewind();
+
+            return $iterator;
         }
         if (\is_array($input)) {
             return new \ArrayIterator($input);

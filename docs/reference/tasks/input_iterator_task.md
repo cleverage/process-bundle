@@ -12,7 +12,7 @@ Task reference
 Accepted inputs
 ---------------
 
-`array`, `\Iterator` or `\IteratorAggregate`: any other type throws an `\UnexpectedValueException`
+`array`, `\Iterator` or `\IteratorAggregate` (whatever `\Traversable` its `getIterator()` returns): any other type throws an `\UnexpectedValueException`
 
 Possible outputs
 ----------------

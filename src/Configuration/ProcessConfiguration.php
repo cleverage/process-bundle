@@ -21,10 +21,20 @@ use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
  */
 class ProcessConfiguration
 {
+    /**
+     * @var list<list<string>>|null
+     */
     protected ?array $dependencyGroups = null;
 
+    /**
+     * @var list<string>|null
+     */
     protected ?array $mainTaskGroup = null;
 
+    /**
+     * @param array<string, TaskConfiguration> $taskConfigurations
+     * @param array<string, mixed>             $options
+     */
     public function __construct(
         protected string $code,
         protected array $taskConfigurations,
@@ -42,6 +52,9 @@ class ProcessConfiguration
         return $this->code;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array
     {
         return $this->options;
@@ -106,6 +119,8 @@ class ProcessConfiguration
      * Group all task by dependencies.
      *
      * If one task depend from another, it should come after
+     *
+     * @return list<list<string>>
      */
     public function getDependencyGroups(): array
     {
@@ -130,6 +145,8 @@ class ProcessConfiguration
      * It may be defined by the entry_point, or the end_point or simply the first task.
      *
      * If one task depend from another, it should come after
+     *
+     * @return list<string>
      */
     public function getMainTaskGroup(): array
     {
@@ -195,6 +212,10 @@ class ProcessConfiguration
 
     /**
      * Cross all relations of a task to find all dependencies, and append them to the given array.
+     *
+     * @param list<string> $dependencies
+     *
+     * @return list<string>
      */
     protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies = []): array
     {
@@ -222,6 +243,10 @@ class ProcessConfiguration
 
     /**
      * Sort the tasks by dependencies.
+     *
+     * @param list<string> $dependencies
+     *
+     * @return list<string>
      */
     protected function sortDependencies(array $dependencies): array
     {

@@ -110,6 +110,9 @@ class EventDispatcherTaskTest extends TestCase
         return $dispatcher;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function execute(EventDispatcher $dispatcher, array $options, mixed $input = null): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

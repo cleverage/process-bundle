@@ -5,16 +5,5 @@ parameters:
         - tests
     excludePaths:
         - src/Resources/tests/*
-    ignoreErrors:
-        - '#type has no value type specified in iterable type#'
-        - '#has parameter .* with no value type specified in iterable type#'
-        - '#has no value type specified in iterable type array#'
-        - '#configureOptions\(\) has no return type specified.#'
-        - '#configure\(\) has no return type specified#'
-        - '#process\(\) has no return type specified#'
-        - '#should return Iterator but returns Traversable#'
-        - '#Negated boolean expression is always false#'
-        - identifier: missingType.generics
-    reportUnmatchedIgnoredErrors: false
     inferPrivatePropertyTypeFromConstructor: true
     treatPhpDocTypesAsCertain: false

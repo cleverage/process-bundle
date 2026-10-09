@@ -239,6 +239,9 @@ class JsonStreamReaderTaskTest extends TestCase
         return $path;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

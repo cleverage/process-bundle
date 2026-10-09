@@ -3,6 +3,10 @@ Latest
 
 ## Changes
 * [#197](https://github.com/cleverage/process-bundle/issues/197) Add missing tests: every Task and Transformer is now covered by unit tests. Remove the obsolete `tests.old` directory.
+* [#143](https://github.com/cleverage/process-bundle/issues/143) Improve PHPStan configuration: remove all `ignoreErrors` and `@phpstan-ignore` comments (report unmatched ignored errors again), add missing iterable value types and generic types in PHPDoc, remove unreachable code in AbstractIterableOutputTask and InputAggregatorTask.
+
+## Fixes
+* [#143](https://github.com/cleverage/process-bundle/issues/143) Fix InputIteratorTask: an `\IteratorAggregate` input whose `getIterator()` does not return an `\Iterator` (e.g. another `\IteratorAggregate`) is iterated instead of failing with a `TypeError`. Update documentation, add tests.
 
 v5.1
 -----

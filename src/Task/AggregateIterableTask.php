@@ -23,6 +23,9 @@ use CleverAge\ProcessBundle\Model\ProcessState;
  */
 class AggregateIterableTask implements BlockingTaskInterface
 {
+    /**
+     * @var list<mixed>
+     */
     protected array $result = [];
 
     public function execute(ProcessState $state): void

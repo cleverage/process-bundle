@@ -24,6 +24,9 @@ class SplFile
 
     protected int $lineNumber = 1;
 
+    /**
+     * @param list<int>|null $splFileObjectFlags
+     */
     public function __construct(
         string $filename,
         string $mode = 'rb',

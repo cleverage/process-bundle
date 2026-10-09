@@ -33,6 +33,9 @@ class RulesTransformer implements ConfigurableTransformerInterface
         $this->transformerRegistry = $transformerRegistry;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         foreach ($options['rules_set'] as $rule) {
@@ -92,6 +95,8 @@ class RulesTransformer implements ConfigurableTransformerInterface
 
     /**
      * Configure options for one "rule" block.
+     *
+     * @param array<string, mixed>|null $expressionVariables
      */
     public function configureRuleOptions(OptionsResolver $resolver, ?array $expressionVariables = null): void
     {
@@ -127,6 +132,8 @@ class RulesTransformer implements ConfigurableTransformerInterface
 
     /**
      * Test if a value match a rule.
+     *
+     * @param array<string, mixed> $rule
      */
     protected function matchRule(mixed $value, array $rule, bool $useValueAsVariable): bool
     {

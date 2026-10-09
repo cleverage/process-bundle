@@ -74,7 +74,8 @@ class FilterTaskTest extends TestCase
     }
 
     /**
-     * @param list<int> $expectedKept
+     * @param array<string, mixed> $options
+     * @param list<int>            $expectedKept
      */
     #[DataProvider('filterProvider')]
     public function testInputsAreFiltered(array $options, array $expectedKept): void
@@ -138,6 +139,9 @@ class FilterTaskTest extends TestCase
         yield 'other path on scalar is empty' => [['not_empty' => ['[key]' => null]], 'foo', true];
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     #[DataProvider('scalarProvider')]
     public function testScalarInput(array $options, mixed $input, bool $expectedSkipped): void
     {
@@ -156,6 +160,9 @@ class FilterTaskTest extends TestCase
         $this->execute(['equals' => []], []);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function execute(array $options, mixed $input): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

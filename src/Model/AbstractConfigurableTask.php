@@ -21,6 +21,9 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 abstract class AbstractConfigurableTask implements InitializableTaskInterface, ResetInterface
 {
+    /**
+     * @var array<string, mixed>|null
+     */
     protected ?array $options = null;
 
     /**
@@ -36,6 +39,9 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface, R
         $this->options = null;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     protected function getOptions(ProcessState $state): ?array
     {
         if (null === $this->options) {

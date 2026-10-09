@@ -35,6 +35,9 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     protected array $launchedProcesses = [];
 
+    /**
+     * @var \SplQueue<string>
+     */
     protected \SplQueue $finishedBuffers;
 
     protected bool $flushMode = false;
@@ -59,7 +62,6 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             $state->setOutput($this->finishedBuffers->dequeue());
 
             // After dequeue, stop flush
-            /* @phpstan-ignore-next-line */
             if ($this->finishedBuffers->isEmpty()) {
                 $this->flushMode = false;
             }
