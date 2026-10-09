@@ -107,6 +107,29 @@ class InputFileReaderTaskTest extends TestCase
         $this->read($task, $state, $filename);
     }
 
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function invalidInputProvider(): iterable
+    {
+        yield 'null' => [null];
+        yield 'empty string' => [''];
+        yield 'array' => [['a.txt']];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('invalidInputProvider')]
+    public function testThrowsWhenNoFilePathIsGivenAsInput(mixed $input): void
+    {
+        $task = new InputFileReaderTask();
+        $state = $this->createState([]);
+        $task->initialize($state);
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('No file path given as input');
+
+        $this->read($task, $state, $input);
+    }
+
     public function testRejectsFilenameOption(): void
     {
         $task = new InputFileReaderTask();

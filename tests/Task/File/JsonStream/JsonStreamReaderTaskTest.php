@@ -211,6 +211,11 @@ class JsonStreamReaderTaskTest extends TestCase
         $task->initialize($state);
     }
 
+    public function testNextWithoutFileReturnsFalse(): void
+    {
+        self::assertFalse((new JsonStreamReaderTask())->next($this->createState([])));
+    }
+
     /**
      * Mimics the ProcessManager loop over an iterable task and returns the non-skipped outputs.
      *

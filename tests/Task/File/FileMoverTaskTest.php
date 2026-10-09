@@ -42,7 +42,6 @@ class FileMoverTaskTest extends TestCase
 
     protected function setUp(): void
     {
-        // No more_entropy: the directory name must not contain a dot (see makeFilenameUnique)
         $this->tmpDir = sys_get_temp_dir().\DIRECTORY_SEPARATOR.uniqid('file_mover_test_');
         $this->filesystem = new Filesystem();
         $this->filesystem->dumpFile($this->tmpDir.'/src/file.csv', 'source');
@@ -168,6 +167,51 @@ class FileMoverTaskTest extends TestCase
 
         self::assertSame($this->tmpDir.'/dest/file-1', $state->getOutput());
         self::assertSame('source', file_get_contents($this->tmpDir.'/dest/file-1'));
+    }
+
+    public function testAutoincrementIncrementsExistingSuffixOfFileWithoutExtension(): void
+    {
+        $this->filesystem->dumpFile($this->tmpDir.'/src/file', 'source');
+        $this->filesystem->dumpFile($this->tmpDir.'/dest/file', 'existing');
+        $this->filesystem->dumpFile($this->tmpDir.'/dest/file-1', 'existing 1');
+
+        $state = $this->execute(
+            ['destination' => $this->tmpDir.'/dest', 'autoincrement' => true],
+            $this->tmpDir.'/src/file',
+        );
+
+        self::assertSame($this->tmpDir.'/dest/file-2', $state->getOutput());
+        self::assertSame('source', file_get_contents($this->tmpDir.'/dest/file-2'));
+    }
+
+    /**
+     * @return iterable<string, array{string, string}>
+     */
+    public static function autoincrementFileNameProvider(): iterable
+    {
+        yield 'file with extension' => ['file.csv', 'file-1.csv'];
+        yield 'file without extension' => ['file', 'file-1'];
+        yield 'file with numeric suffix' => ['report-2024.csv', 'report-2024-1.csv'];
+        yield 'file with several dots' => ['archive.tar.gz', 'archive.tar-1.gz'];
+        yield 'hidden file' => ['.env', '.env-1'];
+        yield 'hidden file with extension' => ['.env.local', '.env-1.local'];
+    }
+
+    #[DataProvider('autoincrementFileNameProvider')]
+    public function testAutoincrementOnlyChangesFileNameInDottedDirectory(string $fileName, string $expectedFileName): void
+    {
+        $dir = $this->tmpDir.'/repro.d';
+        $this->filesystem->dumpFile($dir.'/src/'.$fileName, 'source');
+        $this->filesystem->dumpFile($dir.'/dest/'.$fileName, 'existing');
+
+        $state = $this->execute(
+            ['destination' => $dir.'/dest', 'autoincrement' => true],
+            $dir.'/src/'.$fileName,
+        );
+
+        self::assertSame($dir.'/dest/'.$expectedFileName, $state->getOutput());
+        self::assertSame('source', file_get_contents($dir.'/dest/'.$expectedFileName));
+        self::assertSame('existing', file_get_contents($dir.'/dest/'.$fileName));
     }
 
     public function testThrowsOnMissingDestinationOption(): void

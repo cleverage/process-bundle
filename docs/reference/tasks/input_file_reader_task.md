@@ -12,8 +12,8 @@ Task reference
 Accepted inputs
 ---------------
 
-`string`: path of the file to read. An `\UnexpectedValueException` is thrown if the file does not exist or is not
-readable.
+`string`: path of the file to read. An `\UnexpectedValueException` is thrown if the input is not a non-empty string
+(e.g. `null`, `''`), or if the file does not exist or is not readable.
 
 Possible outputs
 ----------------

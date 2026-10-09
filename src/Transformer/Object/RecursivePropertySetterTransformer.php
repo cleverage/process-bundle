@@ -66,9 +66,8 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
                     $this->accessor->setValue($item, $propertyPath, $propertyValue);
                 } catch (NoSuchPropertyException $e) {
                     if ($item instanceof \stdClass) {
-                        $item = (object) array_merge((array) $item, [
-                            $propertyPath => $propertyValue,
-                        ]);
+                        // Add the property to the item itself, to modify it in place
+                        $item->{$propertyPath} = $propertyValue;
                     } else {
                         throw $e;
                     }

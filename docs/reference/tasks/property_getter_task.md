@@ -21,8 +21,8 @@ Possible outputs
 
 `mixed`: the value read at the `property` path.
 
-If the value cannot be read, the exception is set on the state (with the `property` added to the error context) and
-handled according to the task `error_strategy`.
+If the value cannot be read (including a `\TypeError` of the property accessor, e.g. on a scalar input), the exception
+is set on the state (with the `property` added to the error context) and handled according to the task `error_strategy`.
 
 Options
 -------

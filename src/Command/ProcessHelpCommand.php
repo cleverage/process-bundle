@@ -107,12 +107,13 @@ class ProcessHelpCommand extends Command
         $totalBranches = \count($taskList);
         for ($i = 0; $i < $totalBranches; ++$i) {
             // Find the best task to display
-            $nextTaskCode = $this->findBestNextTask($branches, $remainingTasks, $process);
+            // A numeric task code may be returned as an integer array key
+            $nextTaskCode = (string) $this->findBestNextTask($branches, $remainingTasks, $process);
 
             $this->resolveBranchOutput($branches, $nextTaskCode, $process, $output);
 
             // Remove the task from the remaining list
-            $remainingTasks = array_filter($remainingTasks, static fn ($task): bool => $task !== $nextTaskCode);
+            $remainingTasks = array_values(array_filter($remainingTasks, static fn ($task): bool => $task !== $nextTaskCode));
         }
 
         $branches = array_filter($branches);
@@ -127,8 +128,8 @@ class ProcessHelpCommand extends Command
     /**
      * Try to find a best candidate for next display.
      *
-     * @param array<string|null> $branches
-     * @param list<string>       $taskList
+     * @param array<int, string|null> $branches
+     * @param list<string>            $taskList
      */
     protected function findBestNextTask(
         array $branches,
@@ -227,7 +228,7 @@ class ProcessHelpCommand extends Command
     /**
      * Merge needed branches, display a task node, split following needed branches.
      *
-     * @param array<string|null> $branches
+     * @param array<int, string|null> $branches
      */
     protected function resolveBranchOutput(
         array &$branches,
@@ -293,7 +294,12 @@ class ProcessHelpCommand extends Command
 
             $origin = array_shift($branchesToMerge);
             $final = $gapFrom;
-            $branches[$origin] = $taskCode;
+            if (null === $origin) {
+                // No previous branch found (an error has been displayed): open a new branch
+                $branches[] = $taskCode;
+            } else {
+                $branches[$origin] = $taskCode;
+            }
         }
 
         // Merge branches
@@ -377,6 +383,9 @@ class ProcessHelpCommand extends Command
             $this->writeBranches($output, $branches);
             array_shift($nextTasks);
             $origin = array_search($taskCode, $branches, true);
+            if (false === $origin) {
+                throw new \UnexpectedValueException("Task '{$taskCode}' is not in any branch");
+            }
             $expandBranches = [];
             foreach ($nextTasks as $nextTask) {
                 $index = array_search(null, $branches, true);
@@ -448,7 +457,7 @@ class ProcessHelpCommand extends Command
     }
 
     /**
-     * @param array<string|null>      $branches
+     * @param array<int, string|null> $branches
      * @param string|iterable<string> $comment
      */
     protected function writeBranches(

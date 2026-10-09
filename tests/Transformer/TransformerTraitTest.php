@@ -19,7 +19,6 @@ use CleverAge\ProcessBundle\Transformer\CallbackTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
 #[\PHPUnit\Framework\Attributes\CoversTrait(TransformerTrait::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(TransformerRegistry::class)]
@@ -67,44 +66,19 @@ class TransformerTraitTest extends TestCase
         $this->createHolder()->resolve(['callback#' => ['callback' => 'trim']]);
     }
 
-    private function createHolder(): object
+    public function testMissingRegistryThrows(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('No transformer registry defined');
+
+        (new TransformerTraitHolder())->cleanCode('callback#1');
+    }
+
+    private function createHolder(): TransformerTraitHolder
     {
         $registry = new TransformerRegistry();
         $registry->addTransformer(new CallbackTransformer());
 
-        return new class($registry) {
-            use TransformerTrait;
-
-            public function __construct(TransformerRegistry $transformerRegistry)
-            {
-                $this->transformerRegistry = $transformerRegistry;
-            }
-
-            public function cleanCode(string $code): string
-            {
-                return $this->getCleanedTransfomerCode($code);
-            }
-
-            /**
-             * @param array<string, mixed> $transformers
-             *
-             * @return array<string, \Closure>
-             */
-            public function resolve(array $transformers): array
-            {
-                $resolver = new OptionsResolver();
-                $this->configureTransformersOptions($resolver);
-
-                return $resolver->resolve(['transformers' => $transformers])['transformers'];
-            }
-
-            /**
-             * @param array<string, \Closure> $transformers
-             */
-            public function apply(array $transformers, mixed $value): mixed
-            {
-                return $this->applyTransformers($transformers, $value);
-            }
-        };
+        return new TransformerTraitHolder($registry);
     }
 }
