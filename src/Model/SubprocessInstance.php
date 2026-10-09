@@ -64,11 +64,14 @@ class SubprocessInstance
      */
     public function buildProcess(): static
     {
-        $pathFinder = new PhpExecutableFinder();
+        $phpBinary = (new PhpExecutableFinder())->find();
+        if (false === $phpBinary) {
+            throw new \RuntimeException('Unable to find the PHP executable');
+        }
 
         $arguments = [
             'nohup',
-            $pathFinder->find(),
+            $phpBinary,
             $this->consolePath,
             '--env='.$this->environment,
             'cleverage:process:execute',

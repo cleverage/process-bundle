@@ -125,6 +125,6 @@ class ListProcessCommand extends Command
 
     protected function filterOutTags(string $string): string
     {
-        return preg_replace('/<[^<>]*>/', '', $string);
+        return preg_replace('/<[^<>]*>/', '', $string) ?? $string;
     }
 }
