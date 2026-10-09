@@ -5,6 +5,7 @@ services:
         arguments:
             - ~
             - ~
+            - ~
 
     cleverage_process.registry.transformer:
         class: CleverAge\ProcessBundle\Registry\TransformerRegistry
