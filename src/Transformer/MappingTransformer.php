@@ -115,6 +115,9 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 $this->accessor->setValue($result, $targetProperty, $transformedValue);
             } elseif (\is_array($result)) {
                 $result[$targetProperty] = $transformedValue;
+            } elseif ($result instanceof \stdClass && 1 === preg_match('/^[^.[\]]+$/', $targetProperty)) {
+                // Only a simple property name can be added to a \stdClass, nested paths are not created
+                $result->{$targetProperty} = $transformedValue;
             } else {
                 throw new \UnexpectedValueException("Property '{$targetProperty}' is not writable");
             }
