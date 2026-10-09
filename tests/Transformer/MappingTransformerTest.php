@@ -36,6 +36,11 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 #[\PHPUnit\Framework\Attributes\UsesClass(TransformerException::class)]
 class MappingTransformerTest extends TestCase
 {
+    /**
+     * @var list<string>
+     */
+    private array $deprecations = [];
+
     public function testGetCode(): void
     {
         self::assertSame('mapping', $this->createTransformer()->getCode());
@@ -442,6 +447,65 @@ class MappingTransformerTest extends TestCase
         $transformer->transform([], $options);
     }
 
+    public function testSimpleTargetPropertyIsAddedToAnArrayDestinationWithoutDeprecation(): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, [
+            'mapping' => [
+                'field2' => ['code' => '[field]'],
+            ],
+        ]);
+
+        $result = $this->transformCollectingDeprecations($transformer, ['field' => 'value'], $options);
+
+        self::assertSame(['field2' => 'value'], $result);
+        self::assertSame([], $this->deprecations);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function nonSimpleArrayTargetPropertyProvider(): iterable
+    {
+        yield 'nested path' => ['field2.child'];
+        yield 'index after a property' => ['field2[child]'];
+        yield 'property after an index' => ['[field2].child'];
+    }
+
+    #[DataProvider('nonSimpleArrayTargetPropertyProvider')]
+    public function testNonSimpleTargetPropertyOfAnArrayDestinationIsDeprecated(string $targetProperty): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, [
+            'mapping' => [
+                $targetProperty => ['code' => '[field]'],
+            ],
+        ]);
+
+        $result = $this->transformCollectingDeprecations($transformer, ['field' => 'value'], $options);
+
+        self::assertSame([$targetProperty => 'value'], $result);
+        self::assertSame([
+            "Setting the target property '{$targetProperty}' as a literal key of an array destination is deprecated, it will throw an \\UnexpectedValueException in v6.0. Use '[{$targetProperty}]' to keep a literal key, or the index notation for nested arrays (e.g. '[a][b]').",
+        ], $this->deprecations);
+    }
+
+    public function testIndexNotationKeepsALiteralKeyWithoutDeprecation(): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, [
+            'mapping' => [
+                '[field2.child]' => ['code' => '[field]'],
+                '[field3][child]' => ['code' => '[field]'],
+            ],
+        ]);
+
+        $result = $this->transformCollectingDeprecations($transformer, ['field' => 'value'], $options);
+
+        self::assertSame(['field2.child' => 'value', 'field3' => ['child' => 'value']], $result);
+        self::assertSame([], $this->deprecations);
+    }
+
     public function testKeepInputCopiesAnArrayInput(): void
     {
         $transformer = $this->createTransformer();
@@ -582,6 +646,23 @@ class MappingTransformerTest extends TestCase
                 $this->records[] = ['level' => $level, 'message' => (string) $message, 'context' => $context];
             }
         };
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    private function transformCollectingDeprecations(MappingTransformer $transformer, mixed $value, array $options): mixed
+    {
+        set_error_handler(function (int $errno, string $errstr): bool {
+            $this->deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            return $transformer->transform($value, $options);
+        } finally {
+            restore_error_handler();
+        }
     }
 
     /**
