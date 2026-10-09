@@ -7,6 +7,7 @@ Latest
 
 ## Fixes
 * [#143](https://github.com/cleverage/process-bundle/issues/143) Fix InputIteratorTask: an `\IteratorAggregate` input whose `getIterator()` does not return an `\Iterator` (e.g. another `\IteratorAggregate`) is iterated instead of failing with a `TypeError`. Update documentation, add tests.
+* [#242](https://github.com/cleverage/process-bundle/issues/242) Fix InputFileReaderTask: an input that is not a non-empty string (e.g. `null`) throws an explicit `\UnexpectedValueException` (`No file path given as input`) instead of a PHP warning followed by a `TypeError`. Update documentation, add tests.
 
 v5.1
 -----

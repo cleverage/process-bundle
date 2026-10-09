@@ -21,6 +21,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class InputFileReaderTask extends FileReaderTask
 {
+    #[\Override]
+    public function initialize(ProcessState $state): void
+    {
+        // Only validate the options: the file path comes from the input
+        parent::getOptions($state);
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -28,9 +35,11 @@ class InputFileReaderTask extends FileReaderTask
     protected function getOptions(ProcessState $state): array
     {
         $options = parent::getOptions($state);
-        if (null !== $state->getInput()) {
-            $options['filename'] = $state->getInput();
+        $filename = $state->getInput();
+        if (!\is_string($filename) || '' === $filename) {
+            throw new \UnexpectedValueException('No file path given as input');
         }
+        $options['filename'] = $filename;
 
         return $options;
     }
