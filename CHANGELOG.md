@@ -7,6 +7,7 @@ Latest
 
 ## Fixes
 * [#143](https://github.com/cleverage/process-bundle/issues/143) Fix InputIteratorTask: an `\IteratorAggregate` input whose `getIterator()` does not return an `\Iterator` (e.g. another `\IteratorAggregate`) is iterated instead of failing with a `TypeError`. Update documentation, add tests.
+* [#239](https://github.com/cleverage/process-bundle/issues/239) Fix PropertyGetterTask: catch any `\Throwable`, so that the `TypeError` of the property accessor on a scalar input is set on the state (with the `property` error context) and handled according to the task `error_strategy` instead of escaping it. Update documentation, add tests.
 
 v5.1
 -----

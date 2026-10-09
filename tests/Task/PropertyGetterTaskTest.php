@@ -94,6 +94,16 @@ class PropertyGetterTaskTest extends TestCase
         self::assertNull($state->getOutput());
     }
 
+    public function testScalarInputSetsExceptionWithErrorContext(): void
+    {
+        // The PropertyAccessor throws a \TypeError (not an \Exception) on a scalar input
+        $state = $this->execute('[sku]', 'foo');
+
+        self::assertInstanceOf(\TypeError::class, $state->getException());
+        self::assertSame(['property' => '[sku]'], $state->getErrorContext());
+        self::assertNull($state->getOutput());
+    }
+
     public function testMissingPropertyOptionIsRejected(): void
     {
         $this->expectException(MissingOptionsException::class);
