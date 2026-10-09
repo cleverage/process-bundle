@@ -7,6 +7,7 @@ Latest
 
 ## Fixes
 * [#143](https://github.com/cleverage/process-bundle/issues/143) Fix InputIteratorTask: an `\IteratorAggregate` input whose `getIterator()` does not return an `\Iterator` (e.g. another `\IteratorAggregate`) is iterated instead of failing with a `TypeError`. Update documentation, add tests.
+* [#240](https://github.com/cleverage/process-bundle/issues/240) Fix FileMoverTask: with `autoincrement`, the suffix was computed on the whole path (a dot in a directory name was taken as the extension, making the move fail for a file without extension) and an existing numeric suffix of the file name was replaced (`report-2024.csv` became `report-1.csv`). The suffix is now appended to the file name only (`report-2024-1.csv`, `file-1`, `.env-1`). Update documentation, add tests.
 
 v5.1
 -----
