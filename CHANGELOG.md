@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#197](https://github.com/cleverage/process-bundle/issues/197) Add missing tests: every Task and Transformer is now covered by unit tests. Remove the obsolete `tests.old` directory.
+
 v5.1
 -----
 
