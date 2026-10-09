@@ -42,6 +42,9 @@ v5.1
 * [#189](https://github.com/cleverage/process-bundle/issues/189) EventDispatcherTask: when `event_name` is set, listening to `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent` is deprecated (the event is still dispatched under its class name, with an `E_USER_DEPRECATED` error, if it has listeners). Listen to the configured `event_name` instead: the BC layer will be removed in v6.0.
 * [#222](https://github.com/cleverage/process-bundle/issues/222) ProcessManager: going on with the process after an exception thrown by a task `initialize()` is deprecated (an `E_USER_DEPRECATED` error is triggered). In v6.0, the process will fail before executing any task.
 
+## BC breaks
+* [#234](https://github.com/cleverage/process-bundle/issues/234) ArrayFirstTransformer: restore the meaning of the `allow_not_iterable` option, inverted since v4.0. By default (`false`), a non-iterable input now throws an `\UnexpectedValueException` (it was returned unchanged); with `allow_not_iterable: true`, it is returned unchanged (it threw a `\TypeError`). Set `allow_not_iterable: true` to keep the former default behaviour. Traversable inputs return their first element. Update documentation, add tests.
+
 v5.0
 -----
 
