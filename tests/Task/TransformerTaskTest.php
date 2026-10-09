@@ -110,6 +110,21 @@ class TransformerTaskTest extends TestCase
         self::assertSame([2, 4, 3], $state->getOutput());
     }
 
+    public function testTransformersCanBeGivenAsAList(): void
+    {
+        $state = $this->execute([
+            'transformers' => [
+                ['mapping' => ['mapping' => ['values' => ['code' => '[values]', 'transformers' => ['trim' => null]]]]],
+                'array_last',
+                ['callback' => ['callback' => 'explode', 'left_parameters' => [',']]],
+                ['callback' => ['callback' => 'array_reverse']],
+            ],
+        ], ['values' => ' 1,2,3 ']);
+
+        self::assertNull($state->getException());
+        self::assertSame(['3', '2', '1'], $state->getOutput());
+    }
+
     public function testNonConfigurableTransformerAcceptsNullOptions(): void
     {
         $state = $this->execute(['transformers' => ['array_last' => null]], [1, 2, 3]);
