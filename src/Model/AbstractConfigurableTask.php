@@ -40,9 +40,9 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface, R
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return array<string, mixed>
      */
-    protected function getOptions(ProcessState $state): ?array
+    protected function getOptions(ProcessState $state): array
     {
         if (null === $this->options) {
             $resolver = new OptionsResolver();
