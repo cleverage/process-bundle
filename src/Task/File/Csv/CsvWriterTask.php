@@ -96,8 +96,13 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     {
         $headers = $options['headers'];
         if (null === $headers) {
+            $input = $state->getInput();
+            if (!\is_array($input)) {
+                throw new \UnexpectedValueException('Input value is not an array');
+            }
+
             // Keys of a list are integers: the CSV output is the same with their string value
-            return array_map(strval(...), array_keys($state->getInput()));
+            return array_map(strval(...), array_keys($input));
         }
 
         return $headers;

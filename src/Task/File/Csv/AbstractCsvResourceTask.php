@@ -30,6 +30,7 @@ abstract class AbstractCsvResourceTask extends AbstractConfigurableTask implemen
     {
         if ($this->csv instanceof CsvResource) {
             $this->csv->close();
+            $this->csv = null;
         }
     }
 

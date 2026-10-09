@@ -212,6 +212,30 @@ class CsvWriterTaskTest extends TestCase
         $task->execute($state);
     }
 
+    public function testThrowsWhenInputIsNotAnArrayWithoutStaticHeaders(): void
+    {
+        $task = new CsvWriterTask();
+        $state = $this->createState(['file_path' => $this->tmpDir.'/out.csv']);
+        $task->initialize($state);
+        $state->setInput('not an array');
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Input value is not an array');
+        $task->execute($state);
+    }
+
+    public function testCanWriteAgainAfterFinalize(): void
+    {
+        $filePath = $this->tmpDir.'/out.csv';
+        $task = new CsvWriterTask();
+        $state = $this->createState(['file_path' => $filePath]);
+
+        $this->write($task, $state, [['id' => 1]]);
+        $this->write($task, $state, [['id' => 2]]);
+
+        self::assertSame("id\n2\n", file_get_contents($filePath));
+    }
+
     public function testThrowsWhenInputHasMissingColumn(): void
     {
         $task = new CsvWriterTask();
