@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#90](https://github.com/cleverage/process-bundle/issues/90) Installation documentation: describe the Symfony Flex recipe ([symfony/recipes-contrib#2081](https://github.com/symfony/recipes-contrib/pull/2081)), which registers the bundle and creates `config/packages/clever_age_process.yaml` importing the `config/packages/process/` directory, and the manual setup without Flex.
+
 v5.2
 -----
 
