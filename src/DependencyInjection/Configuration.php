@@ -27,6 +27,17 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  */
 class Configuration implements ConfigurationInterface
 {
+    protected const LOG_LEVELS = [
+        LogLevel::EMERGENCY,
+        LogLevel::ALERT,
+        LogLevel::CRITICAL,
+        LogLevel::ERROR,
+        LogLevel::WARNING,
+        LogLevel::NOTICE,
+        LogLevel::INFO,
+        LogLevel::DEBUG,
+    ];
+
     public function __construct(
         protected string $root = 'clever_age_process',
     ) {
@@ -41,6 +52,19 @@ class Configuration implements ConfigurationInterface
         $definition->enumNode('default_error_strategy')
             ->values([TaskConfiguration::STRATEGY_SKIP, TaskConfiguration::STRATEGY_STOP])
             ->defaultValue(TaskConfiguration::STRATEGY_STOP);
+
+        // Default log levels of the end of the processes
+        $logsDefinition = $definition->arrayNode('logs')
+            ->addDefaultsIfNotSet()
+            ->children();
+        $logsDefinition->enumNode('success_level')
+            ->values(self::LOG_LEVELS)
+            ->defaultValue(LogLevel::INFO)
+            ->info('Level of the "Process <code> succeed" log');
+        $logsDefinition->enumNode('failed_level')
+            ->values(self::LOG_LEVELS)
+            ->defaultValue(LogLevel::DEBUG)
+            ->info('Level of the "Process <code> failed" log');
 
         $this->appendRootProcessConfigDefinition($definition);
         $this->appendRootTransformersConfigDefinition($definition);
@@ -125,6 +149,20 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('options')
             ->prototype('variable')
             ->end()
+            ->end()
+            ->arrayNode('logs')
+            ->info('Override the default log levels of the end of the process')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->enumNode('success_level')
+            ->values([...self::LOG_LEVELS, null])
+            ->defaultNull()
+            ->end()
+            ->enumNode('failed_level')
+            ->values([...self::LOG_LEVELS, null])
+            ->defaultNull()
+            ->end()
+            ->end()
             ->end();
 
         /** @var ArrayNodeDefinition $tasksArrayDefinition */
@@ -145,17 +183,6 @@ class Configuration implements ConfigurationInterface
 
     protected function appendTaskConfigDefinition(NodeBuilder $definition): void
     {
-        $logLevels = [
-            LogLevel::EMERGENCY,
-            LogLevel::ALERT,
-            LogLevel::CRITICAL,
-            LogLevel::ERROR,
-            LogLevel::WARNING,
-            LogLevel::NOTICE,
-            LogLevel::INFO,
-            LogLevel::DEBUG,
-        ];
-
         $definition->scalarNode('service')
             ->isRequired();
         $definition->scalarNode('description')
@@ -168,7 +195,7 @@ class Configuration implements ConfigurationInterface
         $definition->scalarNode('error_strategy')
             ->defaultNull();
         $definition->enumNode('log_level')
-            ->values($logLevels)
+            ->values(self::LOG_LEVELS)
             ->defaultValue(LogLevel::CRITICAL);
 
         foreach (['outputs', 'errors', 'error_outputs'] as $nodeName) {

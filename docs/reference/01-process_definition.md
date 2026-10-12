@@ -7,6 +7,9 @@ YAML Configuration
 ```yaml
 clever_age_process:
     default_error_strategy: <stop|skip>
+    logs:
+        success_level: <emergency|alert|critical|error|warning|notice|info|debug>
+        failed_level: <emergency|alert|critical|error|warning|notice|info|debug>
     configurations:
         <process_code>:
             description: <string>
@@ -15,6 +18,9 @@ clever_age_process:
             end_point: <task_code>
             public: <true|false>
             options: <array>
+            logs:
+                success_level: <emergency|alert|critical|error|warning|notice|info|debug>
+                failed_level: <emergency|alert|critical|error|warning|notice|info|debug>
             tasks:
                 <task_code>: <task_definition>
 ```
@@ -24,6 +30,16 @@ Global attributes
 
 **default_error_strategy**: optional, either *stop* (default) or *skip*. Error strategy used by every task that does
 not define its own `error_strategy` (see [task definition](02-task_definition.md)).
+
+**logs**: optional [RFC 5424](https://datatracker.ietf.org/doc/html/rfc5424) severities of the logs written at the end
+of each process (channel `cleverage_process`, with the `duration` of the process in seconds in the record context):
+* `success_level` (default *info*): level of the `Process <process_code> succeed` log
+* `failed_level` (default *debug*): level of the `Process <process_code> failed` log, written when the process fails,
+  either with an exception (in addition to the `Critical process failure` log) or when it is stopped without exception
+  (e.g. by a [StopTask](tasks/stop_task.md))
+
+Without UI, the success log is the only trace of a succeeded process: lower its level (e.g. *debug*) only if processes
+are followed by other means.
 
 Process attributes
 ------------------
@@ -50,6 +66,9 @@ from the process list (unless `--all` is used) but execution is still allowed.
 **options**: optional free array (default is empty), not used by this bundle itself. It is available to other bundles
 through `ProcessConfiguration::getOptions()`, e.g. [cleverage/ui-process-bundle](https://github.com/cleverage/ui-process-bundle)
 reads its `ui` key to configure the launch form.
+
+**logs**: optional `success_level` and `failed_level` overriding, for this process only, the global
+[`logs`](#global-attributes) levels (e.g. a scheduled process that often has nothing to do).
 
 **tasks**: list of task definitions contained in the process, indexed by task code. See
 [task definition](02-task_definition.md).

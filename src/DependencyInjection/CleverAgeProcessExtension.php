@@ -40,6 +40,7 @@ class CleverAgeProcessExtension extends Extension
         $processConfigurationRegistry = $container->getDefinition('cleverage_process.registry.process_configuration');
         $processConfigurationRegistry->replaceArgument(0, $config['configurations']);
         $processConfigurationRegistry->replaceArgument(1, $config['default_error_strategy']);
+        $processConfigurationRegistry->replaceArgument(2, $config['logs']);
 
         // Automatic transformer creation from config
         foreach ($config['generic_transformers'] as $transformerCode => $transformerConfig) {
