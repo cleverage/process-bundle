@@ -50,6 +50,7 @@
         - [JsonStreamWriterTask](reference/tasks/json_stream_writer_task.md)
     - File/XML
         - [XmlReaderTask](reference/tasks/xml_reader_task.md)
+        - [XmlStreamReaderTask](reference/tasks/xml_stream_reader_task.md)
         - [XmlWriterTask](reference/tasks/xml_writer_task.md)
     - File/Yaml
         - [YamlReaderTask](reference/tasks/yaml_reader_task.md)
