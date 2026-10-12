@@ -30,10 +30,28 @@ Open a command console, enter your project directory and install it using compos
 composer require cleverage/process-bundle
 ```
 
-Remember to add the following line to `config/bundles.php` (not required if Symfony Flex is used):
+With [Symfony Flex](https://symfony.com/doc/current/setup/flex.html), the
+[recipe](https://github.com/symfony/recipes-contrib/tree/main/cleverage/process-bundle) registers the bundle and creates:
+- `config/packages/clever_age_process.yaml`: the [global configuration](#global-configuration), which imports the
+  `config/packages/process/` directory,
+- `config/packages/process/`: the directory of your processes, one file per process (see
+  [process definition](reference/01-process_definition.md)).
+
+Without Flex, add the following line to `config/bundles.php`:
 
 ```php
 CleverAge\ProcessBundle\CleverAgeProcessBundle::class => ['all' => true],
+```
+
+Then create the `config/packages/process/` directory and the configuration that imports it:
+
+```yaml
+# config/packages/clever_age_process.yaml
+imports:
+    - { resource: process/ }
+
+clever_age_process:
+    default_error_strategy: stop
 ```
 
 Some tasks and transformers use the main Symfony serializer service, and the bundle checks at container compilation
