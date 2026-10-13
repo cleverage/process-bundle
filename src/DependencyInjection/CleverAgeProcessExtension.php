@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
+use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Transformer\GenericTransformer;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -33,6 +34,9 @@ class CleverAgeProcessExtension extends Extension
     {
         // Get the path of the service folder wherever the bundle is installed
         $this->findServices($container, __DIR__.'/../../config/services');
+
+        $container->registerForAutoconfiguration(ProcessStopCheckerInterface::class)
+            ->addTag('cleverage_process.stop_checker');
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
