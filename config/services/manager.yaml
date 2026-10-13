@@ -9,6 +9,7 @@ services:
             - '@cleverage_process.registry.process_configuration'
             - '@cleverage_process.context.contextual_option_resolver'
             - '@event_dispatcher'
+            - !tagged_iterator cleverage_process.stop_checker
 
     cleverage_process.context.contextual_option_resolver:
         class: CleverAge\ProcessBundle\Context\ContextualOptionResolver

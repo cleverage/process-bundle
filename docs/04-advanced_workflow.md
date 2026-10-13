@@ -241,6 +241,60 @@ of a process: it dispatches a `CleverAge\ProcessBundle\Event\EventDispatcherTask
 `ProcessState`. The event is dispatched under the `event_name` option or, when it is not set, under its class name
 (`CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`).
 
+## Stopping a running process
+
+A running process can be stopped from the outside (e.g. on a request made from a UI) by a service implementing
+`CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface`. Such services are autoconfigured (tag
+`cleverage_process.stop_checker`) and injected into the process manager, which calls their `shouldStop()` method
+before **each task execution**: once per item for the iterable tasks and their children, and before proceeding or
+flushing a task.
+
+When a checker returns `true`, the task is not executed and the process is stopped as if the task had failed with the
+`stop` error strategy, whatever its `error_strategy` (its error outputs are not executed): the process fails with a
+`ProcessFailedException` whose previous exception is a `CleverAge\ProcessBundle\Exception\ProcessStoppedException`,
+and the `cleverage_process.fail` event is dispatched. As for any failure, the remaining items are not flushed and the
+tasks are not finalized.
+
+```php
+namespace App\Process;
+
+use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
+
+class FileStopChecker implements ProcessStopCheckerInterface
+{
+    private float $lastCheck = 0;
+
+    private bool $stop = false;
+
+    public function __construct(private string $stopDirectory)
+    {
+    }
+
+    public function shouldStop(ProcessState $state): bool
+    {
+        // Called very often: check at most every 2 seconds
+        if (!$this->stop && microtime(true) - $this->lastCheck >= 2) {
+            $this->lastCheck = microtime(true);
+            $this->stop = file_exists($this->stopDirectory.'/'.$state->getProcessConfiguration()->getCode());
+        }
+
+        return $this->stop;
+    }
+}
+```
+
+Keep in mind that:
+- `shouldStop()` is called very often: it must be fast, e.g. query an external storage at most every few seconds.
+- The process stops between two task executions: a task blocked in a single long call (SQL query, HTTP request,
+  sub-process launched by the [ProcessLauncherTask](reference/tasks/process_launcher_task.md)) stops only when the
+  call returns. Sub-processes launched by the `ProcessLauncherTask` are separate PHP processes, which are not stopped.
+- Sub-processes executed by the [ProcessExecutorTask](reference/tasks/process_executor_task.md) run in the same
+  process manager: the checkers receive the states of their tasks. Their failure is a task error of the parent
+  process (handled according to the `error_strategy` of the `ProcessExecutorTask`): keep returning `true` until the
+  parent process has failed. To recognize a stopped process, look for a `ProcessStoppedException` in the chain of the
+  previous exceptions of the process error.
+
 ## Parallelization
 
 PHP executes a process in a single thread. To use several CPU cores, the

@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#266](https://github.com/cleverage/process-bundle/issues/266) Allow to stop a running process from the outside: services implementing the new `ProcessStopCheckerInterface` (autoconfigured, tag `cleverage_process.stop_checker`, new optional `$stopCheckers` argument of `ProcessManager`) are asked before each task execution; when one of them returns `true`, the task is not executed and the process fails with a `ProcessFailedException` whose previous exception is the new `ProcessStoppedException`. Add documentation and tests.
+
 v5.2
 -----
 

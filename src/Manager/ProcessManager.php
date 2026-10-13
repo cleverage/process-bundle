@@ -19,6 +19,7 @@ use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Event\ProcessEvent;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Exception\ProcessFailedException;
+use CleverAge\ProcessBundle\Exception\ProcessStoppedException;
 use CleverAge\ProcessBundle\Logger\ProcessLogger;
 use CleverAge\ProcessBundle\Logger\TaskLogger;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
@@ -28,6 +29,7 @@ use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -58,6 +60,9 @@ class ProcessManager
 
     protected ?TaskConfiguration $taskConfiguration = null;
 
+    /**
+     * @param iterable<ProcessStopCheckerInterface> $stopCheckers
+     */
     public function __construct(
         protected ContainerInterface $container,
         protected ProcessLogger $processLogger,
@@ -65,6 +70,7 @@ class ProcessManager
         protected ProcessConfigurationRegistry $processConfigurationRegistry,
         protected ContextualOptionResolver $contextualOptionResolver,
         protected EventDispatcherInterface $eventDispatcher,
+        protected iterable $stopCheckers = [],
     ) {
     }
 
@@ -377,6 +383,14 @@ class ProcessManager
         }
         $state = $taskConfiguration->getState();
 
+        if ($this->isStopRequested($state)) {
+            $state->reset(self::EXECUTE_PROCESS !== $executionFlag);
+            $this->processLogger->info("Process stop requested, the task {$taskConfiguration->getCode()} is not executed");
+            $state->stop(ProcessStoppedException::create($state->getProcessConfiguration()->getCode(), $taskConfiguration->getCode()));
+
+            return;
+        }
+
         try {
             if (self::EXECUTE_PROCESS === $executionFlag) {
                 $state->reset(false);
@@ -430,6 +444,17 @@ class ProcessManager
                 throw new \UnexpectedValueException("Unknown error strategy '{$taskConfiguration->getErrorStrategy()}'");
             }
         }
+    }
+
+    protected function isStopRequested(ProcessState $state): bool
+    {
+        foreach ($this->stopCheckers as $stopChecker) {
+            if ($stopChecker->shouldStop($state)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
