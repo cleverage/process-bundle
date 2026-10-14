@@ -3,7 +3,5 @@ parameters:
     paths:
         - src
         - tests
-    excludePaths:
-        - src/Resources/tests/*
     inferPrivatePropertyTypeFromConstructor: true
     treatPhpDocTypesAsCertain: false
