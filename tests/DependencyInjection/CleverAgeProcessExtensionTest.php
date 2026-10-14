@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Tests\DependencyInjection;
 
+use CleverAge\ProcessBundle\Attribute\AsTransformer;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\DependencyInjection\CleverAgeProcessExtension;
 use CleverAge\ProcessBundle\DependencyInjection\Configuration;
@@ -21,6 +22,7 @@ use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Task\DummyTask;
+use CleverAge\ProcessBundle\Tests\Fixtures\AttributedTransformer;
 use CleverAge\ProcessBundle\Transformer\String\TrimTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -28,6 +30,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
 use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\AttributeAutoconfigurationPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
 use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -36,6 +39,7 @@ use Symfony\Component\Yaml\Yaml;
 
 #[CoversClass(CleverAgeProcessExtension::class)]
 #[UsesClass(Configuration::class)]
+#[UsesClass(AsTransformer::class)]
 class CleverAgeProcessExtensionTest extends TestCase
 {
     public function testEveryServiceDefinitionFileIsLoaded(): void
@@ -116,7 +120,21 @@ class CleverAgeProcessExtensionTest extends TestCase
             self::assertSame([['channel' => 'cleverage_process_transformer']], $transformer->getTag('monolog.logger'), $id);
         }
         // The bundle transformers (explicitly defined and tagged, not autoconfigured) are tagged once
-        self::assertSame([[]], $container->findDefinition(TrimTransformer::class)->getTag('cleverage.transformer'));
+        self::assertSame([['code' => 'trim']], $container->findDefinition(TrimTransformer::class)->getTag('cleverage.transformer'));
+    }
+
+    public function testAsTransformerAttributeRegistersTheCode(): void
+    {
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([], $container);
+        $container->setDefinition('app.attributed', (new Definition(AttributedTransformer::class))->setAutoconfigured(true));
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new ResolveChildDefinitionsPass())->process($container);
+
+        $tags = $container->getDefinition('app.attributed')->getTag('cleverage.transformer');
+        self::assertContains(['code' => 'app_attributed'], $tags);
     }
 
     public function testStopCheckersAreInjectedInTheProcessManager(): void

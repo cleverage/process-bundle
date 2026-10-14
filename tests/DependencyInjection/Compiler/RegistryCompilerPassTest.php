@@ -21,6 +21,23 @@ use Symfony\Component\DependencyInjection\Reference;
 #[\PHPUnit\Framework\Attributes\CoversClass(RegistryCompilerPass::class)]
 class RegistryCompilerPassTest extends TestCase
 {
+    public function testIsDeprecated(): void
+    {
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            new RegistryCompilerPass('registry', 'tag', 'append');
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame(['Since cleverage/process-bundle 5.4: The "'.RegistryCompilerPass::class.'" class is deprecated, it will be removed in v6.0.'], $deprecations);
+    }
+
     public function testTaggedServicesAreAddedToTheRegistry(): void
     {
         $container = new ContainerBuilder();

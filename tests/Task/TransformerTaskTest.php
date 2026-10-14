@@ -30,6 +30,7 @@ use CleverAge\ProcessBundle\Transformer\String\TrimTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerTrait;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
@@ -220,11 +221,15 @@ class TransformerTaskTest extends TestCase
         $state->setTaskConfiguration(new TaskConfiguration('transform', TransformerTask::class, $options));
         $state->setInput($input);
 
-        $registry = new TransformerRegistry();
-        $registry->addTransformer(new ArrayLastTransformer());
-        $registry->addTransformer(new CallbackTransformer());
-        $registry->addTransformer(new TrimTransformer());
-        $registry->addTransformer(new MappingTransformer($registry, new NullLogger(), PropertyAccess::createPropertyAccessor()));
+        $registry = new TransformerRegistry(new ServiceLocator([
+            'array_last' => static fn (): ArrayLastTransformer => new ArrayLastTransformer(),
+            'callback' => static fn (): CallbackTransformer => new CallbackTransformer(),
+            'trim' => static fn (): TrimTransformer => new TrimTransformer(),
+            // The mapping transformer uses the registry itself
+            'mapping' => static function () use (&$registry): MappingTransformer {
+                return new MappingTransformer($registry, new NullLogger(), PropertyAccess::createPropertyAccessor());
+            },
+        ]));
 
         $task = new TransformerTask(new NullLogger(), $registry);
         $task->initialize($state);

@@ -7,7 +7,8 @@ Task & transformer declaration
 With autoconfiguration (`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton), nothing more is needed:
 the bundle makes the services implementing `CleverAge\ProcessBundle\Model\TaskInterface` not shared, tags
 the ones implementing `CleverAge\ProcessBundle\Transformer\TransformerInterface` with `cleverage.transformer`, and binds
-both to their logging channel (`monolog.logger` tags).
+both to their logging channel (`monolog.logger` tags). Add the `#[AsTransformer(code: '...')]` attribute to your
+transformer classes, so that they are only instantiated when used (see [transformers](../03-custom_tasks.md#transformers)).
 
 Without autoconfiguration, example of a generic declaration for all the tasks and transformers of your application:
 
@@ -21,11 +22,11 @@ services:
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }
 
-    App\Transformer\:
-        resource: '../src/Transformer/*'
+    # One definition per transformer, the code of the tag being the one returned by getCode()
+    App\Transformer\VatTransformer:
         autowire: true
         tags:
-            - { name: cleverage.transformer }
+            - { name: cleverage.transformer, code: app_vat }
             - { name: monolog.logger, channel: cleverage_process_transformer }
 ```
 
@@ -47,9 +48,12 @@ services:
                 - { name: monolog.logger, channel: cleverage_process_task }
         CleverAge\ProcessBundle\Transformer\TransformerInterface:
             tags:
-                - { name: cleverage.transformer }
                 - { name: monolog.logger, channel: cleverage_process_transformer }
 ```
+
+An `_instanceof` rule cannot give a code per transformer: declare the `cleverage.transformer` tag with its `code` on each
+transformer, or use the `#[AsTransformer]` attribute with autoconfiguration. A `cleverage.transformer` tag without
+`code` is deprecated since 5.4.
 
 Configuration
 -------------

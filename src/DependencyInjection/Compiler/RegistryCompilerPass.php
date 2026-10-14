@@ -19,6 +19,9 @@ use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Generic compiler pass to add tagged services to a registry.
+ *
+ * @deprecated since 5.4, no longer used by the bundle (the transformers are registered by
+ *             TransformerLocatorCompilerPass), will be removed in v6.0
  */
 class RegistryCompilerPass implements CompilerPassInterface
 {
@@ -27,6 +30,7 @@ class RegistryCompilerPass implements CompilerPassInterface
         protected ?string $tag = null,
         protected ?string $method = null,
     ) {
+        trigger_deprecation('cleverage/process-bundle', '5.4', 'The "%s" class is deprecated, it will be removed in v6.0.', self::class);
     }
 
     /**
