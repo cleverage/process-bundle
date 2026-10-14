@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
+use CleverAge\ProcessBundle\Attribute\AsTransformer;
 use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Transformer\GenericTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -46,6 +48,13 @@ class CleverAgeProcessExtension extends Extension
         $container->registerForAutoconfiguration(TransformerInterface::class)
             ->addTag('cleverage.transformer')
             ->addTag('monolog.logger', ['channel' => 'cleverage_process_transformer']);
+        // Lazy loading of the transformers by code
+        $container->registerAttributeForAutoconfiguration(
+            AsTransformer::class,
+            static function (ChildDefinition $definition, AsTransformer $attribute): void {
+                $definition->addTag('cleverage.transformer', ['code' => $attribute->code]);
+            }
+        );
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
@@ -65,7 +74,7 @@ class CleverAgeProcessExtension extends Extension
                 new Reference('cleverage_process.registry.transformer'),
             ]);
             $transformerDefinition->addMethodCall('initialize', [$transformerCode, $transformerConfig]);
-            $transformerDefinition->addTag('cleverage.transformer');
+            $transformerDefinition->addTag('cleverage.transformer', ['code' => $transformerCode]);
 
             $container->setDefinition(GenericTransformer::class.'\\'.$transformerCode, $transformerDefinition);
         }

@@ -200,8 +200,10 @@ must skip the state (`ProcessState::setSkipped(true)`) instead of outputting the
 Transformers are another kind of service. They implement `CleverAge\ProcessBundle\Transformer\TransformerInterface`
 (`transform(mixed $value, array $options = []): mixed` and `getCode(): string`) or
 `CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface` (which adds
-`configureOptions(OptionsResolver $resolver): void`) and are declared with a `cleverage.transformer` tag (added by
-autoconfiguration, with a `monolog.logger` tag on the `cleverage_process_transformer` channel).
+`configureOptions(OptionsResolver $resolver): void`) and are declared with a `cleverage.transformer` tag whose `code`
+attribute is the code returned by `getCode()`: with autoconfiguration, add the
+`CleverAge\ProcessBundle\Attribute\AsTransformer` attribute to the class (the `cleverage.transformer` and
+`monolog.logger` tags are added for you).
 
 They're meant to be lightweight, composable, and stateless pieces of your process. Feel free to implement custom ones
 as soon as provided ones don't fit your goal.
@@ -209,9 +211,11 @@ as soon as provided ones don't fit your goal.
 ```php
 namespace App\Transformer;
 
+use CleverAge\ProcessBundle\Attribute\AsTransformer;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+#[AsTransformer(code: 'app_vat')]
 class VatTransformer implements ConfigurableTransformerInterface
 {
     public function transform(mixed $value, array $options = []): mixed
@@ -238,12 +242,24 @@ services:
     App\Transformer\:
         resource: '../src/Transformer/*'
         autowire: true
-        autoconfigure: true # or, without autoconfiguration: tags: [{ name: cleverage.transformer }]
+        autoconfigure: true
+
+    # or, without autoconfiguration, one definition per transformer:
+    App\Transformer\VatTransformer:
+        autowire: true
+        tags:
+            - { name: cleverage.transformer, code: app_vat }
 ```
 
 Once properly set up, they are registered in the `CleverAge\ProcessBundle\Registry\TransformerRegistry` (used by the
-`TransformerTask` and every transformer using a sub-list of transformers), using the code from
-`TransformerInterface::getCode`. Two transformers cannot share the same code. When creating a new transformer for your
+`TransformerTask` and every transformer using a sub-list of transformers) under their code, in a service locator: a
+transformer is only instantiated when a process uses it. The code of the tag must be the one returned by
+`TransformerInterface::getCode()` (an exception is thrown otherwise when the transformer is used). Two transformers
+cannot share the same code (the container compilation fails).
+
+A transformer tagged without `code` (e.g. autoconfigured without the attribute) still works, but it is instantiated with
+the registry and registered with `TransformerRegistry::addTransformer()`, which is deprecated since 5.4: the `code` will
+be required in v6.0. When creating a new transformer for your
 project you should use an internal prefix in your codes to avoid conflicts with potential standard additions.
 
 ```yaml

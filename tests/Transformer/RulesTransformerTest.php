@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Transformer\Array\ArrayLastTransformer;
 use CleverAge\ProcessBundle\Transformer\RulesTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerTrait;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -72,8 +73,9 @@ class RulesTransformerTest extends TestCase
 
     private function createTransformer(): RulesTransformer
     {
-        $registry = new TransformerRegistry();
-        $registry->addTransformer(new ArrayLastTransformer());
+        $registry = new TransformerRegistry(new ServiceLocator([
+            'array_last' => static fn (): ArrayLastTransformer => new ArrayLastTransformer(),
+        ]));
 
         return new RulesTransformer($registry, new ExpressionLanguage());
     }

@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -622,8 +623,9 @@ class MappingTransformerTest extends TestCase
 
     private function createTransformer(?LoggerInterface $logger = null): MappingTransformer
     {
-        $registry = new TransformerRegistry();
-        $registry->addTransformer(new CallbackTransformer());
+        $registry = new TransformerRegistry(new ServiceLocator([
+            'callback' => static fn (): CallbackTransformer => new CallbackTransformer(),
+        ]));
 
         return new MappingTransformer(
             $registry,

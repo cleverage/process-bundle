@@ -80,18 +80,20 @@ bundle configures them:
 - services implementing `CleverAge\ProcessBundle\Model\TaskInterface` are not shared (no data shared between task
   usages), with a `monolog.logger` tag on the `cleverage_process_task` channel;
 - services implementing `CleverAge\ProcessBundle\Transformer\TransformerInterface` get the `cleverage.transformer` tag
-  (needed by the transformer registry) and a `monolog.logger` tag on the `cleverage_process_transformer` channel.
+  (needed by the transformer registry) and a `monolog.logger` tag on the `cleverage_process_transformer` channel. Add
+  the `#[CleverAge\ProcessBundle\Attribute\AsTransformer(code: '...')]` attribute to their class, with the code returned
+  by `getCode()`: the transformer is then only instantiated when a process uses it (see
+  [transformers](03-custom_tasks.md#transformers)).
 
 Without autoconfiguration, declare these settings yourself:
 
 ```yaml
 # config/services.yaml
 services:
-    App\Transformer\:
-        resource: '../src/Transformer/*'
+    App\Transformer\VatTransformer:                # One definition per transformer, for its code
         autowire: true
         tags:
-            - { name: cleverage.transformer }       # Needed by the transformer registry to find transformers
+            - { name: cleverage.transformer, code: app_vat } # Needed by the transformer registry, code returned by getCode()
             - { name: monolog.logger, channel: cleverage_process_transformer } # Optional, see logging
 
     App\Task\:

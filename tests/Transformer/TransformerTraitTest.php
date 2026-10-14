@@ -21,6 +21,7 @@ use CleverAge\ProcessBundle\Transformer\String\TrimTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 #[\PHPUnit\Framework\Attributes\CoversTrait(TransformerTrait::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(TransformerRegistry::class)]
@@ -86,9 +87,10 @@ class TransformerTraitTest extends TestCase
 
     public function testListedTransformerCodeWithoutOptions(): void
     {
-        $registry = new TransformerRegistry();
-        $registry->addTransformer(new CallbackTransformer());
-        $registry->addTransformer(new TrimTransformer());
+        $registry = new TransformerRegistry(new ServiceLocator([
+            'callback' => static fn (): CallbackTransformer => new CallbackTransformer(),
+            'trim' => static fn (): TrimTransformer => new TrimTransformer(),
+        ]));
         $holder = new TransformerTraitHolder($registry);
 
         $transformers = $holder->resolve(['trim', ['trim' => null], ['callback' => ['callback' => 'strrev']]]);
@@ -142,8 +144,9 @@ class TransformerTraitTest extends TestCase
 
     private function createHolder(): TransformerTraitHolder
     {
-        $registry = new TransformerRegistry();
-        $registry->addTransformer(new CallbackTransformer());
+        $registry = new TransformerRegistry(new ServiceLocator([
+            'callback' => static fn (): CallbackTransformer => new CallbackTransformer(),
+        ]));
 
         return new TransformerTraitHolder($registry);
     }

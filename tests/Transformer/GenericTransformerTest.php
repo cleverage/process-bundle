@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Transformer\CallbackTransformer;
 use CleverAge\ProcessBundle\Transformer\GenericTransformer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -73,8 +74,9 @@ class GenericTransformerTest extends TestCase
 
     public function testTransformersCanBeGivenAsAList(): void
     {
-        $registry = new TransformerRegistry();
-        $registry->addTransformer(new CallbackTransformer());
+        $registry = new TransformerRegistry(new ServiceLocator([
+            'callback' => static fn (): CallbackTransformer => new CallbackTransformer(),
+        ]));
 
         $transformer = new GenericTransformer(new ContextualOptionResolver(), $registry);
         $transformer->initialize('substr_upper', [
@@ -105,8 +107,9 @@ class GenericTransformerTest extends TestCase
      */
     private function createSubstrTransformer(array $contextualOptions): GenericTransformer
     {
-        $registry = new TransformerRegistry();
-        $registry->addTransformer(new CallbackTransformer());
+        $registry = new TransformerRegistry(new ServiceLocator([
+            'callback' => static fn (): CallbackTransformer => new CallbackTransformer(),
+        ]));
 
         $transformer = new GenericTransformer(new ContextualOptionResolver(), $registry);
         $transformer->initialize('substr', [
