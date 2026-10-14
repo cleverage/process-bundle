@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#268](https://github.com/cleverage/process-bundle/issues/268) Clean up composer.json: remove the unused `symfony/dotenv`, `symfony/runtime` and `symfony/error-handler` dependencies (applications relying on the bundle to install them must require them), bound `symfony/service-contracts` to `^2.5|^3`, update the package description.
+
 v5.3
 -----
 

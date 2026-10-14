@@ -1,6 +1,6 @@
 {
   "name": "cleverage/process-bundle",
-  "description": "Process, import/export, transform and validate data with a simple API with Symfony3",
+  "description": "Configure series of tasks to process, import/export, transform and validate data in Symfony",
   "keywords": [
     "process",
     "task",
@@ -62,8 +62,6 @@
     "symfony/config": "^6.4|^7.4|^8",
     "symfony/console": "^6.4|^7.4|^8",
     "symfony/dependency-injection": "^6.4|^7.4|^8",
-    "symfony/dotenv": "^6.4|^7.4|^8",
-    "symfony/error-handler": "^6.4|^7.4|^8",
     "symfony/event-dispatcher": "^6.4|^7.4|^8",
     "symfony/event-dispatcher-contracts": "^3",
     "symfony/expression-language": "^6.4|^7.4|^8",
@@ -76,9 +74,8 @@
     "symfony/options-resolver": "^6.4|^7.4|^8",
     "symfony/process": "^6.4|^7.4|^8",
     "symfony/property-access": "^6.4|^7.4|^8",
-    "symfony/runtime": "^6.4|^7.4|^8",
     "symfony/serializer": "^6.4|^7.4|^8",
-    "symfony/service-contracts": ">=1.0.0",
+    "symfony/service-contracts": "^2.5|^3",
     "symfony/stopwatch": "^6.4|^7.4|^8",
     "symfony/validator": "^6.4|^7.4|^8",
     "symfony/var-dumper": "^6.4|^7.4|^8",
@@ -106,8 +103,7 @@
   "config": {
     "allow-plugins": {
       "phpstan/extension-installer": true,
-      "symfony/flex": true,
-      "symfony/runtime": true
+      "symfony/flex": true
     },
     "sort-packages": true
   }
