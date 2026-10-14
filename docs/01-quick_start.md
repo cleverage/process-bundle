@@ -77,9 +77,8 @@ clever_age_process:
 When creating custom tasks and transformers, you can use Symfony automatic registration. With autoconfiguration
 (`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton, so the default `App\:` resource is enough), the
 bundle configures them:
-- services implementing `CleverAge\ProcessBundle\Model\TaskInterface` are `public` (the process manager fetches tasks
-  from the container) and not shared (no data shared between task usages), with a `monolog.logger` tag on the
-  `cleverage_process_task` channel;
+- services implementing `CleverAge\ProcessBundle\Model\TaskInterface` are not shared (no data shared between task
+  usages), with a `monolog.logger` tag on the `cleverage_process_task` channel;
 - services implementing `CleverAge\ProcessBundle\Transformer\TransformerInterface` get the `cleverage.transformer` tag
   (needed by the transformer registry) and a `monolog.logger` tag on the `cleverage_process_transformer` channel.
 
@@ -99,7 +98,6 @@ services:
         resource: '../src/Task/*'
         autowire: true
         shared: false                               # Important to avoid shared data between task usages
-        public: true                                # Needed by the Process Manager to fetch tasks from the container
         tags:
             - { name: monolog.logger, channel: cleverage_process_task } # Optional, see logging
 ```

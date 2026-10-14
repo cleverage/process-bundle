@@ -9,10 +9,12 @@ create your own.
 
 As stated before, tasks are simple services implementing `CleverAge\ProcessBundle\Model\TaskInterface`, so you can
 design them like any other service, with only small specificities:
-- the service should be **public**: the process manager fetches it, using the `service` reference of the task
-  configuration (with or without the leading `@`), from a service locator built when the container is compiled from
-  the process configurations (so a private service works too), and only falls back on the service container (public
-  services only, deprecated) for a service that is not referenced by these configurations
+- the service does **not need to be public**: the process manager fetches it, using the `service` reference of the
+  task configuration (a service id or alias, with or without the leading `@`, see
+  [task definition](reference/02-task_definition.md#task-attributes)), from a service locator built from the process
+  configurations when the container is compiled. Only a service that is not referenced by these configurations (e.g. a
+  configuration added at runtime) is fetched from the service container, which requires a public service and is
+  deprecated
 - the service should **not be shared** ([`shared: false`](https://symfony.com/doc/current/service_container/shared.html))
 
 Most of the time you don't want a task declared in a process to share some data with another declaration using the
@@ -21,9 +23,9 @@ create one instance (keeping values in every attribute of your class). With `sha
 each time a task configuration is initialized.
 
 With autoconfiguration (`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton), the bundle applies
-these settings to every service implementing `TaskInterface`: `public: true`, `shared: false` and a `monolog.logger`
-tag on the `cleverage_process_task` channel (see [logging](#logging)). A setting explicitly defined on the service
-wins (e.g. `shared: true`).
+these settings to every service implementing `TaskInterface`: `shared: false` and a `monolog.logger` tag on the
+`cleverage_process_task` channel (see [logging](#logging)), as well as `public: true`, only kept for the deprecated
+fallback on the service container. A setting explicitly defined on the service wins (e.g. `shared: true`).
 
 ```yaml
 # config/services.yaml
@@ -42,7 +44,6 @@ services:
     App\Task\:
         resource: '../src/Task/*'
         autowire: true
-        public: true
         shared: false
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }
@@ -276,7 +277,6 @@ services:
     App\Task\:
         resource: '../src/Task/*'
         autowire: true
-        public: true
         shared: false
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }

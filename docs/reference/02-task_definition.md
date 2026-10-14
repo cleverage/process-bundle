@@ -20,8 +20,27 @@ YAML Configuration
 Task attributes
 ---------------
 
-**service**: required, reference to the service used for the task, with or without a leading `@`. The service must be
-public and implement `CleverAge\ProcessBundle\Model\TaskInterface`.
+**service**: required, reference to the service used for the task: a service **id** or a service **alias**, with or
+without a leading `@` (quote the value when it starts with `@`, as YAML requires). The service must implement
+`CleverAge\ProcessBundle\Model\TaskInterface`. For instance, the `UnzipTask` of the archive bridge is registered as
+`cleverage_archive_process.task.unzip`, with an alias named after its class: these four references are equivalent.
+
+```yaml
+service: '@cleverage_archive_process.task.unzip'                  # id, with @
+service: cleverage_archive_process.task.unzip                     # id, without @
+service: '@CleverAge\ArchiveProcessBundle\Task\UnzipTask'         # alias, with @
+service: CleverAge\ArchiveProcessBundle\Task\UnzipTask            # alias, without @
+```
+
+The tasks of this bundle are registered with their class name as id (e.g. `'@CleverAge\ProcessBundle\Task\TransformerTask'`),
+the tasks of the bridge bundles with a `cleverage_*_process.task.*` id and an alias named after their class, and your
+own task services with any id or alias you choose. With an unknown service, a reference with `@` throws the
+`ServiceNotFoundException` of the service container, a reference without `@` an `\UnexpectedValueException`
+(`Unable to resolve service reference for Task '<task code>'`).
+
+The services referenced by the process configurations are collected when the container is compiled, so they can be
+private (as well as the aliases). Only a service that is not referenced by these configurations (e.g. a configuration
+added at runtime) is fetched from the service container, which requires a public service and is deprecated since 5.4.
 
 **description**: optional string to describe a task, displayed in process help (should not exceed one line).
 
