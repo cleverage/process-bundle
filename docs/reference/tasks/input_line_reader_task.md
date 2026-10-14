@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\InputLineReaderTask`
+* **Code**: `input_line_reader` (`task: input_line_reader`)
 * **Iterable task**
 
 Accepted inputs

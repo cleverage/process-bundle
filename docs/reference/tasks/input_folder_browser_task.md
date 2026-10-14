@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\InputFolderBrowserTask`
+* **Code**: `input_folder_browser` (`task: input_folder_browser`)
 * **Iterable task**
 * **Flushable task**
 

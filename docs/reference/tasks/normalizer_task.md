@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Serialization\NormalizerTask`
+* **Code**: `normalizer` (`task: normalizer`)
 
 Accepted inputs
 ---------------

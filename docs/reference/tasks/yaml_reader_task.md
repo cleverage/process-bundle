@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Yaml\YamlReaderTask`
+* **Code**: `yaml_reader` (`task: yaml_reader`)
 * **Iterable task**
 
 Accepted inputs

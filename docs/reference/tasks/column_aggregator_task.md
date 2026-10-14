@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\ColumnAggregatorTask`
+* **Code**: `column_aggregator` (`task: column_aggregator`)
 * **Blocking task**
 
 Accepted inputs

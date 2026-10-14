@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Serialization\DeserializerTask`
+* **Code**: `deserializer` (`task: deserializer`)
 
 Accepted inputs
 ---------------

@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Debug\StopwatchTask`
+* **Code**: `stopwatch` (`task: stopwatch`)
 
 Accepted inputs
 ---------------

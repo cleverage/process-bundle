@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\FileSplitterTask`
+* **Code**: `file_splitter` (`task: file_splitter`)
 * **Iterable task**
 
 Accepted inputs

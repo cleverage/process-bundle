@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Xml\XmlReaderTask`
+* **Code**: `xml_reader` (`task: xml_reader`)
 
 Accepted inputs
 ---------------

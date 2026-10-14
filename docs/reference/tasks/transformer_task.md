@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\TransformerTask`
+* **Code**: `transformer` (`task: transformer`)
 
 Accepted inputs
 ---------------

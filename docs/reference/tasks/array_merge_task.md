@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\ArrayMergeTask`
+* **Code**: `array_merge` (`task: array_merge`)
 * **Blocking task**
 
 Accepted inputs

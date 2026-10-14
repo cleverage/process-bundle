@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamReaderTask`
+* **Code**: `json_stream_reader` (`task: json_stream_reader`)
 * **Iterable task**
 
 Accepted inputs

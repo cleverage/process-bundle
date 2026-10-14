@@ -172,6 +172,10 @@ class Configuration implements ConfigurationInterface
             ->performNoDeepMerging()
             ->cannotBeOverwritten()
             ->info('Unique custom task code')
+            ->validate()
+            ->ifTrue(static fn (array $task): bool => (null === $task['service']) === (null === $task['task']))
+            ->thenInvalid('A task must define either a "service" (service id or class name) or a "task" (code of the task), not both: %s')
+            ->end()
             ->children();
 
         $this->appendTaskConfigDefinition($taskListDefinition);
@@ -180,7 +184,11 @@ class Configuration implements ConfigurationInterface
     protected function appendTaskConfigDefinition(NodeBuilder $definition): void
     {
         $definition->scalarNode('service')
-            ->isRequired();
+            ->info('Service id or alias of the task, with or without a leading "@" (or use "task")')
+            ->defaultNull();
+        $definition->scalarNode('task')
+            ->info('Code of the task (cleverage.task tag, #[AsTask]), instead of "service"')
+            ->defaultNull();
         $definition->scalarNode('description')
             ->defaultValue('');
         $definition->scalarNode('help')

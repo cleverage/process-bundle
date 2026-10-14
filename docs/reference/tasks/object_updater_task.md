@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\ObjectUpdaterTask`
+* **Code**: `object_updater` (`task: object_updater`)
 
 Accepted inputs
 ---------------

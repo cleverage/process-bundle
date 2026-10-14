@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Yaml\YamlWriterTask`
+* **Code**: `yaml_writer` (`task: yaml_writer`)
 
 Accepted inputs
 ---------------

@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\SkipEmptyTask`
+* **Code**: `skip_empty` (`task: skip_empty`)
 
 Accepted inputs
 ---------------

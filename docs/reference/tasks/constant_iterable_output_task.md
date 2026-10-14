@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\ConstantIterableOutputTask`
+* **Code**: `constant_iterable_output` (`task: constant_iterable_output`)
 * **Iterable task**
 
 Accepted inputs

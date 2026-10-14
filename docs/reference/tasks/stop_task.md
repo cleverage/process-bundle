@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\StopTask`
+* **Code**: `stop` (`task: stop`)
 
 Accepted inputs
 ---------------

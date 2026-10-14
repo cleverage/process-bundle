@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask`
+* **Code**: `process_executor` (`task: process_executor`)
 
 Accepted inputs
 ---------------

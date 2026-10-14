@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\FileRemoverTask`
+* **Code**: `file_remover` (`task: file_remover`)
 
 Accepted inputs
 ---------------

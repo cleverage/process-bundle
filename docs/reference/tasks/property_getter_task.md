@@ -10,6 +10,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\PropertyGetterTask`
+* **Code**: `property_getter` (`task: property_getter`)
 
 Accepted inputs
 ---------------

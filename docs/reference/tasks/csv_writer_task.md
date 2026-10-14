@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask`
+* **Code**: `csv_writer` (`task: csv_writer`)
 * **Blocking task**
 
 Accepted inputs

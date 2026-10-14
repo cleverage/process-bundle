@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask`
+* **Code**: `csv_reader` (`task: csv_reader`)
 * **Iterable task**
 
 Accepted inputs

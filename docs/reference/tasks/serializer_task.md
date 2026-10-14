@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Serialization\SerializerTask`
+* **Code**: `serializer` (`task: serializer`)
 
 Accepted inputs
 ---------------

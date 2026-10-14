@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Debug\DieTask`
+* **Code**: `die` (`task: die`)
 
 Accepted inputs
 ---------------

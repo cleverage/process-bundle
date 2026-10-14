@@ -52,6 +52,41 @@ services:
 If your `services.yaml` also has the default `App\:` resource (which includes `src/Task/`), declare `App\Task\:` after
 it: the last definition of a service wins.
 
+### Task code
+
+To reference your task with a short code in the process configurations (`task: app_my_task` instead of
+`service: '@App\Task\MyTask'`, see [task definition](reference/02-task_definition.md#task-attributes)), give it a code:
+with autoconfiguration, add the `CleverAge\ProcessBundle\Attribute\AsTask` attribute to the class; without, add a
+`cleverage.task` tag with a `code` attribute to the service. Use an internal prefix in your codes to avoid conflicts
+with the tasks of the bundles. Two services cannot share the same code (the container compilation fails).
+
+```php
+namespace App\Task;
+
+use CleverAge\ProcessBundle\Attribute\AsTask;
+use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Model\TaskInterface;
+
+#[AsTask(code: 'app_my_task')]
+class MyTask implements TaskInterface
+{
+    public function execute(ProcessState $state): void
+    {
+        // ...
+    }
+}
+```
+
+```yaml
+# Without autoconfiguration
+services:
+    App\Task\MyTask:
+        autowire: true
+        shared: false
+        tags:
+            - { name: cleverage.task, code: app_my_task }
+```
+
 ## Using the state object
 
 With the `TaskInterface::execute` method comes a small container object: the state

@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\InputIteratorTask`
+* **Code**: `input_iterator` (`task: input_iterator`)
 * **Iterable task**
 
 Accepted inputs

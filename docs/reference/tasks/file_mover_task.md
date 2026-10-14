@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\FileMoverTask`
+* **Code**: `file_mover` (`task: file_mover`)
 
 Accepted inputs
 ---------------

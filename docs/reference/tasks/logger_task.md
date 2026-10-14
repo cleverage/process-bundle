@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Reporting\LoggerTask`
+* **Code**: `logger` (`task: logger`)
 
 Accepted inputs
 ---------------

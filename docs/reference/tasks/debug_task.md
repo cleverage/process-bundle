@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Debug\DebugTask`
+* **Code**: `debug` (`task: debug`)
 
 Accepted inputs
 ---------------

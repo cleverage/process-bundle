@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Tests\DependencyInjection;
 
+use CleverAge\ProcessBundle\Attribute\AsTask;
 use CleverAge\ProcessBundle\Attribute\AsTransformer;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\DependencyInjection\CleverAgeProcessExtension;
@@ -22,6 +23,7 @@ use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Task\DummyTask;
+use CleverAge\ProcessBundle\Tests\Fixtures\AttributedTask;
 use CleverAge\ProcessBundle\Tests\Fixtures\AttributedTransformer;
 use CleverAge\ProcessBundle\Transformer\String\TrimTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
@@ -40,6 +42,7 @@ use Symfony\Component\Yaml\Yaml;
 #[CoversClass(CleverAgeProcessExtension::class)]
 #[UsesClass(Configuration::class)]
 #[UsesClass(AsTransformer::class)]
+#[UsesClass(AsTask::class)]
 class CleverAgeProcessExtensionTest extends TestCase
 {
     public function testEveryServiceDefinitionFileIsLoaded(): void
@@ -121,6 +124,32 @@ class CleverAgeProcessExtensionTest extends TestCase
         }
         // The bundle transformers (explicitly defined and tagged, not autoconfigured) are tagged once
         self::assertSame([['code' => 'trim']], $container->findDefinition(TrimTransformer::class)->getTag('cleverage.transformer'));
+    }
+
+    public function testEveryBundleTaskHasAUniqueCode(): void
+    {
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([], $container);
+
+        $tagged = $container->findTaggedServiceIds('cleverage.task');
+        self::assertCount(58, $tagged);
+        foreach ($tagged as $id => $tags) {
+            // The code is the end of the service id: cleverage_process.task.<code>
+            self::assertSame([['code' => substr($id, \strlen('cleverage_process.task.'))]], $tags, $id);
+        }
+    }
+
+    public function testAsTaskAttributeRegistersTheCode(): void
+    {
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([], $container);
+        $container->setDefinition('app.attributed_task', (new Definition(AttributedTask::class))->setAutoconfigured(true));
+
+        (new AttributeAutoconfigurationPass())->process($container);
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new ResolveChildDefinitionsPass())->process($container);
+
+        self::assertSame([['code' => 'app_attributed']], $container->getDefinition('app.attributed_task')->getTag('cleverage.task'));
     }
 
     public function testAsTransformerAttributeRegistersTheCode(): void

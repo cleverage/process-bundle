@@ -11,6 +11,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\InputAggregatorTask`
+* **Code**: `input_aggregator` (`task: input_aggregator`)
 
 Accepted inputs
 ---------------

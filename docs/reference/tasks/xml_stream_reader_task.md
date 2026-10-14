@@ -11,6 +11,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Xml\XmlStreamReaderTask`
+* **Code**: `xml_stream_reader` (`task: xml_stream_reader`)
 * **Iterable task**
 
 Accepted inputs

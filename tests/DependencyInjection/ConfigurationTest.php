@@ -54,6 +54,39 @@ class ConfigurationTest extends TestCase
         );
     }
 
+    public function testTaskIsDefinedByAServiceOrACode(): void
+    {
+        $config = $this->process(['configurations' => ['test.process' => ['tasks' => [
+            'by_service' => ['service' => '@app.task'],
+            'by_code' => ['task' => 'transformer'],
+        ]]]]);
+
+        $tasks = $config['configurations']['test.process']['tasks'];
+        self::assertSame(['@app.task', null], [$tasks['by_service']['service'], $tasks['by_service']['task']]);
+        self::assertSame([null, 'transformer'], [$tasks['by_code']['service'], $tasks['by_code']['task']]);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function provideInvalidTaskDefinitions(): iterable
+    {
+        yield 'neither service nor task' => [['options' => []]];
+        yield 'both service and task' => [['service' => '@app.task', 'task' => 'transformer']];
+    }
+
+    /**
+     * @param array<string, mixed> $task
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidTaskDefinitions')]
+    public function testTaskMustDefineEitherAServiceOrACode(array $task): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('A task must define either a "service" (service id or class name) or a "task" (code of the task), not both');
+
+        $this->process(['configurations' => ['test.process' => ['tasks' => ['invalid' => $task]]]]);
+    }
+
     public function testInvalidDefaultLogLevelIsRejected(): void
     {
         $this->expectException(InvalidConfigurationException::class);

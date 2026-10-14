@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Reporting\AdvancedStatCounterTask`
+* **Code**: `advanced_stat_counter` (`task: advanced_stat_counter`)
 
 Accepted inputs
 ---------------

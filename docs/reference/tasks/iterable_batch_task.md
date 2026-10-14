@@ -10,6 +10,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\IterableBatchTask`
+* **Code**: `iterable_batch` (`task: iterable_batch`)
 * **Iterable task**
 * **Flushable task**
 

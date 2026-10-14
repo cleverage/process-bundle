@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Csv\CsvSplitterTask`
+* **Code**: `csv_splitter` (`task: csv_splitter`)
 * **Iterable task**
 
 Accepted inputs

@@ -121,11 +121,11 @@ clever_age_process:
             tasks: []
 ```
 
-Then you can add tasks in this array. They consist of a `service`, optionally configured by `options`, and eventually
-chained with others through their `outputs`. Minimal syntax is:
+Then you can add tasks in this array. They consist of a `task` code (or a `service` reference), optionally configured
+by `options`, and eventually chained with others through their `outputs`. Minimal syntax is:
 ```yaml
 <task_name>:
-    service: <service_reference>
+    task: <task_code>               # e.g. transformer, or service: <service_reference>
     options: 
         <option_key_1>: <option_value_1>
         <option_key_2>: <option_value_2>

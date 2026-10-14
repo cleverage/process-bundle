@@ -6,7 +6,7 @@ YAML Configuration
 
 ```yaml
 <task_code>:
-    service: <service reference>
+    service: <service reference>   # or task: <code of the task>
     description: <string>
     help: <multiline string>
     options: <task options>
@@ -20,7 +20,15 @@ YAML Configuration
 Task attributes
 ---------------
 
-**service**: required, reference to the service used for the task: a service **id** or a service **alias**, with or
+**task**: code of the task, e.g. `task: transformer`: the short way to reference a task, instead of its `service`. The
+code of each task of this bundle is given on its [reference page](tasks/) (e.g. `transformer` for the
+[TransformerTask](tasks/transformer_task.md)); the code of a task service is declared with a `cleverage.task` tag with
+a `code` attribute, or with the `#[CleverAge\ProcessBundle\Attribute\AsTask(code: '...')]` attribute (see
+[custom tasks](../03-custom_tasks.md#service-declaration)). The codes are resolved when the container is compiled: an
+unknown code fails the compilation, with the list of the known codes. A task defines either `task` or `service`, not
+both.
+
+**service**: reference to the service used for the task (or use `task`): a service **id** or a service **alias**, with or
 without a leading `@` (quote the value when it starts with `@`, as YAML requires). The service must implement
 `CleverAge\ProcessBundle\Model\TaskInterface`. For instance, the `UnzipTask` of the archive bridge is registered as
 `cleverage_archive_process.task.unzip`, with an alias named after its class: these four references are equivalent.

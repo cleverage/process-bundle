@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\SimpleBatchTask`
+* **Code**: `simple_batch` (`task: simple_batch`)
 * **Flushable task**
 
 Accepted inputs

@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask`
+* **Code**: `denormalizer` (`task: denormalizer`)
 
 Accepted inputs
 ---------------

@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Debug\ErrorForwarderTask`
+* **Code**: `error_forwarder` (`task: error_forwarder`)
 
 Accepted inputs
 ---------------

@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\GroupByAggregateIterableTask`
+* **Code**: `group_by_aggregate_iterable` (`task: group_by_aggregate_iterable`)
 * **Blocking task**
 
 Accepted inputs

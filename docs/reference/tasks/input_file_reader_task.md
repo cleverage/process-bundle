@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\InputFileReaderTask`
+* **Code**: `input_file_reader` (`task: input_file_reader`)
 
 Accepted inputs
 ---------------

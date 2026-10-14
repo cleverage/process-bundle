@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask`
+* **Code**: `process_launcher` (`task: process_launcher`)
 * **Iterable task**
 * **Flushable task**
 

@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Event\EventDispatcherTask`
+* **Code**: `event_dispatcher` (`task: event_dispatcher`)
 
 Accepted inputs
 ---------------

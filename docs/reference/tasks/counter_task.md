@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\CounterTask`
+* **Code**: `counter` (`task: counter`)
 * **Flushable task**
 
 Accepted inputs

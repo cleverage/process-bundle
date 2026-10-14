@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\RowAggregatorTask`
+* **Code**: `row_aggregator` (`task: row_aggregator`)
 * **Blocking task**
 
 Accepted inputs

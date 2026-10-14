@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamWriterTask`
+* **Code**: `json_stream_writer` (`task: json_stream_writer`)
 * **Blocking task**
 
 Accepted inputs

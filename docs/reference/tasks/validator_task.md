@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Validation\ValidatorTask`
+* **Code**: `validator` (`task: validator`)
 
 Accepted inputs
 ---------------

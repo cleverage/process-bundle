@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Process\CommandRunnerTask`
+* **Code**: `command_runner` (`task: command_runner`)
 
 Accepted inputs
 ---------------

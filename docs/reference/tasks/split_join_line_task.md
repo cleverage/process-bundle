@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\SplitJoinLineTask`
+* **Code**: `split_join_line` (`task: split_join_line`)
 * **Iterable task**
 
 Accepted inputs

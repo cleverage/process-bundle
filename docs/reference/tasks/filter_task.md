@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\FilterTask`
+* **Code**: `filter` (`task: filter`)
 
 Accepted inputs
 ---------------

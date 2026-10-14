@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\FileWriterTask`
+* **Code**: `file_writer` (`task: file_writer`)
 
 Accepted inputs
 ---------------

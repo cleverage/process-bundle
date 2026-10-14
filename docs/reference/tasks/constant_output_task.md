@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\ConstantOutputTask`
+* **Code**: `constant_output` (`task: constant_output`)
 
 Accepted inputs
 ---------------

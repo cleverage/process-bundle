@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\DummyTask`
+* **Code**: `dummy` (`task: dummy`)
 
 Accepted inputs
 ---------------

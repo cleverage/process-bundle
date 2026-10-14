@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
+use CleverAge\ProcessBundle\Attribute\AsTask;
 use CleverAge\ProcessBundle\Attribute\AsTransformer;
 use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
@@ -48,6 +49,13 @@ class CleverAgeProcessExtension extends Extension
         $container->registerForAutoconfiguration(TransformerInterface::class)
             ->addTag('cleverage.transformer')
             ->addTag('monolog.logger', ['channel' => 'cleverage_process_transformer']);
+        // Tasks referenced by code (task: <code>)
+        $container->registerAttributeForAutoconfiguration(
+            AsTask::class,
+            static function (ChildDefinition $definition, AsTask $attribute): void {
+                $definition->addTag('cleverage.task', ['code' => $attribute->code]);
+            }
+        );
         // Lazy loading of the transformers by code
         $container->registerAttributeForAutoconfiguration(
             AsTransformer::class,

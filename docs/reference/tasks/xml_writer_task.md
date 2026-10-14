@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Xml\XmlWriterTask`
+* **Code**: `xml_writer` (`task: xml_writer`)
 
 Accepted inputs
 ---------------

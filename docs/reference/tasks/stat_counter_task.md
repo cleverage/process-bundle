@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Reporting\StatCounterTask`
+* **Code**: `stat_counter` (`task: stat_counter`)
 
 Accepted inputs
 ---------------
