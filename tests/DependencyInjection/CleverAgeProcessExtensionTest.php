@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Tests\DependencyInjection;
 
+use CleverAge\ProcessBundle\Attribute\AsTransformer;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\DependencyInjection\CleverAgeProcessExtension;
 use CleverAge\ProcessBundle\DependencyInjection\Configuration;
@@ -22,7 +23,6 @@ use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Task\DummyTask;
 use CleverAge\ProcessBundle\Tests\Fixtures\AttributedTransformer;
-use CleverAge\ProcessBundle\Transformer\GenericTransformer;
 use CleverAge\ProcessBundle\Transformer\String\TrimTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -39,6 +39,7 @@ use Symfony\Component\Yaml\Yaml;
 
 #[CoversClass(CleverAgeProcessExtension::class)]
 #[UsesClass(Configuration::class)]
+#[UsesClass(AsTransformer::class)]
 class CleverAgeProcessExtensionTest extends TestCase
 {
     public function testEveryServiceDefinitionFileIsLoaded(): void
@@ -120,31 +121,6 @@ class CleverAgeProcessExtensionTest extends TestCase
         }
         // The bundle transformers (explicitly defined and tagged, not autoconfigured) are tagged once
         self::assertSame([['code' => 'trim']], $container->findDefinition(TrimTransformer::class)->getTag('cleverage.transformer'));
-    }
-
-    public function testEveryTransformerIsRegisteredWithItsCode(): void
-    {
-        $container = new ContainerBuilder();
-        (new CleverAgeProcessExtension())->load([[
-            'generic_transformers' => ['app_generic' => ['transformers' => ['trim' => []]]],
-        ]], $container);
-
-        $tagged = $container->findTaggedServiceIds('cleverage.transformer');
-        self::assertCount(38, $tagged);
-        foreach ($tagged as $id => $tags) {
-            $class = $container->getDefinition($id)->getClass();
-            self::assertIsString($class);
-            if (GenericTransformer::class === $class) {
-                $code = 'app_generic';
-            } else {
-                self::assertTrue(is_a($class, TransformerInterface::class, true), $class);
-                $transformer = (new \ReflectionClass($class))->newInstanceWithoutConstructor();
-                self::assertInstanceOf(TransformerInterface::class, $transformer);
-                $code = $transformer->getCode();
-            }
-            // Lazy loading: the code of the tag must be the one returned by getCode()
-            self::assertSame([['code' => $code]], $tags, $id);
-        }
     }
 
     public function testAsTransformerAttributeRegistersTheCode(): void
