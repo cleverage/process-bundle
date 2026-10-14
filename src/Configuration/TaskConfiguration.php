@@ -129,7 +129,7 @@ class TaskConfiguration
     #[\Deprecated(message: 'Use getErrorOutputs method instead')]
     public function getErrors(): array
     {
-        @trigger_error('Deprecated method, use getErrorOutputs instead', \E_USER_DEPRECATED);
+        trigger_deprecation('cleverage/process-bundle', '2.0.4', 'The "%s()" method is deprecated, use "getErrorOutputs()" instead.', __METHOD__);
 
         return $this->getErrorOutputs();
     }

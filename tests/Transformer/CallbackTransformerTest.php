@@ -90,6 +90,34 @@ class CallbackTransformerTest extends TestCase
         self::assertSame('6-7-8', $transformer->transform('6', $options));
     }
 
+    public function testAdditionalParametersAreDeprecated(): void
+    {
+        $transformer = new CallbackTransformer();
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            $this->resolveOptions($transformer, [
+                'callback' => [self::class, 'doCallback'],
+                'additional_parameters' => [7, 8],
+            ]);
+            $this->resolveOptions($transformer, [
+                'callback' => [self::class, 'doCallback'],
+                'right_parameters' => [4],
+            ]);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame(
+            ['Since cleverage/process-bundle 2.0.4: The "additional_parameters" option is deprecated. Use "right_parameters" instead.'],
+            $deprecations
+        );
+    }
+
     public function testAdditionalParametersAreIgnoredWhenRightParametersAreSet(): void
     {
         $transformer = new CallbackTransformer();
