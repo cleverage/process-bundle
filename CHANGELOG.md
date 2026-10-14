@@ -2,6 +2,7 @@ Latest
 ------
 
 ## Changes
+* [#271](https://github.com/cleverage/process-bundle/issues/271) DependencyInjection: `CleverAgeProcessExtension::findServices()` loads the service definition files with a glob pattern instead of a `Finder` (same files), `Configuration` uses `arrayPrototype()` / `variablePrototype()` / `scalarPrototype()` instead of `prototype()` (same configuration tree). Add tests.
 * [#282](https://github.com/cleverage/process-bundle/issues/282) Require `psr/container` (`ProcessHelpCommand`), `ext-xmlreader` (`XmlStreamReaderTask`) and `ext-libxml` (`XmlFile`, `XmlStreamReaderTask`, `XpathEvaluatorTransformer`), used directly; add `symfony/cache` (used by the tests) to the dev requirements.
 * [#268](https://github.com/cleverage/process-bundle/issues/268) Clean up composer.json: remove the unused `symfony/dotenv`, `symfony/runtime` and `symfony/error-handler` dependencies (applications relying on the bundle to install them must require them), bound `symfony/service-contracts` to `^2.5|^3`, update the package description.
 
