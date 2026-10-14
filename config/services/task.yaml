@@ -7,6 +7,7 @@ services:
 
     CleverAge\ProcessBundle\Task\:
         resource: '../../src/Task/*'
+        exclude: '../../src/Task/UnavailableTask.php'
         autowire: true
         public: true
         shared: false

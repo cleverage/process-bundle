@@ -20,6 +20,9 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Check the presence of the serializer (required for this bundle), and help the user to set it.
+ *
+ * @deprecated no longer used by the bundle, which compiles without the serializer: the services depending on it
+ *             fail when they are used (see UnavailableServicesCompilerPass). Will be removed in v6.0.
  */
 class CheckSerializerCompilerPass implements CompilerPassInterface
 {

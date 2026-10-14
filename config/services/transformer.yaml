@@ -6,7 +6,9 @@ services:
 
     CleverAge\ProcessBundle\Transformer\:
         resource: '../../src/Transformer/*'
-        exclude: '../../src/Transformer/GenericTransformer.php'
+        exclude:
+            - '../../src/Transformer/GenericTransformer.php'
+            - '../../src/Transformer/UnavailableTransformer.php'
         autowire: true
         autoconfigure: true
         public: true
