@@ -36,14 +36,20 @@ Remember to add the following line to `config/bundles.php` (not required if Symf
 CleverAge\ProcessBundle\CleverAgeProcessBundle::class => ['all' => true],
 ```
 
-Some tasks and transformers use the main Symfony serializer service, and the bundle checks at container compilation
-that it is available: if it is not, the build fails with an explicit message. Make sure it is enabled
-(see [`framework.serializer.enabled`](https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled)):
+Some tasks and transformers use the Symfony serializer (`NormalizerTask`, `DenormalizerTask`, `SerializerTask`,
+`DeserializerTask`, the `normalize` and `denormalize` transformers) or validator (`ValidatorTask`) services. If they are
+not enabled, the container still compiles, and a process using one of these tasks or transformers fails with an explicit
+message. To use them, enable the serializer
+(see [`framework.serializer.enabled`](https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled))
+and the validator
+(see [`framework.validation.enabled`](https://symfony.com/doc/current/reference/configuration/framework.html#reference-validation-enabled)):
 
 ```yaml
 # config/packages/framework.yaml
 framework:
     serializer:
+        enabled: true
+    validation:
         enabled: true
 ```
 
