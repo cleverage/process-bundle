@@ -6,7 +6,11 @@ services:
             - ~
             - ~
             - ~
+    CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry:
+        alias: cleverage_process.registry.process_configuration
 
     cleverage_process.registry.transformer:
         class: CleverAge\ProcessBundle\Registry\TransformerRegistry
         public: false
+    CleverAge\ProcessBundle\Registry\TransformerRegistry:
+        alias: cleverage_process.registry.transformer

@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\DependencyInjection;
 
 use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
+use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Transformer\GenericTransformer;
+use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -36,6 +38,14 @@ class CleverAgeProcessExtension extends Extension
 
         $container->registerForAutoconfiguration(ProcessStopCheckerInterface::class)
             ->addTag('cleverage_process.stop_checker');
+        // Tasks are fetched from the container by the process manager, and keep state between executions
+        $container->registerForAutoconfiguration(TaskInterface::class)
+            ->setPublic(true)
+            ->setShared(false)
+            ->addTag('monolog.logger', ['channel' => 'cleverage_process_task']);
+        $container->registerForAutoconfiguration(TransformerInterface::class)
+            ->addTag('cleverage.transformer')
+            ->addTag('monolog.logger', ['channel' => 'cleverage_process_transformer']);
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);

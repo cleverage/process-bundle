@@ -13,14 +13,25 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Tests\DependencyInjection;
 
+use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\DependencyInjection\CleverAgeProcessExtension;
 use CleverAge\ProcessBundle\DependencyInjection\Configuration;
+use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
+use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use CleverAge\ProcessBundle\Task\DummyTask;
+use CleverAge\ProcessBundle\Transformer\String\TrimTransformer;
+use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\TaggedIteratorArgument;
+use Symfony\Component\DependencyInjection\ChildDefinition;
+use Symfony\Component\DependencyInjection\Compiler\ResolveChildDefinitionsPass;
+use Symfony\Component\DependencyInjection\Compiler\ResolveInstanceofConditionalsPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\Yaml\Yaml;
 
 #[CoversClass(CleverAgeProcessExtension::class)]
@@ -55,6 +66,57 @@ class CleverAgeProcessExtensionTest extends TestCase
                 self::assertTrue($container->has((string) $id), \sprintf('Service "%s" of %s is not registered', $id, basename($file)));
             }
         }
+    }
+
+    public function testServicesCanBeAutowiredByClassName(): void
+    {
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([], $container);
+
+        foreach ([
+            ProcessManager::class => 'cleverage_process.manager.process',
+            ProcessConfigurationRegistry::class => 'cleverage_process.registry.process_configuration',
+            TransformerRegistry::class => 'cleverage_process.registry.transformer',
+            ContextualOptionResolver::class => 'cleverage_process.context.contextual_option_resolver',
+        ] as $class => $id) {
+            self::assertSame($id, (string) $container->getAlias($class));
+            self::assertSame($class, $container->getDefinition($id)->getClass());
+        }
+    }
+
+    public function testTasksAndTransformersAreAutoconfigured(): void
+    {
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([], $container);
+
+        // Application services, autoconfigured
+        $container->setDefinition('app.task', (new Definition(DummyTask::class))->setAutoconfigured(true));
+        $container->setDefinition('app.shared_task', (new Definition(DummyTask::class))->setAutoconfigured(true)->setShared(true));
+        $container->setDefinition('app.transformer', (new Definition(TrimTransformer::class))->setAutoconfigured(true));
+        // An application keeping its own "_instanceof" rule, as documented before
+        $container->setDefinition('app.instanceof_transformer', (new Definition(TrimTransformer::class))
+            ->setAutoconfigured(true)
+            ->setInstanceofConditionals([
+                TransformerInterface::class => (new ChildDefinition(''))->addTag('cleverage.transformer'),
+            ]));
+        (new ResolveInstanceofConditionalsPass())->process($container);
+        (new ResolveChildDefinitionsPass())->process($container);
+
+        $task = $container->getDefinition('app.task');
+        self::assertTrue($task->isPublic());
+        self::assertFalse($task->isShared());
+        self::assertSame([['channel' => 'cleverage_process_task']], $task->getTag('monolog.logger'));
+        // An explicit configuration of the service wins
+        self::assertTrue($container->getDefinition('app.shared_task')->isShared());
+
+        foreach (['app.transformer', 'app.instanceof_transformer'] as $id) {
+            $transformer = $container->getDefinition($id);
+            // Registered once in the transformer registry (no duplicate tag)
+            self::assertSame([[]], $transformer->getTag('cleverage.transformer'), $id);
+            self::assertSame([['channel' => 'cleverage_process_transformer']], $transformer->getTag('monolog.logger'), $id);
+        }
+        // The bundle transformers (autoconfigured, tagged explicitly) are not tagged twice
+        self::assertSame([[]], $container->getDefinition(TrimTransformer::class)->getTag('cleverage.transformer'));
     }
 
     public function testStopCheckersAreInjectedInTheProcessManager(): void
