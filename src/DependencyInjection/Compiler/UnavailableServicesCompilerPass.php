@@ -60,19 +60,20 @@ final class UnavailableServicesCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param list<class-string> $ids
+     * @param list<class-string> $classes the services are registered with an alias named after their class
      */
-    private function replace(ContainerBuilder $container, string $message, array $ids): void
+    private function replace(ContainerBuilder $container, string $message, array $classes): void
     {
-        foreach ($ids as $id) {
+        foreach ($classes as $class) {
+            $id = $container->hasAlias($class) ? (string) $container->getAlias($class) : $class;
             if (!$container->hasDefinition($id)) {
                 continue;
             }
             $original = $container->getDefinition($id);
-            $text = \sprintf($message, $id);
-            if (is_a($id, TransformerInterface::class, true)) {
+            $text = \sprintf($message, $class);
+            if (is_a($class, TransformerInterface::class, true)) {
                 // The code is needed by the transformer registry: the bundle transformers return a constant
-                $code = (new \ReflectionClass($id))->newInstanceWithoutConstructor()->getCode();
+                $code = (new \ReflectionClass($class))->newInstanceWithoutConstructor()->getCode();
                 $definition = new Definition(UnavailableTransformer::class, [$code, $text]);
             } else {
                 $definition = new Definition(UnavailableTask::class, [$text]);

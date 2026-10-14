@@ -115,8 +115,8 @@ class CleverAgeProcessExtensionTest extends TestCase
             self::assertSame([[]], $transformer->getTag('cleverage.transformer'), $id);
             self::assertSame([['channel' => 'cleverage_process_transformer']], $transformer->getTag('monolog.logger'), $id);
         }
-        // The bundle transformers (autoconfigured, tagged explicitly) are not tagged twice
-        self::assertSame([[]], $container->getDefinition(TrimTransformer::class)->getTag('cleverage.transformer'));
+        // The bundle transformers (explicitly defined and tagged, not autoconfigured) are tagged once
+        self::assertSame([[]], $container->findDefinition(TrimTransformer::class)->getTag('cleverage.transformer'));
     }
 
     public function testStopCheckersAreInjectedInTheProcessManager(): void

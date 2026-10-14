@@ -45,7 +45,7 @@ class UnavailableServicesCompilerPassTest extends TestCase
         $container = $this->createContainer(serializer: true, validator: true);
 
         foreach ([...self::SERIALIZER_TASKS, NormalizeTransformer::class, DenormalizeTransformer::class, ValidatorTask::class] as $id) {
-            self::assertSame($id, $container->getDefinition($id)->getClass());
+            self::assertSame($id, $container->findDefinition($id)->getClass());
         }
     }
 
@@ -54,34 +54,34 @@ class UnavailableServicesCompilerPassTest extends TestCase
         $container = $this->createContainer(serializer: false, validator: true);
 
         foreach (self::SERIALIZER_TASKS as $id) {
-            $definition = $container->getDefinition($id);
+            $definition = $container->findDefinition($id);
             self::assertSame(UnavailableTask::class, $definition->getClass(), $id);
             self::assertSame([\sprintf(UnavailableServicesCompilerPass::SERIALIZER_MESSAGE, $id)], $definition->getArguments());
-            // Still fetched by the process manager, and logged in the tasks channel
-            self::assertTrue($definition->isPublic());
+            // Still referenced by the alias named after the class, and logged in the tasks channel
+            self::assertTrue($container->getAlias($id)->isPublic());
             self::assertFalse($definition->isShared());
             self::assertSame([['channel' => 'cleverage_process_task']], $definition->getTag('monolog.logger'));
         }
         foreach ([NormalizeTransformer::class => 'normalize', DenormalizeTransformer::class => 'denormalize'] as $id => $code) {
-            $definition = $container->getDefinition($id);
+            $definition = $container->findDefinition($id);
             self::assertSame(UnavailableTransformer::class, $definition->getClass(), $id);
             // Still registered under its code, so that using it gives the explicit message
             self::assertSame([$code, \sprintf(UnavailableServicesCompilerPass::SERIALIZER_MESSAGE, $id)], $definition->getArguments());
             self::assertTrue($definition->hasTag('cleverage.transformer'));
         }
-        self::assertSame(ValidatorTask::class, $container->getDefinition(ValidatorTask::class)->getClass());
+        self::assertSame(ValidatorTask::class, $container->findDefinition(ValidatorTask::class)->getClass());
     }
 
     public function testValidatorTaskIsReplacedWithoutValidator(): void
     {
         $container = $this->createContainer(serializer: true, validator: false);
 
-        $definition = $container->getDefinition(ValidatorTask::class);
+        $definition = $container->findDefinition(ValidatorTask::class);
         self::assertSame(UnavailableTask::class, $definition->getClass());
         self::assertSame([\sprintf(UnavailableServicesCompilerPass::VALIDATOR_MESSAGE, ValidatorTask::class)], $definition->getArguments());
-        self::assertTrue($definition->isPublic());
+        self::assertTrue($container->getAlias(ValidatorTask::class)->isPublic());
         self::assertFalse($definition->isShared());
-        self::assertSame(NormalizerTask::class, $container->getDefinition(NormalizerTask::class)->getClass());
+        self::assertSame(NormalizerTask::class, $container->findDefinition(NormalizerTask::class)->getClass());
     }
 
     private function createContainer(bool $serializer, bool $validator): ContainerBuilder
