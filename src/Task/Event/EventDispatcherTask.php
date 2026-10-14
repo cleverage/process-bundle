@@ -47,13 +47,12 @@ class EventDispatcherTask extends AbstractConfigurableTask
             && EventDispatcherTaskEvent::class !== $options['event_name']
             && $this->eventDispatcher->hasListeners(EventDispatcherTaskEvent::class)
         ) {
-            @trigger_error(
-                \sprintf(
-                    'Listening to "%s" for an EventDispatcherTask with the "event_name" option set is deprecated since v5 and will not work anymore in v6.0, listen to "%s" instead.',
-                    EventDispatcherTaskEvent::class,
-                    $options['event_name'],
-                ),
-                \E_USER_DEPRECATED
+            trigger_deprecation(
+                'cleverage/process-bundle',
+                '5.1',
+                'Listening to "%s" for an EventDispatcherTask with the "event_name" option set is deprecated and will not work anymore in v6.0, listen to "%s" instead.',
+                EventDispatcherTaskEvent::class,
+                $options['event_name'],
             );
             $this->eventDispatcher->dispatch($event);
         }

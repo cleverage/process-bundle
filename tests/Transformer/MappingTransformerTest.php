@@ -486,7 +486,7 @@ class MappingTransformerTest extends TestCase
 
         self::assertSame([$targetProperty => 'value'], $result);
         self::assertSame([
-            "Setting the target property '{$targetProperty}' as a literal key of an array destination is deprecated, it will throw an \\UnexpectedValueException in v6.0. Use '[{$targetProperty}]' to keep a literal key, or the index notation for nested arrays (e.g. '[a][b]').",
+            "Since cleverage/process-bundle 5.2: Setting the target property '{$targetProperty}' as a literal key of an array destination is deprecated, it will throw an \\UnexpectedValueException in v6.0. Use '[{$targetProperty}]' to keep a literal key, or the index notation for nested arrays (e.g. '[a][b]').",
         ], $this->deprecations);
     }
 

@@ -92,7 +92,7 @@ class ProcessManagerInitializationTest extends TestCase
 
     private function getExpectedDeprecation(): string
     {
-        return 'The initialization of the task "bad" of the process "test.process" has failed with message "Invalid configuration". Going on with the process after an initialization failure is deprecated since v5: in v6.0, the process will fail before executing any task.';
+        return 'Since cleverage/process-bundle 5.1: The initialization of the task "bad" of the process "test.process" has failed with message "Invalid configuration". Going on with the process after an initialization failure is deprecated: in v6.0, the process will fail before executing any task.';
     }
 
     private function execute(ProcessManager $processManager): void

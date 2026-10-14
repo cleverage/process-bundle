@@ -2,6 +2,7 @@ Latest
 ------
 
 ## Changes
+* [#273](https://github.com/cleverage/process-bundle/issues/273) Trigger the deprecations with `trigger_deprecation()` (`symfony/deprecation-contracts`, now required) instead of `@trigger_error(..., E_USER_DEPRECATED)`: the messages are prefixed with the package and the version that introduced the deprecation (e.g. `Since cleverage/process-bundle 5.1: ...`), as for the Symfony packages. Same `E_USER_DEPRECATED` level. Add tests.
 * [#270](https://github.com/cleverage/process-bundle/issues/270) Add a `.gitattributes`: the development files (`.docker/`, `.github/`, `tests/`, quality tools and PHPUnit configurations, `Makefile`…) are no longer part of the archive installed by Composer (`dist`). Remove the obsolete test fixtures of `src/Resources/tests/` (not used since the tests rewrite).
 * [#271](https://github.com/cleverage/process-bundle/issues/271) DependencyInjection: `CleverAgeProcessExtension::findServices()` loads the service definition files with a glob pattern instead of a `Finder` (same files), `Configuration` uses `arrayPrototype()` / `variablePrototype()` / `scalarPrototype()` instead of `prototype()` (same configuration tree). Add tests.
 * [#282](https://github.com/cleverage/process-bundle/issues/282) Require `psr/container` (`ProcessHelpCommand`), `ext-xmlreader` (`XmlStreamReaderTask`) and `ext-libxml` (`XmlFile`, `XmlStreamReaderTask`, `XpathEvaluatorTransformer`), used directly; add `symfony/cache` (used by the tests) to the dev requirements.
