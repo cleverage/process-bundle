@@ -15,7 +15,6 @@ namespace CleverAge\ProcessBundle\DependencyInjection;
 
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use Psr\Log\LogLevel;
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -23,7 +22,7 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 /**
  * This is the class that validates and merges configuration from your app/config files.
  *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/configuration.html}
+ * @see https://symfony.com/doc/current/bundles/configuration.html
  */
 class Configuration implements ConfigurationInterface
 {
@@ -77,10 +76,9 @@ class Configuration implements ConfigurationInterface
      */
     protected function appendRootTransformersConfigDefinition(NodeBuilder $definition): void
     {
-        /** @var ArrayNodeDefinition $transformersArrayDefinition */
         $transformersArrayDefinition = $definition->arrayNode('generic_transformers')
             ->useAttributeAsKey('code')
-            ->prototype('array');
+            ->arrayPrototype();
 
         // Process list
         $transformerListDefinition = $transformersArrayDefinition
@@ -99,11 +97,11 @@ class Configuration implements ConfigurationInterface
     {
         $definition
             ->arrayNode('contextual_options')
-            ->prototype('variable')
+            ->variablePrototype()
             ->end()
             ->end()
             ->arrayNode('transformers')
-            ->prototype('variable')
+            ->variablePrototype()
             ->end()
             ->end();
     }
@@ -113,10 +111,9 @@ class Configuration implements ConfigurationInterface
      */
     protected function appendRootProcessConfigDefinition(NodeBuilder $definition): void
     {
-        /** @var ArrayNodeDefinition $configurationsArrayDefinition */
         $configurationsArrayDefinition = $definition->arrayNode('configurations')
             ->useAttributeAsKey('code')
-            ->prototype('array');
+            ->arrayPrototype();
 
         // Process list
         $processListDefinition = $configurationsArrayDefinition
@@ -147,7 +144,7 @@ class Configuration implements ConfigurationInterface
             ->defaultTrue()
             ->end()
             ->arrayNode('options')
-            ->prototype('variable')
+            ->variablePrototype()
             ->end()
             ->end()
             ->arrayNode('logs')
@@ -165,11 +162,10 @@ class Configuration implements ConfigurationInterface
             ->end()
             ->end();
 
-        /** @var ArrayNodeDefinition $tasksArrayDefinition */
         $tasksArrayDefinition = $definition
             ->arrayNode('tasks')
             ->useAttributeAsKey('code')
-            ->prototype('array');
+            ->arrayPrototype();
 
         // Process list
         $taskListDefinition = $tasksArrayDefinition
@@ -190,7 +186,7 @@ class Configuration implements ConfigurationInterface
         $definition->scalarNode('help')
             ->defaultValue('');
         $definition->arrayNode('options')
-            ->prototype('variable')
+            ->variablePrototype()
             ->end();
         $definition->scalarNode('error_strategy')
             ->defaultNull();
@@ -203,7 +199,7 @@ class Configuration implements ConfigurationInterface
                 ->beforeNormalization()
                 ->ifString()
                 ->then(static fn ($item): array => [$item])->end()
-                ->prototype('scalar');
+                ->scalarPrototype();
         }
     }
 }
