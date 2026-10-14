@@ -72,8 +72,10 @@ final class UnavailableServicesCompilerPass implements CompilerPassInterface
             $original = $container->getDefinition($id);
             $text = \sprintf($message, $class);
             if (is_a($class, TransformerInterface::class, true)) {
-                // The code is needed by the transformer registry: the bundle transformers return a constant
-                $code = (new \ReflectionClass($class))->newInstanceWithoutConstructor()->getCode();
+                // The code is needed by the transformer registry: the one of the tag (see TransformerLocatorCompilerPass),
+                // or, for a definition tagged without code (deprecated), the one returned by the bundle transformer
+                $code = $this->getTagCode($original)
+                    ?? (new \ReflectionClass($class))->newInstanceWithoutConstructor()->getCode();
                 $definition = new Definition(UnavailableTransformer::class, [$code, $text]);
             } else {
                 $definition = new Definition(UnavailableTask::class, [$text]);
@@ -83,5 +85,16 @@ final class UnavailableServicesCompilerPass implements CompilerPassInterface
             $definition->setTags($original->getTags());
             $container->setDefinition($id, $definition);
         }
+    }
+
+    private function getTagCode(Definition $definition): ?string
+    {
+        foreach ($definition->getTag('cleverage.transformer') as $attributes) {
+            if (isset($attributes['code']) && \is_string($attributes['code'])) {
+                return $attributes['code'];
+            }
+        }
+
+        return null;
     }
 }

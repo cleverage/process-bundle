@@ -257,10 +257,15 @@ transformer is only instantiated when a process uses it. The code of the tag mus
 `TransformerInterface::getCode()` (an exception is thrown otherwise when the transformer is used). Two transformers
 cannot share the same code (the container compilation fails).
 
+`TransformerInterface::getCode()` is deprecated since 5.4: the code is given by the tag or the attribute, and the method
+will be removed from the interface in v6.0. Until then, keep implementing it, returning the same code.
+
 A transformer tagged without `code` (e.g. autoconfigured without the attribute) still works, but it is instantiated with
 the registry and registered with `TransformerRegistry::addTransformer()`, which is deprecated since 5.4: the `code` will
-be required in v6.0. When creating a new transformer for your
-project you should use an internal prefix in your codes to avoid conflicts with potential standard additions.
+be required in v6.0.
+
+When creating a new transformer for your project, use an internal prefix in your codes to avoid conflicts with potential
+standard additions.
 
 ```yaml
 transform:

@@ -72,6 +72,19 @@ class UnavailableServicesCompilerPassTest extends TestCase
         self::assertSame(ValidatorTask::class, $container->findDefinition(ValidatorTask::class)->getClass());
     }
 
+    public function testTransformerTaggedWithoutCodeKeepsTheCodeOfTheClass(): void
+    {
+        $container = new ContainerBuilder();
+        // e.g. a definition overridden by the application, tagged without code (deprecated)
+        $container->register(NormalizeTransformer::class, NormalizeTransformer::class)->addTag('cleverage.transformer');
+
+        (new UnavailableServicesCompilerPass())->process($container);
+
+        $definition = $container->getDefinition(NormalizeTransformer::class);
+        self::assertSame(UnavailableTransformer::class, $definition->getClass());
+        self::assertSame('normalize', $definition->getArgument(0));
+    }
+
     public function testValidatorTaskIsReplacedWithoutValidator(): void
     {
         $container = $this->createContainer(serializer: true, validator: false);
