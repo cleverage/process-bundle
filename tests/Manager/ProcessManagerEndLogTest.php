@@ -27,6 +27,7 @@ use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use CleverAge\ProcessBundle\Task\ConstantOutputTask;
 use CleverAge\ProcessBundle\Task\StopTask;
 use PHPUnit\Framework\TestCase;
@@ -40,6 +41,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[\PHPUnit\Framework\Attributes\CoversClass(ProcessConfigurationRegistry::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(ProcessConfiguration::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessFailedException::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TaskRegistry::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(TaskConfiguration::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ContextualOptionResolver::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessEvent::class)]
@@ -183,6 +185,7 @@ class ProcessManagerEndLogTest extends TestCase
             new ProcessConfigurationRegistry(['test.process' => $rawConfiguration], 'stop', $defaultLogLevels),
             new ContextualOptionResolver(),
             new EventDispatcher(),
+            taskRegistry: new TaskRegistry($container),
         );
     }
 

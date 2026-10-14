@@ -27,6 +27,7 @@ use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
@@ -38,6 +39,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(ProcessManager::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessConfiguration::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TaskRegistry::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(TaskConfiguration::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ContextualOptionResolver::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessEvent::class)]
@@ -183,6 +185,7 @@ class ProcessManagerInitializationTest extends TestCase
             $registry,
             new ContextualOptionResolver(),
             new EventDispatcher(),
+            taskRegistry: new TaskRegistry($container),
         );
     }
 

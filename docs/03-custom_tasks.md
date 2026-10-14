@@ -9,8 +9,10 @@ create your own.
 
 As stated before, tasks are simple services implementing `CleverAge\ProcessBundle\Model\TaskInterface`, so you can
 design them like any other service, with only small specificities:
-- the service must be **public**: the process manager fetches it from the container using the `service` reference of
-  the task configuration (with or without the leading `@`)
+- the service should be **public**: the process manager fetches it, using the `service` reference of the task
+  configuration (with or without the leading `@`), from a service locator built when the container is compiled from
+  the process configurations (so a private service works too), and only falls back on the service container (public
+  services only, deprecated) for a service that is not referenced by these configurations
 - the service should **not be shared** ([`shared: false`](https://symfony.com/doc/current/service_container/shared.html))
 
 Most of the time you don't want a task declared in a process to share some data with another declaration using the

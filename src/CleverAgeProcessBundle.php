@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle;
 
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
+use CleverAge\ProcessBundle\DependencyInjection\Compiler\TaskLocatorCompilerPass;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\UnavailableServicesCompilerPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
@@ -32,6 +33,7 @@ class CleverAgeProcessBundle extends Bundle
         );
 
         $container->addCompilerPass(new UnavailableServicesCompilerPass());
+        $container->addCompilerPass(new TaskLocatorCompilerPass());
     }
 
     #[\Override]

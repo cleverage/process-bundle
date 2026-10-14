@@ -20,6 +20,7 @@ use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask;
 use CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask;
 use Psr\Container\ContainerInterface;
@@ -59,11 +60,26 @@ class ProcessHelpCommand extends Command
 
     protected const INDENT_SIZE = 4;
 
+    protected TaskRegistry $taskRegistry;
+
     public function __construct(
         protected ProcessConfigurationRegistry $processConfigRegistry,
         protected ContainerInterface $container,
+        ?TaskRegistry $taskRegistry = null,
     ) {
         parent::__construct();
+        if (!$taskRegistry instanceof TaskRegistry) {
+            trigger_deprecation(
+                'cleverage/process-bundle',
+                '5.4',
+                'Not passing a "%s" to "%s::__construct()" is deprecated: the tasks are fetched from the service container. The argument will be required in v6.0.',
+                TaskRegistry::class,
+                self::class,
+            );
+            // Same behaviour as before the task registry: any service of the container
+            $taskRegistry = new TaskRegistry($this->container, $this->container);
+        }
+        $this->taskRegistry = $taskRegistry;
     }
 
     protected function configure(): void
@@ -534,21 +550,6 @@ class ProcessHelpCommand extends Command
 
     protected function getTaskService(TaskConfiguration $taskConfiguration): TaskInterface
     {
-        // Duplicate code from \CleverAge\ProcessBundle\Manager\ProcessManager::initialize
-        // @todo Refactor this using a Registry with this feature:
-        // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
-        $serviceReference = $taskConfiguration->getServiceReference();
-        if (str_starts_with($serviceReference, '@')) {
-            $task = $this->container->get(ltrim($serviceReference, '@'));
-        } elseif ($this->container->has($serviceReference)) {
-            $task = $this->container->get($serviceReference);
-        } else {
-            throw new \UnexpectedValueException("Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'");
-        }
-        if (!$task instanceof TaskInterface) {
-            throw new \UnexpectedValueException("Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface");
-        }
-
-        return $task;
+        return $this->taskRegistry->getTask($taskConfiguration);
     }
 }

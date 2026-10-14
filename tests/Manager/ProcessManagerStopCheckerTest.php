@@ -29,6 +29,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use CleverAge\ProcessBundle\Task\AbstractIterableOutputTask;
 use CleverAge\ProcessBundle\Task\ConstantIterableOutputTask;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -41,6 +42,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[CoversClass(ProcessManager::class)]
 #[CoversClass(ProcessStoppedException::class)]
 #[UsesClass(ProcessFailedException::class)]
+#[UsesClass(TaskRegistry::class)]
 #[UsesClass(ProcessConfiguration::class)]
 #[UsesClass(TaskConfiguration::class)]
 #[UsesClass(ContextualOptionResolver::class)]
@@ -200,6 +202,7 @@ class ProcessManagerStopCheckerTest extends TestCase
             new ContextualOptionResolver(),
             $eventDispatcher,
             $stopCheckers,
+            taskRegistry: new TaskRegistry($container),
         );
     }
 
