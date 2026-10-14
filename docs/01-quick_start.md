@@ -68,8 +68,16 @@ clever_age_process:
     default_error_strategy: stop
 ```
 
-When creating custom tasks and transformers, you can use Symfony automatic registration, but remember there are a few
-required configurations:
+When creating custom tasks and transformers, you can use Symfony automatic registration. With autoconfiguration
+(`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton, so the default `App\:` resource is enough), the
+bundle configures them:
+- services implementing `CleverAge\ProcessBundle\Model\TaskInterface` are `public` (the process manager fetches tasks
+  from the container) and not shared (no data shared between task usages), with a `monolog.logger` tag on the
+  `cleverage_process_task` channel;
+- services implementing `CleverAge\ProcessBundle\Transformer\TransformerInterface` get the `cleverage.transformer` tag
+  (needed by the transformer registry) and a `monolog.logger` tag on the `cleverage_process_transformer` channel.
+
+Without autoconfiguration, declare these settings yourself:
 
 ```yaml
 # config/services.yaml
@@ -77,8 +85,6 @@ services:
     App\Transformer\:
         resource: '../src/Transformer/*'
         autowire: true
-        autoconfigure: true
-        public: false
         tags:
             - { name: cleverage.transformer }       # Needed by the transformer registry to find transformers
             - { name: monolog.logger, channel: cleverage_process_transformer } # Optional, see logging
@@ -86,17 +92,14 @@ services:
     App\Task\:
         resource: '../src/Task/*'
         autowire: true
-        autoconfigure: true
         shared: false                               # Important to avoid shared data between task usages
         public: true                                # Needed by the Process Manager to fetch tasks from the container
         tags:
             - { name: monolog.logger, channel: cleverage_process_task } # Optional, see logging
 ```
 
-The `cleverage.transformer` tag is not added by autoconfiguration: you have to declare it yourself (or use an
-`_instanceof` rule on `CleverAge\ProcessBundle\Transformer\TransformerInterface`, which only applies to services
-defined in the same file). If your `services.yaml` also has the default `App\:` resource, declare these resources after
-it, so that they override its definitions. The `monolog.logger` tags bind injected loggers to the bundle channels (see
+If your `services.yaml` also has the default `App\:` resource, declare these resources after it, so that they override
+its definitions. The `monolog.logger` tags bind injected loggers to the bundle channels (see
 [logging](03-custom_tasks.md#logging)).
 
 ## Process definition

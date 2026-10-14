@@ -11,6 +11,11 @@ services:
             - '@event_dispatcher'
             - !tagged_iterator cleverage_process.stop_checker
 
+    CleverAge\ProcessBundle\Manager\ProcessManager:
+        alias: cleverage_process.manager.process
+
     cleverage_process.context.contextual_option_resolver:
         class: CleverAge\ProcessBundle\Context\ContextualOptionResolver
         public: false
+    CleverAge\ProcessBundle\Context\ContextualOptionResolver:
+        alias: cleverage_process.context.contextual_option_resolver

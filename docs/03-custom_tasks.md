@@ -18,6 +18,11 @@ same service, or even with another instance of your process. Since a task is a s
 create one instance (keeping values in every attribute of your class). With `shared: false`, a new instance is created
 each time a task configuration is initialized.
 
+With autoconfiguration (`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton), the bundle applies
+these settings to every service implementing `TaskInterface`: `public: true`, `shared: false` and a `monolog.logger`
+tag on the `cleverage_process_task` channel (see [logging](#logging)). A setting explicitly defined on the service
+wins (e.g. `shared: true`).
+
 ```yaml
 # config/services.yaml
 services:
@@ -25,6 +30,16 @@ services:
         resource: '../src/Task/*'
         autowire: true
         autoconfigure: true
+```
+
+Without autoconfiguration, declare them explicitly:
+
+```yaml
+# config/services.yaml
+services:
+    App\Task\:
+        resource: '../src/Task/*'
+        autowire: true
         public: true
         shared: false
         tags:
@@ -182,7 +197,8 @@ must skip the state (`ProcessState::setSkipped(true)`) instead of outputting the
 Transformers are another kind of service. They implement `CleverAge\ProcessBundle\Transformer\TransformerInterface`
 (`transform(mixed $value, array $options = []): mixed` and `getCode(): string`) or
 `CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface` (which adds
-`configureOptions(OptionsResolver $resolver): void`) and are declared with a `cleverage.transformer` tag.
+`configureOptions(OptionsResolver $resolver): void`) and are declared with a `cleverage.transformer` tag (added by
+autoconfiguration, with a `monolog.logger` tag on the `cleverage_process_transformer` channel).
 
 They're meant to be lightweight, composable, and stateless pieces of your process. Feel free to implement custom ones
 as soon as provided ones don't fit your goal.
@@ -219,8 +235,7 @@ services:
     App\Transformer\:
         resource: '../src/Transformer/*'
         autowire: true
-        tags:
-            - { name: cleverage.transformer }
+        autoconfigure: true # or, without autoconfiguration: tags: [{ name: cleverage.transformer }]
 ```
 
 Once properly set up, they are registered in the `CleverAge\ProcessBundle\Registry\TransformerRegistry` (used by the
@@ -252,7 +267,7 @@ Each channel has a Monolog processor that adds the following values in the `extr
 if any) for the task and transformer channels.
 
 To benefit from those in your own tasks, inject a `Psr\Log\LoggerInterface` and bind it to the task channel with the
-`monolog.logger` tag:
+`monolog.logger` tag (added by autoconfiguration, see [service declaration](#service-declaration)):
 
 ```yaml
 services:

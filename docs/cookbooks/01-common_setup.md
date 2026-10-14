@@ -4,7 +4,12 @@ Common Setup
 Task & transformer declaration
 ------------------------------
 
-Example of a generic declaration for all the tasks and transformers of your application:
+With autoconfiguration (`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton), nothing more is needed:
+the bundle makes the services implementing `CleverAge\ProcessBundle\Model\TaskInterface` public and not shared, tags
+the ones implementing `CleverAge\ProcessBundle\Transformer\TransformerInterface` with `cleverage.transformer`, and binds
+both to their logging channel (`monolog.logger` tags).
+
+Without autoconfiguration, example of a generic declaration for all the tasks and transformers of your application:
 
 ```yaml
 # config/services.yaml
@@ -29,7 +34,8 @@ services:
 If the file also contains the default `App\:` resource (which includes `src/Task/` and `src/Transformer/`), declare
 these resources after it: the last definition of a service wins.
 
-Alternatively, you can use `_instanceof` rules to configure every class implementing
+Alternatively (still without autoconfiguration, or to override these settings), you can use `_instanceof` rules to
+configure every class implementing
 `CleverAge\ProcessBundle\Model\TaskInterface` or `CleverAge\ProcessBundle\Transformer\TransformerInterface`, wherever
 it is located in your sources (`_instanceof` only applies to the services defined in the same file, typically by the
 `App\:` resource of `config/services.yaml`):
