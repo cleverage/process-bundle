@@ -5,7 +5,7 @@ Task & transformer declaration
 ------------------------------
 
 With autoconfiguration (`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton), nothing more is needed:
-the bundle makes the services implementing `CleverAge\ProcessBundle\Model\TaskInterface` public and not shared, tags
+the bundle makes the services implementing `CleverAge\ProcessBundle\Model\TaskInterface` not shared, tags
 the ones implementing `CleverAge\ProcessBundle\Transformer\TransformerInterface` with `cleverage.transformer`, and binds
 both to their logging channel (`monolog.logger` tags).
 
@@ -17,7 +17,6 @@ services:
     App\Task\:
         resource: '../src/Task/*'
         autowire: true
-        public: true
         shared: false
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }
@@ -25,7 +24,6 @@ services:
     App\Transformer\:
         resource: '../src/Transformer/*'
         autowire: true
-        public: false
         tags:
             - { name: cleverage.transformer }
             - { name: monolog.logger, channel: cleverage_process_transformer }
@@ -44,7 +42,6 @@ it is located in your sources (`_instanceof` only applies to the services define
 services:
     _instanceof:
         CleverAge\ProcessBundle\Model\TaskInterface:
-            public: true
             shared: false
             tags:
                 - { name: monolog.logger, channel: cleverage_process_task }

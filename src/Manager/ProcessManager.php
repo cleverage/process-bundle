@@ -32,6 +32,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -60,6 +61,8 @@ class ProcessManager
 
     protected ?TaskConfiguration $taskConfiguration = null;
 
+    protected TaskRegistry $taskRegistry;
+
     /**
      * @param iterable<ProcessStopCheckerInterface> $stopCheckers
      */
@@ -71,7 +74,20 @@ class ProcessManager
         protected ContextualOptionResolver $contextualOptionResolver,
         protected EventDispatcherInterface $eventDispatcher,
         protected iterable $stopCheckers = [],
+        ?TaskRegistry $taskRegistry = null,
     ) {
+        if (!$taskRegistry instanceof TaskRegistry) {
+            trigger_deprecation(
+                'cleverage/process-bundle',
+                '5.4',
+                'Not passing a "%s" to "%s::__construct()" is deprecated: the tasks are fetched from the service container. The argument will be required in v6.0.',
+                TaskRegistry::class,
+                self::class,
+            );
+            // Same behaviour as before the task registry: any service of the container
+            $taskRegistry = new TaskRegistry($this->container, $this->container);
+        }
+        $this->taskRegistry = $taskRegistry;
     }
 
     public function getProcessHistory(): ?ProcessHistory
@@ -250,19 +266,7 @@ class ProcessManager
             $m .= "but it's error strategy 'stop' implies they will never be reached.";
             $this->taskLogger->debug($m);
         }
-        // @todo Refactor this using a Registry with this feature:
-        // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
-        $serviceReference = $taskConfiguration->getServiceReference();
-        if (str_starts_with($serviceReference, '@')) {
-            $task = $this->container->get(ltrim($serviceReference, '@'));
-        } elseif ($this->container->has($serviceReference)) {
-            $task = $this->container->get($serviceReference);
-        } else {
-            throw new \UnexpectedValueException("Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'");
-        }
-        if (!$task instanceof TaskInterface) {
-            throw new \UnexpectedValueException("Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface");
-        }
+        $task = $this->taskRegistry->getTask($taskConfiguration);
         $taskConfiguration->setTask($task);
 
         if ($task instanceof InitializableTaskInterface) {

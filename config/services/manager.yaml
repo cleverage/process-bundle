@@ -10,6 +10,7 @@ services:
             - '@cleverage_process.context.contextual_option_resolver'
             - '@event_dispatcher'
             - !tagged_iterator cleverage_process.stop_checker
+            - '@cleverage_process.registry.task'
 
     CleverAge\ProcessBundle\Manager\ProcessManager:
         alias: cleverage_process.manager.process

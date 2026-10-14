@@ -14,3 +14,12 @@ services:
         public: false
     CleverAge\ProcessBundle\Registry\TransformerRegistry:
         alias: cleverage_process.registry.transformer
+
+    cleverage_process.registry.task:
+        class: CleverAge\ProcessBundle\Registry\TaskRegistry
+        public: false
+        arguments:
+            - ~ # Service locator of the task services, see TaskLocatorCompilerPass
+            - '@service_container' # Deprecated fallback, removed in v6.0
+    CleverAge\ProcessBundle\Registry\TaskRegistry:
+        alias: cleverage_process.registry.task
