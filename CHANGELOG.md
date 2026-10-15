@@ -18,6 +18,9 @@ Latest
 * [#282](https://github.com/cleverage/process-bundle/issues/282) Require `psr/container` (`ProcessHelpCommand`), `ext-xmlreader` (`XmlStreamReaderTask`) and `ext-libxml` (`XmlFile`, `XmlStreamReaderTask`, `XpathEvaluatorTransformer`), used directly; add `symfony/cache` (used by the tests) to the dev requirements.
 * [#268](https://github.com/cleverage/process-bundle/issues/268) Clean up composer.json: remove the unused `symfony/dotenv`, `symfony/runtime` and `symfony/error-handler` dependencies (applications relying on the bundle to install them must require them), bound `symfony/service-contracts` to `^2.5|^3`, update the package description.
 
+## Fixes
+* [#301](https://github.com/cleverage/process-bundle/issues/301) Fix ProcessManager: the history of the parent process is restored after a failed process too, so that the logs of a parent process going on after a failed sub-process (e.g. `process_executor` task with the `skip` error strategy) are no longer attributed to the sub-process (`process_id`, `process_code` and `process_context` added by the Monolog processors), and that no history of a failed process is left after its execution (`getProcessHistory()`). The `Critical process failure` log and the `cleverage_process.fail` event are still attributed to the failed process. `ProcessManager` implements `ResetInterface` (`kernel.reset` tag): its state is reset between two messages of a long-running worker. Add tests.
+
 v5.3
 -----
 

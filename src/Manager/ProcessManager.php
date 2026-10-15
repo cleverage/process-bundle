@@ -35,13 +35,14 @@ use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Execute processes.
  *
  * @final since 5.4
  */
-class ProcessManager
+class ProcessManager implements ResetInterface
 {
     protected const EXECUTE_PROCESS = 1;
 
@@ -92,6 +93,17 @@ class ProcessManager
         $this->taskRegistry = $taskRegistry;
     }
 
+    /**
+     * Forget the state of the previous executions, e.g. between two messages of a long-running worker.
+     */
+    public function reset(): void
+    {
+        $this->processedIterables = [];
+        $this->processedBlockings = [];
+        $this->processHistory = null;
+        $this->taskConfiguration = null;
+    }
+
     public function getProcessHistory(): ?ProcessHistory
     {
         return $this->processHistory;
@@ -113,6 +125,7 @@ class ProcessManager
      */
     public function execute(string $processCode, mixed $input = null, array $context = []): mixed
     {
+        $parentProcessHistory = $this->processHistory;
         try {
             $this->eventDispatcher->dispatch(
                 new ProcessEvent($processCode, $input, $context),
@@ -137,6 +150,10 @@ class ProcessManager
             );
 
             throw $error;
+        } finally {
+            // When the process has failed, doExecute() did not restore the history of the parent process (if any): the
+            // logs above are still attributed to the failed process, the next ones to the parent process
+            $this->processHistory = $parentProcessHistory;
         }
 
         return $result;

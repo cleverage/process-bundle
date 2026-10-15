@@ -11,6 +11,8 @@ services:
             - '@event_dispatcher'
             - !tagged_iterator cleverage_process.stop_checker
             - '@cleverage_process.registry.task'
+        tags:
+            - { name: kernel.reset, method: reset }
 
     CleverAge\ProcessBundle\Manager\ProcessManager:
         alias: cleverage_process.manager.process
