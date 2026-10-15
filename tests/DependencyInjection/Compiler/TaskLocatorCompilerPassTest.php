@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Argument\ServiceClosureArgument;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
@@ -65,6 +66,70 @@ class TaskLocatorCompilerPassTest extends TestCase
         }
     }
 
+    public function testTaskCodesAreResolvedIntoServices(): void
+    {
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([[
+            'configurations' => [
+                'test.codes' => ['tasks' => [
+                    'bundle' => ['task' => 'dummy', 'options' => ['format' => '%%s']],
+                    'application' => ['task' => 'app_task'],
+                ]],
+            ],
+        ]], $container);
+        $container->setDefinition('app.task', (new Definition(DummyTask::class))->addTag('cleverage.task', ['code' => 'app_task']));
+
+        (new TaskLocatorCompilerPass())->process($container);
+
+        $configurations = $container->getDefinition('cleverage_process.registry.process_configuration')->getArgument(0);
+        self::assertIsArray($configurations);
+        $tasks = $configurations['test.codes']['tasks'];
+        self::assertSame('@'.DummyTask::class, $tasks['bundle']['service']);
+        self::assertSame('@app.task', $tasks['application']['service']);
+        // Only the service is set: the parameters of the configuration are not resolved (escaped %)
+        self::assertSame(['format' => '%%s'], $tasks['bundle']['options']);
+
+        $locatorReference = $container->getDefinition('cleverage_process.registry.task')->getArgument(0);
+        self::assertInstanceOf(Reference::class, $locatorReference);
+        $services = $container->getDefinition((string) $locatorReference)->getArgument(0);
+        self::assertIsArray($services);
+        self::assertSame([DummyTask::class, 'app.task'], array_keys($services));
+    }
+
+    public function testUnknownTaskCodeThrows(): void
+    {
+        $container = $this->createContainerWithTask(['task' => 'unknown']);
+        $container->setDefinition('app.task', (new Definition(DummyTask::class))->addTag('cleverage.task', ['code' => 'app_task']));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown task code "unknown" for the task "my_task" of the process "test.process". Known codes: "app_task".');
+
+        (new TaskLocatorCompilerPass())->process($container);
+    }
+
+    public function testDuplicateTaskCodeThrows(): void
+    {
+        $container = $this->createContainerWithTask(['task' => 'same']);
+        $container->setDefinition('app.first', (new Definition(DummyTask::class))->addTag('cleverage.task', ['code' => 'same']));
+        $container->setDefinition('app.second', (new Definition(DummyTask::class))->addTag('cleverage.task', ['code' => 'same']));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The task code "same" is used by the "app.first" and "app.second" services.');
+
+        (new TaskLocatorCompilerPass())->process($container);
+    }
+
+    public function testInvalidTaskCodeAttributeThrows(): void
+    {
+        $container = $this->createContainerWithTask(['task' => 'app_task']);
+        $container->setDefinition('app.task', (new Definition(DummyTask::class))->addTag('cleverage.task'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The "code" attribute of the "cleverage.task" tag of the "app.task" service must be a non-empty string.');
+
+        (new TaskLocatorCompilerPass())->process($container);
+    }
+
     public function testNothingIsDoneWithoutTheRegistries(): void
     {
         $container = new ContainerBuilder();
@@ -72,5 +137,20 @@ class TaskLocatorCompilerPassTest extends TestCase
         (new TaskLocatorCompilerPass())->process($container);
 
         self::assertFalse($container->hasDefinition('cleverage_process.registry.task'));
+    }
+
+    /**
+     * @param array<string, mixed> $task
+     */
+    private function createContainerWithTask(array $task): ContainerBuilder
+    {
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([['configurations' => ['test.process' => ['tasks' => ['my_task' => $task]]]]], $container);
+        // Only the tasks of the test
+        foreach (array_keys($container->findTaggedServiceIds('cleverage.task')) as $id) {
+            $container->getDefinition($id)->clearTag('cleverage.task');
+        }
+
+        return $container;
     }
 }

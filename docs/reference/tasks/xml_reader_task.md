@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Xml\XmlReaderTask`
+* **Code**: `xml_reader` (`task: xml_reader`)
 
 Accepted inputs
 ---------------
@@ -34,7 +35,7 @@ Examples
 ```yaml
 # Task configuration level
 read_xml:
-  service: '@CleverAge\ProcessBundle\Task\File\Xml\XmlReaderTask'
+  task: xml_reader
   options:
     file_path: '%kernel.project_dir%/var/data/file.xml'
   outputs: [transform]

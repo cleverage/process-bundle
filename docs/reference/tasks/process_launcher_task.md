@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask`
+* **Code**: `process_launcher` (`task: process_launcher`)
 * **Iterable task**
 * **Flushable task**
 
@@ -51,7 +52,7 @@ Examples
 ```yaml
 # Task configuration level
 parallel_import:
-  service: '@CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask'
+  task: process_launcher
   options:
     process: app.import_file
     max_processes: 5

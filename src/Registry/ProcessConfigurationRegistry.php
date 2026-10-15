@@ -86,6 +86,10 @@ class ProcessConfigurationRegistry
                 }
                 $rawTaskConfiguration['error_outputs'] = $rawTaskConfiguration['errors'];
             }
+            if (!\is_string($rawTaskConfiguration['service'] ?? null)) {
+                // The "task" codes are resolved into services when the container is compiled (TaskLocatorCompilerPass)
+                throw new \LogicException("The task {$taskCode} of the process {$processCode} has no service: a \"task\" code can only be used in the configurations known when the container is compiled");
+            }
             $taskConfigurations[$taskCode] = new TaskConfiguration(
                 $taskCode,
                 $rawTaskConfiguration['service'],

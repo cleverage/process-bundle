@@ -17,18 +17,18 @@ clever_age_process:
             description: 'Aggregate API logs per service'
             tasks:
                 list_sources:
-                    service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
+                    task: folder_browser
                     options:
                         folder_path: '%kernel.project_dir%/var/logs/api'
                         name_pattern: '*.json-stream'
                     outputs: [read_log]
 
                 read_log:
-                    service: '@CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamReaderTask' # Reads the file path given as input
+                    task: json_stream_reader # Reads the file path given as input
                     outputs: [map_log]
 
                 map_log:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    task: transformer
                     options:
                         transformers:
                             mapping:
@@ -39,7 +39,7 @@ clever_age_process:
                     outputs: [group_by_service]
 
                 group_by_service:
-                    service: '@CleverAge\ProcessBundle\Task\RowAggregatorTask'
+                    task: row_aggregator
                     options:
                         aggregate_by: service
                         aggregate_columns: [duration, status]
@@ -47,11 +47,11 @@ clever_age_process:
                     outputs: [iterate_services]
 
                 iterate_services:
-                    service: '@CleverAge\ProcessBundle\Task\InputIteratorTask'
+                    task: input_iterator
                     outputs: [compute_stats]
 
                 compute_stats:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    task: transformer
                     options:
                         transformers:
                             mapping:
@@ -74,7 +74,7 @@ clever_age_process:
                     outputs: [write_summary]
 
                 write_summary:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
+                    task: csv_writer
                     options:
                         file_path: '%kernel.project_dir%/var/exports/report_summary_{date}.csv'
                         headers: [service, calls, total_duration]

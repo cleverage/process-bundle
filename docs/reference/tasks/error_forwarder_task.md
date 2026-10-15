@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Debug\ErrorForwarderTask`
+* **Code**: `error_forwarder` (`task: error_forwarder`)
 
 Accepted inputs
 ---------------
@@ -34,13 +35,13 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output: [Error 1, Error 2, Error 3]
   outputs: [error_forwarder]
 error_forwarder:
-  service: '@CleverAge\ProcessBundle\Task\Debug\ErrorForwarderTask'
+  task: error_forwarder
   error_outputs: [debug]
 debug:
-  service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
+  task: debug
 ```

@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\ObjectUpdaterTask`
+* **Code**: `object_updater` (`task: object_updater`)
 
 Accepted inputs
 ---------------
@@ -39,7 +40,7 @@ Examples
 ```yaml
 # Task configuration level
 update_object:
-  service: '@CleverAge\ProcessBundle\Task\ObjectUpdaterTask'
+  task: object_updater
   options:
     property_path: name
   outputs: [save]

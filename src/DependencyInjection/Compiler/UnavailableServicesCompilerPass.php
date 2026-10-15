@@ -60,7 +60,7 @@ final class UnavailableServicesCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * @param list<class-string> $classes the services are registered with an alias named after their class
+     * @param list<class-string> $classes the services are registered with their class name as id (or an alias)
      */
     private function replace(ContainerBuilder $container, string $message, array $classes): void
     {

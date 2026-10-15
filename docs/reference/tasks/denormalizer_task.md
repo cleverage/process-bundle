@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask`
+* **Code**: `denormalizer` (`task: denormalizer`)
 
 Accepted inputs
 ---------------
@@ -37,7 +38,7 @@ Examples
 ```yaml
 # Task configuration level
 denormalize:
-  service: '@CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask'
+  task: denormalizer
   options:
     class: App\Entity\Author
   outputs: [save]
@@ -48,7 +49,7 @@ denormalize:
 ```yaml
 # Task configuration level
 dto:
-  service: '@CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask'
+  task: denormalizer
   options:
     class: 'App\Dto\Commune[]'
   outputs: [debug]

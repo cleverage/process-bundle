@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Process\CommandRunnerTask`
+* **Code**: `command_runner` (`task: command_runner`)
 
 Accepted inputs
 ---------------
@@ -41,7 +42,7 @@ Examples
 ```yaml
 # Task configuration level
 count_lines:
-  service: '@CleverAge\ProcessBundle\Task\Process\CommandRunnerTask'
+  task: command_runner
   options:
     commandline: ['wc', '-l']
     timeout: 30
@@ -53,7 +54,7 @@ count_lines:
 ```yaml
 # Task configuration level
 count_errors:
-  service: '@CleverAge\ProcessBundle\Task\Process\CommandRunnerTask'
+  task: command_runner
   options:
     commandline: 'grep "$PATTERN" | wc -l'
     env:

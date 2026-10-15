@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\CounterTask`
+* **Code**: `counter` (`task: counter`)
 * **Flushable task**
 
 Accepted inputs
@@ -37,12 +38,12 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output: [1, 2, 3, 4, 5, 6, 7, 8, 9]
   outputs: [counter]
 counter:
-  service: '@CleverAge\ProcessBundle\Task\CounterTask'
+  task: counter
   options:
     flush_every: 3
   outputs: [debug]

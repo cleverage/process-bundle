@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Debug\DieTask`
+* **Code**: `die` (`task: die`)
 
 Accepted inputs
 ---------------
@@ -33,10 +34,10 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+  task: constant_output
   options:
     output: { id: 123 }
   outputs: [die]
 die:
-  service: '@CleverAge\ProcessBundle\Task\Debug\DieTask'
+  task: die
 ```

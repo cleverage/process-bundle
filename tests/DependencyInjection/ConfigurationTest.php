@@ -54,6 +54,62 @@ class ConfigurationTest extends TestCase
         );
     }
 
+    public function testTaskIsDefinedByAServiceOrACode(): void
+    {
+        $config = $this->process(['configurations' => ['test.process' => ['tasks' => [
+            'by_service' => ['service' => '@app.task'],
+            'by_code' => ['task' => 'transformer'],
+        ]]]]);
+
+        $tasks = $config['configurations']['test.process']['tasks'];
+        self::assertSame(['@app.task', null], [$tasks['by_service']['service'], $tasks['by_service']['task']]);
+        self::assertSame([null, 'transformer'], [$tasks['by_code']['service'], $tasks['by_code']['task']]);
+    }
+
+    public function testServiceIsDeprecated(): void
+    {
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            $this->process(['configurations' => ['test.process' => ['tasks' => [
+                'by_service' => ['service' => '@app.task'],
+                'by_code' => ['task' => 'transformer'],
+            ]]]]);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame(
+            ['Since cleverage/process-bundle 5.4: The "service" option of the task "clever_age_process.configurations.test.process.tasks.by_service" is deprecated, reference the task by its code instead ("task: <code>", given on the reference page of each task; give a code to your own tasks with #[AsTask] or a "cleverage.task" tag). It will be removed in v6.0.'],
+            $deprecations
+        );
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function provideInvalidTaskDefinitions(): iterable
+    {
+        yield 'neither service nor task' => [['options' => []]];
+        yield 'both service and task' => [['service' => '@app.task', 'task' => 'transformer']];
+    }
+
+    /**
+     * @param array<string, mixed> $task
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidTaskDefinitions')]
+    public function testTaskMustDefineEitherAServiceOrACode(array $task): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('A task must define either its code ("task: <code>") or, deprecated, its "service", not both');
+
+        $this->process(['configurations' => ['test.process' => ['tasks' => ['invalid' => $task]]]]);
+    }
+
     public function testInvalidDefaultLogLevelIsRejected(): void
     {
         $this->expectException(InvalidConfigurationException::class);

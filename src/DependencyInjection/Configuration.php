@@ -172,6 +172,10 @@ class Configuration implements ConfigurationInterface
             ->performNoDeepMerging()
             ->cannotBeOverwritten()
             ->info('Unique custom task code')
+            ->validate()
+            ->ifTrue(static fn (array $task): bool => (null === $task['service']) === (null === $task['task']))
+            ->thenInvalid('A task must define either its code ("task: <code>") or, deprecated, its "service", not both: %s')
+            ->end()
             ->children();
 
         $this->appendTaskConfigDefinition($taskListDefinition);
@@ -180,7 +184,16 @@ class Configuration implements ConfigurationInterface
     protected function appendTaskConfigDefinition(NodeBuilder $definition): void
     {
         $definition->scalarNode('service')
-            ->isRequired();
+            ->info('Deprecated, use "task": service id or alias of the task, with or without a leading "@"')
+            ->setDeprecated(
+                'cleverage/process-bundle',
+                '5.4',
+                'The "%node%" option of the task "%path%" is deprecated, reference the task by its code instead ("task: <code>", given on the reference page of each task; give a code to your own tasks with #[AsTask] or a "cleverage.task" tag). It will be removed in v6.0.'
+            )
+            ->defaultNull();
+        $definition->scalarNode('task')
+            ->info('Code of the task (cleverage.task tag, #[AsTask])')
+            ->defaultNull();
         $definition->scalarNode('description')
             ->defaultValue('');
         $definition->scalarNode('help')

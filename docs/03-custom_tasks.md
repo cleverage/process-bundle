@@ -9,12 +9,12 @@ create your own.
 
 As stated before, tasks are simple services implementing `CleverAge\ProcessBundle\Model\TaskInterface`, so you can
 design them like any other service, with only small specificities:
-- the service does **not need to be public**: the process manager fetches it, using the `service` reference of the
-  task configuration (a service id or alias, with or without the leading `@`, see
-  [task definition](reference/02-task_definition.md#task-attributes)), from a service locator built from the process
-  configurations when the container is compiled. Only a service that is not referenced by these configurations (e.g. a
-  configuration added at runtime) is fetched from the service container, which requires a public service and is
-  deprecated
+- the service should have a **code**, to reference it in the process configurations (`task: <code>`, see
+  [task code](#task-code))
+- the service does **not need to be public**: the process manager fetches it from a service locator built from the
+  process configurations when the container is compiled. Only a service that is not referenced by these configurations
+  (e.g. a configuration added at runtime) is fetched from the service container, which requires a public service and
+  is deprecated
 - the service should **not be shared** ([`shared: false`](https://symfony.com/doc/current/service_container/shared.html))
 
 Most of the time you don't want a task declared in a process to share some data with another declaration using the
@@ -51,6 +51,42 @@ services:
 
 If your `services.yaml` also has the default `App\:` resource (which includes `src/Task/`), declare `App\Task\:` after
 it: the last definition of a service wins.
+
+### Task code
+
+A task is referenced in the process configurations by its code (`task: app_my_task`, see
+[task definition](reference/02-task_definition.md#task-attributes); referencing it by its service,
+`service: '@App\Task\MyTask'`, is deprecated since 5.4). Give your task a code: with autoconfiguration, add the
+`CleverAge\ProcessBundle\Attribute\AsTask` attribute to the class; without, add a `cleverage.task` tag with a `code`
+attribute to the service. Use an internal prefix in your codes to avoid conflicts
+with the tasks of the bundles. Two services cannot share the same code (the container compilation fails).
+
+```php
+namespace App\Task;
+
+use CleverAge\ProcessBundle\Attribute\AsTask;
+use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Model\TaskInterface;
+
+#[AsTask(code: 'app_my_task')]
+class MyTask implements TaskInterface
+{
+    public function execute(ProcessState $state): void
+    {
+        // ...
+    }
+}
+```
+
+```yaml
+# Without autoconfiguration
+services:
+    App\Task\MyTask:
+        autowire: true
+        shared: false
+        tags:
+            - { name: cleverage.task, code: app_my_task }
+```
 
 ## Using the state object
 
@@ -140,7 +176,7 @@ class PrefixTask extends AbstractConfigurableTask
 
 ```yaml
 prefix:
-    service: '@App\Task\PrefixTask'
+    task: app_prefix                # with #[AsTask(code: 'app_prefix')] on the class, see "task code" above
     options:
         prefix: 'SKU-'
 ```
@@ -269,7 +305,7 @@ standard additions.
 
 ```yaml
 transform:
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+    task: transformer
     options:
         transformers:
             app_vat:

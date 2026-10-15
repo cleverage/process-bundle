@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\FileMoverTask`
+* **Code**: `file_mover` (`task: file_mover`)
 
 Accepted inputs
 ---------------
@@ -36,7 +37,7 @@ Examples
 ```yaml
 # Task configuration level
 move_file:
-  service: '@CleverAge\ProcessBundle\Task\File\FileMoverTask'
+  task: file_mover
   options:
     destination: '%kernel.project_dir%/var/data/archive/'
     autoincrement: true

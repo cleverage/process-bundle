@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Debug\StopwatchTask`
+* **Code**: `stopwatch` (`task: stopwatch`)
 
 Accepted inputs
 ---------------
@@ -32,5 +33,5 @@ Examples
 ```yaml
 # Task configuration level
 stopwatch:
-  service: '@CleverAge\ProcessBundle\Task\Debug\StopwatchTask'
+  task: stopwatch
 ```

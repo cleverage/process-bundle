@@ -121,11 +121,11 @@ clever_age_process:
             tasks: []
 ```
 
-Then you can add tasks in this array. They consist of a `service`, optionally configured by `options`, and eventually
+Then you can add tasks in this array. They consist of a `task` code, optionally configured by `options`, and eventually
 chained with others through their `outputs`. Minimal syntax is:
 ```yaml
 <task_name>:
-    service: <service_reference>
+    task: <task_code>               # e.g. transformer, see the reference page of each task
     options: 
         <option_key_1>: <option_value_1>
         <option_key_2>: <option_value_2>
@@ -154,7 +154,7 @@ clever_age_process:
         project_prefix.process_name:
             tasks:
                 extract:
-                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+                    task: constant_output
                     options:
                         output:
                             id: 123
@@ -163,7 +163,7 @@ clever_age_process:
                     outputs: [transform]
 
                 transform:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    task: transformer
                     options:
                         transformers:
                             mapping:
@@ -181,7 +181,7 @@ clever_age_process:
                     outputs: [load]
 
                 load:
-                    service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
+                    task: debug
 ```
 
 There is more to know about process configuration. See [the full process configuration reference](reference/01-process_definition.md)
@@ -257,7 +257,7 @@ task of the process:
 
 ```yaml
 read:
-    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
+    task: csv_reader
     options:
         file_path: '%kernel.project_dir%/var/import/{{ file_name }}'
 ```

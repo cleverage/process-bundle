@@ -7,7 +7,7 @@ desktop environment.
 Add these tasks to your process:
 ```yaml
 memory:
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+    task: transformer
     options:
         transformers:
             mapping:
@@ -20,7 +20,7 @@ memory:
     outputs: [write_memory]
 
 write_memory:
-    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
+    task: csv_writer
     options:
         file_path: '%kernel.project_dir%/memory.dat'
         headers: [memory_usage]
@@ -47,7 +47,7 @@ identify each of them. All measure tasks send their output to the same `write_me
 
 ```yaml
 memory_after_read:
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+    task: transformer
     options:
         transformers:
             mapping:
@@ -62,7 +62,7 @@ memory_after_read:
     outputs: [write_memory]
 
 memory_after_transform:
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+    task: transformer
     options:
         transformers:
             mapping:
@@ -77,7 +77,7 @@ memory_after_transform:
     outputs: [write_memory]
 
 write_memory:
-    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
+    task: csv_writer
     options:
         file_path: '%kernel.project_dir%/memory_phase.csv'
         headers: [phase, memory_usage]

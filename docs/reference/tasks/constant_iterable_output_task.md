@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\ConstantIterableOutputTask`
+* **Code**: `constant_iterable_output` (`task: constant_iterable_output`)
 * **Iterable task**
 
 Accepted inputs
@@ -35,7 +36,7 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output:
       id: 123

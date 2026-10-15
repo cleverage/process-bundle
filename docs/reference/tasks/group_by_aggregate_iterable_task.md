@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\GroupByAggregateIterableTask`
+* **Code**: `group_by_aggregate_iterable` (`task: group_by_aggregate_iterable`)
 * **Blocking task**
 
 Accepted inputs
@@ -38,7 +39,7 @@ Examples
 ```yaml
 # Task configuration level
 deduplicate:
-  service: '@CleverAge\ProcessBundle\Task\GroupByAggregateIterableTask'
+  task: group_by_aggregate_iterable
   options:
     group_by_accessors:
       - '[type]'

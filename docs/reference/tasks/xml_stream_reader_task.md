@@ -11,6 +11,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Xml\XmlStreamReaderTask`
+* **Code**: `xml_stream_reader` (`task: xml_stream_reader`)
 * **Iterable task**
 
 Accepted inputs
@@ -42,13 +43,13 @@ Examples
 ```yaml
 # Task configuration level
 read:
-  service: '@CleverAge\ProcessBundle\Task\File\Xml\XmlStreamReaderTask'
+  task: xml_stream_reader
   options:
     file_path: '%kernel.project_dir%/var/data/products.xml'
     node_name: product
   outputs: [transform]
 transform:
-  service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+  task: transformer
   options:
     transformers:
       xpath_evaluator:

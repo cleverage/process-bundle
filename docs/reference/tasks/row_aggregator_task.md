@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\RowAggregatorTask`
+* **Code**: `row_aggregator` (`task: row_aggregator`)
 * **Blocking task**
 
 Accepted inputs
@@ -39,7 +40,7 @@ Examples
 ```yaml
 # Task configuration level
 aggregate_rows:
-  service: '@CleverAge\ProcessBundle\Task\RowAggregatorTask'
+  task: row_aggregator
   options:
     aggregate_by: order_id
     aggregate_columns: [product, qty]

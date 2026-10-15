@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\SplitJoinLineTask`
+* **Code**: `split_join_line` (`task: split_join_line`)
 * **Iterable task**
 
 Accepted inputs
@@ -39,7 +40,7 @@ Examples
 ```yaml
 # Task configuration level
 split_line:
-  service: '@CleverAge\ProcessBundle\Task\SplitJoinLineTask'
+  task: split_join_line
   options:
     split_columns: [category, tag]
     join_column: value

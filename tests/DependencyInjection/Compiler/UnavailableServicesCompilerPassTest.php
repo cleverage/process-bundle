@@ -28,6 +28,7 @@ use CleverAge\ProcessBundle\Transformer\UnavailableTransformer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
@@ -57,8 +58,8 @@ class UnavailableServicesCompilerPassTest extends TestCase
             $definition = $container->findDefinition($id);
             self::assertSame(UnavailableTask::class, $definition->getClass(), $id);
             self::assertSame([\sprintf(UnavailableServicesCompilerPass::SERIALIZER_MESSAGE, $id)], $definition->getArguments());
-            // Still referenced by the alias named after the class, and logged in the tasks channel
-            self::assertTrue($container->getAlias($id)->isPublic());
+            // Still public (deprecated fallback on the service container), and logged in the tasks channel
+            self::assertTrue($definition->isPublic());
             self::assertFalse($definition->isShared());
             self::assertSame([['channel' => 'cleverage_process_task']], $definition->getTag('monolog.logger'));
         }
@@ -92,7 +93,7 @@ class UnavailableServicesCompilerPassTest extends TestCase
         $definition = $container->findDefinition(ValidatorTask::class);
         self::assertSame(UnavailableTask::class, $definition->getClass());
         self::assertSame([\sprintf(UnavailableServicesCompilerPass::VALIDATOR_MESSAGE, ValidatorTask::class)], $definition->getArguments());
-        self::assertTrue($container->getAlias(ValidatorTask::class)->isPublic());
+        self::assertTrue($definition->isPublic());
         self::assertFalse($definition->isShared());
         self::assertSame(NormalizerTask::class, $container->findDefinition(NormalizerTask::class)->getClass());
     }
@@ -101,6 +102,8 @@ class UnavailableServicesCompilerPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         (new CleverAgeProcessExtension())->load([], $container);
+        // The class of the services whose id is the class name, as when the container is compiled
+        (new ResolveClassPass())->process($container);
         if ($serializer) {
             $container->setDefinition('serializer', new Definition(\stdClass::class));
         }

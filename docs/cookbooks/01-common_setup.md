@@ -115,14 +115,14 @@ clever_age_process:
             help: 'bin/console cleverage:process:execute app.file_import -c "file:''products.csv''"'
             tasks:
                 read_csv:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
+                    task: csv_reader
                     options:
                         file_path: '%kernel.project_dir%/var/data/{{ file }}'
                         delimiter: ';'
                     outputs: [transform]
 
                 transform:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    task: transformer
                     error_strategy: skip
                     options:
                         transformers:
@@ -142,7 +142,7 @@ clever_age_process:
                     outputs: [write_csv]
 
                 write_csv:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
+                    task: csv_writer
                     options:
                         file_path: '%kernel.project_dir%/var/output/products_prepared_{date_time}.csv'
                         headers: [id, slug]

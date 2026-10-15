@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\FolderBrowserTask`
+* **Code**: `folder_browser` (`task: folder_browser`)
 * **Iterable task**
 
 Accepted inputs
@@ -41,7 +42,7 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
+  task: folder_browser
   options:
     folder_path: '%kernel.project_dir%/var/data'
     name_pattern: '*.csv'
