@@ -41,9 +41,9 @@ service: '@CleverAge\ArchiveProcessBundle\Task\UnzipTask'         # alias, with 
 service: CleverAge\ArchiveProcessBundle\Task\UnzipTask            # alias, without @
 ```
 
-The tasks of this bundle and of the bridge bundles are registered with a `cleverage_process.task.*` /
-`cleverage_*_process.task.*` id and an alias named after their class (e.g. `cleverage_process.task.transformer` and
-`CleverAge\ProcessBundle\Task\TransformerTask`). With an unknown service, a reference with `@` throws the
+The tasks of this bundle are registered with their class name as id (e.g.
+`CleverAge\ProcessBundle\Task\TransformerTask`), the tasks of the bridge bundles with a `cleverage_*_process.task.*` id
+and an alias named after their class. With an unknown service, a reference with `@` throws the
 `ServiceNotFoundException` of the service container, a reference without `@` an `\UnexpectedValueException`
 (`Unable to resolve service reference for Task '<task code>'`). A task defines either `task` or `service`, not both.
 

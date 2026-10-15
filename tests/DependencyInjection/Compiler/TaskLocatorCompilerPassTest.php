@@ -84,7 +84,7 @@ class TaskLocatorCompilerPassTest extends TestCase
         $configurations = $container->getDefinition('cleverage_process.registry.process_configuration')->getArgument(0);
         self::assertIsArray($configurations);
         $tasks = $configurations['test.codes']['tasks'];
-        self::assertSame('@cleverage_process.task.dummy', $tasks['bundle']['service']);
+        self::assertSame('@'.DummyTask::class, $tasks['bundle']['service']);
         self::assertSame('@app.task', $tasks['application']['service']);
         // Only the service is set: the parameters of the configuration are not resolved (escaped %)
         self::assertSame(['format' => '%%s'], $tasks['bundle']['options']);
@@ -93,7 +93,7 @@ class TaskLocatorCompilerPassTest extends TestCase
         self::assertInstanceOf(Reference::class, $locatorReference);
         $services = $container->getDefinition((string) $locatorReference)->getArgument(0);
         self::assertIsArray($services);
-        self::assertSame(['cleverage_process.task.dummy', 'app.task'], array_keys($services));
+        self::assertSame([DummyTask::class, 'app.task'], array_keys($services));
     }
 
     public function testUnknownTaskCodeThrows(): void

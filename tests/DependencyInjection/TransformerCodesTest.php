@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Transformer\GenericTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -33,6 +34,8 @@ class TransformerCodesTest extends TestCase
         (new CleverAgeProcessExtension())->load([[
             'generic_transformers' => ['app_generic' => ['transformers' => ['trim' => []]]],
         ]], $container);
+        // The class of the services whose id is the class name, as when the container is compiled
+        (new ResolveClassPass())->process($container);
 
         $tagged = $container->findTaggedServiceIds('cleverage.transformer');
         self::assertCount(38, $tagged);

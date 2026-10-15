@@ -134,8 +134,9 @@ class CleverAgeProcessExtensionTest extends TestCase
         $tagged = $container->findTaggedServiceIds('cleverage.task');
         self::assertCount(58, $tagged);
         foreach ($tagged as $id => $tags) {
-            // The code is the end of the service id: cleverage_process.task.<code>
-            self::assertSame([['code' => substr($id, \strlen('cleverage_process.task.'))]], $tags, $id);
+            // The id is the class name, the code its snake case without the "Task" suffix
+            $code = strtolower((string) preg_replace('/(?<!^)[A-Z]/', '_$0', (string) preg_replace('/Task$/', '', substr((string) strrchr($id, '\\'), 1))));
+            self::assertSame([['code' => $code]], $tags, $id);
         }
     }
 
