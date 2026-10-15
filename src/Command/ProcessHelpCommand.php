@@ -270,7 +270,7 @@ class ProcessHelpCommand extends Command
         if ([] === $previousTasks) {
             $branches[] = $task->getCode();
         } elseif (1 === \count($previousTasks)) {
-            $prevTask = current($previousTasks)
+            $prevTask = array_first($previousTasks)
                 ->getCode();
             foreach (array_reverse($branches, true) as $i => $branchTask) {
                 if ($branchTask === $prevTask) {

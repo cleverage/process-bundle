@@ -201,12 +201,8 @@ class ProcessConfiguration
 
         // By default use the first defined task
         if (!$entryTask instanceof TaskConfiguration) {
-            $entryTask = reset($this->taskConfigurations);
-        }
-
-        // May happen with an empty array
-        if (false === $entryTask) {
-            return null;
+            // null with an empty array
+            return array_first($this->taskConfigurations);
         }
 
         return $entryTask;
