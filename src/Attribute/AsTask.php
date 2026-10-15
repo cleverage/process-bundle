@@ -17,7 +17,8 @@ namespace CleverAge\ProcessBundle\Attribute;
  * Gives a code to a task service, to reference it with the `task` key of a task configuration (`task: <code>`)
  * instead of its service id or class name (`service: '@<id>'`).
  *
- * Requires autoconfiguration; equivalent to a `cleverage.task` tag with a `code` attribute.
+ * Requires autoconfiguration; equivalent to a `cleverage.task` tag with a `code` attribute. The code is unique: two task
+ * services with the same code fail the container compilation (use a prefix for the application tasks).
  */
 #[\Attribute(\Attribute::TARGET_CLASS)]
 final readonly class AsTask

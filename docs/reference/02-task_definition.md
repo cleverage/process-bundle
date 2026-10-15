@@ -24,28 +24,20 @@ Task attributes
 [reference page](tasks/) (e.g. `transformer` for the [TransformerTask](tasks/transformer_task.md)); the code of a task
 service is declared with a `cleverage.task` tag with a `code` attribute, or with the
 `#[CleverAge\ProcessBundle\Attribute\AsTask(code: '...')]` attribute (see
-[custom tasks](../03-custom_tasks.md#task-code)). The codes are resolved when the container is compiled: an unknown
-code fails the compilation, with the list of the known codes. The services of the tasks referenced by the process
+[custom tasks](../03-custom_tasks.md#task-code)). A code is **unique**: it identifies a single task service in the
+application (the tasks of this bundle have unprefixed codes, use a prefix for the ones of your own tasks), two services
+with the same code fail the container compilation.
+The codes are resolved when the container is compiled: an unknown code fails the compilation, with the list of the
+known codes. The services of the tasks referenced by the process
 configurations are collected when the container is compiled, so they can be private.
 
 **service**: **deprecated since 5.4, removed in v6.0**, use `task`. Reference to the service used for the task, instead
-of its code: a service **id** or a service **alias**, with or without a leading `@` (quote the value when it starts with
-`@`, as YAML requires). The service must implement `CleverAge\ProcessBundle\Model\TaskInterface`. For instance, the
-`UnzipTask` of the archive bridge is registered as `cleverage_archive_process.task.unzip`, with an alias named after its
-class: these four references are equivalent.
-
-```yaml
-service: '@cleverage_archive_process.task.unzip'                  # id, with @
-service: cleverage_archive_process.task.unzip                     # id, without @
-service: '@CleverAge\ArchiveProcessBundle\Task\UnzipTask'         # alias, with @
-service: CleverAge\ArchiveProcessBundle\Task\UnzipTask            # alias, without @
-```
-
-The tasks of this bundle are registered with their class name as id (e.g.
-`CleverAge\ProcessBundle\Task\TransformerTask`), the tasks of the bridge bundles with a `cleverage_*_process.task.*` id
-and an alias named after their class. With an unknown service, a reference with `@` throws the
-`ServiceNotFoundException` of the service container, a reference without `@` an `\UnexpectedValueException`
-(`Unable to resolve service reference for Task '<task code>'`). A task defines either `task` or `service`, not both.
+of its code: its service id, with or without a leading `@` (quote the value when it starts with `@`, as YAML requires),
+e.g. `service: '@CleverAge\ProcessBundle\Task\TransformerTask'` (the tasks of this bundle have their class name as
+service id). The service must implement `CleverAge\ProcessBundle\Model\TaskInterface`. With an unknown service, a
+reference with `@` throws the `ServiceNotFoundException` of the service container, a reference without `@` an
+`\UnexpectedValueException` (`Unable to resolve service reference for Task '<task code>'`). A task defines either `task`
+or `service`, not both.
 
 Only a service that is not referenced by the configurations known when the container is compiled (e.g. a configuration
 added at runtime) is fetched from the service container, which requires a public service and is deprecated since 5.4.

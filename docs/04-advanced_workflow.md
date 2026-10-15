@@ -29,18 +29,15 @@ the process code, the task code and the original message. The original exception
 
 ### Executing a process from PHP
 
-The process manager service id is `cleverage_process.manager.process`. It is private and has no class alias, so it
-cannot be autowired by type: inject it explicitly (or declare the alias yourself).
+The process manager service (`cleverage_process.manager.process`, private) can be autowired by its class,
+`CleverAge\ProcessBundle\Manager\ProcessManager`, or injected explicitly:
 
 ```yaml
 # config/services.yaml
 services:
     App\Service\ProductImporter:
         arguments:
-            $processManager: '@cleverage_process.manager.process'
-
-    # Or, to enable autowiring of the ProcessManager type everywhere:
-    CleverAge\ProcessBundle\Manager\ProcessManager: '@cleverage_process.manager.process'
+            $processManager: '@cleverage_process.manager.process' # not needed with autowiring
 ```
 
 ```php
