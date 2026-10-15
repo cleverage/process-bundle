@@ -4,6 +4,8 @@ CommandRunnerTask
 Runs a system command (with the Symfony Process component) for each input. The input is passed to the command as
 stdin, and the command standard output becomes the task output.
 
+Requires `symfony/process` (`composer require symfony/process`): without it, the task fails with an explicit message.
+
 Task reference
 --------------
 

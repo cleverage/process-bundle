@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\DependencyInjection\Compiler;
 
+use CleverAge\ProcessBundle\Task\Debug\StopwatchTask;
+use CleverAge\ProcessBundle\Task\Process\CommandRunnerTask;
+use CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask;
 use CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask;
 use CleverAge\ProcessBundle\Task\Serialization\DeserializerTask;
 use CleverAge\ProcessBundle\Task\Serialization\NormalizerTask;
@@ -26,6 +29,7 @@ use CleverAge\ProcessBundle\Transformer\UnavailableTransformer;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -35,11 +39,23 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
  *
  * @internal
  */
-final class UnavailableServicesCompilerPass implements CompilerPassInterface
+final readonly class UnavailableServicesCompilerPass implements CompilerPassInterface
 {
     public const SERIALIZER_MESSAGE = 'The "%s" service requires the Symfony serializer, which does not seem enabled: consider enabling framework.serializer (see https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled).';
 
     public const VALIDATOR_MESSAGE = 'The "%s" service requires the Symfony validator, which does not seem enabled: consider enabling framework.validation (see https://symfony.com/doc/current/reference/configuration/framework.html#reference-validation-enabled).';
+
+    public const STOPWATCH_MESSAGE = 'The "%s" service requires the Symfony Stopwatch component, which does not seem installed: try "composer require symfony/stopwatch".';
+
+    public const PROCESS_MESSAGE = 'The "%s" service requires the Symfony Process component, which does not seem installed: try "composer require symfony/process".';
+
+    /**
+     * @param (\Closure(class-string): bool)|null $classExists defaults to class_exists() (the tests check the missing packages)
+     */
+    public function __construct(
+        private ?\Closure $classExists = null,
+    ) {
+    }
 
     public function process(ContainerBuilder $container): void
     {
@@ -56,6 +72,15 @@ final class UnavailableServicesCompilerPass implements CompilerPassInterface
 
         if (!$container->has('validator') && !$container->has(ValidatorInterface::class)) {
             $this->replace($container, self::VALIDATOR_MESSAGE, [ValidatorTask::class]);
+        }
+
+        // The debug.stopwatch service is registered by the FrameworkBundle when symfony/stopwatch is installed
+        if (!$container->has('debug.stopwatch')) {
+            $this->replace($container, self::STOPWATCH_MESSAGE, [StopwatchTask::class]);
+        }
+
+        if (!($this->classExists ?? class_exists(...))(Process::class)) {
+            $this->replace($container, self::PROCESS_MESSAGE, [CommandRunnerTask::class, ProcessLauncherTask::class]);
         }
     }
 
