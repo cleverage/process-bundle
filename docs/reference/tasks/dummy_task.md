@@ -33,14 +33,14 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\DummyTask'
+  task: dummy
   outputs: [output1, output2]
 output1:
-  service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+  task: constant_output
   options:
     output: { id: 123 }
 output2:
-  service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+  task: constant_output
   options:
     output: { id: 456 }
 ```

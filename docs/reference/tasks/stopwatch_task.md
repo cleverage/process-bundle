@@ -33,5 +33,5 @@ Examples
 ```yaml
 # Task configuration level
 stopwatch:
-  service: '@CleverAge\ProcessBundle\Task\Debug\StopwatchTask'
+  task: stopwatch
 ```

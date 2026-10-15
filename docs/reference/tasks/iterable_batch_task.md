@@ -39,10 +39,10 @@ Examples
 ```yaml
 # Task configuration level
 iterator:
-  service: '@CleverAge\ProcessBundle\Task\InputIteratorTask'
+  task: input_iterator
   outputs: [batch]
 batch:
-  service: '@CleverAge\ProcessBundle\Task\IterableBatchTask'
+  task: iterable_batch
   options:
     batch_count: 2
   outputs: [next_task]

@@ -33,9 +33,9 @@ Examples
 ```yaml
 # Task configuration level
 merge:
-  service: '@CleverAge\ProcessBundle\Task\ArrayMergeTask'
+  task: array_merge
   outputs: [skip_if_empty]
 skip_if_empty:
-  service: '@CleverAge\ProcessBundle\Task\SkipEmptyTask'
+  task: skip_empty
   outputs: [next_task]
 ```

@@ -40,7 +40,7 @@ Examples
 ```yaml
 # Task configuration level
 code:
-  service: '@Fully\Qualified\ClassName'
+  task: task_code
   options:
     a: 1
     b: 2

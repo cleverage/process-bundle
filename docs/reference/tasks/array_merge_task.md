@@ -36,14 +36,14 @@ Examples
 ```yaml
 # Task configuration level
 data:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output:
       - { a: 1, b: { c: 2 } }
       - { b: { d: 3 } }
   outputs: [merge]
 merge:
-  service: '@CleverAge\ProcessBundle\Task\ArrayMergeTask'
+  task: array_merge
   options:
     merge_function: array_replace_recursive
 ```

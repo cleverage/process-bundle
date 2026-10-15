@@ -33,7 +33,7 @@ Examples
 ```yaml
 # Task configuration level
 write_yaml:
-  service: '@CleverAge\ProcessBundle\Task\File\Yaml\YamlWriterTask'
+  task: yaml_writer
   options:
     file_path: '%kernel.project_dir%/var/data/export.yaml'
     inline: 3

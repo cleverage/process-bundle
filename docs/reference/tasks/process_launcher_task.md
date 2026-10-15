@@ -52,7 +52,7 @@ Examples
 ```yaml
 # Task configuration level
 parallel_import:
-  service: '@CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask'
+  task: process_launcher
   options:
     process: app.import_file
     max_processes: 5

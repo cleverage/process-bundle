@@ -37,7 +37,7 @@ Examples
 ```yaml
 # Task configuration level
 run_subprocess:
-  service: '@CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask'
+  task: process_executor
   options:
     process: app.import_product
     context:

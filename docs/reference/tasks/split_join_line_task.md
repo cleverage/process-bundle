@@ -40,7 +40,7 @@ Examples
 ```yaml
 # Task configuration level
 split_line:
-  service: '@CleverAge\ProcessBundle\Task\SplitJoinLineTask'
+  task: split_join_line
   options:
     split_columns: [category, tag]
     join_column: value

@@ -38,7 +38,7 @@ Examples
 ```yaml
 # Task configuration level
 json_decode:
-  service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+  task: transformer
   options:
     transformers:
       callback:
@@ -52,7 +52,7 @@ json_decode:
 ```yaml
 # Task configuration level
 transform:
-  service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+  task: transformer
   options:
     transformers:
       mapping:
@@ -73,7 +73,7 @@ transform:
 ```yaml
 # Task configuration level
 transform:
-  service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+  task: transformer
   options:
     transformers:
       - mapping:

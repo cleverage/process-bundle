@@ -36,7 +36,7 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output:
       id: 123

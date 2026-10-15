@@ -37,7 +37,7 @@ Examples
 ```yaml
 # Task configuration level
 log:
-  service: '@CleverAge\ProcessBundle\Task\Reporting\LoggerTask'
+  task: logger
   options:
     level: warning
     message: DEMO LOGGER
@@ -49,7 +49,7 @@ log:
 ```yaml
 # Task configuration level
 log:
-  service: '@CleverAge\ProcessBundle\Task\Reporting\LoggerTask'
+  task: logger
   options:
     level: info
     message: Transformed

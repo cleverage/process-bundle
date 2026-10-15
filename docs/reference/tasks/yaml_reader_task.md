@@ -34,7 +34,7 @@ Examples
 ```yaml
 # Task configuration level
 read_yaml:
-  service: '@CleverAge\ProcessBundle\Task\File\Yaml\YamlReaderTask'
+  task: yaml_reader
   options:
     file_path: '%kernel.project_dir%/var/data/data.yaml'
   outputs: [process_item]

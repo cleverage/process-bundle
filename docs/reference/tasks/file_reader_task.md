@@ -33,7 +33,7 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\FileReaderTask'
+  task: file_reader
   options:
     filename: '%kernel.project_dir%/var/data/sample.txt'
   outputs: [debug]

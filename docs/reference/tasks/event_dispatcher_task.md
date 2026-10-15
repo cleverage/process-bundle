@@ -38,12 +38,12 @@ Examples
 ```yaml
 # Task configuration level
 data:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output: [1, 2, 3]
   outputs: [push_data_event]
 push_data_event:
-  service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
+  task: event_dispatcher
   options:
     event_name: myapp.data_queue
 ```

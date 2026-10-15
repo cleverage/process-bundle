@@ -37,12 +37,12 @@ Examples
 ```yaml
 # Task configuration level
 data:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output: [1, 2, 3]
   outputs: [batch]
 batch:
-  service: '@CleverAge\ProcessBundle\Task\SimpleBatchTask'
+  task: simple_batch
   options:
     batch_count: 2
   outputs: [next_task]

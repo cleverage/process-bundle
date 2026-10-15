@@ -41,20 +41,20 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\DummyTask'
+  task: dummy
   outputs: [branch_a, branch_b]
 branch_a:
-  service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+  task: constant_output
   options:
     output: A
   outputs: [aggregate]
 branch_b:
-  service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+  task: constant_output
   options:
     output: B
   outputs: [aggregate]
 aggregate:
-  service: '@CleverAge\ProcessBundle\Task\InputAggregatorTask'
+  task: input_aggregator
   options:
     input_codes:
       branch_a: a

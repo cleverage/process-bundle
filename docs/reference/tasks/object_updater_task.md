@@ -40,7 +40,7 @@ Examples
 ```yaml
 # Task configuration level
 update_object:
-  service: '@CleverAge\ProcessBundle\Task\ObjectUpdaterTask'
+  task: object_updater
   options:
     property_path: name
   outputs: [save]

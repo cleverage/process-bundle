@@ -5,8 +5,8 @@ YAML Configuration
 ------------------
 
 ```yaml
-<task_code>:
-    service: <service reference>   # or task: <code of the task>
+<task_name>:                       # name of the task in the process, used in the outputs
+    task: <code of the task>       # service: <service reference> is deprecated
     description: <string>
     help: <multiline string>
     options: <task options>
@@ -20,18 +20,19 @@ YAML Configuration
 Task attributes
 ---------------
 
-**task**: code of the task, e.g. `task: transformer`: the short way to reference a task, instead of its `service`. The
-code of each task of this bundle is given on its [reference page](tasks/) (e.g. `transformer` for the
-[TransformerTask](tasks/transformer_task.md)); the code of a task service is declared with a `cleverage.task` tag with
-a `code` attribute, or with the `#[CleverAge\ProcessBundle\Attribute\AsTask(code: '...')]` attribute (see
-[custom tasks](../03-custom_tasks.md#service-declaration)). The codes are resolved when the container is compiled: an
-unknown code fails the compilation, with the list of the known codes. A task defines either `task` or `service`, not
-both.
+**task**: required, code of the task, e.g. `task: transformer`. The code of each task of this bundle is given on its
+[reference page](tasks/) (e.g. `transformer` for the [TransformerTask](tasks/transformer_task.md)); the code of a task
+service is declared with a `cleverage.task` tag with a `code` attribute, or with the
+`#[CleverAge\ProcessBundle\Attribute\AsTask(code: '...')]` attribute (see
+[custom tasks](../03-custom_tasks.md#task-code)). The codes are resolved when the container is compiled: an unknown
+code fails the compilation, with the list of the known codes. The services of the tasks referenced by the process
+configurations are collected when the container is compiled, so they can be private.
 
-**service**: reference to the service used for the task (or use `task`): a service **id** or a service **alias**, with or
-without a leading `@` (quote the value when it starts with `@`, as YAML requires). The service must implement
-`CleverAge\ProcessBundle\Model\TaskInterface`. For instance, the `UnzipTask` of the archive bridge is registered as
-`cleverage_archive_process.task.unzip`, with an alias named after its class: these four references are equivalent.
+**service**: **deprecated since 5.4, removed in v6.0**, use `task`. Reference to the service used for the task, instead
+of its code: a service **id** or a service **alias**, with or without a leading `@` (quote the value when it starts with
+`@`, as YAML requires). The service must implement `CleverAge\ProcessBundle\Model\TaskInterface`. For instance, the
+`UnzipTask` of the archive bridge is registered as `cleverage_archive_process.task.unzip`, with an alias named after its
+class: these four references are equivalent.
 
 ```yaml
 service: '@cleverage_archive_process.task.unzip'                  # id, with @
@@ -42,13 +43,11 @@ service: CleverAge\ArchiveProcessBundle\Task\UnzipTask            # alias, witho
 
 The tasks of this bundle and of the bridge bundles are registered with a `cleverage_process.task.*` /
 `cleverage_*_process.task.*` id and an alias named after their class (e.g. `cleverage_process.task.transformer` and
-`'@CleverAge\ProcessBundle\Task\TransformerTask'`, the class name being the reference used in this documentation), and
-your own task services with any id or alias you choose. With an unknown service, a reference with `@` throws the
+`CleverAge\ProcessBundle\Task\TransformerTask`). With an unknown service, a reference with `@` throws the
 `ServiceNotFoundException` of the service container, a reference without `@` an `\UnexpectedValueException`
-(`Unable to resolve service reference for Task '<task code>'`).
+(`Unable to resolve service reference for Task '<task code>'`). A task defines either `task` or `service`, not both.
 
-The services referenced by the process configurations are collected when the container is compiled, so they can be
-private (as well as the aliases). Only a service that is not referenced by these configurations (e.g. a configuration
+Only a service that is not referenced by the configurations known when the container is compiled (e.g. a configuration
 added at runtime) is fetched from the service container, which requires a public service and is deprecated since 5.4.
 
 **description**: optional string to describe a task, displayed in process help (should not exceed one line).

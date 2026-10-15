@@ -49,15 +49,15 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+  task: constant_output
   options:
     output: '/var/data'
   outputs: [directory]
 directory:
-  service: '@CleverAge\ProcessBundle\Task\File\InputFolderBrowserTask'
+  task: input_folder_browser
   options:
     base_folder_path: '%kernel.project_dir%'
   outputs: [read]
 read:
-  service: '@CleverAge\ProcessBundle\Task\File\InputFileReaderTask'
+  task: input_file_reader
 ```

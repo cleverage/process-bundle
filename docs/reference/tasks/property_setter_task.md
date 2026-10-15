@@ -41,7 +41,7 @@ Examples
 ```yaml
 # Task configuration level
 modify:
-  service: '@CleverAge\ProcessBundle\Task\PropertySetterTask'
+  task: property_setter
   options:
     values:
       firstname: Gérard
@@ -53,7 +53,7 @@ modify:
 ```yaml
 # Task configuration level
 set_defaults:
-  service: '@CleverAge\ProcessBundle\Task\PropertySetterTask'
+  task: property_setter
   options:
     values:
       '[status]': imported

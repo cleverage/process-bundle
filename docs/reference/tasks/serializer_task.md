@@ -35,7 +35,7 @@ Examples
 ```yaml
 # Task configuration level
 serialize:
-  service: '@CleverAge\ProcessBundle\Task\Serialization\SerializerTask'
+  task: serializer
   options:
     format: json
     context:

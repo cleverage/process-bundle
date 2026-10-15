@@ -36,7 +36,7 @@ Examples
 ```yaml
 # Task configuration level
 normalize:
-  service: '@CleverAge\ProcessBundle\Task\Serialization\NormalizerTask'
+  task: normalizer
   options:
     format: json
     context:

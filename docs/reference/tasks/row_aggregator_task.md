@@ -40,7 +40,7 @@ Examples
 ```yaml
 # Task configuration level
 aggregate_rows:
-  service: '@CleverAge\ProcessBundle\Task\RowAggregatorTask'
+  task: row_aggregator
   options:
     aggregate_by: order_id
     aggregate_columns: [product, qty]

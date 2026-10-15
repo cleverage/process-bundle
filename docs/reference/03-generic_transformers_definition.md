@@ -62,7 +62,7 @@ clever_age_process:
         app.demo:
             tasks:
                 transform:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    task: transformer
                     options:
                         transformers:
                             mapping:

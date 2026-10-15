@@ -72,12 +72,12 @@ clever_age_process:
         app.csv_copy:
             tasks:
                 read:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
+                    task: csv_reader
                     options:
                         file_path: '%kernel.project_dir%/var/data/input.csv'
                     outputs: [transform]
                 transform:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    task: transformer
                     options:
                         transformers:
                             mapping:
@@ -86,12 +86,12 @@ clever_age_process:
                                     name: { code: '[name]' }
                     outputs: [write]
                 write:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
+                    task: csv_writer
                     options:
                         file_path: '%kernel.project_dir%/var/data/output.csv'
                     outputs: [log]
                 log:
-                    service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
+                    task: debug
 ```
 
 ### Orphan tasks
@@ -123,7 +123,7 @@ stops.
 
 ```yaml
 transform:
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+    task: transformer
     error_strategy: skip          # Continue with the next item on error
     log_level: warning            # Log errors as warning instead of critical
     options:
@@ -134,7 +134,7 @@ transform:
     outputs: [write]
     error_outputs: [write_errors] # Receives the input that failed
 write_errors:
-    service: '@CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamWriterTask'
+    task: json_stream_writer
     options:
         file_path: '%kernel.project_dir%/var/data/errors_{date_time}.json-stream'
 ```
@@ -165,13 +165,13 @@ clever_age_process:
         app.import_all:
             tasks:
                 list_files:
-                    service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
+                    task: folder_browser
                     options:
                         folder_path: '%kernel.project_dir%/var/import'
                         name_pattern: '*.csv'
                     outputs: [import_file]
                 import_file:
-                    service: '@CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask'
+                    task: process_executor
                     options:
                         process: app.import_file
                         context:
@@ -182,10 +182,10 @@ clever_age_process:
             entry_point: read
             tasks:
                 read:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask'
+                    task: input_csv_reader
                     outputs: [save]
                 save:
-                    service: '@App\Task\SaveProductTask'
+                    task: app_save_product # code of an application task, see #[AsTask]
 ```
 
 If the parent process is executed without a `dry_run` context value, the placeholder is not replaced and the
@@ -313,7 +313,7 @@ PHP executes a process in a single thread. To use several CPU cores, the
 
 ```yaml
 parallel_import:
-    service: '@CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask'
+    task: process_launcher
     options:
         process: app.import_file
         max_processes: 4

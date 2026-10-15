@@ -35,11 +35,11 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
+  task: folder_browser
   options:
     folder_path: '%kernel.project_dir%/var/data'
   outputs: [read]
 read:
-  service: '@CleverAge\ProcessBundle\Task\File\InputFileReaderTask'
+  task: input_file_reader
   outputs: [debug]
 ```

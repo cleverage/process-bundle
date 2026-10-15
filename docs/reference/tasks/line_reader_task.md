@@ -37,12 +37,12 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\LineReaderTask'
+  task: line_reader
   options:
     filename: '%kernel.project_dir%/var/data/sample.txt'
   outputs: [trim]
 trim:
-  service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+  task: transformer
   options:
     transformers:
       trim: ~

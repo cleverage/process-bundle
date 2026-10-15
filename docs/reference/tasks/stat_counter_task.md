@@ -35,5 +35,5 @@ Examples
 ```yaml
 # Task configuration level
 count:
-  service: '@CleverAge\ProcessBundle\Task\Reporting\StatCounterTask'
+  task: stat_counter
 ```

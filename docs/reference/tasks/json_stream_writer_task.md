@@ -38,7 +38,7 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output:
       - column1: value1-1
@@ -47,7 +47,7 @@ entry:
         column2: value2-2
   outputs: [write]
 write:
-  service: '@CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamWriterTask'
+  task: json_stream_writer
   options:
     file_path: '%kernel.project_dir%/var/data/json_stream_writer_{date_time}.json'
     json_flags:

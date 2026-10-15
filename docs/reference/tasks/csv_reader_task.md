@@ -47,7 +47,7 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
+  task: csv_reader
   options:
     file_path: '%kernel.project_dir%/var/data/sample.csv'
     delimiter: '{{ delimiter }}'
@@ -59,7 +59,7 @@ entry:
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
+  task: csv_reader
   options:
     file_path: '%kernel.project_dir%/var/data/no_header.csv'
     delimiter: ','
