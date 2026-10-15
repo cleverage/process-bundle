@@ -20,6 +20,8 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 /**
  * Normalize input to output with configurable format.
+ *
+ * @final since 5.4
  */
 class NormalizerTask extends AbstractConfigurableTask
 {

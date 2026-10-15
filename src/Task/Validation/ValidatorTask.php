@@ -25,6 +25,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Validate the input and pass it to the output.
+ *
+ * @final since 5.4
  */
 class ValidatorTask extends AbstractConfigurableTask
 {

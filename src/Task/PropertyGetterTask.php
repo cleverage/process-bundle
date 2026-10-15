@@ -21,6 +21,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Get a property on the input and return it with PropertyAccessor.
+ *
+ * @final since 5.4
  */
 class PropertyGetterTask extends AbstractConfigurableTask
 {

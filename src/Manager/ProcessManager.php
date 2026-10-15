@@ -38,6 +38,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Execute processes.
+ *
+ * @final since 5.4
  */
 class ProcessManager
 {

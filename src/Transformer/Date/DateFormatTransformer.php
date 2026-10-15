@@ -23,6 +23,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * transformers:
  *     date_format:
  *         format: Y-m-d
+ *
+ * @final since 5.4
  */
 class DateFormatTransformer implements ConfigurableTransformerInterface
 {

@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Move the file passed as input, requires the destination path in options.
+ *
+ * @final since 5.4
  */
 class FileMoverTask extends AbstractConfigurableTask
 {

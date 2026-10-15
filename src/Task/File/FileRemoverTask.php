@@ -19,6 +19,8 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * Simply delete the file passed as input.
+ *
+ * @final since 5.4
  */
 class FileRemoverTask implements TaskInterface
 {

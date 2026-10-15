@@ -19,6 +19,8 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 /**
  * This is a dummy task mostly intended for testing purpose.
  * Forward any input to the error output.
+ *
+ * @final since 5.4
  */
 class ErrorForwarderTask implements TaskInterface
 {

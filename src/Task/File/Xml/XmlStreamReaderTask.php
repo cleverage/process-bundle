@@ -21,6 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Read an XML file element by element with \XMLReader, so that the whole file is never loaded in memory.
+ *
+ * @final since 5.4
  */
 class XmlStreamReaderTask extends AbstractConfigurableTask implements IterableTaskInterface, FinalizableTaskInterface
 {

@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Unset a key from an array.
+ *
+ * @final since 5.4
  */
 class ArrayUnsetTransformer implements ConfigurableTransformerInterface
 {

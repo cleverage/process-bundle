@@ -23,6 +23,8 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
  * This is the class that validates and merges configuration from your app/config files.
  *
  * @see https://symfony.com/doc/current/bundles/configuration.html
+ *
+ * @internal
  */
 class Configuration implements ConfigurationInterface
 {

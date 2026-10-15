@@ -21,6 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Count the number of times the task is processed and continue every N iteration (skip the rest of the time)
  * Flush at the end with the actual count.
+ *
+ * @final since 5.4
  */
 class CounterTask extends AbstractConfigurableTask implements FlushableTaskInterface
 {

@@ -31,6 +31,8 @@ use Symfony\Component\DependencyInjection\Reference;
  * This is the class that loads and manages your bundle configuration.
  *
  * @see https://symfony.com/doc/current/bundles/extension.html
+ *
+ * @internal
  */
 class CleverAgeProcessExtension extends Extension
 {

@@ -20,6 +20,8 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Writes a YAML file from an array.
+ *
+ * @final since 5.4
  */
 class YamlWriterTask extends AbstractConfigurableTask
 {

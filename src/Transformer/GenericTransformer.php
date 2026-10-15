@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * A generic class that can be used to create configuration-driven transformer instances.
+ *
+ * @final since 5.4
  */
 class GenericTransformer implements ConfigurableTransformerInterface
 {

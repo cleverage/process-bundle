@@ -24,7 +24,7 @@ use Psr\Container\ContainerInterface;
  * (see TaskLocatorCompilerPass). The fallback container is only used, with a deprecation, for services that are not
  * in the locator (e.g. a process configuration added at runtime).
  */
-class TaskRegistry
+final class TaskRegistry
 {
     public function __construct(
         protected ContainerInterface $locator,

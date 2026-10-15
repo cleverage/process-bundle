@@ -15,6 +15,8 @@ namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
  * Read and write CSV files through a simple API.
+ *
+ * @final since 5.4
  */
 class CsvFile extends CsvResource
 {

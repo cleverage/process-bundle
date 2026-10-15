@@ -19,6 +19,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Read a property from the input value and return it.
+ *
+ * @final since 5.4
  */
 class PropertyAccessorTransformer implements ConfigurableTransformerInterface
 {

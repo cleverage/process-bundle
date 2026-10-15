@@ -24,6 +24,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 /**
  * For each configured column, collect the input rows that contain this column (and match the optional condition), and
  * output all the groups once all previous tasks are resolved.
+ *
+ * @final since 5.4
  */
 class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {

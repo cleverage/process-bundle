@@ -19,6 +19,8 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Count the number of times the task was executed, and log it when the process ends. The input is passed to the output.
+ *
+ * @final since 5.4
  */
 class StatCounterTask implements FinalizableTaskInterface
 {

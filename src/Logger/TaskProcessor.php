@@ -15,6 +15,9 @@ namespace CleverAge\ProcessBundle\Logger;
 
 use Monolog\LogRecord;
 
+/**
+ * @internal
+ */
 class TaskProcessor extends AbstractProcessor
 {
     #[\Override]

@@ -17,6 +17,8 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 
 /**
  * Iterates from the input of the previous task.
+ *
+ * @final since 5.4
  */
 class InputIteratorTask extends AbstractIterableOutputTask
 {

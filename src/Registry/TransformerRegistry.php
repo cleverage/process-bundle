@@ -23,6 +23,8 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  * The transformer services are fetched lazily from a service locator indexed by code (`code` attribute of the
  * `cleverage.transformer` tag, or `#[AsTransformer]`, see TransformerLocatorCompilerPass): a transformer is only
  * instantiated when it is used.
+ *
+ * @final since 5.4
  */
 class TransformerRegistry
 {

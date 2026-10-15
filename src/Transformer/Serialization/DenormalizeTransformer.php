@@ -19,6 +19,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Denormalize the given value based on options.
+ *
+ * @final since 5.4
  */
 class DenormalizeTransformer implements ConfigurableTransformerInterface
 {

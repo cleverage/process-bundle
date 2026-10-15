@@ -22,6 +22,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 /**
  * Read an iterable from the input, then set one or more properties on each of its items, using values read from the
  * input itself.
+ *
+ * @final since 5.4
  */
 class RecursivePropertySetterTransformer implements ConfigurableTransformerInterface
 {

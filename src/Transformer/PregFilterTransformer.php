@@ -17,6 +17,9 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @final since 5.4
+ */
 class PregFilterTransformer implements ConfigurableTransformerInterface
 {
     /**
@@ -24,6 +27,7 @@ class PregFilterTransformer implements ConfigurableTransformerInterface
      *
      * @return array<mixed>|string|null
      */
+    // @phpstan-ignore return.unusedType (narrowing the return type of a non-final class breaks the child classes, see #279)
     public function transform(mixed $value, array $options = []): array|string|null
     {
         $pattern = $options['pattern'];

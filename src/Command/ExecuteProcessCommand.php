@@ -30,6 +30,8 @@ use Symfony\Component\Yaml\Parser;
 
 /**
  * Run a process from the command line interface.
+ *
+ * @internal
  */
 #[AsCommand(name: 'cleverage:process:execute', description: 'Execute a process', )]
 class ExecuteProcessCommand extends Command

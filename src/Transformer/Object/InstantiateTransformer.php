@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Instantiate a new object with parameters from the input array.
+ *
+ * @final since 5.4
  */
 class InstantiateTransformer implements ConfigurableTransformerInterface
 {

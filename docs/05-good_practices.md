@@ -79,3 +79,25 @@ relying on the order in which branches are executed.
 Values that change between executions (a file name, a date, a limit...) should not be hard-coded in the process
 configuration: pass them as [contextual values](01-quick_start.md#contextual-values) (`-c key:value`) and use
 `{{ key }}` placeholders in the task options.
+
+## Extend the bundle without inheriting its classes
+
+The classes meant to be extended are the abstract ones (`AbstractConfigurableTask`, `AbstractIterableOutputTask`,
+`AbstractCsvTask`, `Logger\AbstractLogger`...), the interfaces and traits, the exceptions, and a few file tasks used as
+a base by other tasks (`FileReaderTask`, `LineReaderTask`, `FolderBrowserTask`, `CsvReaderTask`, `InputCsvReaderTask`
+and `Filesystem\CsvResource`).
+
+The other classes are marked `@final since 5.4`, they will be `final` in v6.0: the engine (`ProcessManager`, the
+registries, `ContextualOptionResolver`), the models (`ProcessState`, the configurations, the events) and the concrete
+tasks and transformers. Extending one of them triggers a deprecation (with the Symfony `DebugClassLoader`, enabled by
+`symfony/error-handler` in debug mode). Instead:
+
+- write your own task (extending `AbstractConfigurableTask`) or transformer, and inject the services of the bundle you
+  need;
+- [decorate](https://symfony.com/doc/current/service_container/service_decoration.html) a service, or listen to the
+  process [events](04-advanced_workflow.md);
+- chain existing tasks and transformers in the process configuration.
+
+The classes marked `@internal` (the dependency injection extension, configuration and compiler passes, the commands, the
+event listeners, the Monolog processors, `ProcessLogger`, `TaskLogger` and `PhpFunctionProvider`) are not part of the
+public API: they can change in any version.

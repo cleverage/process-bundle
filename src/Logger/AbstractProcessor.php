@@ -18,6 +18,9 @@ use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use Monolog\LogRecord;
 
+/**
+ * @internal
+ */
 class AbstractProcessor
 {
     public function __construct(

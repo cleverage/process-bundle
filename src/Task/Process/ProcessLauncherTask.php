@@ -27,6 +27,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Launch a new process for each input received, input must be a scalar, a resource or a \Traversable.
+ *
+ * @final since 5.4
  */
 class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
 {

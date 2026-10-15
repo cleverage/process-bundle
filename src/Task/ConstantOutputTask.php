@@ -19,6 +19,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Always send the same output regardless of the input.
+ *
+ * @final since 5.4
  */
 class ConstantOutputTask extends AbstractConfigurableTask
 {

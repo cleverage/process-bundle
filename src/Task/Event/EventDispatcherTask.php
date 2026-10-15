@@ -22,6 +22,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Call the Symfony event dispatcher
  * If defined as passive (which is the default), it automatically set the output from the input.
+ *
+ * @final since 5.4
  */
 class EventDispatcherTask extends AbstractConfigurableTask
 {

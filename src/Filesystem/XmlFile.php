@@ -15,6 +15,8 @@ namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
  * Read and write XML files.
+ *
+ * @final since 5.4
  */
 class XmlFile
 {

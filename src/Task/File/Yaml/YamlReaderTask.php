@@ -21,6 +21,8 @@ use Symfony\Component\Yaml\Yaml;
 
 /**
  * Reads a YAML file and iterate over its root elements.
+ *
+ * @final since 5.4
  */
 class YamlReaderTask extends AbstractIterableOutputTask
 {

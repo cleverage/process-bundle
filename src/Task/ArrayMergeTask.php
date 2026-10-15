@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Merge every input array, and return the result.
+ *
+ * @final since 5.4
  */
 class ArrayMergeTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {

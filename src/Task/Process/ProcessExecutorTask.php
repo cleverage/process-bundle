@@ -25,6 +25,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Execute a process for each input: the input is passed to the process entry point, and the output of its end point
  * becomes the task output.
+ *
+ * @final since 5.4
  */
 class ProcessExecutorTask extends AbstractConfigurableTask
 {

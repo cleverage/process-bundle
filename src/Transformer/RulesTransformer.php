@@ -21,6 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Uses a set of rules to conditionally transform a value.
+ *
+ * @final since 5.4
  */
 class RulesTransformer implements ConfigurableTransformerInterface
 {

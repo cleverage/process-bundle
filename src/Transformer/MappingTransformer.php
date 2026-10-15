@@ -24,6 +24,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Maps properties of an array/object to an other array/object.
+ *
+ * @final since 5.4
  */
 class MappingTransformer implements ConfigurableTransformerInterface
 {

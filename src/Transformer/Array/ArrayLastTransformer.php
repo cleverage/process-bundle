@@ -17,6 +17,8 @@ use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 
 /**
  * Return the last element of an array.
+ *
+ * @final since 5.4
  */
 class ArrayLastTransformer implements TransformerInterface
 {

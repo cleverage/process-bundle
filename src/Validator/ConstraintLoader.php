@@ -16,6 +16,9 @@ namespace CleverAge\ProcessBundle\Validator;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Validator\Mapping\Loader\AbstractLoader;
 
+/**
+ * @final since 5.4
+ */
 class ConstraintLoader extends AbstractLoader
 {
     public function loadClassMetadata(ClassMetadata $metadata): bool

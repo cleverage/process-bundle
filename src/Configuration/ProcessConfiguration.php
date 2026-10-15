@@ -19,6 +19,8 @@ use Psr\Log\LogLevel;
 
 /**
  * Holds the processes configuration to launch a task.
+ *
+ * @final since 5.4
  */
 class ProcessConfiguration
 {
