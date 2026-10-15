@@ -63,6 +63,13 @@ class ProcessManagerStopCheckerTest extends TestCase
 
     private ?\Throwable $failedEventError = null;
 
+    private ?ProcessManager $processManager = null;
+
+    /**
+     * Whether the history of the process manager was failed when the "failed" event was dispatched.
+     */
+    private ?bool $failedEventHistoryIsFailed = null;
+
     public function testWithoutStopCheckerTheProcessRunsEntirely(): void
     {
         $this->createProcessManager([])->execute('test.process');
@@ -107,7 +114,9 @@ class ProcessManagerStopCheckerTest extends TestCase
 
         self::assertSame([1, 2], $this->recorded);
         self::assertSame($exception, $this->failedEventError);
-        self::assertTrue($processManager->getProcessHistory()?->isFailed());
+        self::assertTrue($this->failedEventHistoryIsFailed);
+        // The history of the failed process is not kept once it has ended
+        self::assertNull($processManager->getProcessHistory());
     }
 
     public function testAnyCheckerCanRequestAStop(): void
@@ -192,9 +201,10 @@ class ProcessManagerStopCheckerTest extends TestCase
         $eventDispatcher = new EventDispatcher();
         $eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_FAILED, function (ProcessEvent $event): void {
             $this->failedEventError = $event->getProcessError();
+            $this->failedEventHistoryIsFailed = $this->processManager?->getProcessHistory()?->isFailed();
         });
 
-        return new ProcessManager(
+        return $this->processManager = new ProcessManager(
             $container,
             new ProcessLogger(new NullLogger()),
             new TaskLogger(new NullLogger()),

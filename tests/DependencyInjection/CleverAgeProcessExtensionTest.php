@@ -180,4 +180,15 @@ class CleverAgeProcessExtensionTest extends TestCase
         self::assertInstanceOf(TaggedIteratorArgument::class, $argument);
         self::assertSame('cleverage_process.stop_checker', $argument->getTag());
     }
+
+    public function testTheProcessManagerIsResetBetweenExecutions(): void
+    {
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([], $container);
+
+        self::assertSame(
+            [['method' => 'reset']],
+            $container->getDefinition('cleverage_process.manager.process')->getTag('kernel.reset')
+        );
+    }
 }
