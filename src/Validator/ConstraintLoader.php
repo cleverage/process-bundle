@@ -41,13 +41,13 @@ class ConstraintLoader extends AbstractLoader
 
         foreach ($nodes as $name => $childNodes) {
             if (is_numeric($name) && \is_array($childNodes) && 1 === \count($childNodes)) {
-                $options = current($childNodes);
+                $options = array_first($childNodes);
 
                 if (\is_array($options)) {
                     $options = $this->buildConstraints($options);
                 }
 
-                $values[] = $this->newConstraint(key($childNodes), $options);
+                $values[] = $this->newConstraint(array_key_first($childNodes), $options);
             } else {
                 if (\is_array($childNodes)) {
                     $childNodes = $this->buildConstraints($childNodes);
