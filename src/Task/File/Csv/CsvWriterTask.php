@@ -24,6 +24,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Ignores any input.
  *
  * @property CsvFile $csv
+ *
+ * @final since 5.4
  */
 class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 {

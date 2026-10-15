@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Browse a folder with the path as an input and iterate each file for output.
+ *
+ * @final since 5.4
  */
 class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskInterface
 {

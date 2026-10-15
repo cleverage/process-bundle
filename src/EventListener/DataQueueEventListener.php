@@ -20,6 +20,8 @@ use CleverAge\ProcessBundle\Model\ProcessState;
  * Class DataQueueEventListener
  * This is a basic queue, mainly aiming to catch data coming out of a process
  * Used mostly for testing purpose.
+ *
+ * @internal
  */
 class DataQueueEventListener
 {

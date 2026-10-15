@@ -19,6 +19,8 @@ use Psr\Log\LogLevel;
 
 /**
  * Represents a task configuration inside a process.
+ *
+ * @final since 5.4
  */
 class TaskConfiguration
 {

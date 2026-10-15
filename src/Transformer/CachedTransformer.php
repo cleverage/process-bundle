@@ -21,6 +21,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @final since 5.4
+ */
 class CachedTransformer implements ConfigurableTransformerInterface
 {
     use TransformerTrait;

@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Slugify a value.
+ *
+ * @final since 5.4
  */
 class SlugifyTransformer implements ConfigurableTransformerInterface
 {

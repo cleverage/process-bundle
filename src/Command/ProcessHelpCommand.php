@@ -34,6 +34,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Describe a process configuration
  * This is a POC, waiting to evolve properly.
+ *
+ * @internal
  */
 #[AsCommand(name: 'cleverage:process:help', description: 'Describe a process', )]
 class ProcessHelpCommand extends Command

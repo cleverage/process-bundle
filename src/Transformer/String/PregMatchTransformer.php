@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Perform a regular expression match.
+ *
+ * @final since 5.4
  */
 class PregMatchTransformer implements ConfigurableTransformerInterface
 {

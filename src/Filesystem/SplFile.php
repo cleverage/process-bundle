@@ -15,6 +15,8 @@ namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
  * Wrapper around files to read/write them.
+ *
+ * @final since 5.4
  */
 class SplFile
 {

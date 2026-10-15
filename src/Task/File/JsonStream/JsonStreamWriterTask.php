@@ -21,6 +21,9 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @final since 5.4
+ */
 class JsonStreamWriterTask extends AbstractConfigurableTask implements BlockingTaskInterface, FinalizableTaskInterface
 {
     protected ?JsonStreamFile $file = null;

@@ -21,6 +21,8 @@ use Psr\Log\LogLevel;
 
 /**
  * Build and holds all the process configurations.
+ *
+ * @final since 5.4
  */
 class ProcessConfigurationRegistry
 {

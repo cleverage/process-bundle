@@ -19,6 +19,8 @@ use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Dump the content of the input.
+ *
+ * @final since 5.4
  */
 class DebugTask implements TaskInterface
 {

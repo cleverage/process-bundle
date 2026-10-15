@@ -21,6 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Write an XML file.
+ *
+ * @final since 5.4
  */
 class XmlWriterTask extends AbstractConfigurableTask
 {

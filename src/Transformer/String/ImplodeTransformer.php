@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Implode multiple array values to a string, based on a split character.
+ *
+ * @final since 5.4
  */
 class ImplodeTransformer implements ConfigurableTransformerInterface
 {

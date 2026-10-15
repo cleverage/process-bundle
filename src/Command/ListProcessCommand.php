@@ -23,6 +23,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * List all configured processes.
+ *
+ * @internal
  */
 #[AsCommand(name: 'cleverage:process:list', description: 'List defined processes', )]
 class ListProcessCommand extends Command

@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Return the nth element of an array.
+ *
+ * @final since 5.4
  */
 class ArrayElementTransformer implements ConfigurableTransformerInterface
 {

@@ -23,6 +23,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * A Batch task that iterate on flush
  * It's mainly an example task since it's not useful as-is, but the processInput method may allow custom overrides.
+ *
+ * @final since 5.4
  */
 class IterableBatchTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
 {

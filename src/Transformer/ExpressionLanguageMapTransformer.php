@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Parse an input using the Expression Language and returning a specific value upon a specific condition.
+ *
+ * @final since 5.4
  */
 class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterface
 {

@@ -23,6 +23,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * Class LoggerTask.
  *
  * Add custom log in state
+ *
+ * @final since 5.4
  */
 class LoggerTask extends AbstractConfigurableTask
 {

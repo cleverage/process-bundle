@@ -19,6 +19,8 @@ use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 
 /**
  * Used to pass information between tasks.
+ *
+ * @final since 5.4
  */
 class ProcessState
 {
@@ -298,6 +300,7 @@ class ProcessState
     /**
      * @return array<string, mixed>|null
      */
+    // @phpstan-ignore return.unusedType (narrowing the return type of a non-final class breaks the child classes, see #279)
     public function getContextualizedOptions(): ?array
     {
         if (!$this->contextualizedOptions) {

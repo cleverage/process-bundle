@@ -19,6 +19,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Convert input based on a callback.
+ *
+ * @final since 5.4
  */
 class CallbackTransformer implements ConfigurableTransformerInterface
 {

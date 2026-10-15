@@ -19,6 +19,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Manipulate XML elements using xpath.
+ *
+ * @final since 5.4
  */
 class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
 {

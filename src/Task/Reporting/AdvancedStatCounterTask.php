@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Count the time between 2 iterations, and log statistics every N executions. The input is passed to the output.
+ *
+ * @final since 5.4
  */
 class AdvancedStatCounterTask extends AbstractConfigurableTask
 {

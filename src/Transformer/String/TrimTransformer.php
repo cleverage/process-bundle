@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Trim an input based on specific characters.
+ *
+ * @final since 5.4
  */
 class TrimTransformer implements ConfigurableTransformerInterface
 {

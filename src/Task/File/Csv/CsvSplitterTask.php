@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Split long CSV files into smaller ones, keeping the headers.
+ *
+ * @final since 5.4
  */
 class CsvSplitterTask extends InputCsvReaderTask
 {

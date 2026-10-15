@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Split a single line into multiple lines based on multiple columns and split characters.
+ *
+ * @final since 5.4
  */
 class SplitJoinLineTask extends AbstractIterableOutputTask
 {

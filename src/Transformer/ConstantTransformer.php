@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Return always the same value configured in options, redundant when used inside mapping except in certain useful
  * circumstances.
+ *
+ * @final since 5.4
  */
 class ConstantTransformer implements ConfigurableTransformerInterface
 {

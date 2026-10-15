@@ -18,6 +18,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Unset a given property.
+ *
+ * @final since 5.4
  */
 class UnsetTransformer implements ConfigurableTransformerInterface
 {

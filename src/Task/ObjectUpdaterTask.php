@@ -21,6 +21,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Takes an array containing an object and a value updates an object's property with this value, then return the object.
+ *
+ * @final since 5.4
  */
 class ObjectUpdaterTask extends AbstractConfigurableTask
 {

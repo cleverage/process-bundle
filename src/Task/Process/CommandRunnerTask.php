@@ -21,6 +21,8 @@ use Symfony\Component\Process\Process;
 
 /**
  * Launch a system command for each input, passing input to command.
+ *
+ * @final since 5.4
  */
 class CommandRunnerTask extends AbstractConfigurableTask
 {

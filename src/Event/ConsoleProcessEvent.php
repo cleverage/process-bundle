@@ -19,6 +19,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event object used during CLI process manipulation.
+ *
+ * @final since 5.4
  */
 class ConsoleProcessEvent extends Event
 {

@@ -18,6 +18,8 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 
 /**
  * Dummy task that pass the input to the output.
+ *
+ * @final since 5.4
  */
 class DummyTask implements TaskInterface
 {

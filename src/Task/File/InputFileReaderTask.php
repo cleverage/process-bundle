@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Reads the whole input file and outputs its content.
+ *
+ * @final since 5.4
  */
 class InputFileReaderTask extends FileReaderTask
 {

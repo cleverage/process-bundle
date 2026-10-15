@@ -18,6 +18,8 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 
 /**
  * Allows to directly stop a process, marking it as failed.
+ *
+ * @final since 5.4
  */
 class StopTask implements TaskInterface
 {

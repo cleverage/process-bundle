@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Always send the same output regardless of the input, only accepts array for values and iterate over it.
+ *
+ * @final since 5.4
  */
 class ConstantIterableOutputTask extends AbstractIterableOutputTask
 {

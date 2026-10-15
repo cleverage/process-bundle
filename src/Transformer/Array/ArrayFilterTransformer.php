@@ -22,6 +22,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * Array filtering transformer, should match native array_filter behavior.
  *
  * @see https://secure.php.net/manual/fr/function.array-filter.php
+ *
+ * @final since 5.4
  */
 class ArrayFilterTransformer implements ConfigurableTransformerInterface
 {

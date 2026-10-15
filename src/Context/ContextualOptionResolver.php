@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Context;
 
+/**
+ * @final since 5.4
+ */
 class ContextualOptionResolver
 {
     /**

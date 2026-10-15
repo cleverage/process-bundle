@@ -15,6 +15,8 @@ namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
  * Wrapper around JSON files to read them in a stream.
+ *
+ * @final since 5.4
  */
 class JsonStreamFile implements FileStreamInterface, WritableFileInterface
 {

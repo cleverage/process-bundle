@@ -21,6 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Applies transformers to each element of an array.
+ *
+ * @final since 5.4
  */
 class ArrayMapTransformer implements ConfigurableTransformerInterface
 {
