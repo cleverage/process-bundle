@@ -75,16 +75,11 @@
     "symfony/finder": "^6.4|^7.4|^8",
     "symfony/framework-bundle": "^6.4|^7.4|^8",
     "symfony/http-kernel": "^6.4|^7.4|^8",
-    "symfony/monolog-bridge": "^6.4|^7.4|^8",
-    "symfony/monolog-bundle": "^3.11|^4",
     "symfony/options-resolver": "^6.4|^7.4|^8",
-    "symfony/process": "^6.4|^7.4|^8",
     "symfony/property-access": "^6.4|^7.4|^8",
     "symfony/serializer": "^6.4|^7.4|^8",
     "symfony/service-contracts": "^2.5|^3",
-    "symfony/stopwatch": "^6.4|^7.4|^8",
     "symfony/validator": "^6.4|^7.4|^8",
-    "symfony/var-dumper": "^6.4|^7.4|^8",
     "symfony/yaml": "^6.4|^7.4|^8"
   },
   "require-dev": {
@@ -96,9 +91,21 @@
     "rector/rector": "*",
     "roave/security-advisories": "dev-latest",
     "symfony/cache": "^6.4|^7.4|^8",
-    "symfony/test-pack": "^1.1"
+    "symfony/process": "^6.4|^7.4|^8",
+    "symfony/stopwatch": "^6.4|^7.4|^8",
+    "symfony/test-pack": "^1.1",
+    "symfony/var-dumper": "^6.4|^7.4|^8"
+  },
+  "conflict": {
+    "cleverage/doctrine-process-bundle": "<3.3",
+    "cleverage/soap-process-bundle": "<3.3",
+    "cleverage/ui-process-bundle": "<3.3"
   },
   "suggest": {
+    "symfony/monolog-bundle": "To log in the dedicated cleverage_process, cleverage_process_task and cleverage_process_transformer channels, with the process and task data in the extra of the records",
+    "symfony/process": "Required by the CommandRunnerTask and the ProcessLauncherTask",
+    "symfony/stopwatch": "Required by the StopwatchTask",
+    "symfony/var-dumper": "To dump the values with the DebugTask, the DebugTransformer and the --output-format=dump option of cleverage:process:execute",
     "cleverage/archive-process-bundle": "Dedicated bundle for Archive dependencies for the Process Bundle",
     "cleverage/cache-process-bundle": "Dedicated bundle for Cache dependencies for the Process Bundle",
     "cleverage/doctrine-process-bundle": "Dedicated bundle for Doctrine dependencies for the process bundle",

@@ -314,7 +314,9 @@ transform:
 
 ## Logging
 
-The bundle declares three [Monolog channels](https://symfony.com/doc/current/logging/channels_handlers.html):
+The bundle declares three [Monolog channels](https://symfony.com/doc/current/logging/channels_handlers.html), created
+when the MonologBundle is installed (`composer require symfony/monolog-bundle`, otherwise every log goes to the default
+Symfony logger, without the `extra` values below):
 
 | Channel | Used by |
 | ------- | ------- |

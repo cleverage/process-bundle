@@ -5,6 +5,8 @@ Launches a process in a separate system process (`bin/console cleverage:process:
 allowing parallelization. The task keeps a pool of at most `max_processes` running sub-processes and waits for a free
 slot before launching a new one.
 
+Requires `symfony/process` (`composer require symfony/process`): without it, the task fails with an explicit message.
+
 Task reference
 --------------
 

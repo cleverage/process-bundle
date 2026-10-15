@@ -16,6 +16,9 @@ namespace CleverAge\ProcessBundle\Tests\DependencyInjection\Compiler;
 use CleverAge\ProcessBundle\DependencyInjection\CleverAgeProcessExtension;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\UnavailableServicesCompilerPass;
 use CleverAge\ProcessBundle\DependencyInjection\Configuration;
+use CleverAge\ProcessBundle\Task\Debug\StopwatchTask;
+use CleverAge\ProcessBundle\Task\Process\CommandRunnerTask;
+use CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask;
 use CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask;
 use CleverAge\ProcessBundle\Task\Serialization\DeserializerTask;
 use CleverAge\ProcessBundle\Task\Serialization\NormalizerTask;
@@ -31,6 +34,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\Compiler\ResolveClassPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\Process\Process;
 
 #[CoversClass(UnavailableServicesCompilerPass::class)]
 #[UsesClass(CleverAgeProcessExtension::class)]
@@ -45,7 +49,7 @@ class UnavailableServicesCompilerPassTest extends TestCase
     {
         $container = $this->createContainer(serializer: true, validator: true);
 
-        foreach ([...self::SERIALIZER_TASKS, NormalizeTransformer::class, DenormalizeTransformer::class, ValidatorTask::class] as $id) {
+        foreach ([...self::SERIALIZER_TASKS, NormalizeTransformer::class, DenormalizeTransformer::class, ValidatorTask::class, StopwatchTask::class, CommandRunnerTask::class, ProcessLauncherTask::class] as $id) {
             self::assertSame($id, $container->findDefinition($id)->getClass());
         }
     }
@@ -98,7 +102,33 @@ class UnavailableServicesCompilerPassTest extends TestCase
         self::assertSame(NormalizerTask::class, $container->findDefinition(NormalizerTask::class)->getClass());
     }
 
-    private function createContainer(bool $serializer, bool $validator): ContainerBuilder
+    public function testStopwatchTaskIsReplacedWithoutStopwatch(): void
+    {
+        $container = $this->createContainer(serializer: true, validator: true, stopwatch: false);
+
+        $definition = $container->findDefinition(StopwatchTask::class);
+        self::assertSame(UnavailableTask::class, $definition->getClass());
+        self::assertSame([\sprintf(UnavailableServicesCompilerPass::STOPWATCH_MESSAGE, StopwatchTask::class)], $definition->getArguments());
+        self::assertTrue($definition->isPublic());
+        self::assertFalse($definition->isShared());
+        self::assertSame(CommandRunnerTask::class, $container->findDefinition(CommandRunnerTask::class)->getClass());
+    }
+
+    public function testProcessTasksAreReplacedWithoutProcessComponent(): void
+    {
+        $container = $this->createContainer(serializer: true, validator: true, process: false);
+
+        foreach ([CommandRunnerTask::class, ProcessLauncherTask::class] as $id) {
+            $definition = $container->findDefinition($id);
+            self::assertSame(UnavailableTask::class, $definition->getClass(), $id);
+            self::assertSame([\sprintf(UnavailableServicesCompilerPass::PROCESS_MESSAGE, $id)], $definition->getArguments());
+            self::assertTrue($definition->isPublic());
+            self::assertFalse($definition->isShared());
+        }
+        self::assertSame(StopwatchTask::class, $container->findDefinition(StopwatchTask::class)->getClass());
+    }
+
+    private function createContainer(bool $serializer, bool $validator, bool $stopwatch = true, bool $process = true): ContainerBuilder
     {
         $container = new ContainerBuilder();
         (new CleverAgeProcessExtension())->load([], $container);
@@ -110,7 +140,11 @@ class UnavailableServicesCompilerPassTest extends TestCase
         if ($validator) {
             $container->setDefinition('validator', new Definition(\stdClass::class));
         }
-        (new UnavailableServicesCompilerPass())->process($container);
+        if ($stopwatch) {
+            $container->setDefinition('debug.stopwatch', new Definition(\stdClass::class));
+        }
+        $classExists = static fn (string $class): bool => (Process::class !== $class || $process) && class_exists($class);
+        (new UnavailableServicesCompilerPass($classExists))->process($container);
 
         return $container;
     }
