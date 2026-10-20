@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Exception\RuntimeException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -49,7 +51,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
     {
         $previousState = $state->getPreviousState();
         if (!$previousState instanceof ProcessState) {
-            throw new \UnexpectedValueException('This task cannot be used without a previous task');
+            throw new UnexpectedValueException('This task cannot be used without a previous task');
         }
 
         $inputCode = $this->getInputCode($state);
@@ -60,7 +62,7 @@ class InputAggregatorTask extends AbstractConfigurableTask
                 $this->inputs = [];
                 $this->inputAncestors = [];
             } else {
-                throw new \UnexpectedValueException("The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output");
+                throw new UnexpectedValueException("The output from input '{$inputCode}' has already been defined, please use an aggregator if you have an iterable output");
             }
         }
 
@@ -101,13 +103,13 @@ class InputAggregatorTask extends AbstractConfigurableTask
     {
         $previousState = $state->getPreviousState();
         if (!$previousState instanceof ProcessState) {
-            throw new \RuntimeException('No previous state for current task');
+            throw new RuntimeException('No previous state for current task');
         }
         $previousTaskCode = $previousState->getTaskConfiguration()
             ->getCode();
         $inputCodes = $this->getOption($state, 'input_codes');
         if (!\array_key_exists($previousTaskCode, $inputCodes)) {
-            throw new \UnexpectedValueException("Task '{$previousTaskCode}' is not mapped in the input_codes option");
+            throw new UnexpectedValueException("Task '{$previousTaskCode}' is not mapped in the input_codes option");
         }
 
         return $inputCodes[$previousTaskCode];

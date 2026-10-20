@@ -25,7 +25,7 @@ Possible outputs
 ----------------
 
 Nothing is output when an input is received (the task is skipped). When `json_buffering` is enabled, the sub-process
-end point output (only if it is an array) is written to a JSON stream file (`var/cdm_buffer_*.json-stream`) and, once the sub-process is
+end point output (only if it is an array) is written to a JSON stream file of the system temporary directory (`<sys_get_temp_dir()>/cdm_buffer_*.json-stream`, in `var/` of the project before 5.4) and, once the sub-process is
 finished, the task outputs the path of this file (`string`), during the next iterations or when flushed. Without
 `json_buffering`, the task outputs nothing.
 
@@ -67,5 +67,7 @@ parallel_import:
 Notes
 -----
 
-* Sub-processes are run with the same Symfony environment as the current one (`--env`).
+* Sub-processes are run with the console of the project (`%kernel.project_dir%/bin/console`) and the same Symfony
+  environment as the current one (`--env`), the arguments of the service.
+* The JSON stream files are not removed by the task: remove them once read (e.g. with a [file remover](file_remover_task.md) task).
 * The incremental error output (stderr) of the running sub-processes is echoed directly.

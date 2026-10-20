@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -58,7 +59,7 @@ class SplitJoinLineTask extends AbstractIterableOutputTask
         $outputLines = [];
         foreach ($options['split_columns'] as $column) {
             if (!\array_key_exists($column, $originalLine)) {
-                throw new \UnexpectedValueException("Missing column {$column}");
+                throw new UnexpectedValueException("Missing column {$column}");
             }
             $columnValues = explode($options['split_character'], (string) $originalLine[$column]);
             foreach ($columnValues as $columnValue) {

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\ProcessState;
 
 /**
@@ -44,6 +45,6 @@ class InputIteratorTask extends AbstractIterableOutputTask
             return new \ArrayIterator($input);
         }
 
-        throw new \UnexpectedValueException('Cannot create iterator from input');
+        throw new UnexpectedValueException('Cannot create iterator from input');
     }
 }
