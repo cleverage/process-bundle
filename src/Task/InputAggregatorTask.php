@@ -22,10 +22,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Should have been a BlockingTask, but due to limitations in the current model, it's a hack using skips and finalize.
  *
  * @see        README.md:Known issues
- * @deprecated It's way too much error prone - should be refactored as a blocking task
+ * @deprecated since 5.4, it's way too much error prone - should be refactored as a blocking task, will be removed in v6.0
  */
 class InputAggregatorTask extends AbstractConfigurableTask
 {
+    public function __construct()
+    {
+        trigger_deprecation('cleverage/process-bundle', '5.4', 'The "%s" task is deprecated: it is too error-prone. It will be removed in v6.0.', self::class);
+    }
+
     /**
      * @var array<string, mixed>
      */

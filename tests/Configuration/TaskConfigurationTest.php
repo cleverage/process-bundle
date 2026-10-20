@@ -37,9 +37,8 @@ class TaskConfigurationTest extends TestCase
         }
 
         self::assertSame(['error'], $errors);
-        // PHP 8.4+ also triggers its own deprecation for the #[\Deprecated] attribute
-        self::assertContains(
-            'Since cleverage/process-bundle 2.0.4: The "CleverAge\ProcessBundle\Configuration\TaskConfiguration::getErrors()" method is deprecated, use "getErrorOutputs()" instead.',
+        self::assertSame(
+            ['Since cleverage/process-bundle 2.0.4: The "CleverAge\ProcessBundle\Configuration\TaskConfiguration::getErrors()" method is deprecated, use "getErrorOutputs()" instead.'],
             $deprecations
         );
     }

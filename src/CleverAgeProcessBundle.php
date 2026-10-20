@@ -13,12 +13,17 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle;
 
+use CleverAge\ProcessBundle\DependencyInjection\Compiler\PublicTaskDeprecationCompilerPass;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\TaskLocatorCompilerPass;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\TransformerLocatorCompilerPass;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\UnavailableServicesCompilerPass;
+use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
+/**
+ * @final since 5.4
+ */
 class CleverAgeProcessBundle extends Bundle
 {
     /**
@@ -31,6 +36,8 @@ class CleverAgeProcessBundle extends Bundle
         $container->addCompilerPass(new UnavailableServicesCompilerPass());
         $container->addCompilerPass(new TransformerLocatorCompilerPass());
         $container->addCompilerPass(new TaskLocatorCompilerPass());
+        // Before ResolveInstanceofConditionalsPass (priority 100)
+        $container->addCompilerPass(new PublicTaskDeprecationCompilerPass(), PassConfig::TYPE_BEFORE_OPTIMIZATION, 110);
     }
 
     #[\Override]

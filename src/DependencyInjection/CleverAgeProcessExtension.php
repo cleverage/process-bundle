@@ -43,7 +43,8 @@ class CleverAgeProcessExtension extends Extension
 
         $container->registerForAutoconfiguration(ProcessStopCheckerInterface::class)
             ->addTag('cleverage_process.stop_checker');
-        // Tasks are fetched from the container by the process manager, and keep state between executions
+        // Tasks keep state between executions. Public for the deprecated fallback of the TaskRegistry on the service
+        // container: their direct access is deprecated (PublicTaskDeprecationCompilerPass), private in v6.0
         $container->registerForAutoconfiguration(TaskInterface::class)
             ->setPublic(true)
             ->setShared(false)
@@ -77,7 +78,6 @@ class CleverAgeProcessExtension extends Extension
         // Automatic transformer creation from config
         foreach ($config['generic_transformers'] as $transformerCode => $transformerConfig) {
             $transformerDefinition = new Definition(GenericTransformer::class);
-            $transformerDefinition->setAutowired(true);
             $transformerDefinition->setPublic(false);
             $transformerDefinition->setArguments([
                 new Reference('cleverage_process.context.contextual_option_resolver'),

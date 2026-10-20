@@ -25,7 +25,10 @@ each time a task configuration is initialized.
 With autoconfiguration (`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton), the bundle applies
 these settings to every service implementing `TaskInterface`: `shared: false` and a `monolog.logger` tag on the
 `cleverage_process_task` channel (see [logging](#logging)), as well as `public: true`, only kept for the deprecated
-fallback on the service container. A setting explicitly defined on the service wins (e.g. `shared: true`).
+fallback on the service container: fetching such a task directly from the service container is deprecated since 5.4
+(the task will be private in v6.0), unless the application makes it public itself (`public: true` on the service, in
+`_defaults` or `_instanceof`, or `#[Autoconfigure(public: true)]`). A setting explicitly defined on the service wins
+(e.g. `shared: true`).
 
 ```yaml
 # config/services.yaml

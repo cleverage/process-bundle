@@ -93,6 +93,31 @@ class ConfigurationTest extends TestCase
         );
     }
 
+    public function testErrorsIsDeprecated(): void
+    {
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            $config = $this->process(['configurations' => ['test.process' => ['tasks' => [
+                'with_errors' => ['task' => 'transformer', 'errors' => 'error'],
+                'with_error_outputs' => ['task' => 'transformer', 'error_outputs' => 'error'],
+                'error' => ['task' => 'transformer'],
+            ]]]]);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame(
+            ['Since cleverage/process-bundle 5.4: The "errors" option of the task "clever_age_process.configurations.test.process.tasks.with_errors" is deprecated, use "error_outputs" instead. It will be removed in v6.0.'],
+            $deprecations
+        );
+        self::assertSame(['error'], $config['configurations']['test.process']['tasks']['with_errors']['errors']);
+    }
+
     /**
      * @return iterable<string, array{array<string, mixed>}>
      */

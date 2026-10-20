@@ -21,6 +21,7 @@ use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Task\DummyTask;
 use CleverAge\ProcessBundle\Task\InputAggregatorTask;
+use CleverAge\ProcessBundle\Tests\IgnoreDeprecationsTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -35,11 +36,33 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
 class InputAggregatorTaskTest extends TestCase
 {
+    use IgnoreDeprecationsTrait;
+
     private const INPUT_CODES = ['branch_a' => 'a', 'branch_b' => 'b'];
+
+    public function testTaskIsDeprecated(): void
+    {
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            new InputAggregatorTask();
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame(
+            ['Since cleverage/process-bundle 5.4: The "'.InputAggregatorTask::class.'" task is deprecated: it is too error-prone. It will be removed in v6.0.'],
+            $deprecations
+        );
+    }
 
     public function testTaskIsSkippedUntilEveryInputIsReceived(): void
     {
-        $task = new InputAggregatorTask();
+        $task = $this->createTask();
         $options = ['input_codes' => self::INPUT_CODES];
 
         $state = $this->receive($task, $options, 'branch_a', 'A');
@@ -53,7 +76,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testBufferIsClearedAfterOutput(): void
     {
-        $task = new InputAggregatorTask();
+        $task = $this->createTask();
         $options = ['input_codes' => self::INPUT_CODES];
 
         $this->receive($task, $options, 'branch_a', 'A1');
@@ -68,7 +91,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testOverriddenInputClearsBufferByDefault(): void
     {
-        $task = new InputAggregatorTask();
+        $task = $this->createTask();
         $options = ['input_codes' => ['branch_a' => 'a', 'branch_b' => 'b', 'branch_c' => 'c']];
 
         $this->receive($task, $options, 'branch_a', 'A1');
@@ -85,7 +108,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testOverriddenInputThrowsWhenCleaningIsDisabled(): void
     {
-        $task = new InputAggregatorTask();
+        $task = $this->createTask();
         $options = ['input_codes' => self::INPUT_CODES, 'clean_input_on_override' => false];
 
         $this->receive($task, $options, 'branch_a', 'A1');
@@ -98,7 +121,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testKeptInputsAreReusedForNextOutputs(): void
     {
-        $task = new InputAggregatorTask();
+        $task = $this->createTask();
         $options = ['input_codes' => self::INPUT_CODES, 'keep_inputs' => ['a']];
 
         $this->receive($task, $options, 'branch_a', 'A');
@@ -112,7 +135,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testSeveralParentsCanTargetTheSameKey(): void
     {
-        $task = new InputAggregatorTask();
+        $task = $this->createTask();
         $options = ['input_codes' => ['branch_a' => 'value', 'branch_b' => 'value']];
 
         $state = $this->receive($task, $options, 'branch_b', 'B');
@@ -122,7 +145,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testTaskWithoutPreviousStateThrows(): void
     {
-        $task = new InputAggregatorTask();
+        $task = $this->createTask();
         $state = $this->createState(['input_codes' => self::INPUT_CODES]);
         $task->initialize($state);
 
@@ -134,7 +157,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testUnmappedPreviousTaskThrows(): void
     {
-        $task = new InputAggregatorTask();
+        $task = $this->createTask();
 
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage("Task 'unknown' is not mapped in the input_codes option");
@@ -144,7 +167,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testInputCodesOptionIsRequired(): void
     {
-        $task = new InputAggregatorTask();
+        $task = $this->createTask();
 
         $this->expectException(MissingOptionsException::class);
 
@@ -167,7 +190,7 @@ class InputAggregatorTaskTest extends TestCase
     #[DataProvider('invalidOptionsProvider')]
     public function testInvalidOptionsAreRejected(array $options): void
     {
-        $task = new InputAggregatorTask();
+        $task = $this->createTask();
 
         $this->expectException(InvalidOptionsException::class);
 
@@ -188,6 +211,11 @@ class InputAggregatorTaskTest extends TestCase
         $task->execute($state);
 
         return $state;
+    }
+
+    private function createTask(): InputAggregatorTask
+    {
+        return self::ignoreDeprecations(static fn (): InputAggregatorTask => new InputAggregatorTask());
     }
 
     /**
