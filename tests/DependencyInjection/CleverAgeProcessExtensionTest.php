@@ -191,4 +191,18 @@ class CleverAgeProcessExtensionTest extends TestCase
             $container->getDefinition('cleverage_process.manager.process')->getTag('kernel.reset')
         );
     }
+
+    public function testTheDataQueueListenerIsDeprecated(): void
+    {
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([], $container);
+
+        $id = 'cleverage_process.event_listener.data_queue';
+        $definition = $container->getDefinition($id);
+        self::assertTrue($definition->isDeprecated());
+        $deprecation = $definition->getDeprecation($id);
+        self::assertSame('cleverage/process-bundle', $deprecation['package']);
+        self::assertSame('5.4', $deprecation['version']);
+        self::assertStringStartsWith(\sprintf('The "%s" service is deprecated, it will be removed in v6.0', $id), $deprecation['message']);
+    }
 }

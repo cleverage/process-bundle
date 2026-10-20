@@ -67,6 +67,11 @@ public function onDataQueue(EventDispatcherTaskEvent $event): void
   `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`. Every `EventDispatcherTask` without `event_name` then
   triggers the same listeners.
 
+**Deprecated since 5.4, removed in v6.0**: the bundle listens to the `cleverage_process.data_queue` event with the
+`cleverage_process.event_listener.data_queue` service (`DataQueueEventListener`), which keeps a copy of the
+`ProcessState` of every event in memory. Injecting or fetching this service triggers an `E_USER_DEPRECATED` error: write
+your own listener, as above.
+
 **Deprecated since v5, removed in v6.0**: from v4.0 to v5.0, the `event_name` option was ignored and the event was
 always dispatched under its class name. To preserve backward compatibility, when `event_name` is set (and differs from the
 event class name) and listeners subscribe to `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`, the event is also
