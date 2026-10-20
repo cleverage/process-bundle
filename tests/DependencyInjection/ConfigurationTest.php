@@ -15,6 +15,7 @@ namespace CleverAge\ProcessBundle\Tests\DependencyInjection;
 
 use CleverAge\ProcessBundle\DependencyInjection\CleverAgeProcessExtension;
 use CleverAge\ProcessBundle\DependencyInjection\Configuration;
+use CleverAge\ProcessBundle\Tests\IgnoreDeprecationsTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
@@ -24,6 +25,8 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 #[\PHPUnit\Framework\Attributes\CoversClass(CleverAgeProcessExtension::class)]
 class ConfigurationTest extends TestCase
 {
+    use IgnoreDeprecationsTrait;
+
     public function testLogLevelsDefaults(): void
     {
         $config = $this->process(['configurations' => ['test.process' => ['tasks' => []]]]);
@@ -56,10 +59,11 @@ class ConfigurationTest extends TestCase
 
     public function testTaskIsDefinedByAServiceOrACode(): void
     {
-        $config = $this->process(['configurations' => ['test.process' => ['tasks' => [
+        // Deprecated "service" option, see testServiceIsDeprecated()
+        $config = self::ignoreDeprecations(fn (): array => $this->process(['configurations' => ['test.process' => ['tasks' => [
             'by_service' => ['service' => '@app.task'],
             'by_code' => ['task' => 'transformer'],
-        ]]]]);
+        ]]]]));
 
         $tasks = $config['configurations']['test.process']['tasks'];
         self::assertSame(['@app.task', null], [$tasks['by_service']['service'], $tasks['by_service']['task']]);
@@ -107,7 +111,8 @@ class ConfigurationTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('A task must define either its code ("task: <code>") or, deprecated, its "service", not both');
 
-        $this->process(['configurations' => ['test.process' => ['tasks' => ['invalid' => $task]]]]);
+        // Deprecated "service" option, see testServiceIsDeprecated()
+        self::ignoreDeprecations(fn (): array => $this->process(['configurations' => ['test.process' => ['tasks' => ['invalid' => $task]]]]));
     }
 
     public function testInvalidDefaultLogLevelIsRejected(): void

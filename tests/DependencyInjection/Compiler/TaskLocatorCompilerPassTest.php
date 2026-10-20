@@ -17,6 +17,7 @@ use CleverAge\ProcessBundle\DependencyInjection\CleverAgeProcessExtension;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\TaskLocatorCompilerPass;
 use CleverAge\ProcessBundle\DependencyInjection\Configuration;
 use CleverAge\ProcessBundle\Task\DummyTask;
+use CleverAge\ProcessBundle\Tests\IgnoreDeprecationsTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -32,10 +33,13 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 #[UsesClass(Configuration::class)]
 class TaskLocatorCompilerPassTest extends TestCase
 {
+    use IgnoreDeprecationsTrait;
+
     public function testLocatorContainsTheServicesReferencedByTheProcesses(): void
     {
         $container = new ContainerBuilder();
-        (new CleverAgeProcessExtension())->load([[
+        // Deprecated "service" option
+        self::ignoreDeprecations(static fn () => (new CleverAgeProcessExtension())->load([[
             'configurations' => [
                 'test.first' => ['tasks' => [
                     'dummy' => ['service' => '@'.DummyTask::class],
@@ -46,7 +50,7 @@ class TaskLocatorCompilerPassTest extends TestCase
                     'unknown' => ['service' => '@app.unknown'],
                 ]],
             ],
-        ]], $container);
+        ]], $container));
         // Private services can be fetched from the locator
         $container->setDefinition('app.private_task', (new Definition(DummyTask::class))->setPublic(false));
 
