@@ -165,6 +165,42 @@ class ConfigurationTest extends TestCase
         );
     }
 
+    public function testUnknownErrorStrategyIsDeprecated(): void
+    {
+        $container = new ContainerBuilder();
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            (new CleverAgeProcessExtension())->load([['configurations' => ['test.process' => ['tasks' => [
+                'default' => ['task' => 'transformer'],
+                'skip' => ['task' => 'transformer', 'error_strategy' => 'skip'],
+                'stop' => ['task' => 'transformer', 'error_strategy' => 'stop'],
+                // Placeholder of the environment variable, as given to the extension
+                'env' => ['task' => 'transformer', 'error_strategy' => $container->getParameterBag()->resolveValue('%env(APP_ERROR_STRATEGY)%')],
+                'typo' => ['task' => 'transformer', 'error_strategy' => 'skp'],
+            ]]]]], $container);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame(
+            ['Since cleverage/process-bundle 5.4: The error strategy "skp" of the task "typo" of the process "test.process" is unknown, use "skip" or "stop" (or remove it to use the "default_error_strategy"). Unknown error strategies are deprecated, they will be rejected in v6.0.'],
+            $deprecations
+        );
+    }
+
+    public function testPublicMustBeABoolean(): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid type for path "clever_age_process.configurations.test.process.public". Expected "bool", but got "string".');
+
+        $this->process(['configurations' => ['test.process' => ['public' => 'no', 'tasks' => []]]]);
+    }
+
     /**
      * @param array<string, mixed> $config
      *

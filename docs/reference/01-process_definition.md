@@ -61,7 +61,8 @@ must be in the [main branch](#main-branch) of the process.
 be in the main branch of the process.
 
 **public**: optional boolean (default is true) to mark a process as public or private. Private processes are filtered
-from the process list (unless `--all` is used) but execution is still allowed.
+from the process list (unless `--all` is used) but execution is still allowed. A value other than a boolean is rejected
+when the container is compiled.
 
 **options**: optional free array (default is empty), not used by this bundle itself. It is available to other bundles
 through `ProcessConfiguration::getOptions()`, e.g. [cleverage/ui-process-bundle](https://github.com/cleverage/ui-process-bundle)
