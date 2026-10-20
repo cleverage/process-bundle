@@ -16,6 +16,8 @@ services:
 
     CleverAge\ProcessBundle\Manager\ProcessManager:
         alias: cleverage_process.manager.process
+    CleverAge\ProcessBundle\Manager\ProcessManagerInterface:
+        alias: cleverage_process.manager.process
 
     cleverage_process.context.contextual_option_resolver:
         class: CleverAge\ProcessBundle\Context\ContextualOptionResolver

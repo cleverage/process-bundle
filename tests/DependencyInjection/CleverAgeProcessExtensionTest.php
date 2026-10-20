@@ -19,9 +19,13 @@ use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\DependencyInjection\CleverAgeProcessExtension;
 use CleverAge\ProcessBundle\DependencyInjection\Configuration;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
+use CleverAge\ProcessBundle\Manager\ProcessManagerInterface;
 use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistryInterface;
+use CleverAge\ProcessBundle\Registry\TaskRegistryInterface;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
+use CleverAge\ProcessBundle\Registry\TransformerRegistryInterface;
 use CleverAge\ProcessBundle\Task\DummyTask;
 use CleverAge\ProcessBundle\Tests\Fixtures\AttributedTask;
 use CleverAge\ProcessBundle\Tests\Fixtures\AttributedTransformer;
@@ -88,6 +92,24 @@ class CleverAgeProcessExtensionTest extends TestCase
         ] as $class => $id) {
             self::assertSame($id, (string) $container->getAlias($class));
             self::assertSame($class, $container->getDefinition($id)->getClass());
+        }
+    }
+
+    public function testServicesCanBeAutowiredByInterface(): void
+    {
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([], $container);
+
+        foreach ([
+            ProcessManagerInterface::class => 'cleverage_process.manager.process',
+            ProcessConfigurationRegistryInterface::class => 'cleverage_process.registry.process_configuration',
+            TransformerRegistryInterface::class => 'cleverage_process.registry.transformer',
+            TaskRegistryInterface::class => 'cleverage_process.registry.task',
+        ] as $interface => $id) {
+            self::assertSame($id, (string) $container->getAlias($interface));
+            $class = $container->getDefinition($id)->getClass();
+            self::assertIsString($class);
+            self::assertTrue(is_a($class, $interface, true), $class);
         }
     }
 
