@@ -55,7 +55,6 @@
   "require": {
     "php": ">=8.2",
     "ext-dom": "*",
-    "ext-intl": "*",
     "ext-json": "*",
     "ext-libxml": "*",
     "ext-mbstring": "*",
@@ -105,6 +104,7 @@
     "cleverage/ui-process-bundle": "<3.3"
   },
   "suggest": {
+    "ext-intl": "Required by the slugify transformer",
     "symfony/monolog-bundle": "To log in the dedicated cleverage_process, cleverage_process_task and cleverage_process_transformer channels, with the process and task data in the extra of the records",
     "symfony/process": "Required by the CommandRunnerTask and the ProcessLauncherTask",
     "symfony/stopwatch": "Required by the StopwatchTask",
