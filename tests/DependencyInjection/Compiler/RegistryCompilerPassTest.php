@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests\DependencyInjection\Compiler;
 
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\RegistryCompilerPass;
+use CleverAge\ProcessBundle\Tests\IgnoreDeprecationsTrait;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -21,6 +22,8 @@ use Symfony\Component\DependencyInjection\Reference;
 #[\PHPUnit\Framework\Attributes\CoversClass(RegistryCompilerPass::class)]
 class RegistryCompilerPassTest extends TestCase
 {
+    use IgnoreDeprecationsTrait;
+
     public function testIsDeprecated(): void
     {
         $deprecations = [];
@@ -44,7 +47,7 @@ class RegistryCompilerPassTest extends TestCase
         $container->register('registry', \ArrayObject::class);
         $container->register('service', \stdClass::class)->addTag('tag');
 
-        (new RegistryCompilerPass('registry', 'tag', 'append'))->process($container);
+        self::ignoreDeprecations(static fn () => new RegistryCompilerPass('registry', 'tag', 'append'))->process($container);
 
         self::assertEquals([['append', [new Reference('service')]]], $container->getDefinition('registry')->getMethodCalls());
     }
@@ -54,7 +57,7 @@ class RegistryCompilerPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->register('service', \stdClass::class)->addTag('tag');
 
-        (new RegistryCompilerPass('registry', 'tag', 'append'))->process($container);
+        self::ignoreDeprecations(static fn () => new RegistryCompilerPass('registry', 'tag', 'append'))->process($container);
 
         self::assertFalse($container->has('registry'));
     }
@@ -64,6 +67,6 @@ class RegistryCompilerPassTest extends TestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('The registry, tag and method of the RegistryCompilerPass must be defined');
 
-        (new RegistryCompilerPass())->process(new ContainerBuilder());
+        self::ignoreDeprecations(static fn () => new RegistryCompilerPass())->process(new ContainerBuilder());
     }
 }

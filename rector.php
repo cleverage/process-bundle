@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\DeadCode\Rector\If_\RemoveAlwaysTrueIfConditionRector;
 use Rector\Symfony\Set\SymfonySetList;
 use Rector\ValueObject\PhpVersion;
 
@@ -19,5 +20,9 @@ return RectorConfig::configure()
     ->withAttributesSets(symfony: true)
     ->withSets([
         SymfonySetList::SYMFONY_CONSTRUCTOR_INJECTION,
+    ])
+    ->withSkip([
+        // Conditions on the Symfony version: always true with the installed version only
+        RemoveAlwaysTrueIfConditionRector::class => [__DIR__.'/tests/App/TestKernel.php'],
     ])
 ;

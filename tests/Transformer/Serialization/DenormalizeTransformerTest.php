@@ -49,7 +49,7 @@ class DenormalizeTransformerTest extends TestCase
         $transformer = $this->createTransformer();
         $options = $this->resolveOptions($transformer, ['class' => \DateTimeImmutable::class.'[]']);
 
-        $result = $transformer->transform(['a' => '2024-01-02', 'b' => '2024-02-03'], $options);
+        $result = $transformer->transform(['a' => '2024-01-02T00:00:00+00:00', 'b' => '2024-02-03T00:00:00+00:00'], $options);
 
         self::assertIsArray($result);
         self::assertSame(['a', 'b'], array_keys($result));
