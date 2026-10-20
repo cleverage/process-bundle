@@ -6,7 +6,7 @@ Convert a string into a slug. The value is transliterated with a
 tags are stripped, the result is trimmed and lowercased, every sequence of characters matching `replace` is replaced by
 `separator`, and leading and trailing separators are removed.
 
-Requires the `intl` PHP extension.
+Requires the `intl` PHP extension (suggested by the bundle): without it, the transformer fails with an explicit message.
 
 Transformer reference
 ---------------------
