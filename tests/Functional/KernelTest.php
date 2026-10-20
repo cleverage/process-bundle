@@ -19,6 +19,7 @@ use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Tests\App\TestKernel;
+use CleverAge\ProcessBundle\Tests\IgnoreDeprecationsTrait;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use PHPUnit\Framework\Attributes\CoversNothing;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -30,6 +31,8 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 #[CoversNothing]
 class KernelTest extends KernelTestCase
 {
+    use IgnoreDeprecationsTrait;
+
     private mixed $exceptionHandler;
 
     protected function setUp(): void
@@ -57,7 +60,12 @@ class KernelTest extends KernelTestCase
         $codes = TestKernel::getTaskCodes();
         self::assertNotEmpty($codes);
         foreach ($codes as $code) {
-            self::assertInstanceOf(TaskInterface::class, $taskRegistry->getTask($processConfiguration->getTaskConfiguration($code)), $code);
+            $taskConfiguration = $processConfiguration->getTaskConfiguration($code);
+            // Deprecated InputAggregatorTask, see InputAggregatorTaskTest::testTaskIsDeprecated()
+            $task = 'input_aggregator' === $code
+                ? self::ignoreDeprecations(static fn (): TaskInterface => $taskRegistry->getTask($taskConfiguration))
+                : $taskRegistry->getTask($taskConfiguration);
+            self::assertInstanceOf(TaskInterface::class, $task, $code);
         }
     }
 

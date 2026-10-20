@@ -54,7 +54,8 @@ are replaced by the process [contextual values](../01-quick_start.md#contextual-
 **error_outputs**: optional list of following tasks, receiving the error output of this task (by default its input when
 an error occurs). It can be a simple string. See [errors and skips](../04-advanced_workflow.md#errors-and-skips).
 
-**errors**: deprecated alias of `error_outputs`. Defining both on the same task throws an exception.
+**errors**: **deprecated since 5.4, removed in v6.0**, use `error_outputs` (same behaviour). Defining both on the same
+task throws an exception.
 
 **error_strategy**: optional, either *skip* or *stop*. Defines if the process continues with the next input or stops
 when the task fails. When not defined, the global `default_error_strategy` is used (*stop* by default).

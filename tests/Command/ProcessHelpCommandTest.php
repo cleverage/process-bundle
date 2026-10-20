@@ -27,10 +27,10 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 #[UsesClass(TaskRegistry::class)]
 class ProcessHelpCommandTest extends TestCase
 {
-    public function testWithoutTaskRegistryIsDeprecated(): void
+    public function testWithContainerIsDeprecated(): void
     {
         self::assertSame(
-            ['Since cleverage/process-bundle 5.4: Not passing a "'.TaskRegistry::class.'" to "'.ProcessHelpCommand::class.'::__construct()" is deprecated: the tasks are fetched from the service container. The argument will be required in v6.0.'],
+            ['Since cleverage/process-bundle 5.4: Passing a service container to "'.ProcessHelpCommand::class.'::__construct()" is deprecated, pass a "'.TaskRegistry::class.'" instead: the tasks are fetched from the service container. Only a "'.TaskRegistry::class.'" will be accepted in v6.0.'],
             $this->collectDeprecations(static fn (): ProcessHelpCommand => new ProcessHelpCommand(new ProcessConfigurationRegistry([], 'stop'), new Container()))
         );
     }
@@ -39,7 +39,7 @@ class ProcessHelpCommandTest extends TestCase
     {
         self::assertSame(
             [],
-            $this->collectDeprecations(static fn (): ProcessHelpCommand => new ProcessHelpCommand(new ProcessConfigurationRegistry([], 'stop'), new Container(), new TaskRegistry(new ServiceLocator([]))))
+            $this->collectDeprecations(static fn (): ProcessHelpCommand => new ProcessHelpCommand(new ProcessConfigurationRegistry([], 'stop'), new TaskRegistry(new ServiceLocator([]))))
         );
     }
 

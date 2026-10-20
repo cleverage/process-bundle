@@ -210,8 +210,16 @@ class Configuration implements ConfigurationInterface
             ->defaultValue(LogLevel::CRITICAL);
 
         foreach (['outputs', 'errors', 'error_outputs'] as $nodeName) {
-            $definition->arrayNode($nodeName)
-                ->beforeNormalization()
+            $node = $definition->arrayNode($nodeName);
+            if ('errors' === $nodeName) {
+                $node->info('Deprecated, use "error_outputs"')
+                    ->setDeprecated(
+                        'cleverage/process-bundle',
+                        '5.4',
+                        'The "%node%" option of the task "%path%" is deprecated, use "error_outputs" instead. It will be removed in v6.0.'
+                    );
+            }
+            $node->beforeNormalization()
                 ->ifString()
                 ->then(static fn ($item): array => [$item])->end()
                 ->scalarPrototype();

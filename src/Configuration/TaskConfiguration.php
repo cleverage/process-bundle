@@ -49,6 +49,9 @@ class TaskConfiguration
 
     protected bool $inErrorBranch = false;
 
+    /**
+     * @deprecated not used, will be removed in v6.0
+     */
     protected bool $logErrors;
 
     /**
@@ -67,7 +70,7 @@ class TaskConfiguration
         protected string $errorStrategy = self::STRATEGY_SKIP,
         protected string $logLevel = LogLevel::CRITICAL,
     ) {
-        $this->logErrors = LogLevel::DEBUG !== $logLevel; // @deprecated, remove me in next version
+        $this->logErrors = LogLevel::DEBUG !== $logLevel;
     }
 
     public function getCode(): string
@@ -126,9 +129,10 @@ class TaskConfiguration
     }
 
     /**
+     * @deprecated since 2.0.4, use getErrorOutputs() instead, will be removed in v6.0
+     *
      * @return list<string>
      */
-    #[\Deprecated(message: 'Use getErrorOutputs method instead')]
     public function getErrors(): array
     {
         trigger_deprecation('cleverage/process-bundle', '2.0.4', 'The "%s()" method is deprecated, use "getErrorOutputs()" instead.', __METHOD__);

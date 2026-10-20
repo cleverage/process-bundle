@@ -64,22 +64,28 @@ class ProcessHelpCommand extends Command
 
     protected TaskRegistry $taskRegistry;
 
+    /**
+     * @deprecated since 5.4, only set when a container is passed to the constructor, will be removed in v6.0
+     */
+    protected ?ContainerInterface $container = null;
+
     public function __construct(
         protected ProcessConfigurationRegistry $processConfigRegistry,
-        protected ContainerInterface $container,
-        ?TaskRegistry $taskRegistry = null,
+        TaskRegistry|ContainerInterface $taskRegistry,
     ) {
         parent::__construct();
-        if (!$taskRegistry instanceof TaskRegistry) {
+        if ($taskRegistry instanceof ContainerInterface) {
             trigger_deprecation(
                 'cleverage/process-bundle',
                 '5.4',
-                'Not passing a "%s" to "%s::__construct()" is deprecated: the tasks are fetched from the service container. The argument will be required in v6.0.',
-                TaskRegistry::class,
+                'Passing a service container to "%s::__construct()" is deprecated, pass a "%s" instead: the tasks are fetched from the service container. Only a "%s" will be accepted in v6.0.',
                 self::class,
+                TaskRegistry::class,
+                TaskRegistry::class,
             );
+            $this->container = $taskRegistry;
             // Same behaviour as before the task registry: any service of the container
-            $taskRegistry = new TaskRegistry($this->container, $this->container);
+            $taskRegistry = new TaskRegistry($taskRegistry, $taskRegistry);
         }
         $this->taskRegistry = $taskRegistry;
     }

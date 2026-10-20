@@ -1,7 +1,8 @@
 InputAggregatorTask
 ===================
 
-**Deprecated**: this class is marked `@deprecated` (too error-prone, should be refactored as a blocking task).
+**Deprecated since v5.4, removed in v6.0**: this task is too error-prone (it should be refactored as a blocking task).
+An `E_USER_DEPRECATED` error is triggered when it is instantiated.
 
 Accumulates inputs coming from several parent tasks. The task is skipped until an input has been received from every
 parent declared in `input_codes`; it then outputs an array of all received inputs, indexed by their destination key,
