@@ -75,6 +75,35 @@ class CommandRunnerTaskTest extends TestCase
         $this->assertSame('bar'.\PHP_EOL.realpath(sys_get_temp_dir()).\PHP_EOL, $state->getOutput());
     }
 
+    public function testProjectDirIsTheDefaultCwd(): void
+    {
+        $state = $this->createState(['commandline' => 'pwd']);
+
+        $this->createTask()->execute($state);
+
+        $this->assertSame(realpath(sys_get_temp_dir()).\PHP_EOL, $state->getOutput());
+    }
+
+    public function testPassingTheKernelIsDeprecated(): void
+    {
+        $kernel = $this->createStub(KernelInterface::class);
+        $kernel->method('getProjectDir')->willReturn(sys_get_temp_dir());
+        $task = null;
+
+        $deprecations = $this->collectDeprecations(static function () use ($kernel, &$task): void {
+            $task = new CommandRunnerTask($kernel);
+        });
+
+        $this->assertSame(
+            ['Since cleverage/process-bundle 5.4: Passing a "Symfony\Component\HttpKernel\KernelInterface" to "CleverAge\ProcessBundle\Task\Process\CommandRunnerTask::__construct()" is deprecated, pass the project directory instead. The argument will only accept a string in v6.0.'],
+            $deprecations
+        );
+        $this->assertInstanceOf(CommandRunnerTask::class, $task);
+        $state = $this->createState(['commandline' => 'pwd']);
+        $task->execute($state);
+        $this->assertSame(realpath(sys_get_temp_dir()).\PHP_EOL, $state->getOutput());
+    }
+
     public function testProcessOptionsArePassedToProcess(): void
     {
         $state = $this->createState([
@@ -108,10 +137,29 @@ class CommandRunnerTaskTest extends TestCase
 
     private function createTask(): CommandRunnerTask
     {
-        $kernel = $this->createStub(KernelInterface::class);
-        $kernel->method('getProjectDir')->willReturn(sys_get_temp_dir());
+        return new CommandRunnerTask(sys_get_temp_dir());
+    }
 
-        return new CommandRunnerTask($kernel);
+    /**
+     * @param callable(): mixed $callback
+     *
+     * @return list<string>
+     */
+    private function collectDeprecations(callable $callback): array
+    {
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            $callback();
+        } finally {
+            restore_error_handler();
+        }
+
+        return $deprecations;
     }
 
     /**

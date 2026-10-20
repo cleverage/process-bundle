@@ -235,7 +235,7 @@ services:
             - { name: cleverage.task, code: command_runner }
         shared: false
         arguments:
-            - '@kernel'
+            - '%kernel.project_dir%'
 
     CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask:
         tags:
@@ -253,7 +253,8 @@ services:
         arguments:
             - '@logger'
             - '@cleverage_process.registry.process_configuration'
-            - '@kernel'
+            - '%kernel.project_dir%/bin/console'
+            - '%kernel.environment%'
 
     CleverAge\ProcessBundle\Task\PropertyGetterTask:
         tags:

@@ -38,29 +38,45 @@ class SubprocessInstance
 
     protected string $consolePath;
 
-    protected string $environment;
-
-    protected string $logDir;
+    /**
+     * @deprecated since 5.4, not used; only set when the kernel is passed to the constructor
+     */
+    protected ?string $logDir = null;
 
     /**
-     * @param array<string, mixed> $context
-     * @param array<string, mixed> $options
+     * @param string|KernelInterface $consolePath path of the Symfony console; passing the kernel is deprecated since 5.4
+     * @param array<string, mixed>   $context
+     * @param array<string, mixed>   $options
+     * @param string|null            $environment environment of the sub-process (--env), the default one of the console
+     *                                            if null; taken from the kernel when it is passed
      */
     public function __construct(
-        KernelInterface $kernel,
+        KernelInterface|string $consolePath,
         protected string $processCode,
         protected ?string $input,
         protected array $context = [],
         array $options = [],
+        protected ?string $environment = null,
     ) {
         $resolver = new OptionsResolver();
         $this->configureOptions($resolver);
         $this->options = $resolver->resolve($options);
 
-        $this->consolePath = $kernel->getProjectDir().'/bin/console';
-        $this->environment = $kernel->getEnvironment();
-        $this->bufferPath = $kernel->getProjectDir().'/var/cdm_buffer_'.uniqid('', true).'.json-stream';
-        $this->logDir = $kernel->getLogDir().'/process';
+        if ($consolePath instanceof KernelInterface) {
+            trigger_deprecation(
+                'cleverage/process-bundle',
+                '5.4',
+                'Passing a "%s" to "%s::__construct()" is deprecated, pass the path of the console and the environment instead. The argument will only accept a string in v6.0.',
+                KernelInterface::class,
+                self::class,
+            );
+            $this->environment ??= $consolePath->getEnvironment();
+            $this->logDir = $consolePath->getLogDir().'/process';
+            $consolePath = $consolePath->getProjectDir().'/bin/console';
+        }
+        $this->consolePath = $consolePath;
+        // The project directory may be read-only (e.g. in a container)
+        $this->bufferPath = sys_get_temp_dir().'/cdm_buffer_'.uniqid('', true).'.json-stream';
     }
 
     /**
@@ -77,13 +93,12 @@ class SubprocessInstance
             'nohup',
             $phpBinary,
             $this->consolePath,
-            '--env='.$this->environment,
+            ...(null !== $this->environment ? ['--env='.$this->environment] : []),
             'cleverage:process:execute',
             '--input-from-stdin',
         ];
 
         $fs = new Filesystem();
-        $fs->mkdir($this->logDir);
         if (!$fs->exists($this->consolePath)) {
             throw new RuntimeException("Unable to resolve path to symfony console '{$this->consolePath}'");
         }
