@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Command;
 
 use CleverAge\ProcessBundle\Event\ConsoleProcessEvent;
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
@@ -125,7 +126,7 @@ class ExecuteProcessCommand extends Command
             preg_match($pattern, (string) $contextValue, $parts);
             if (3 !== \count($parts)
                 || $parts[0] !== $contextValue) {
-                throw new \InvalidArgumentException(\sprintf('Invalid context %s', $contextValue));
+                throw new InvalidArgumentException(\sprintf('Invalid context %s', $contextValue));
             }
             $context[$parts[1]] = $parser->parse($parts[2]);
         }
@@ -150,7 +151,7 @@ class ExecuteProcessCommand extends Command
                 } elseif (self::OUTPUT_FORMAT_JSON === $input->getOption('output-format')) {
                     $output->writeln(json_encode($data, \JSON_THROW_ON_ERROR));
                 } else {
-                    throw new \InvalidArgumentException(\sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
+                    throw new InvalidArgumentException(\sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
                 }
             }
         } elseif (self::OUTPUT_FORMAT_JSON === $input->getOption('output-format')) {
@@ -165,7 +166,7 @@ class ExecuteProcessCommand extends Command
                 $output->writeln(\sprintf("Output stored in '%s'", $input->getOption('output')));
             }
         } else {
-            throw new \InvalidArgumentException(\sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
+            throw new InvalidArgumentException(\sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
         }
     }
 }

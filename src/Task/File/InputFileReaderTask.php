@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -39,7 +40,7 @@ class InputFileReaderTask extends FileReaderTask
         $options = parent::getOptions($state);
         $filename = $state->getInput();
         if (!\is_string($filename) || '' === $filename) {
-            throw new \UnexpectedValueException('No file path given as input');
+            throw new UnexpectedValueException('No file path given as input');
         }
         $options['filename'] = $filename;
 

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -28,11 +29,11 @@ class FileReaderTask extends AbstractConfigurableTask
         $filename = $options['filename'];
 
         if (!file_exists($filename)) {
-            throw new \UnexpectedValueException("File does not exists: '{$filename}'");
+            throw new UnexpectedValueException("File does not exists: '{$filename}'");
         }
 
         if (!is_readable($filename)) {
-            throw new \UnexpectedValueException("File is not readable: '{$filename}'");
+            throw new UnexpectedValueException("File is not readable: '{$filename}'");
         }
 
         $state->setOutput(file_get_contents($filename));

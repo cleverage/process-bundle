@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle\Registry;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Exception\MissingProcessException;
 use Psr\Log\LogLevel;
 
@@ -84,13 +85,13 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
                 ) : 0) > 0) {
                     $m = "Don't define both 'errors' and 'error_outputs' for task {$taskCode}, these options ";
                     $m .= "are the same, 'errors' is deprecated, just use the new one 'error_outputs'";
-                    throw new \LogicException($m);
+                    throw new LogicException($m);
                 }
                 $rawTaskConfiguration['error_outputs'] = $rawTaskConfiguration['errors'];
             }
             if (!\is_string($rawTaskConfiguration['service'] ?? null)) {
                 // The "task" codes are resolved into services when the container is compiled (TaskLocatorCompilerPass)
-                throw new \LogicException("The task {$taskCode} of the process {$processCode} has no service: a \"task\" code can only be used in the configurations known when the container is compiled");
+                throw new LogicException("The task {$taskCode} of the process {$processCode} has no service: a \"task\" code can only be used in the configurations known when the container is compiled");
             }
             $taskConfigurations[$taskCode] = new TaskConfiguration(
                 $taskCode,

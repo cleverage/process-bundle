@@ -16,6 +16,8 @@ namespace CleverAge\ProcessBundle\Model;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Exception\RuntimeException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 
 /**
  * Used to pass information between tasks.
@@ -288,7 +290,7 @@ class ProcessState
     public function setStatus(string $status): void
     {
         if (!\in_array($status, self::STATUS, true)) {
-            throw new \UnexpectedValueException("Unknown status {$status}");
+            throw new UnexpectedValueException("Unknown status {$status}");
         }
 
         $this->status = $status;
@@ -313,7 +315,7 @@ class ProcessState
     public function setContext(array $context): void
     {
         if ($this->context) {
-            throw new \RuntimeException('Once defined, context is immutable');
+            throw new RuntimeException('Once defined, context is immutable');
         }
 
         $this->context = $context;

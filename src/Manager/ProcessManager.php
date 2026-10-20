@@ -20,6 +20,8 @@ use CleverAge\ProcessBundle\Event\ProcessEvent;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Exception\ProcessFailedException;
 use CleverAge\ProcessBundle\Exception\ProcessStoppedException;
+use CleverAge\ProcessBundle\Exception\RuntimeException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Logger\ProcessLogger;
 use CleverAge\ProcessBundle\Logger\TaskLogger;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
@@ -247,7 +249,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
         }
 
         if (!$allParentsResolved) {
-            throw new \UnexpectedValueException('Cannot resolve all parents');
+            throw new UnexpectedValueException('Cannot resolve all parents');
         }
 
         $state->setStatus(ProcessState::STATUS_PROCESSING);
@@ -401,7 +403,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
     {
         $task = $taskConfiguration->getTask();
         if (!$task instanceof TaskInterface) {
-            throw new \RuntimeException("Missing task for configuration {$taskConfiguration->getCode()}");
+            throw new RuntimeException("Missing task for configuration {$taskConfiguration->getCode()}");
         }
         $state = $taskConfiguration->getState();
 
@@ -426,7 +428,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 $state->reset(true);
                 if (!$task instanceof BlockingTaskInterface) {
                     // This exception should never be thrown
-                    throw new \UnexpectedValueException("Task {$taskConfiguration->getCode()} is not blocking");
+                    throw new UnexpectedValueException("Task {$taskConfiguration->getCode()} is not blocking");
                 }
                 $this->processLogger->debug("Proceeding task {$taskConfiguration->getCode()}");
                 $task->proceed($state);
@@ -435,12 +437,12 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 $state->reset(true);
                 if (!$task instanceof FlushableTaskInterface) {
                     // This exception should never be thrown
-                    throw new \UnexpectedValueException("Task {$taskConfiguration->getCode()} is not flushable");
+                    throw new UnexpectedValueException("Task {$taskConfiguration->getCode()} is not flushable");
                 }
                 $this->processLogger->debug("Flushing task {$taskConfiguration->getCode()}");
                 $task->flush($state);
             } else {
-                throw new \UnexpectedValueException("Unknown execution flag: {$executionFlag}");
+                throw new UnexpectedValueException("Unknown execution flag: {$executionFlag}");
             }
 
             $exception = $state->getException();
@@ -464,7 +466,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             } elseif (TaskConfiguration::STRATEGY_STOP === $taskConfiguration->getErrorStrategy()) {
                 $state->stop($exception);
             } else {
-                throw new \UnexpectedValueException("Unknown error strategy '{$taskConfiguration->getErrorStrategy()}'");
+                throw new UnexpectedValueException("Unknown error strategy '{$taskConfiguration->getErrorStrategy()}'");
             }
         }
     }

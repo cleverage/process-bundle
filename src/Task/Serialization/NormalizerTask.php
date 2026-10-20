@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\Serialization;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -35,7 +36,7 @@ class NormalizerTask extends AbstractConfigurableTask
         $options = $this->getOptions($state);
 
         if (!$this->normalizer->supportsNormalization($state->getInput(), $options['format'])) {
-            throw new \UnexpectedValueException('Given value is not normalizable for format '.$options['format']);
+            throw new UnexpectedValueException('Given value is not normalizable for format '.$options['format']);
         }
 
         $normalizedData = $this->normalizer->normalize(

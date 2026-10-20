@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -43,7 +44,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         }
         $csv = $this->csv;
         if (!$csv instanceof CsvFile) {
-            throw new \LogicException('No CSV File initialized');
+            throw new LogicException('No CSV File initialized');
         }
         $lineNumber = $csv->getLineNumber();
         $output = $csv->readLine();
@@ -73,7 +74,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     public function next(ProcessState $state): bool
     {
         if (!$this->csv instanceof CsvFile) {
-            throw new \LogicException('No CSV File initialized');
+            throw new LogicException('No CSV File initialized');
         }
 
         $state->removeErrorContext('csv_file');

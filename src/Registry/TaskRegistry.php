@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Registry;
 
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use Psr\Container\ContainerInterface;
 
@@ -51,10 +52,10 @@ final class TaskRegistry implements TaskRegistryInterface
             // Same exception as before the locator for an unknown service referenced with "@"
             $task = $this->fallbackContainer->get($id);
         } else {
-            throw new \UnexpectedValueException("Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'");
+            throw new UnexpectedValueException("Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'");
         }
         if (!$task instanceof TaskInterface) {
-            throw new \UnexpectedValueException("Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface");
+            throw new UnexpectedValueException("Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface");
         }
 
         return $task;

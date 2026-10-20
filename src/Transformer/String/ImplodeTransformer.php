@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer\String;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -35,7 +36,7 @@ class ImplodeTransformer implements ConfigurableTransformerInterface
     public function transform(mixed $value, array $options = []): string
     {
         if (!\is_array($value)) {
-            throw new \UnexpectedValueException('Given value is not an array');
+            throw new UnexpectedValueException('Given value is not an array');
         }
 
         return implode($options['separator'], $value);
