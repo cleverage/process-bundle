@@ -57,13 +57,14 @@ Some features rely on optional packages, suggested by the bundle:
 
 | Package | Needed by |
 | ------- | --------- |
+| `ext-intl` (PHP extension) | the [SlugifyTransformer](reference/transformers/slugify_transformer.md) |
 | `symfony/process` | the [CommandRunnerTask](reference/tasks/command_runner_task.md) and the [ProcessLauncherTask](reference/tasks/process_launcher_task.md) |
 | `symfony/stopwatch` | the [StopwatchTask](reference/tasks/stopwatch_task.md) |
 | `symfony/var-dumper` | the dumps of the [DebugTask](reference/tasks/debug_task.md), of the `debug` transformer and of `cleverage:process:execute --output-format=dump` (nothing is dumped without it) |
 | `symfony/monolog-bundle` | the `cleverage_process`, `cleverage_process_task` and `cleverage_process_transformer` log channels, with the process and task data in the `extra` of the records (see [logging](03-custom_tasks.md#logging)); without it, the default Symfony logger is used |
 
-Without `symfony/process` or `symfony/stopwatch`, the container still compiles, and a process using one of these tasks
-fails with an explicit message giving the package to install.
+Without `symfony/process`, `symfony/stopwatch` or `ext-intl`, the container still compiles, and a process using one of
+these tasks or transformers fails with an explicit message giving the package or extension to install.
 
 ## Global configuration
 

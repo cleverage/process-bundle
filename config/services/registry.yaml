@@ -8,6 +8,8 @@ services:
             - ~
     CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry:
         alias: cleverage_process.registry.process_configuration
+    CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistryInterface:
+        alias: cleverage_process.registry.process_configuration
 
     cleverage_process.registry.transformer:
         class: CleverAge\ProcessBundle\Registry\TransformerRegistry
@@ -15,6 +17,8 @@ services:
         arguments:
             - ~ # Service locator of the transformers by code, see TransformerLocatorCompilerPass
     CleverAge\ProcessBundle\Registry\TransformerRegistry:
+        alias: cleverage_process.registry.transformer
+    CleverAge\ProcessBundle\Registry\TransformerRegistryInterface:
         alias: cleverage_process.registry.transformer
 
     cleverage_process.registry.task:
@@ -24,4 +28,6 @@ services:
             - ~ # Service locator of the task services, see TaskLocatorCompilerPass
             - '@service_container' # Deprecated fallback, removed in v6.0
     CleverAge\ProcessBundle\Registry\TaskRegistry:
+        alias: cleverage_process.registry.task
+    CleverAge\ProcessBundle\Registry\TaskRegistryInterface:
         alias: cleverage_process.registry.task
