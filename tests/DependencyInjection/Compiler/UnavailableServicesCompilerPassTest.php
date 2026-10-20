@@ -27,6 +27,7 @@ use CleverAge\ProcessBundle\Task\UnavailableTask;
 use CleverAge\ProcessBundle\Task\Validation\ValidatorTask;
 use CleverAge\ProcessBundle\Transformer\Serialization\DenormalizeTransformer;
 use CleverAge\ProcessBundle\Transformer\Serialization\NormalizeTransformer;
+use CleverAge\ProcessBundle\Transformer\String\SlugifyTransformer;
 use CleverAge\ProcessBundle\Transformer\UnavailableTransformer;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -49,7 +50,7 @@ class UnavailableServicesCompilerPassTest extends TestCase
     {
         $container = $this->createContainer(serializer: true, validator: true);
 
-        foreach ([...self::SERIALIZER_TASKS, NormalizeTransformer::class, DenormalizeTransformer::class, ValidatorTask::class, StopwatchTask::class, CommandRunnerTask::class, ProcessLauncherTask::class] as $id) {
+        foreach ([...self::SERIALIZER_TASKS, NormalizeTransformer::class, DenormalizeTransformer::class, ValidatorTask::class, StopwatchTask::class, CommandRunnerTask::class, ProcessLauncherTask::class, SlugifyTransformer::class] as $id) {
             self::assertSame($id, $container->findDefinition($id)->getClass());
         }
     }
@@ -128,7 +129,18 @@ class UnavailableServicesCompilerPassTest extends TestCase
         self::assertSame(StopwatchTask::class, $container->findDefinition(StopwatchTask::class)->getClass());
     }
 
-    private function createContainer(bool $serializer, bool $validator, bool $stopwatch = true, bool $process = true): ContainerBuilder
+    public function testSlugifyTransformerIsReplacedWithoutIntl(): void
+    {
+        $container = $this->createContainer(serializer: true, validator: true, intl: false);
+
+        $definition = $container->findDefinition(SlugifyTransformer::class);
+        self::assertSame(UnavailableTransformer::class, $definition->getClass());
+        self::assertSame(['slugify', \sprintf(UnavailableServicesCompilerPass::INTL_MESSAGE, SlugifyTransformer::class)], $definition->getArguments());
+        self::assertSame([['code' => 'slugify']], $definition->getTag('cleverage.transformer'));
+        self::assertSame(StopwatchTask::class, $container->findDefinition(StopwatchTask::class)->getClass());
+    }
+
+    private function createContainer(bool $serializer, bool $validator, bool $stopwatch = true, bool $process = true, bool $intl = true): ContainerBuilder
     {
         $container = new ContainerBuilder();
         (new CleverAgeProcessExtension())->load([], $container);
@@ -143,7 +155,9 @@ class UnavailableServicesCompilerPassTest extends TestCase
         if ($stopwatch) {
             $container->setDefinition('debug.stopwatch', new Definition(\stdClass::class));
         }
-        $classExists = static fn (string $class): bool => (Process::class !== $class || $process) && class_exists($class);
+        $classExists = static fn (string $class): bool => (Process::class !== $class || $process)
+            && (\Transliterator::class !== $class || $intl)
+            && class_exists($class);
         (new UnavailableServicesCompilerPass($classExists))->process($container);
 
         return $container;

@@ -24,6 +24,7 @@ use CleverAge\ProcessBundle\Task\UnavailableTask;
 use CleverAge\ProcessBundle\Task\Validation\ValidatorTask;
 use CleverAge\ProcessBundle\Transformer\Serialization\DenormalizeTransformer;
 use CleverAge\ProcessBundle\Transformer\Serialization\NormalizeTransformer;
+use CleverAge\ProcessBundle\Transformer\String\SlugifyTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use CleverAge\ProcessBundle\Transformer\UnavailableTransformer;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -48,6 +49,8 @@ final readonly class UnavailableServicesCompilerPass implements CompilerPassInte
     public const STOPWATCH_MESSAGE = 'The "%s" service requires the Symfony Stopwatch component, which does not seem installed: try "composer require symfony/stopwatch".';
 
     public const PROCESS_MESSAGE = 'The "%s" service requires the Symfony Process component, which does not seem installed: try "composer require symfony/process".';
+
+    public const INTL_MESSAGE = 'The "%s" service requires the PHP intl extension, which does not seem installed (see https://www.php.net/manual/en/book.intl.php).';
 
     /**
      * @param (\Closure(class-string): bool)|null $classExists defaults to class_exists() (the tests check the missing packages)
@@ -81,6 +84,10 @@ final readonly class UnavailableServicesCompilerPass implements CompilerPassInte
 
         if (!($this->classExists ?? class_exists(...))(Process::class)) {
             $this->replace($container, self::PROCESS_MESSAGE, [CommandRunnerTask::class, ProcessLauncherTask::class]);
+        }
+
+        if (!($this->classExists ?? class_exists(...))(\Transliterator::class)) {
+            $this->replace($container, self::INTL_MESSAGE, [SlugifyTransformer::class]);
         }
     }
 
