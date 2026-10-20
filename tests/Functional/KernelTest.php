@@ -19,9 +19,9 @@ use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Tests\App\TestKernel;
-use CleverAge\ProcessBundle\Tests\IgnoreDeprecationsTrait;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -31,8 +31,6 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 #[CoversNothing]
 class KernelTest extends KernelTestCase
 {
-    use IgnoreDeprecationsTrait;
-
     private mixed $exceptionHandler;
 
     protected function setUp(): void
@@ -60,12 +58,7 @@ class KernelTest extends KernelTestCase
         $codes = TestKernel::getTaskCodes();
         self::assertNotEmpty($codes);
         foreach ($codes as $code) {
-            $taskConfiguration = $processConfiguration->getTaskConfiguration($code);
-            // Deprecated InputAggregatorTask, see InputAggregatorTaskTest::testTaskIsDeprecated()
-            $task = 'input_aggregator' === $code
-                ? self::ignoreDeprecations(static fn (): TaskInterface => $taskRegistry->getTask($taskConfiguration))
-                : $taskRegistry->getTask($taskConfiguration);
-            self::assertInstanceOf(TaskInterface::class, $task, $code);
+            self::assertInstanceOf(TaskInterface::class, $taskRegistry->getTask($processConfiguration->getTaskConfiguration($code)), $code);
         }
     }
 
@@ -86,6 +79,27 @@ class KernelTest extends KernelTestCase
         self::assertInstanceOf(ProcessManager::class, $processManager);
 
         self::assertSame('Hello world', $processManager->execute('test.run'));
+    }
+
+    /**
+     * @return iterable<string, array{string, list<array<string, mixed>>}>
+     */
+    public static function provideInputAggregatorProcesses(): iterable
+    {
+        yield 'filtered items' => ['test.input_aggregator', [['a' => 'a1', 'b' => 'b1'], ['a' => 'a3', 'b' => 'b3'], ['a' => 'a5', 'b' => 'b5']]];
+        yield 'error with the skip strategy' => ['test.input_aggregator_error', [['a' => 1, 'b' => 'b1'], ['a' => 3, 'b' => 'b3']]];
+    }
+
+    /**
+     * @param list<array<string, mixed>> $expected
+     */
+    #[DataProvider('provideInputAggregatorProcesses')]
+    public function testInputAggregatorDropsTheItemsSkippedByABranch(string $processCode, array $expected): void
+    {
+        $processManager = self::getContainer()->get('test.process_manager');
+        self::assertInstanceOf(ProcessManager::class, $processManager);
+
+        self::assertSame($expected, $processManager->execute($processCode));
     }
 
     private function getExceptionHandler(): mixed

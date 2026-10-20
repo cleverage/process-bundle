@@ -78,6 +78,11 @@ class ProcessState
 
     protected string $status = self::STATUS_NEW;
 
+    /**
+     * Number of executions of the task (execute, proceed or flush), not reset between the items: tells the items apart.
+     */
+    protected int $executionCount = 0;
+
     public function __construct(
         protected ProcessConfiguration $processConfiguration,
         protected ProcessHistory $processHistory,
@@ -256,6 +261,23 @@ class ProcessState
     public function setPreviousState(?self $previousState): void
     {
         $this->previousState = $previousState;
+    }
+
+    /**
+     * Number of executions of the task (execute, proceed or flush) since the beginning of the process: each output of a
+     * task follows an execution, so a task downstream can tell whether two inputs come from the same item.
+     */
+    public function getExecutionCount(): int
+    {
+        return $this->executionCount;
+    }
+
+    /**
+     * @internal called by the ProcessManager before each execution of the task
+     */
+    public function incrementExecutionCount(): void
+    {
+        ++$this->executionCount;
     }
 
     public function getStatus(): string

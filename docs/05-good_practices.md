@@ -71,7 +71,8 @@ See [errors and skips](04-advanced_workflow.md#errors-and-skips).
 
 When a task has several `outputs`, each output is fully processed one after the other, in the configured order, but
 this is an implementation detail. If a task needs the result of another branch, make the dependency explicit in the
-graph (e.g. with a blocking task) rather than relying on the order in which branches are executed.
+graph (e.g. with a blocking task or an [InputAggregatorTask](reference/tasks/input_aggregator_task.md)) rather than
+relying on the order in which branches are executed.
 
 ## Use the context for runtime parameters
 

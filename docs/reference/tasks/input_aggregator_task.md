@@ -1,12 +1,12 @@
 InputAggregatorTask
 ===================
 
-**Deprecated since v5.4, removed in v6.0**: this task is too error-prone (it should be refactored as a blocking task).
-An `E_USER_DEPRECATED` error is triggered when it is instantiated.
-
-Accumulates inputs coming from several parent tasks. The task is skipped until an input has been received from every
+Joins the inputs coming from several parent tasks. The task is skipped until an input has been received from every
 parent declared in `input_codes`; it then outputs an array of all received inputs, indexed by their destination key,
 and clears its buffer (except for the keys listed in `keep_inputs`).
+
+Unlike a blocking task (e.g. [AggregateIterableTask](aggregate_iterable_task.md)), which waits for all the items and
+outputs them once, it outputs once **per item** in an iterable process.
 
 Task reference
 --------------
@@ -62,10 +62,42 @@ aggregate:
       branch_b: b
 ```
 
+* Join two branches for each item of an iterable process, a branch skipping some items
+
+```yaml
+# Task configuration level
+entry:
+  task: constant_iterable_output
+  options:
+    output: [1, 2, 3]
+  outputs: [branch_a, branch_b]
+branch_a:
+  task: filter
+  options:
+    not_match: { '': 2 }
+  outputs: [aggregate]
+branch_b:
+  task: transformer
+  options:
+    transformers:
+      sprintf: { format: 'item %s' }
+  outputs: [aggregate]
+aggregate:
+  task: input_aggregator
+  options:
+    input_codes:
+      branch_a: a
+      branch_b: b
+# Outputs ['a' => 1, 'b' => 'item 1'], then ['a' => 3, 'b' => 'item 3']: the item 2, skipped by branch_a, is dropped
+```
+
 Notes
 -----
 
-In iterable processes, inputs of different iterations may get mixed (for instance when a parent task skips an item
-because of an error), even with `clean_input_on_override: true`. Its usage is **strongly discouraged** outside of
-non-iterable processes; prefer a blocking task such as [ArrayMergeTask](array_merge_task.md) or
-[AggregateIterableTask](aggregate_iterable_task.md) when possible.
+The inputs of an item are told apart by the executions of the ancestors they have in common (their execution count,
+`ProcessState::getExecutionCount()`): when an input arrives after a common ancestor has been executed again, the inputs
+received from the other branches for a previous item are dropped (except those of `keep_inputs`). An item skipped by a
+branch (filter, error with `error_strategy: skip`) is therefore never joined with the next item. Before v5.4, the
+inputs of two items could be joined in that case.
+
+Inputs without any common ancestor (e.g. two branches starting with their own root task) are always joined.
