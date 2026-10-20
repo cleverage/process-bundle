@@ -58,7 +58,9 @@ an error occurs). It can be a simple string. See [errors and skips](../04-advanc
 task throws an exception.
 
 **error_strategy**: optional, either *skip* or *stop*. Defines if the process continues with the next input or stops
-when the task fails. When not defined, the global `default_error_strategy` is used (*stop* by default).
+when the task fails. When not defined, the global `default_error_strategy` is used (*stop* by default). Another value
+is deprecated since 5.4 (`E_USER_DEPRECATED` error when the container is compiled; the process fails with "Unknown
+error strategy" when the task fails), it will be rejected in v6.0.
 
 **log_level**: optional [RFC 5424](https://datatracker.ietf.org/doc/html/rfc5424) severity (emergency, alert, critical,
 error, warning, notice, info, debug) of the log record written on the `cleverage_process_task` channel when the task
