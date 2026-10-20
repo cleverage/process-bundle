@@ -42,7 +42,7 @@ use Symfony\Contracts\Service\ResetInterface;
  *
  * @final since 5.4
  */
-class ProcessManager implements ResetInterface
+class ProcessManager implements ProcessManagerInterface, ResetInterface
 {
     protected const EXECUTE_PROCESS = 1;
 

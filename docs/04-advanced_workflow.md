@@ -29,8 +29,11 @@ the process code, the task code and the original message. The original exception
 
 ### Executing a process from PHP
 
-The process manager service (`cleverage_process.manager.process`, private) can be autowired by its class,
-`CleverAge\ProcessBundle\Manager\ProcessManager`, or injected explicitly:
+The process manager service (`cleverage_process.manager.process`, private) can be autowired by its interface,
+`CleverAge\ProcessBundle\Manager\ProcessManagerInterface` (or by its class, `ProcessManager`), or injected
+explicitly. Type your services on the interface: the class will be `final` in v6.0 (the services of the bundle will
+then be typed on the interfaces, so that they can be decorated). The registries have their interface too: `ProcessConfigurationRegistryInterface`,
+`TransformerRegistryInterface` and `TaskRegistryInterface` (namespace `CleverAge\ProcessBundle\Registry`).
 
 ```yaml
 # config/services.yaml

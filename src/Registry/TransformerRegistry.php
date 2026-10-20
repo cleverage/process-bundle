@@ -26,7 +26,7 @@ use Symfony\Contracts\Service\ServiceProviderInterface;
  *
  * @final since 5.4
  */
-class TransformerRegistry
+class TransformerRegistry implements TransformerRegistryInterface
 {
     /**
      * Transformers already fetched from the locator, and the ones registered with addTransformer() (deprecated).

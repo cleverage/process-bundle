@@ -24,10 +24,10 @@ use Psr\Log\LogLevel;
  *
  * @final since 5.4
  */
-class ProcessConfigurationRegistry
+class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterface
 {
     /**
-     * @var ProcessConfiguration[]
+     * @var array<string, ProcessConfiguration>
      */
     protected array $processConfigurations = [];
 
@@ -53,7 +53,7 @@ class ProcessConfigurationRegistry
     }
 
     /**
-     * @return ProcessConfiguration[]
+     * @return array<string, ProcessConfiguration>
      */
     public function getProcessConfigurations(): array
     {
