@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Filesystem;
 
+use CleverAge\ProcessBundle\Exception\RuntimeException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
+
 /**
  * Wrapper around JSON files to read them in a stream.
  *
@@ -41,7 +44,7 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
         if (!\in_array($filename, ['php://stdin', 'php://stdout', 'php://stderr'], true) && !str_starts_with($mode, 'r')) {
             $dirname = \dirname($filename);
             if (!@mkdir($dirname, 0o755, true) && !is_dir($dirname)) {
-                throw new \RuntimeException(\sprintf('Directory "%s" was not created', $dirname));
+                throw new RuntimeException(\sprintf('Directory "%s" was not created', $dirname));
             }
         }
 
@@ -113,7 +116,7 @@ class JsonStreamFile implements FileStreamInterface, WritableFileInterface
 
         $data = json_decode($rawLine, true, 512, $this->jsonFlags);
         if (null !== $data && !\is_array($data)) {
-            throw new \UnexpectedValueException(\sprintf('Line %d of file "%s" must be a JSON object or array, got %s', $currentLineNumber, $this->file->getPathname(), get_debug_type($data)));
+            throw new UnexpectedValueException(\sprintf('Line %d of file "%s" must be a JSON object or array, got %s', $currentLineNumber, $this->file->getPathname(), get_debug_type($data)));
         }
 
         return $data;

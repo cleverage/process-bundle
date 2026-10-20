@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -77,7 +78,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
             if ($this->getOption($state, 'ignore_missing')) {
                 $this->logger->warning($message);
             } else {
-                throw new \UnexpectedValueException($message);
+                throw new UnexpectedValueException($message);
             }
         }
     }

@@ -27,6 +27,12 @@ Note that a task error handled by the `stop` strategy does not surface as the or
 throws a `CleverAge\ProcessBundle\Exception\ProcessFailedException` (a `\RuntimeException`), whose message contains
 the process code, the task code and the original message. The original exception is available with `getPrevious()`.
 
+The exceptions thrown by the bundle implement `CleverAge\ProcessBundle\Exception\ProcessExceptionInterface` (since 5.4 for
+the `UnexpectedValueException`, `RuntimeException`, `InvalidArgumentException` and `LogicException` of the same
+namespace, which extend the SPL exceptions thrown before), so that they can all be caught at once. Not concerned: the
+exceptions of the Symfony components (e.g. `InvalidOptionsException` for an invalid task option) and the ones of your
+own tasks and transformers.
+
 ### Executing a process from PHP
 
 The process manager service (`cleverage_process.manager.process`, private) can be autowired by its interface,

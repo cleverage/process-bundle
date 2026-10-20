@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\Xml;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
+use CleverAge\ProcessBundle\Exception\RuntimeException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
@@ -69,7 +72,7 @@ class XmlStreamReaderTask extends AbstractConfigurableTask implements IterableTa
     {
         $filePath = $this->getOption($state, 'file_path') ?? $state->getInput();
         if (!\is_string($filePath) || '' === $filePath) {
-            throw new \UnexpectedValueException('No file path given in the "file_path" option or as input');
+            throw new UnexpectedValueException('No file path given in the "file_path" option or as input');
         }
 
         return $filePath;
@@ -78,12 +81,12 @@ class XmlStreamReaderTask extends AbstractConfigurableTask implements IterableTa
     protected function open(string $filePath): void
     {
         if (!is_file($filePath) || !is_readable($filePath)) {
-            throw new \UnexpectedValueException(\sprintf('XML file "%s" does not exist or is not readable', $filePath));
+            throw new UnexpectedValueException(\sprintf('XML file "%s" does not exist or is not readable', $filePath));
         }
 
         $reader = new \XMLReader();
         if (!@$reader->open($filePath)) {
-            throw new \RuntimeException(\sprintf('Could not open XML file "%s"', $filePath));
+            throw new RuntimeException(\sprintf('Could not open XML file "%s"', $filePath));
         }
         $this->reader = $reader;
         $this->filePath = $filePath;
@@ -131,7 +134,7 @@ class XmlStreamReaderTask extends AbstractConfigurableTask implements IterableTa
 
         $this->throwOnErrors($errors);
         if (!$node instanceof \DOMElement) {
-            throw new \UnexpectedValueException(\sprintf('Could not expand element "%s" of XML file "%s"', $reader->name, $this->filePath));
+            throw new UnexpectedValueException(\sprintf('Could not expand element "%s" of XML file "%s"', $reader->name, $this->filePath));
         }
 
         // Each element gets its own document, so that it can be evaluated with xpath like the output of XmlReaderTask
@@ -159,13 +162,13 @@ class XmlStreamReaderTask extends AbstractConfigurableTask implements IterableTa
         $filePath = $this->filePath;
         $this->close();
 
-        throw new \UnexpectedValueException(\sprintf('Invalid XML in file "%s": %s', $filePath, implode('; ', $messages)));
+        throw new UnexpectedValueException(\sprintf('Invalid XML in file "%s": %s', $filePath, implode('; ', $messages)));
     }
 
     protected function getReader(): \XMLReader
     {
         if (!$this->reader instanceof \XMLReader) {
-            throw new \LogicException('No XML file opened');
+            throw new LogicException('No XML file opened');
         }
 
         return $this->reader;

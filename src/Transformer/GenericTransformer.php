@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -103,7 +105,7 @@ class GenericTransformer implements ConfigurableTransformerInterface
         $this->configureTransformersOptions($resolver);
         $resolver->setNormalizer('transformers', function (Options $options, $transformerOptions): array {
             if ([] !== $transformerOptions) {
-                throw new \InvalidArgumentException('Transformers option should not be used at this point');
+                throw new InvalidArgumentException('Transformers option should not be used at this point');
             }
 
             $transformerOptions = $this->normalizeTransformerOptions($options, $this->preconfiguredTransformerOptions ?? []);
@@ -123,7 +125,7 @@ class GenericTransformer implements ConfigurableTransformerInterface
     public function getCode(): string
     {
         if (null === $this->transformerCode) {
-            throw new \LogicException('The generic transformer is not initialized');
+            throw new LogicException('The generic transformer is not initialized');
         }
 
         return $this->transformerCode;

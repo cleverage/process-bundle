@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\Filesystem\Filesystem;
@@ -31,7 +32,7 @@ class FileMoverTask extends AbstractConfigurableTask
         $fs = new Filesystem();
         $file = $state->getInput();
         if (!$fs->exists($file)) {
-            throw new \UnexpectedValueException("File does not exists: '{$file}'");
+            throw new UnexpectedValueException("File does not exists: '{$file}'");
         }
         $dest = $options['destination'];
         if (is_dir($dest)) {
