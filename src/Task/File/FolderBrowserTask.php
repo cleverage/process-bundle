@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -138,7 +139,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
             $this->files = new \ArrayIterator($this->files);
         }
         if (!$this->files instanceof \Iterator) {
-            throw new \LogicException('No folder browsed');
+            throw new LogicException('No folder browsed');
         }
 
         return $this->files;

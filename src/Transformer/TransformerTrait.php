@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Exception\TransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Closure;
@@ -58,7 +60,7 @@ trait TransformerTrait
                 $transformer->configureOptions($transformerOptionsResolver);
                 $transformerOptions = $transformerOptionsResolver->resolve($transformerOptions);
             } elseif (!empty($transformerOptions)) {
-                throw new \InvalidArgumentException("Transformer {$origTransformerCode} should not have options");
+                throw new InvalidArgumentException("Transformer {$origTransformerCode} should not have options");
             }
 
             $closure = static fn ($value) => $transformer->transform($value, $transformerOptions);
@@ -140,7 +142,7 @@ trait TransformerTrait
 
         $type = get_debug_type($transformerOptions);
 
-        throw new \InvalidArgumentException("Options for transformer {$transformerCode} are invalid : found {$type}, expected array or null");
+        throw new InvalidArgumentException("Options for transformer {$transformerCode} are invalid : found {$type}, expected array or null");
     }
 
     /**
@@ -163,13 +165,13 @@ trait TransformerTrait
 
         $type = get_debug_type($transformerDefinition);
 
-        throw new \InvalidArgumentException("Transformer at position {$position} is invalid : found {$type}, expected a transformer code or a single \"code: options\" map");
+        throw new InvalidArgumentException("Transformer at position {$position} is invalid : found {$type}, expected a transformer code or a single \"code: options\" map");
     }
 
     private function getTransformerRegistry(): TransformerRegistry
     {
         if (!$this->transformerRegistry instanceof TransformerRegistry) {
-            throw new \LogicException('No transformer registry defined');
+            throw new LogicException('No transformer registry defined');
         }
 
         return $this->transformerRegistry;

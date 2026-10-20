@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -36,10 +37,10 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
         if (!\is_string($value) && !\is_int($value)) { // If not a valid array index
             if (!$options['auto_cast']) {
                 $type = \gettype($value);
-                throw new \UnexpectedValueException("Value of type {$type} is not a valid array index, set auto_cast to true to cast it to a string");
+                throw new UnexpectedValueException("Value of type {$type} is not a valid array index, set auto_cast to true to cast it to a string");
             }
             if (\is_array($value)) { // Array to string conversion is a simple notice so we need to catch it here
-                throw new \UnexpectedValueException("Unexpected input of type 'array' in convert_value transformer");
+                throw new UnexpectedValueException("Unexpected input of type 'array' in convert_value transformer");
             }
             $value = (string) $value; // Let's cast it to string
         }
@@ -49,7 +50,7 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
                 return $value;
             }
             if (!$options['ignore_missing']) {
-                throw new \UnexpectedValueException("Missing value in map '{$value}'");
+                throw new UnexpectedValueException("Missing value in map '{$value}'");
             }
 
             return null;

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Registry;
 
 use CleverAge\ProcessBundle\Exception\MissingTransformerException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use Symfony\Contracts\Service\ServiceProviderInterface;
 
@@ -58,7 +59,7 @@ class TransformerRegistry implements TransformerRegistryInterface
             $transformer->getCode(),
         );
         if ($this->hasTransformer($transformer->getCode())) {
-            throw new \UnexpectedValueException("Transformer {$transformer->getCode()} is already defined");
+            throw new UnexpectedValueException("Transformer {$transformer->getCode()} is already defined");
         }
         $this->transformers[$transformer->getCode()] = $transformer;
     }
@@ -88,10 +89,10 @@ class TransformerRegistry implements TransformerRegistryInterface
 
         $transformer = $this->locator->get($code);
         if (!$transformer instanceof TransformerInterface) {
-            throw new \UnexpectedValueException(\sprintf('The service of the transformer "%s" must implement "%s".', $code, TransformerInterface::class));
+            throw new UnexpectedValueException(\sprintf('The service of the transformer "%s" must implement "%s".', $code, TransformerInterface::class));
         }
         if ($code !== $transformer->getCode()) {
-            throw new \UnexpectedValueException(\sprintf('The transformer "%s" is registered with the code "%s" but its getCode() method returns "%s": both must be the same.', $transformer::class, $code, $transformer->getCode()));
+            throw new UnexpectedValueException(\sprintf('The transformer "%s" is registered with the code "%s" but its getCode() method returns "%s": both must be the same.', $transformer::class, $code, $transformer->getCode()));
         }
 
         return $this->transformers[$code] = $transformer;

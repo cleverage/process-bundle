@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer\String;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
@@ -34,7 +35,7 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
         $transliterator = $options['transliterator'];
         $string = $transliterator->transliterate($value);
         if (false === $string) {
-            throw new \UnexpectedValueException("Unable to transliterate the value: {$transliterator->getErrorMessage()}");
+            throw new UnexpectedValueException("Unable to transliterate the value: {$transliterator->getErrorMessage()}");
         }
 
         return trim(
