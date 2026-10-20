@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -31,7 +32,7 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
         $this->handleIteratorFromInput($state);
         $iterator = $this->iterator;
         if (!$iterator instanceof \Iterator) {
-            throw new \LogicException('No iterator initialized');
+            throw new LogicException('No iterator initialized');
         }
 
         if ($iterator->valid()) {

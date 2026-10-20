@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Model;
 
+use CleverAge\ProcessBundle\Exception\RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -85,7 +86,7 @@ class SubprocessInstance
     {
         $phpBinary = (new PhpExecutableFinder())->find();
         if (false === $phpBinary) {
-            throw new \RuntimeException('Unable to find the PHP executable');
+            throw new RuntimeException('Unable to find the PHP executable');
         }
 
         $arguments = [
@@ -99,7 +100,7 @@ class SubprocessInstance
 
         $fs = new Filesystem();
         if (!$fs->exists($this->consolePath)) {
-            throw new \RuntimeException("Unable to resolve path to symfony console '{$this->consolePath}'");
+            throw new RuntimeException("Unable to resolve path to symfony console '{$this->consolePath}'");
         }
 
         if ($this->options[self::OPTION_JSON_BUFFERING]) {

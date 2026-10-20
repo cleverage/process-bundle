@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
+
 /**
  * Replaces a transformer whose dependencies are not available (e.g. the Symfony serializer is not enabled), so that
  * the container still compiles and the transformer code is still known: it fails only when it is used, with an
@@ -32,7 +34,7 @@ final readonly class UnavailableTransformer implements TransformerInterface
 
     public function transform(mixed $value, array $options = []): mixed
     {
-        throw new \LogicException($this->message);
+        throw new LogicException($this->message);
     }
 
     public function getCode(): string

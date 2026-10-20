@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\Process;
 
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
+use CleverAge\ProcessBundle\Exception\RuntimeException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
@@ -202,7 +204,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
                 $this->logger->critical($process->getProcess()->getErrorOutput(), $logContext);
                 $this->killProcesses();
 
-                throw new \RuntimeException("Sub-process has failed: {$process->getProcess()->getExitCodeText()}");
+                throw new RuntimeException("Sub-process has failed: {$process->getProcess()->getExitCodeText()}");
             }
 
             $result = $process->getResult();
@@ -255,7 +257,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             static function (Options $options, array $value): array {
                 if ([] !== $value) {
                     // Todo deprecation trigger
-                    throw new \InvalidArgumentException('Deprecated option, please contact support for help');
+                    throw new InvalidArgumentException('Deprecated option, please contact support for help');
                 }
 
                 return $value;

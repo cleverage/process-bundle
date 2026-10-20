@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\JsonStream;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
@@ -42,7 +43,7 @@ class JsonStreamWriterTask extends AbstractConfigurableTask implements BlockingT
 
         $input = $state->getInput();
         if (!\is_array($input)) {
-            throw new \UnexpectedValueException('Input value is not an array');
+            throw new UnexpectedValueException('Input value is not an array');
         }
         $this->file->writeLine($input);
     }

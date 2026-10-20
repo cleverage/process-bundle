@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 
@@ -33,6 +34,6 @@ final readonly class UnavailableTask implements TaskInterface
 
     public function execute(ProcessState $state): void
     {
-        throw new \LogicException($this->message);
+        throw new LogicException($this->message);
     }
 }

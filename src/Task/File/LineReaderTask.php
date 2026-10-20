@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -37,11 +39,11 @@ class LineReaderTask extends AbstractConfigurableTask implements IterableTaskInt
 
         if (!$this->file instanceof \SplFileObject) {
             if (!file_exists($filename)) {
-                throw new \UnexpectedValueException("File does not exist: '{$filename}'");
+                throw new UnexpectedValueException("File does not exist: '{$filename}'");
             }
 
             if (!is_readable($filename)) {
-                throw new \UnexpectedValueException("File is not readable: '{$filename}'");
+                throw new UnexpectedValueException("File is not readable: '{$filename}'");
             }
 
             $this->file = new \SplFileObject($filename);
@@ -56,7 +58,7 @@ class LineReaderTask extends AbstractConfigurableTask implements IterableTaskInt
     public function next(ProcessState $state): bool
     {
         if (!$this->file instanceof \SplFileObject) {
-            throw new \LogicException('No File initialized');
+            throw new LogicException('No File initialized');
         }
 
         $endOfFile = $this->file->eof();

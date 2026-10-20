@@ -15,6 +15,8 @@ namespace CleverAge\ProcessBundle\Command;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
@@ -185,7 +187,7 @@ class ProcessHelpCommand extends Command
         }
 
         if ([] === $taskCandidates) {
-            throw new \UnexpectedValueException('Cannot find a task to output');
+            throw new UnexpectedValueException('Cannot find a task to output');
         }
 
         // Try to find the task the most on the right
@@ -198,7 +200,7 @@ class ProcessHelpCommand extends Command
 
                 // Should never be non-numeric...
                 if (!is_numeric($key)) {
-                    throw new \UnexpectedValueException('Invalid key type');
+                    throw new UnexpectedValueException('Invalid key type');
                 }
                 $weight += $key;
             }
@@ -408,7 +410,7 @@ class ProcessHelpCommand extends Command
             array_shift($nextTasks);
             $origin = array_search($taskCode, $branches, true);
             if (false === $origin) {
-                throw new \UnexpectedValueException("Task '{$taskCode}' is not in any branch");
+                throw new UnexpectedValueException("Task '{$taskCode}' is not in any branch");
             }
             $expandBranches = [];
             foreach ($nextTasks as $nextTask) {
@@ -502,7 +504,7 @@ class ProcessHelpCommand extends Command
                 } elseif (\is_callable($char)) {
                     $str = $char($branchTask, $i);
                 } else {
-                    throw new \InvalidArgumentException('Char must be string|callable');
+                    throw new InvalidArgumentException('Char must be string|callable');
                 }
             } elseif (null !== $branchTask) {
                 $str = self::CHAR_DOWN;

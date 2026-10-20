@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -130,7 +131,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 // Only a simple property name can be added to a \stdClass, nested paths are not created
                 $result->{$targetProperty} = $transformedValue;
             } else {
-                throw new \UnexpectedValueException("Property '{$targetProperty}' is not writable");
+                throw new UnexpectedValueException("Property '{$targetProperty}' is not writable");
             }
         }
 

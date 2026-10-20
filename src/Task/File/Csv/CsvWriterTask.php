@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -79,7 +80,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
     {
         $input = $state->getInput();
         if (!\is_array($input)) {
-            throw new \UnexpectedValueException('Input value is not an array');
+            throw new UnexpectedValueException('Input value is not an array');
         }
         $splitCharacter = $this->getOption($state, 'split_character');
 
@@ -103,7 +104,7 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         if (null === $headers) {
             $input = $state->getInput();
             if (!\is_array($input)) {
-                throw new \UnexpectedValueException('Input value is not an array');
+                throw new UnexpectedValueException('Input value is not an array');
             }
 
             // Keys of a list are integers: the CSV output is the same with their string value
