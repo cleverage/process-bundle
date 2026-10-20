@@ -111,6 +111,51 @@ final class TestKernel extends Kernel
                         ],
                     ],
                 ],
+                // branch_a skips the item 2, branch_b the item 4
+                'test.input_aggregator' => [
+                    'end_point' => 'collect',
+                    'tasks' => [
+                        'entry' => [
+                            'task' => 'constant_iterable_output',
+                            'options' => ['output' => [1, 2, 3, 4, 5]],
+                            'outputs' => ['branch_a', 'branch_b'],
+                        ],
+                        'branch_a' => ['task' => 'filter', 'options' => ['not_match' => ['' => 2]], 'outputs' => ['format_a']],
+                        'format_a' => ['task' => 'transformer', 'options' => ['transformers' => ['sprintf' => ['format' => 'a%s']]], 'outputs' => ['aggregate']],
+                        'branch_b' => ['task' => 'filter', 'options' => ['not_match' => ['' => 4]], 'outputs' => ['format_b']],
+                        'format_b' => ['task' => 'transformer', 'options' => ['transformers' => ['sprintf' => ['format' => 'b%s']]], 'outputs' => ['aggregate']],
+                        'aggregate' => [
+                            'task' => 'input_aggregator',
+                            'options' => ['input_codes' => ['format_a' => 'a', 'format_b' => 'b']],
+                            'outputs' => ['collect'],
+                        ],
+                        'collect' => ['task' => 'aggregate_iterable'],
+                    ],
+                ],
+                // branch_a fails on the item "x" (intdiv() of a string), and skips it
+                'test.input_aggregator_error' => [
+                    'end_point' => 'collect',
+                    'tasks' => [
+                        'entry' => [
+                            'task' => 'constant_iterable_output',
+                            'options' => ['output' => [1, 'x', 3]],
+                            'outputs' => ['branch_a', 'branch_b'],
+                        ],
+                        'branch_a' => [
+                            'task' => 'transformer',
+                            'options' => ['transformers' => ['callback' => ['callback' => 'intdiv', 'right_parameters' => [1]]]],
+                            'error_strategy' => 'skip',
+                            'outputs' => ['aggregate'],
+                        ],
+                        'branch_b' => ['task' => 'transformer', 'options' => ['transformers' => ['sprintf' => ['format' => 'b%s']]], 'outputs' => ['aggregate']],
+                        'aggregate' => [
+                            'task' => 'input_aggregator',
+                            'options' => ['input_codes' => ['branch_a' => 'a', 'branch_b' => 'b']],
+                            'outputs' => ['collect'],
+                        ],
+                        'collect' => ['task' => 'aggregate_iterable'],
+                    ],
+                ],
             ],
         ]);
 

@@ -21,7 +21,6 @@ use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Task\DummyTask;
 use CleverAge\ProcessBundle\Task\InputAggregatorTask;
-use CleverAge\ProcessBundle\Tests\IgnoreDeprecationsTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -36,33 +35,11 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
 class InputAggregatorTaskTest extends TestCase
 {
-    use IgnoreDeprecationsTrait;
-
     private const INPUT_CODES = ['branch_a' => 'a', 'branch_b' => 'b'];
-
-    public function testTaskIsDeprecated(): void
-    {
-        $deprecations = [];
-        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
-            $deprecations[] = $errstr;
-
-            return true;
-        }, \E_USER_DEPRECATED);
-        try {
-            new InputAggregatorTask();
-        } finally {
-            restore_error_handler();
-        }
-
-        self::assertSame(
-            ['Since cleverage/process-bundle 5.4: The "'.InputAggregatorTask::class.'" task is deprecated: it is too error-prone. It will be removed in v6.0.'],
-            $deprecations
-        );
-    }
 
     public function testTaskIsSkippedUntilEveryInputIsReceived(): void
     {
-        $task = $this->createTask();
+        $task = new InputAggregatorTask();
         $options = ['input_codes' => self::INPUT_CODES];
 
         $state = $this->receive($task, $options, 'branch_a', 'A');
@@ -76,7 +53,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testBufferIsClearedAfterOutput(): void
     {
-        $task = $this->createTask();
+        $task = new InputAggregatorTask();
         $options = ['input_codes' => self::INPUT_CODES];
 
         $this->receive($task, $options, 'branch_a', 'A1');
@@ -91,7 +68,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testOverriddenInputClearsBufferByDefault(): void
     {
-        $task = $this->createTask();
+        $task = new InputAggregatorTask();
         $options = ['input_codes' => ['branch_a' => 'a', 'branch_b' => 'b', 'branch_c' => 'c']];
 
         $this->receive($task, $options, 'branch_a', 'A1');
@@ -108,7 +85,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testOverriddenInputThrowsWhenCleaningIsDisabled(): void
     {
-        $task = $this->createTask();
+        $task = new InputAggregatorTask();
         $options = ['input_codes' => self::INPUT_CODES, 'clean_input_on_override' => false];
 
         $this->receive($task, $options, 'branch_a', 'A1');
@@ -121,7 +98,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testKeptInputsAreReusedForNextOutputs(): void
     {
-        $task = $this->createTask();
+        $task = new InputAggregatorTask();
         $options = ['input_codes' => self::INPUT_CODES, 'keep_inputs' => ['a']];
 
         $this->receive($task, $options, 'branch_a', 'A');
@@ -135,7 +112,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testSeveralParentsCanTargetTheSameKey(): void
     {
-        $task = $this->createTask();
+        $task = new InputAggregatorTask();
         $options = ['input_codes' => ['branch_a' => 'value', 'branch_b' => 'value']];
 
         $state = $this->receive($task, $options, 'branch_b', 'B');
@@ -145,7 +122,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testTaskWithoutPreviousStateThrows(): void
     {
-        $task = $this->createTask();
+        $task = new InputAggregatorTask();
         $state = $this->createState(['input_codes' => self::INPUT_CODES]);
         $task->initialize($state);
 
@@ -157,7 +134,7 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testUnmappedPreviousTaskThrows(): void
     {
-        $task = $this->createTask();
+        $task = new InputAggregatorTask();
 
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage("Task 'unknown' is not mapped in the input_codes option");
@@ -167,11 +144,59 @@ class InputAggregatorTaskTest extends TestCase
 
     public function testInputCodesOptionIsRequired(): void
     {
-        $task = $this->createTask();
+        $task = new InputAggregatorTask();
 
         $this->expectException(MissingOptionsException::class);
 
         $task->initialize($this->createState([]));
+    }
+
+    public function testInputsOfAnItemSkippedByTheFirstBranchAreDropped(): void
+    {
+        $task = new InputAggregatorTask();
+        $options = ['input_codes' => self::INPUT_CODES];
+        [$entry, $branchA, $branchB] = $this->createBranches();
+
+        self::assertSame(['a' => 'a1', 'b' => 'b1'], $this->receiveItem($task, $options, $entry, [[$branchA, 'a1'], [$branchB, 'b1']]));
+        // The item 2 is skipped by branch_a: b2 waits for a2
+        self::assertNull($this->receiveItem($task, $options, $entry, [[$branchB, 'b2']]));
+        // b2 is not joined with a3
+        self::assertSame(['a' => 'a3', 'b' => 'b3'], $this->receiveItem($task, $options, $entry, [[$branchA, 'a3'], [$branchB, 'b3']]));
+    }
+
+    public function testInputsOfAnItemSkippedByTheLastBranchAreDropped(): void
+    {
+        $task = new InputAggregatorTask();
+        $options = ['input_codes' => self::INPUT_CODES];
+        [$entry, $branchA, $branchB] = $this->createBranches();
+
+        self::assertNull($this->receiveItem($task, $options, $entry, [[$branchA, 'a1']]));
+        self::assertSame(['a' => 'a2', 'b' => 'b2'], $this->receiveItem($task, $options, $entry, [[$branchA, 'a2'], [$branchB, 'b2']]));
+    }
+
+    public function testKeptInputsAreJoinedWithTheNextItems(): void
+    {
+        $task = new InputAggregatorTask();
+        $options = ['input_codes' => self::INPUT_CODES, 'keep_inputs' => ['a']];
+        [$entry, $branchA, $branchB] = $this->createBranches();
+
+        self::assertSame(['a' => 'a1', 'b' => 'b1'], $this->receiveItem($task, $options, $entry, [[$branchA, 'a1'], [$branchB, 'b1']]));
+        self::assertSame(['a' => 'a1', 'b' => 'b2'], $this->receiveItem($task, $options, $entry, [[$branchB, 'b2']]));
+    }
+
+    public function testInputsWithoutCommonAncestorAreJoined(): void
+    {
+        $task = new InputAggregatorTask();
+        $options = ['input_codes' => self::INPUT_CODES];
+        [, $branchA] = $this->createBranches();
+        [, , $branchB] = $this->createBranches();
+
+        $branchA->incrementExecutionCount();
+        $this->receiveFrom($task, $options, $branchA, 'a1');
+        $branchA->incrementExecutionCount();
+        $branchB->incrementExecutionCount();
+
+        self::assertSame(['a' => 'a1', 'b' => 'b1'], $this->receiveFrom($task, $options, $branchB, 'b1')->getOutput());
     }
 
     /**
@@ -190,7 +215,7 @@ class InputAggregatorTaskTest extends TestCase
     #[DataProvider('invalidOptionsProvider')]
     public function testInvalidOptionsAreRejected(array $options): void
     {
-        $task = $this->createTask();
+        $task = new InputAggregatorTask();
 
         $this->expectException(InvalidOptionsException::class);
 
@@ -213,9 +238,61 @@ class InputAggregatorTaskTest extends TestCase
         return $state;
     }
 
-    private function createTask(): InputAggregatorTask
+    /**
+     * An entry task whose outputs go to branch_a and branch_b.
+     *
+     * @return array{ProcessState, ProcessState, ProcessState}
+     */
+    private function createBranches(): array
     {
-        return self::ignoreDeprecations(static fn (): InputAggregatorTask => new InputAggregatorTask());
+        $entry = $this->createState([], 'entry');
+        $branchA = $this->createState([], 'branch_a');
+        $branchA->setPreviousState($entry);
+        $branchB = $this->createState([], 'branch_b');
+        $branchB->setPreviousState($entry);
+
+        return [$entry, $branchA, $branchB];
+    }
+
+    /**
+     * A new item of the entry task, sent to the branches that do not skip it (in the order of the outputs).
+     *
+     * @param array<string, mixed>              $options
+     * @param list<array{ProcessState, string}> $inputs  branch state, input
+     *
+     * @return array<mixed>|null the output of the task after the last input, null if it is skipped
+     */
+    private function receiveItem(InputAggregatorTask $task, array $options, ProcessState $entry, array $inputs): ?array
+    {
+        $entry->incrementExecutionCount();
+        $state = null;
+        foreach ($inputs as [$branch, $input]) {
+            $branch->incrementExecutionCount();
+            $state = $this->receiveFrom($task, $options, $branch, $input);
+        }
+        self::assertInstanceOf(ProcessState::class, $state);
+        if ($state->isSkipped()) {
+            return null;
+        }
+        $output = $state->getOutput();
+        self::assertIsArray($output);
+
+        return $output;
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    private function receiveFrom(InputAggregatorTask $task, array $options, ProcessState $previousState, string $input): ProcessState
+    {
+        $state = $this->createState($options);
+        $state->setPreviousState($previousState);
+        $state->setInput($input);
+
+        $task->initialize($state);
+        $task->execute($state);
+
+        return $state;
     }
 
     /**

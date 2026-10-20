@@ -413,6 +413,7 @@ class ProcessManager implements ResetInterface
             return;
         }
 
+        $state->incrementExecutionCount();
         try {
             if (self::EXECUTE_PROCESS === $executionFlag) {
                 $state->reset(false);
