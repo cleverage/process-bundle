@@ -1,6 +1,9 @@
 Latest
 ------
 
+v5.4
+-----
+
 ## Changes
 * [#320](https://github.com/cleverage/process-bundle/issues/320) README: add an installation section (`composer require`, bundle registration without Symfony Flex), linking to the quick start.
 * [#319](https://github.com/cleverage/process-bundle/issues/319) Composer: require PHP `^8.2` instead of `>=8.2` (PHP 9 is no longer accepted before being tested), remove the authorization of the `symfony/flex` plugin, which is not required (the CI installs it globally).
