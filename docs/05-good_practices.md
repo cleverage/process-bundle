@@ -78,7 +78,9 @@ relying on the order in which branches are executed.
 
 Values that change between executions (a file name, a date, a limit...) should not be hard-coded in the process
 configuration: pass them as [contextual values](01-quick_start.md#contextual-values) (`-c key:value`) and use
-`{{ key }}` placeholders in the task options.
+`{{ key }}` placeholders in the task options. The context may come from untrusted users and is logged: keep it out of
+the options interpreted by the tasks (shell command, SQL...) and do not put secrets in it (see
+[contextual values](01-quick_start.md#contextual-values)).
 
 ## Extend the bundle without inheriting its classes
 

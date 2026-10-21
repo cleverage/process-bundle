@@ -2,6 +2,7 @@ Latest
 ------
 
 ## Changes
+* [#329](https://github.com/cleverage/process-bundle/issues/329) Documentation: the contextual values may come from users who do not write the process configuration (console, parent process, UI) and are logged: keep them out of the options interpreted by the tasks (string `commandline` of `command_runner`, SQL...) and do not pass secrets in the context.
 * [#90](https://github.com/cleverage/process-bundle/issues/90) Installation documentation: describe the Symfony Flex recipe ([symfony/recipes-contrib#2081](https://github.com/symfony/recipes-contrib/pull/2081)), which registers the bundle and creates `config/packages/clever_age_process.yaml` importing the `config/packages/process/` directory, and the manual setup without Flex.
 
 v5.4
