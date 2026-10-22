@@ -44,3 +44,13 @@ run_subprocess:
       source: '{{ source }}'
   outputs: [next_task]
 ```
+
+Notes
+-----
+
+* When the sub-process fails, the `ProcessFailedException` is thrown by this task: its `error_strategy` applies. With
+  `stop` (default), the parent process fails too; with `skip`, the parent process goes on with the next input (the
+  input is sent to the `error_outputs` of the task, if any).
+* The `process` option is checked when the task is initialized: with an unknown process, the initialization fails, the
+  error is logged and, with process-bundle v5, the parent process fails when the task is first executed (see
+  [initializable tasks](../../02-task_types.md#initializable-tasks)).

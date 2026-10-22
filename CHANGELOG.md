@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#357](https://github.com/cleverage/process-bundle/issues/357) Documentation: input of `file_splitter`, `log_empty_lines` of the CSV readers, empty lines of the line readers, invalid regular expressions of the conditions, cache pool of the `cached` transformer, missing serializer / validator, exceptions of the bundle in the reference pages, failure of a sub-process of `process_executor`, `sleep_on_finalize_interval` of `process_launcher`, initialization failures, `process_options` of `process_launcher` in `UPGRADE.md`.
+
 v5.4.1
 -----
 

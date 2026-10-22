@@ -30,7 +30,7 @@ finished, the task outputs the path of this file (`string`), during the next ite
 `json_buffering`, the task outputs nothing.
 
 If a sub-process exits with a non-zero code, its error output is logged as critical, all running sub-processes are
-stopped and a `\RuntimeException` is thrown.
+stopped and a `RuntimeException` is thrown.
 
 Options
 -------
@@ -41,10 +41,10 @@ Options
 | `max_processes`               | `int`        |          | `3`     | Maximum number of sub-processes running at the same time                                            |
 | `sleep_interval`              | `int\|float` |          | `1`     | Time (in seconds) to wait between two checks when the pool is full                                  |
 | `sleep_interval_after_launch` | `int\|float` |          | `1`     | Time (in seconds) to wait after launching a sub-process                                             |
-| `sleep_on_finalize_interval`  | `int\|float` |          | `1`     | Time (in seconds) to wait when the task has no finished result to output at the end of an iteration |
+| `sleep_on_finalize_interval`  | `int\|float` |          | `1`     | Time (in seconds) to wait at the end of **each** execution (each input) when no sub-process result is ready to be output, in addition to `sleep_interval_after_launch`: lower it to launch the sub-processes faster |
 | `context`                     | `array`      |          | `[]`    | Context values passed to each sub-process (as `--context=key:value`, values must be scalars)        |
 | `json_buffering`              | `bool`       |          | `false` | Store each sub-process output in a JSON stream file and output its path                             |
-| `process_options`             | `array`      |          | `[]`    | **Deprecated**: any non-empty value throws an `\InvalidArgumentException`                           |
+| `process_options`             | `array`      |          | `[]`    | **Deprecated**: any non-empty value throws an `InvalidArgumentException`                           |
 
 Examples
 --------

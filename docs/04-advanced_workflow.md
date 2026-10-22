@@ -31,7 +31,9 @@ The exceptions thrown by the bundle implement `CleverAge\ProcessBundle\Exception
 the `UnexpectedValueException`, `RuntimeException`, `InvalidArgumentException` and `LogicException` of the same
 namespace, which extend the SPL exceptions thrown before), so that they can all be caught at once. Not concerned: the
 exceptions of the Symfony components (e.g. `InvalidOptionsException` for an invalid task option) and the ones of your
-own tasks and transformers.
+own tasks and transformers. The reference pages name these exceptions without their namespace (e.g.
+`UnexpectedValueException`). In a chain of transformers, the exception of a transformer is wrapped in a
+`TransformerException` (see [TransformerTrait](reference/traits/transformer_trait.md)).
 
 ### Executing a process from PHP
 

@@ -4,6 +4,8 @@ DenormalizeTransformer
 Denormalize the input into an instance of the given class, using the Symfony
 [Serializer](https://symfony.com/doc/current/components/serializer.html) denormalizer.
 
+Requires the Symfony serializer (`framework.serializer`): without it, the transformer fails with an explicit message.
+
 See also [DenormalizerTask](../tasks/denormalizer_task.md) for the task equivalent.
 
 Transformer reference

@@ -28,7 +28,8 @@ Provide a configurable set of matching rules, used by tasks and transformers to 
 | `match_regexp`     | `array` |          | `[]`    | `path => pattern`: the value at `path`, cast to string, must match the regular expression                           |
 | `not_match_regexp` | `array` |          | `[]`    | `path => pattern`: the value at `path`, cast to string, must not match the regular expression                       |
 
-An invalid regular expression makes both `match_regexp` and `not_match_regexp` fail.
+An invalid regular expression makes both `match_regexp` and `not_match_regexp` fail. In debug mode, the PHP warning
+of `preg_match()` is converted into an exception by the Symfony error handler: the task fails.
 
 ## Usage
 

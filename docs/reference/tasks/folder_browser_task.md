@@ -30,7 +30,7 @@ Options
 
 | Code              | Type                  | Required | Default   | Description                                                                                                    |
 |-------------------|-----------------------|:--------:|-----------|----------------------------------------------------------------------------------------------------------------|
-| `folder_path`     | `string`              |  **X**   |           | Path of the folder to browse. Must be an existing readable directory (checked at initialization)               |
+| `folder_path`     | `string`              |  **X**   |           | Path of the folder to browse. Must be an existing readable directory (checked at initialization; with process-bundle v5, the process fails when the task is first executed, see [initializable tasks](../../02-task_types.md#initializable-tasks))               |
 | `name_pattern`    | `string\|array\|null` |          | `null`    | Restrict files by name using a pattern (glob, regexp or string) or an array of patterns (see `Finder::name()`) |
 | `empty_log_level` | `string`              |          | `warning` | Log level used when no file is found, one of the `Psr\Log\LogLevel` constants                                  |
 

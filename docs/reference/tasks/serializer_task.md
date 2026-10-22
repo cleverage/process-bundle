@@ -3,6 +3,8 @@ SerializerTask
 
 Serializes the input into a string of the given format using the Symfony Serializer `SerializerInterface`.
 
+Requires the Symfony serializer (`framework.serializer`): without it, the task fails with an explicit message.
+
 Task reference
 --------------
 

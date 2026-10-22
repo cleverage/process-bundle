@@ -25,7 +25,7 @@ Options
 
 | Code       | Type     | Required | Default | Description                                                                                                      |
 |------------|----------|:--------:|---------|------------------------------------------------------------------------------------------------------------------|
-| `filename` | `string` |  **X**   |         | Path of the file to read. An `\UnexpectedValueException` is thrown if the file does not exist or is not readable |
+| `filename` | `string` |  **X**   |         | Path of the file to read. An `UnexpectedValueException` is thrown if the file does not exist or is not readable |
 
 Examples
 --------

@@ -18,7 +18,7 @@ Accepted inputs
 ---------------
 
 `any`: the parent task (previous task) code must be declared in `input_codes`, otherwise an
-`\UnexpectedValueException` is thrown. The task cannot be used without a previous task (e.g. as an entry point).
+`UnexpectedValueException` is thrown. The task cannot be used without a previous task (e.g. as an entry point).
 
 Possible outputs
 ----------------

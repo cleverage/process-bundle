@@ -72,7 +72,7 @@ public function onDataQueue(EventDispatcherTaskEvent $event): void
 `ProcessState` of every event in memory. Injecting or fetching this service triggers an `E_USER_DEPRECATED` error: write
 your own listener, as above.
 
-**Deprecated since v5, removed in v6.0**: from v4.0 to v5.0, the `event_name` option was ignored and the event was
+**Deprecated since v5.1 (deprecation notice), removed in v6.0**: from v4.0 to v5.0, the `event_name` option was ignored and the event was
 always dispatched under its class name. To preserve backward compatibility, when `event_name` is set (and differs from the
 event class name) and listeners subscribe to `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`, the event is also
 dispatched under its class name and an `E_USER_DEPRECATED` error is triggered. In v6.0, listen to the configured

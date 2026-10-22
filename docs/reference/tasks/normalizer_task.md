@@ -3,6 +3,8 @@ NormalizerTask
 
 Normalizes the input (usually an object) using the Symfony Serializer `NormalizerInterface`.
 
+Requires the Symfony serializer (`framework.serializer`): without it, the task fails with an explicit message.
+
 Task reference
 --------------
 
@@ -13,7 +15,7 @@ Accepted inputs
 ---------------
 
 `mixed`: any value supported by the normalizers for the given `format`. If no normalizer supports it, an
-`\UnexpectedValueException` is thrown.
+`UnexpectedValueException` is thrown.
 
 Possible outputs
 ----------------

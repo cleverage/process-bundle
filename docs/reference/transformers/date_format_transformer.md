@@ -15,7 +15,7 @@ Accepted inputs
 * `\DateTimeInterface` (`\DateTime` or `\DateTimeImmutable`)
 * Any falsy value (`null`, `''`, `false`…), returned unchanged
 
-Any other value (including a date string) throws an `\UnexpectedValueException`. Use
+Any other value (including a date string) throws an `UnexpectedValueException`. Use
 [DateParserTransformer](date_parser_transformer.md) first to convert a string into a date.
 
 Possible outputs

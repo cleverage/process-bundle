@@ -13,7 +13,7 @@ Transformer reference
 Accepted inputs
 ---------------
 
-`array` of values that can be cast to `string`. Any other input throws an `\UnexpectedValueException`.
+`array` of values that can be cast to `string`. Any other input throws an `UnexpectedValueException`.
 
 Possible outputs
 ----------------
