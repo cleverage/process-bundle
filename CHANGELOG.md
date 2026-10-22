@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#353](https://github.com/cleverage/process-bundle/issues/353) `cleverage:process:execute`: the process codes and the output format are checked before any process is executed (explicit message for `dump` without `symfony/var-dumper`); the output is printed to STDOUT whatever the verbosity when `--output-format` is given (it required `-vv`); a non-array output that cannot be stored as JSON stream is reported on the error output instead of being silently lost. Update documentation, add tests.
+
 v5.4.1
 -----
 

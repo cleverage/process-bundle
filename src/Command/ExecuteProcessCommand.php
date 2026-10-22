@@ -24,6 +24,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\VarDumper\VarDumper;
@@ -89,13 +90,17 @@ class ExecuteProcessCommand extends Command
 
         $context = $this->parseContextValues($input);
 
-        $this->eventDispatcher->dispatch(new ConsoleProcessEvent($input, $output, $inputData, $context));
-
+        // Checked before executing anything: a wrong option must not be detected once the work is done
         foreach ($input->getArgument('processCodes') as $code) {
             if (!$this->processRegistry->hasProcessConfiguration($code)) {
                 throw new InvalidConfigurationException("Unknown process {$code}");
             }
+        }
+        $this->checkOutputFormat($input);
 
+        $this->eventDispatcher->dispatch(new ConsoleProcessEvent($input, $output, $inputData, $context));
+
+        foreach ($input->getArgument('processCodes') as $code) {
             if (!$output->isQuiet()) {
                 $output->writeln("<comment>Starting process '{$code}'...</comment>");
             }
@@ -134,6 +139,26 @@ class ExecuteProcessCommand extends Command
         return $context;
     }
 
+    /**
+     * The output format must be "dump" (to STDOUT, with the VarDumper component) or "json-stream".
+     */
+    protected function checkOutputFormat(InputInterface $input): void
+    {
+        $format = $input->getOption('output-format');
+        if (!$format) {
+            return;
+        }
+        $toStdout = self::OUTPUT_STDOUT === $input->getOption('output');
+        if (self::OUTPUT_FORMAT_JSON === $format || ($toStdout && self::OUTPUT_FORMAT_DUMP === $format && class_exists(VarDumper::class))) {
+            return;
+        }
+        if ($toStdout && self::OUTPUT_FORMAT_DUMP === $format) {
+            throw new InvalidArgumentException("The 'dump' output format requires the VarDumper component: run \"composer require symfony/var-dumper\"");
+        }
+
+        throw new InvalidArgumentException(\sprintf("Cannot handle data output with format '%s'", $format));
+    }
+
     protected function handleOutputData(mixed $data, InputInterface $input, OutputInterface $output): void
     {
         // Skip all if undefined
@@ -141,32 +166,28 @@ class ExecuteProcessCommand extends Command
             return;
         }
 
-        // Handle printing the output
+        // Handle printing the output: asked explicitly, whatever the verbosity
         if (self::OUTPUT_STDOUT === $input->getOption('output')) {
-            if ($output->isVeryVerbose()) {
-                if (class_exists(VarDumper::class) && (self::OUTPUT_FORMAT_DUMP === $input->getOption(
-                    'output-format'
-                ))) {
-                    VarDumper::dump($data);
-                } elseif (self::OUTPUT_FORMAT_JSON === $input->getOption('output-format')) {
-                    $output->writeln(json_encode($data, \JSON_THROW_ON_ERROR));
-                } else {
-                    throw new InvalidArgumentException(\sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
-                }
-            }
-        } elseif (self::OUTPUT_FORMAT_JSON === $input->getOption('output-format')) {
-            // JsonStreamFile::writeLine only takes an array...
-            // TODO how to handle other cases ?
-            if (\is_array($data)) {
-                $outputFile = new JsonStreamFile($input->getOption('output'), 'wb');
-                $outputFile->writeLine($data);
+            if (self::OUTPUT_FORMAT_DUMP === $input->getOption('output-format')) {
+                VarDumper::dump($data);
+            } else {
+                $output->writeln(json_encode($data, \JSON_THROW_ON_ERROR));
             }
 
-            if (isset($outputFile) && $output->isVerbose()) {
-                $output->writeln(\sprintf("Output stored in '%s'", $input->getOption('output')));
-            }
-        } else {
-            throw new InvalidArgumentException(\sprintf("Cannot handle data output with format '%s'", $input->getOption('output-format')));
+            return;
+        }
+
+        // JsonStreamFile::writeLine() only takes an array
+        if (!\is_array($data)) {
+            $errorOutput = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
+            $errorOutput->writeln(\sprintf("<comment>Output not stored in '%s': the JSON stream format requires an array, %s given</comment>", $input->getOption('output'), get_debug_type($data)));
+
+            return;
+        }
+        $outputFile = new JsonStreamFile($input->getOption('output'), 'wb');
+        $outputFile->writeLine($data);
+        if ($output->isVerbose()) {
+            $output->writeln(\sprintf("Output stored in '%s'", $input->getOption('output')));
         }
     }
 }
