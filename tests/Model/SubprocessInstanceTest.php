@@ -68,10 +68,11 @@ class SubprocessInstanceTest extends TestCase
             $subprocess->getProcess()->getCommandLine()
         );
         preg_match('#--output=([^\']+)#', $subprocess->getProcess()->getCommandLine(), $matches);
+        $bufferPath = $matches[1] ?? '';
         // Created before the sub-process writes into it, readable by its owner only
-        $this->assertFileExists($matches[1]);
-        $this->assertSame(0o600, fileperms($matches[1]) & 0o777);
-        unlink($matches[1]);
+        $this->assertFileExists($bufferPath);
+        $this->assertSame(0o600, fileperms($bufferPath) & 0o777);
+        unlink($bufferPath);
     }
 
     public function testMissingConsoleThrows(): void
