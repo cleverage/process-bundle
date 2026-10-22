@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#339](https://github.com/cleverage/process-bundle/issues/339) A shared service referenced by several tasks of the same process is rejected when the container is compiled (`InvalidArgumentException` naming the service, the tasks and the process): all these tasks ran with the same instance, initialized with the options of each task in turn, without error. Declare the task services with `shared: false` (applied by the autoconfiguration of `TaskInterface` since 5.4). Update documentation, add tests.
+
 v5.4.1
 -----
 
