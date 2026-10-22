@@ -296,6 +296,16 @@ read:
 Note that placeholders are only resolved for keys existing in the context: if you run the process without the
 `file_name` context value, the option will keep the literal `{{ file_name }}` string.
 
+The context values are inserted as is, and they may come from people who do not write the process configuration (the
+console, a parent process, the launch form and the HTTP API of
+[cleverage/ui-process-bundle](https://github.com/cleverage/ui-process-bundle)...):
+- do not use them in options interpreted by the task, where a value could change the meaning of the option: a string
+  `commandline` of [command_runner](reference/tasks/command_runner_task.md) is run by the shell (`'x; id'` runs
+  `id`), and the same goes for an SQL query, a callback name or an expression. Prefer an array `commandline`, query
+  parameters, or a value checked beforehand (e.g. by a [validator](reference/tasks/validator_task.md) task)
+- do not pass secrets (passwords, tokens) in the context: it is added to every log record (and stored with each
+  execution by the UI bundle). Use environment variables or the configuration of your services instead
+
 ## Automation
 
 Once everything is working fine, you may want to automate your processes. The standard way is using the Unix cron jobs:

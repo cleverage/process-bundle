@@ -69,4 +69,6 @@ Notes
 
 An array `commandline` is run with `new Process()`: each argument is escaped and no shell is involved. A string
 `commandline` is run with `Process::fromShellCommandline()`: it is interpreted by the shell, so never build it from
-untrusted input.
+untrusted input, `{{ key }}` context placeholders included (a context value such as `x; id` would run `id`). To use a
+context value, pass it as an argument of an array `commandline`, or as an `env` variable quoted in the command
+(`commandline: 'grep "$PATTERN" | wc -l'`, `env: { PATTERN: '{{ pattern }}' }`).
