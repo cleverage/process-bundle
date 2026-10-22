@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#355](https://github.com/cleverage/process-bundle/issues/355) `ProcessConfigurationRegistry::reset()`, tagged `kernel.reset`: a long-running worker (Messenger, UI bundle) releases the resolved process configurations, with the task instances and states (inputs, outputs, aggregated data) of their last execution, between two messages. Add tests.
+
 v5.4.1
 -----
 
