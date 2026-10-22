@@ -79,7 +79,7 @@
         "phpstan/extension-installer": "*",
         "phpstan/phpstan": "*",
         "phpstan/phpstan-symfony": "*",
-        "phpunit/phpunit": "^11.5.50|^12|^13",
+        "phpunit/phpunit": "^10.5|^11|^12|^13",
         "rector/rector": "*",
         "roave/security-advisories": "dev-latest",
         "symfony/cache": "^6.4|^7.4|^8",
