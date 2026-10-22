@@ -1,1 +1,8 @@
 blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/cleverage/process-bundle/security/advisories/new
+    about: Report a security vulnerability privately, never in a public issue.
+  - name: Documentation
+    url: https://github.com/cleverage/process-bundle/blob/main/docs/index.md
+    about: How to install and use the bundle.
