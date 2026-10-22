@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#337](https://github.com/cleverage/process-bundle/issues/337) `StopTask` (`stop`): the process fails for real, as documented. The task stops its state with a `ProcessStoppedException`, so that the process manager throws a `ProcessFailedException`: the `cleverage_process.fail` event is dispatched, the tasks are not finalized, `cleverage:process:execute` exits with a non-zero code and the `process_executor` task of a parent process fails (according to its `error_strategy`). Before, the process history was flagged as failed but the process ended normally (exit code 0, parent process going on). To end a flow without failure, filter the items instead (`filter`, `skip_empty`). Update documentation and tests.
+
 v5.4.1
 -----
 

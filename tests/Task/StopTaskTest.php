@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests\Task;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
+use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Exception\ProcessStoppedException;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Task\StopTask;
@@ -21,14 +23,17 @@ use PHPUnit\Framework\TestCase;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(StopTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessConfiguration::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TaskConfiguration::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(ProcessStoppedException::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessHistory::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
 class StopTaskTest extends TestCase
 {
-    public function testProcessIsStoppedAndMarkedAsFailed(): void
+    public function testProcessIsStoppedWithAnExceptionAndMarkedAsFailed(): void
     {
         $processConfiguration = new ProcessConfiguration('test', []);
         $state = new ProcessState($processConfiguration, new ProcessHistory($processConfiguration));
+        $state->setTaskConfiguration(new TaskConfiguration('abort', StopTask::class, []));
         $state->setInput(['ignored']);
         $state->reset(false);
         self::assertFalse($state->isStopped());
@@ -41,6 +46,8 @@ class StopTaskTest extends TestCase
         self::assertSame(ProcessHistory::STATE_FAILED, $state->getProcessHistory()->getState());
         self::assertNotNull($state->getProcessHistory()->getEndDate());
         self::assertNull($state->getOutput());
-        self::assertNull($state->getException());
+        $exception = $state->getException();
+        self::assertInstanceOf(ProcessStoppedException::class, $exception);
+        self::assertSame('Process test has been stopped by task abort.', $exception->getMessage());
     }
 }

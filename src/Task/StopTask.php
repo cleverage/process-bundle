@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Exception\ProcessStoppedException;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 
 /**
- * Allows to directly stop a process, marking it as failed.
+ * Allows to directly stop a process, making it fail: the process manager throws a ProcessFailedException.
  *
  * @final since 5.4
  */
@@ -25,7 +26,12 @@ class StopTask implements TaskInterface
 {
     public function execute(ProcessState $state): void
     {
-        $state->setStopped(true);
+        $state->stop(
+            ProcessStoppedException::createByTask(
+                $state->getProcessConfiguration()->getCode(),
+                $state->getTaskConfiguration()->getCode(),
+            )
+        );
         $state->getProcessHistory()
             ->setFailed();
     }

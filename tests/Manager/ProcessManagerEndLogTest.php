@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Event\ProcessEvent;
 use CleverAge\ProcessBundle\Exception\ProcessFailedException;
+use CleverAge\ProcessBundle\Exception\ProcessStoppedException;
 use CleverAge\ProcessBundle\Logger\AbstractLogger;
 use CleverAge\ProcessBundle\Logger\ProcessLogger;
 use CleverAge\ProcessBundle\Logger\TaskLogger;
@@ -51,6 +52,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ConstantOutputTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(StopTask::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(ProcessStoppedException::class)]
 class ProcessManagerEndLogTest extends TestCase
 {
     /**
@@ -93,15 +95,24 @@ class ProcessManagerEndLogTest extends TestCase
 
     public function testStoppedProcessIsLoggedAsFailedAsDebugByDefault(): void
     {
-        $this->createProcessManager('@test.stop')->execute('test.process');
+        try {
+            $this->createProcessManager('@test.stop')->execute('test.process');
+            self::fail('The process should have failed');
+        } catch (ProcessFailedException $exception) {
+            self::assertInstanceOf(ProcessStoppedException::class, $exception->getPrevious());
+        }
 
         self::assertSame([[LogLevel::DEBUG, 'Process test.process failed']], $this->getEndRecords());
     }
 
     public function testStoppedProcessUsesTheDefaultFailedLevel(): void
     {
-        $this->createProcessManager('@test.stop', defaultLogLevels: ['failed_level' => LogLevel::ERROR])
-            ->execute('test.process');
+        try {
+            $this->createProcessManager('@test.stop', defaultLogLevels: ['failed_level' => LogLevel::ERROR])
+                ->execute('test.process');
+            self::fail('The process should have failed');
+        } catch (ProcessFailedException) {
+        }
 
         self::assertSame([[LogLevel::ERROR, 'Process test.process failed']], $this->getEndRecords());
     }
