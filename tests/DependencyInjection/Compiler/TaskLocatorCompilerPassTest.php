@@ -152,7 +152,7 @@ class TaskLocatorCompilerPassTest extends TestCase
 
         (new TaskLocatorCompilerPass())->process($container);
 
-        $this->addToAssertionCount(1);
+        self::assertInstanceOf(Reference::class, $container->getDefinition('cleverage_process.registry.task')->getArgument(0));
     }
 
     public function testSharedServiceCanBeUsedOnceByEachProcess(): void
@@ -162,7 +162,7 @@ class TaskLocatorCompilerPassTest extends TestCase
 
         (new TaskLocatorCompilerPass())->process($container);
 
-        $this->addToAssertionCount(1);
+        self::assertInstanceOf(Reference::class, $container->getDefinition('cleverage_process.registry.task')->getArgument(0));
     }
 
     public function testNothingIsDoneWithoutTheRegistries(): void
