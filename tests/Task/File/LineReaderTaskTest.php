@@ -64,11 +64,11 @@ class LineReaderTaskTest extends TestCase
     public function testTheLastLineIsReadWithoutFinalLineBreak(): void
     {
         self::assertSame(
-            ["l1\n", "\n", "l3\r\n", "l4"],
+            ["l1\n", "\n", "l3\r\n", 'l4'],
             $this->iterate(new LineReaderTask(), $this->createState(['filename' => $this->tmpDir.'/no_final_line_break.txt'])),
         );
         self::assertSame(
-            ["l1\n", "\n", "l3\r\n", "l4"],
+            ["l1\n", "\n", "l3\r\n", 'l4'],
             $this->iterate(new InputLineReaderTask(), $this->createState([]), $this->tmpDir.'/no_final_line_break.txt'),
         );
     }
