@@ -18,6 +18,9 @@ use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @final since 5.4
+ */
 class EvaluatorTransformer implements ConfigurableTransformerInterface
 {
     protected ExpressionLanguage $language;
@@ -47,6 +50,9 @@ class EvaluatorTransformer implements ConfigurableTransformerInterface
         );
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         return $this->language->evaluate($options['expression'], $value);

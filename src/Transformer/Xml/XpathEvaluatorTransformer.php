@@ -13,12 +13,16 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer\Xml;
 
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Manipulate XML elements using xpath.
+ *
+ * @final since 5.4
  */
 class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
 {
@@ -54,7 +58,7 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
             }
 
             // This should never be reached
-            throw new \InvalidArgumentException('Unhandled query');
+            throw new InvalidArgumentException('Unhandled query');
         });
 
         // Use same options & defaults for root option level and subquery options
@@ -64,6 +68,8 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
     /**
      * Configure options about how to handle xpath query results.
      * Available at root and subquery level.
+     *
+     * @param Options<array<string, mixed>>|null $parentOptions
      */
     public function configureQueryOptions(OptionsResolver $resolver, ?Options $parentOptions = null): void
     {
@@ -77,10 +83,13 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('unwrap_value', 'bool');
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (!$value instanceof \DOMNode) {
-            throw new \UnexpectedValueException('Input should be a '.\DOMNode::class);
+            throw new UnexpectedValueException('Input should be a '.\DOMNode::class);
         }
 
         $xpath = $this->buildXpath($value);
@@ -104,18 +113,37 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
     public function buildXpath(\DOMNode $node): \DOMXPath
     {
         $doc = $node instanceof \DOMDocument ? $node : $node->ownerDocument;
+        if (!$doc instanceof \DOMDocument) {
+            throw new UnexpectedValueException('The node does not belong to a document');
+        }
 
         return new \DOMXPath($doc);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function query(\DOMXPath $xpath, string $query, \DOMNode $node, array $options): mixed
     {
-        $nodeList = $xpath->query($query, $node);
+        $previousUseErrors = libxml_use_internal_errors(true);
+        libxml_clear_errors();
+        try {
+            $nodeList = $xpath->query($query, $node);
+            $errors = libxml_get_errors();
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousUseErrors);
+        }
+        if (false === $nodeList) {
+            $messages = array_map(static fn (\LibXMLError $error): string => trim($error->message), $errors);
+
+            throw new UnexpectedValueException(\sprintf("Invalid xpath query '%s': %s", $query, [] !== $messages ? implode('; ', $messages) : 'unknown error'));
+        }
         $results = iterator_to_array($nodeList);
 
         // Convert results to text
         if ($options['unwrap_value']) {
-            $results = array_map(static function (\DOMNode $item) use ($query): string {
+            $results = array_map(static function (\DOMNode|\DOMNameSpaceNode $item) use ($query): string {
                 if ($item instanceof \DOMAttr) {
                     return $item->value;
                 }
@@ -125,18 +153,18 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
                     return $item->textContent;
                 }
 
-                throw new \UnexpectedValueException("Xpath result cannot be unwrapped for query '{$query}'");
+                throw new UnexpectedValueException("Xpath result cannot be unwrapped for query '{$query}'");
             }, $results);
         }
 
         // Unwrap the node list
         if ($options['single_result']) {
             if (\count($results) > 1) {
-                throw new \UnexpectedValueException("There is too much results for query '{$query}'");
+                throw new UnexpectedValueException("There is too much results for query '{$query}'");
             }
 
             if (!$options['ignore_missing'] && [] === $results) {
-                throw new \UnexpectedValueException("There is not enough results for query '{$query}'");
+                throw new UnexpectedValueException("There is not enough results for query '{$query}'");
             }
 
             $results = 1 === \count($results) ? $results[0] : null;

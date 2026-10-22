@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -24,11 +25,16 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 /**
  * For each configured column, collect the input rows that contain this column (and match the optional condition), and
  * output all the groups once all previous tasks are resolved.
+ *
+ * @final since 5.4
  */
 class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
     use ConditionTrait;
 
+    /**
+     * @var array<mixed>
+     */
     protected array $result = [];
 
     public function __construct(
@@ -72,7 +78,7 @@ class ColumnAggregatorTask extends AbstractConfigurableTask implements BlockingT
             if ($this->getOption($state, 'ignore_missing')) {
                 $this->logger->warning($message);
             } else {
-                throw new \UnexpectedValueException($message);
+                throw new UnexpectedValueException($message);
             }
         }
     }

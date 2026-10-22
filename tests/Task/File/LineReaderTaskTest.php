@@ -100,6 +100,9 @@ class LineReaderTaskTest extends TestCase
         return $outputs;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -40,13 +42,17 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         if (!$this->csv instanceof CsvFile) {
             $this->initFile($state);
         }
-        $lineNumber = $this->csv->getLineNumber();
-        $output = $this->csv->readLine();
+        $csv = $this->csv;
+        if (!$csv instanceof CsvFile) {
+            throw new LogicException('No CSV File initialized');
+        }
+        $lineNumber = $csv->getLineNumber();
+        $output = $csv->readLine();
 
         if (null === $output) {
             if ($this->getOption($state, 'log_empty_lines')) {
                 $logContext = [
-                    'csv_file' => $this->csv->getFilePath(),
+                    'csv_file' => $csv->getFilePath(),
                     'csv_line' => $lineNumber,
                 ];
                 $this->logger->warning("Empty line detected at line: {$lineNumber}", $logContext);
@@ -55,7 +61,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
             $state->setSkipped(true);
         }
 
-        $state->addErrorContextValue('csv_file', $this->csv->getFilePath());
+        $state->addErrorContextValue('csv_file', $csv->getFilePath());
         $state->addErrorContextValue('csv_line', $lineNumber);
         $state->setOutput($output);
     }
@@ -68,7 +74,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     public function next(ProcessState $state): bool
     {
         if (!$this->csv instanceof CsvFile) {
-            throw new \LogicException('No CSV File initialized');
+            throw new LogicException('No CSV File initialized');
         }
 
         $state->removeErrorContext('csv_file');
@@ -84,6 +90,11 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         return !$endOfFile;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return list<string>|null
+     */
     protected function getHeaders(ProcessState $state, array $options): ?array
     {
         return $options['headers'];
@@ -96,5 +107,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         $resolver->setDefaults([
             'log_empty_lines' => false,
         ]);
+        // Any value used to be evaluated as a boolean: cast it instead of rejecting it
+        $resolver->setNormalizer('log_empty_lines', static fn (Options $options, mixed $value): bool => (bool) $value);
     }
 }

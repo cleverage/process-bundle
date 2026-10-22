@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Event\EventDispatcherTask`
+* **Code**: `event_dispatcher` (`task: event_dispatcher`)
 
 Accepted inputs
 ---------------
@@ -37,12 +38,12 @@ Examples
 ```yaml
 # Task configuration level
 data:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output: [1, 2, 3]
   outputs: [push_data_event]
 push_data_event:
-  service: '@CleverAge\ProcessBundle\Task\Event\EventDispatcherTask'
+  task: event_dispatcher
   options:
     event_name: myapp.data_queue
 ```
@@ -65,6 +66,11 @@ public function onDataQueue(EventDispatcherTaskEvent $event): void
 * when `event_name` is `null`, the event name is the event class name, so listeners must subscribe to
   `CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`. Every `EventDispatcherTask` without `event_name` then
   triggers the same listeners.
+
+**Deprecated since 5.4, removed in v6.0**: the bundle listens to the `cleverage_process.data_queue` event with the
+`cleverage_process.event_listener.data_queue` service (`DataQueueEventListener`), which keeps a copy of the
+`ProcessState` of every event in memory. Injecting or fetching this service triggers an `E_USER_DEPRECATED` error: write
+your own listener, as above.
 
 **Deprecated since v5, removed in v6.0**: from v4.0 to v5.0, the `event_name` option was ignored and the event was
 always dispatched under its class name. To preserve backward compatibility, when `event_name` is set (and differs from the

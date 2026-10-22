@@ -30,33 +30,72 @@ Open a command console, enter your project directory and install it using compos
 composer require cleverage/process-bundle
 ```
 
-Remember to add the following line to `config/bundles.php` (not required if Symfony Flex is used):
+With [Symfony Flex](https://symfony.com/doc/current/setup/flex.html), the
+[recipe](https://github.com/symfony/recipes-contrib/tree/main/cleverage/process-bundle) registers the bundle and creates:
+- `config/packages/clever_age_process.yaml`: the [global configuration](#global-configuration), which imports the
+  `config/packages/process/` directory,
+- `config/packages/process/`: the directory of your processes, one file per process (see
+  [process definition](reference/01-process_definition.md)).
+
+Without Flex, add the following line to `config/bundles.php`:
 
 ```php
 CleverAge\ProcessBundle\CleverAgeProcessBundle::class => ['all' => true],
 ```
 
-Some tasks and transformers use the main Symfony serializer service, and the bundle checks at container compilation
-that it is available: if it is not, the build fails with an explicit message. Make sure it is enabled
-(see [`framework.serializer.enabled`](https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled)):
+Then create the `config/packages/process/` directory and the configuration that imports it:
+
+```yaml
+# config/packages/clever_age_process.yaml
+imports:
+    - { resource: process/ }
+
+clever_age_process:
+    default_error_strategy: stop
+```
+
+Some tasks and transformers use the Symfony serializer (`NormalizerTask`, `DenormalizerTask`, `SerializerTask`,
+`DeserializerTask`, the `normalize` and `denormalize` transformers) or validator (`ValidatorTask`) services. If they are
+not enabled, the container still compiles, and a process using one of these tasks or transformers fails with an explicit
+message. To use them, enable the serializer
+(see [`framework.serializer.enabled`](https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled))
+and the validator
+(see [`framework.validation.enabled`](https://symfony.com/doc/current/reference/configuration/framework.html#reference-validation-enabled)):
 
 ```yaml
 # config/packages/framework.yaml
 framework:
     serializer:
         enabled: true
+    validation:
+        enabled: true
 ```
+
+Some features rely on optional packages, suggested by the bundle:
+
+| Package | Needed by |
+| ------- | --------- |
+| `ext-intl` (PHP extension) | the [SlugifyTransformer](reference/transformers/slugify_transformer.md) |
+| `symfony/process` | the [CommandRunnerTask](reference/tasks/command_runner_task.md) and the [ProcessLauncherTask](reference/tasks/process_launcher_task.md) |
+| `symfony/stopwatch` | the [StopwatchTask](reference/tasks/stopwatch_task.md) |
+| `symfony/var-dumper` | the dumps of the [DebugTask](reference/tasks/debug_task.md), of the `debug` transformer and of `cleverage:process:execute --output-format=dump` (nothing is dumped without it) |
+| `symfony/monolog-bundle` | the `cleverage_process`, `cleverage_process_task` and `cleverage_process_transformer` log channels, with the process and task data in the `extra` of the records (see [logging](03-custom_tasks.md#logging)); without it, the default Symfony logger is used |
+
+Without `symfony/process`, `symfony/stopwatch` or `ext-intl`, the container still compiles, and a process using one of
+these tasks or transformers fails with an explicit message giving the package or extension to install.
 
 ## Global configuration
 
 You can use `./bin/console config:dump-reference clever_age_process` to have a summary of current configuration.
 
-The configuration has three root keys:
+The configuration has four root keys:
 - `configurations`: your processes (see [process definition](reference/01-process_definition.md))
 - `generic_transformers`: reusable transformers built from configuration (see
   [generic transformers definition](reference/03-generic_transformers_definition.md))
 - `default_error_strategy`: the behavior of a task that encounters an error when it does not define its own
   `error_strategy`. Allowed values are `stop` (the default) and `skip`.
+- `logs`: the levels of the logs written at the end of each process, `success_level` (`info` by default) and
+  `failed_level` (`debug` by default), see [process definition](reference/01-process_definition.md#global-attributes)
 
 We recommend keeping the `stop` default, and then specify task by task which one can be skipped:
 
@@ -66,35 +105,38 @@ clever_age_process:
     default_error_strategy: stop
 ```
 
-When creating custom tasks and transformers, you can use Symfony automatic registration, but remember there are a few
-required configurations:
+When creating custom tasks and transformers, you can use Symfony automatic registration. With autoconfiguration
+(`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton, so the default `App\:` resource is enough), the
+bundle configures them:
+- services implementing `CleverAge\ProcessBundle\Model\TaskInterface` are not shared (no data shared between task
+  usages), with a `monolog.logger` tag on the `cleverage_process_task` channel;
+- services implementing `CleverAge\ProcessBundle\Transformer\TransformerInterface` get the `cleverage.transformer` tag
+  (needed by the transformer registry) and a `monolog.logger` tag on the `cleverage_process_transformer` channel. Add
+  the `#[CleverAge\ProcessBundle\Attribute\AsTransformer(code: '...')]` attribute to their class, with the code returned
+  by `getCode()`: the transformer is then only instantiated when a process uses it (see
+  [transformers](03-custom_tasks.md#transformers)).
+
+Without autoconfiguration, declare these settings yourself:
 
 ```yaml
 # config/services.yaml
 services:
-    App\Transformer\:
-        resource: '../src/Transformer/*'
+    App\Transformer\VatTransformer:                # One definition per transformer, for its code
         autowire: true
-        autoconfigure: true
-        public: false
         tags:
-            - { name: cleverage.transformer }       # Needed by the transformer registry to find transformers
+            - { name: cleverage.transformer, code: app_vat } # Needed by the transformer registry, code returned by getCode()
             - { name: monolog.logger, channel: cleverage_process_transformer } # Optional, see logging
 
     App\Task\:
         resource: '../src/Task/*'
         autowire: true
-        autoconfigure: true
         shared: false                               # Important to avoid shared data between task usages
-        public: true                                # Needed by the Process Manager to fetch tasks from the container
         tags:
             - { name: monolog.logger, channel: cleverage_process_task } # Optional, see logging
 ```
 
-The `cleverage.transformer` tag is not added by autoconfiguration: you have to declare it yourself (or use an
-`_instanceof` rule on `CleverAge\ProcessBundle\Transformer\TransformerInterface`, which only applies to services
-defined in the same file). If your `services.yaml` also has the default `App\:` resource, declare these resources after
-it, so that they override its definitions. The `monolog.logger` tags bind injected loggers to the bundle channels (see
+If your `services.yaml` also has the default `App\:` resource, declare these resources after it, so that they override
+its definitions. The `monolog.logger` tags bind injected loggers to the bundle channels (see
 [logging](03-custom_tasks.md#logging)).
 
 ## Process definition
@@ -110,11 +152,11 @@ clever_age_process:
             tasks: []
 ```
 
-Then you can add tasks in this array. They consist of a `service`, optionally configured by `options`, and eventually
+Then you can add tasks in this array. They consist of a `task` code, optionally configured by `options`, and eventually
 chained with others through their `outputs`. Minimal syntax is:
 ```yaml
 <task_name>:
-    service: <service_reference>
+    task: <task_code>               # e.g. transformer, see the reference page of each task
     options: 
         <option_key_1>: <option_value_1>
         <option_key_2>: <option_value_2>
@@ -143,7 +185,7 @@ clever_age_process:
         project_prefix.process_name:
             tasks:
                 extract:
-                    service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+                    task: constant_output
                     options:
                         output:
                             id: 123
@@ -152,7 +194,7 @@ clever_age_process:
                     outputs: [transform]
 
                 transform:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    task: transformer
                     options:
                         transformers:
                             mapping:
@@ -170,7 +212,7 @@ clever_age_process:
                     outputs: [load]
 
                 load:
-                    service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
+                    task: debug
 ```
 
 There is more to know about process configuration. See [the full process configuration reference](reference/01-process_definition.md)
@@ -246,13 +288,23 @@ task of the process:
 
 ```yaml
 read:
-    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
+    task: csv_reader
     options:
         file_path: '%kernel.project_dir%/var/import/{{ file_name }}'
 ```
 
 Note that placeholders are only resolved for keys existing in the context: if you run the process without the
 `file_name` context value, the option will keep the literal `{{ file_name }}` string.
+
+The context values are inserted as is, and they may come from people who do not write the process configuration (the
+console, a parent process, the launch form and the HTTP API of
+[cleverage/ui-process-bundle](https://github.com/cleverage/ui-process-bundle)...):
+- do not use them in options interpreted by the task, where a value could change the meaning of the option: a string
+  `commandline` of [command_runner](reference/tasks/command_runner_task.md) is run by the shell (`'x; id'` runs
+  `id`), and the same goes for an SQL query, a callback name or an expression. Prefer an array `commandline`, query
+  parameters, or a value checked beforehand (e.g. by a [validator](reference/tasks/validator_task.md) task)
+- do not pass secrets (passwords, tokens) in the context: it is added to every log record (and stored with each
+  execution by the UI bundle). Use environment variables or the configuration of your services instead
 
 ## Automation
 

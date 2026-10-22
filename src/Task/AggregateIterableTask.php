@@ -20,9 +20,14 @@ use CleverAge\ProcessBundle\Model\ProcessState;
  * Class AggregateIterableTask.
  *
  * Aggregate the result of iterable tasks in an array
+ *
+ * @final since 5.4
  */
 class AggregateIterableTask implements BlockingTaskInterface
 {
+    /**
+     * @var list<mixed>
+     */
     protected array $result = [];
 
     public function execute(ProcessState $state): void

@@ -18,9 +18,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Reads an input file line by line and outputs each line.
+ *
+ * @final since 5.4
  */
 class InputLineReaderTask extends LineReaderTask
 {
+    /**
+     * @return array<string, mixed>
+     */
     #[\Override]
     protected function getOptions(ProcessState $state): array
     {

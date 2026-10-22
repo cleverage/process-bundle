@@ -52,7 +52,19 @@ class IterableBatchTaskTest extends TestCase
         self::assertSame(['a', 'b', 'c'], $this->flush($task, $state));
     }
 
+    public function testFlushWithoutInitializationIsSkipped(): void
+    {
+        $task = new IterableBatchTask(new NullLogger());
+        $state = $this->createState(IterableBatchTask::class, []);
+
+        $task->flush($state);
+
+        self::assertTrue($state->isSkipped());
+    }
+
     /**
+     * @param array<string, mixed> $options
+     *
      * @return array{IterableBatchTask, ProcessState}
      */
     private function createTask(array $options): array
@@ -99,6 +111,9 @@ class IterableBatchTaskTest extends TestCase
         return $outputs;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(string $class, array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

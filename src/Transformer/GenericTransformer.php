@@ -14,12 +14,16 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * A generic class that can be used to create configuration-driven transformer instances.
+ *
+ * @final since 5.4
  */
 class GenericTransformer implements ConfigurableTransformerInterface
 {
@@ -27,8 +31,14 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
     protected ?string $transformerCode = null;
 
+    /**
+     * @var array<string, mixed>|null
+     */
     protected ?array $preconfiguredTransformerOptions = null;
 
+    /**
+     * @var array<string, mixed>|null
+     */
     protected ?array $contextualOptions = null;
 
     public function __construct(
@@ -40,6 +50,8 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
     /**
      * Register the generic options, and load the transformer list.
+     *
+     * @param array<string, mixed> $options
      */
     public function initialize(string $code, array $options = []): void
     {
@@ -78,7 +90,7 @@ class GenericTransformer implements ConfigurableTransformerInterface
      */
     public function configureOptions(OptionsResolver $resolver): void
     {
-        foreach ($this->contextualOptions as $option => $optionConfig) {
+        foreach ($this->contextualOptions ?? [] as $option => $optionConfig) {
             $resolver->setDefined($option);
             if (null !== $optionConfig['default'] || $optionConfig['default_is_null']) {
                 $resolver->setDefault($option, $optionConfig['default']);
@@ -93,15 +105,18 @@ class GenericTransformer implements ConfigurableTransformerInterface
         $this->configureTransformersOptions($resolver);
         $resolver->setNormalizer('transformers', function (Options $options, $transformerOptions): array {
             if ([] !== $transformerOptions) {
-                throw new \InvalidArgumentException('Transformers option should not be used at this point');
+                throw new InvalidArgumentException('Transformers option should not be used at this point');
             }
 
-            $transformerOptions = $this->normalizeTransformerOptions($options, $this->preconfiguredTransformerOptions);
+            $transformerOptions = $this->normalizeTransformerOptions($options, $this->preconfiguredTransformerOptions ?? []);
 
             return $this->normalizeTransformers($options, $transformerOptions);
         });
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         return $this->applyTransformers($options['transformers'], $value);
@@ -109,16 +124,25 @@ class GenericTransformer implements ConfigurableTransformerInterface
 
     public function getCode(): string
     {
+        if (null === $this->transformerCode) {
+            throw new LogicException('The generic transformer is not initialized');
+        }
+
         return $this->transformerCode;
     }
 
     /**
      * Get the real transformer from contextual options + generic definitions.
+     *
+     * @param Options<array<string, mixed>> $options
+     * @param array<string, mixed>          $transformerOptions
+     *
+     * @return array<string, mixed>
      */
     public function normalizeTransformerOptions(Options $options, array $transformerOptions): array
     {
         $contextualizedOptionValues = [];
-        foreach ($this->contextualOptions as $contextualOption => $contextualOptionConfig) {
+        foreach ($this->contextualOptions ?? [] as $contextualOption => $contextualOptionConfig) {
             // An optional contextual option without default value is replaced by null when not provided
             $contextualizedOptionValues[$contextualOption] = $options->offsetExists($contextualOption)
                 ? $options[$contextualOption]

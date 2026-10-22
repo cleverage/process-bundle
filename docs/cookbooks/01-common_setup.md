@@ -4,7 +4,13 @@ Common Setup
 Task & transformer declaration
 ------------------------------
 
-Example of a generic declaration for all the tasks and transformers of your application:
+With autoconfiguration (`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton), nothing more is needed:
+the bundle makes the services implementing `CleverAge\ProcessBundle\Model\TaskInterface` not shared, tags
+the ones implementing `CleverAge\ProcessBundle\Transformer\TransformerInterface` with `cleverage.transformer`, and binds
+both to their logging channel (`monolog.logger` tags). Add the `#[AsTransformer(code: '...')]` attribute to your
+transformer classes, so that they are only instantiated when used (see [transformers](../03-custom_tasks.md#transformers)).
+
+Without autoconfiguration, example of a generic declaration for all the tasks and transformers of your application:
 
 ```yaml
 # config/services.yaml
@@ -12,24 +18,23 @@ services:
     App\Task\:
         resource: '../src/Task/*'
         autowire: true
-        public: true
         shared: false
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }
 
-    App\Transformer\:
-        resource: '../src/Transformer/*'
+    # One definition per transformer, the code of the tag being the one returned by getCode()
+    App\Transformer\VatTransformer:
         autowire: true
-        public: false
         tags:
-            - { name: cleverage.transformer }
+            - { name: cleverage.transformer, code: app_vat }
             - { name: monolog.logger, channel: cleverage_process_transformer }
 ```
 
 If the file also contains the default `App\:` resource (which includes `src/Task/` and `src/Transformer/`), declare
 these resources after it: the last definition of a service wins.
 
-Alternatively, you can use `_instanceof` rules to configure every class implementing
+Alternatively (still without autoconfiguration, or to override these settings), you can use `_instanceof` rules to
+configure every class implementing
 `CleverAge\ProcessBundle\Model\TaskInterface` or `CleverAge\ProcessBundle\Transformer\TransformerInterface`, wherever
 it is located in your sources (`_instanceof` only applies to the services defined in the same file, typically by the
 `App\:` resource of `config/services.yaml`):
@@ -38,15 +43,17 @@ it is located in your sources (`_instanceof` only applies to the services define
 services:
     _instanceof:
         CleverAge\ProcessBundle\Model\TaskInterface:
-            public: true
             shared: false
             tags:
                 - { name: monolog.logger, channel: cleverage_process_task }
         CleverAge\ProcessBundle\Transformer\TransformerInterface:
             tags:
-                - { name: cleverage.transformer }
                 - { name: monolog.logger, channel: cleverage_process_transformer }
 ```
+
+An `_instanceof` rule cannot give a code per transformer: declare the `cleverage.transformer` tag with its `code` on each
+transformer, or use the `#[AsTransformer]` attribute with autoconfiguration. A `cleverage.transformer` tag without
+`code` is deprecated since 5.4.
 
 Configuration
 -------------
@@ -108,14 +115,14 @@ clever_age_process:
             help: 'bin/console cleverage:process:execute app.file_import -c "file:''products.csv''"'
             tasks:
                 read_csv:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
+                    task: csv_reader
                     options:
                         file_path: '%kernel.project_dir%/var/data/{{ file }}'
                         delimiter: ';'
                     outputs: [transform]
 
                 transform:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    task: transformer
                     error_strategy: skip
                     options:
                         transformers:
@@ -135,7 +142,7 @@ clever_age_process:
                     outputs: [write_csv]
 
                 write_csv:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
+                    task: csv_writer
                     options:
                         file_path: '%kernel.project_dir%/var/output/products_prepared_{date_time}.csv'
                         headers: [id, slug]

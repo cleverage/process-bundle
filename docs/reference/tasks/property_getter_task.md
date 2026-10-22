@@ -10,6 +10,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\PropertyGetterTask`
+* **Code**: `property_getter` (`task: property_getter`)
 
 Accepted inputs
 ---------------
@@ -21,8 +22,8 @@ Possible outputs
 
 `mixed`: the value read at the `property` path.
 
-If the value cannot be read, the exception is set on the state (with the `property` added to the error context) and
-handled according to the task `error_strategy`.
+If the value cannot be read (including a `\TypeError` of the property accessor, e.g. on a scalar input), the exception
+is set on the state (with the `property` added to the error context) and handled according to the task `error_strategy`.
 
 Options
 -------
@@ -39,7 +40,7 @@ Examples
 ```yaml
 # Task configuration level
 get_file_path:
-  service: '@CleverAge\ProcessBundle\Task\PropertyGetterTask'
+  task: property_getter
   options:
     property: 'path'
   outputs: [remove_input]
@@ -50,7 +51,7 @@ get_file_path:
 ```yaml
 # Task configuration level
 get_sku:
-  service: '@CleverAge\ProcessBundle\Task\PropertyGetterTask'
+  task: property_getter
   options:
     property: '[sku]'
   outputs: [next_task]

@@ -18,9 +18,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Perform a regular expression match.
+ *
+ * @final since 5.4
  */
 class PregMatchTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return array<mixed>|null
+     */
     public function transform(mixed $value, array $options = []): ?array
     {
         if (null === $value || '' === $value) {

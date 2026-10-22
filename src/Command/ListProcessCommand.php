@@ -23,6 +23,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * List all configured processes.
+ *
+ * @internal
  */
 #[AsCommand(name: 'cleverage:process:list', description: 'List defined processes', )]
 class ListProcessCommand extends Command
@@ -48,6 +50,9 @@ class ListProcessCommand extends Command
         return $a->getCode() <=> $b->getCode();
     }
 
+    /**
+     * @param array{output: string} $message
+     */
     public function maxMessageLengthFilter(int $max, array $message): int
     {
         return max($max, \strlen($this->filterOutTags($message['output'])));
@@ -122,6 +127,6 @@ class ListProcessCommand extends Command
 
     protected function filterOutTags(string $string): string
     {
-        return preg_replace('/<[^<>]*>/', '', $string);
+        return preg_replace('/<[^<>]*>/', '', $string) ?? $string;
     }
 }

@@ -15,6 +15,9 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @final since 5.4
+ */
 class TypeSetterTransformer implements ConfigurableTransformerInterface
 {
     public function configureOptions(OptionsResolver $resolver): void
@@ -27,6 +30,9 @@ class TypeSetterTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('type', 'string');
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         settype($value, $options['type']);

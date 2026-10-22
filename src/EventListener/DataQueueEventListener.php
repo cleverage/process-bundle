@@ -14,16 +14,22 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\EventListener;
 
 use CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent;
+use CleverAge\ProcessBundle\Model\ProcessState;
 
 /**
  * Class DataQueueEventListener
  * This is a basic queue, mainly aiming to catch data coming out of a process
  * Used mostly for testing purpose.
+ *
+ * @internal
+ *
+ * @deprecated since cleverage/process-bundle 5.4, will be removed in 6.0: write your own listener of the event
+ *             dispatched by the event_dispatcher task
  */
 class DataQueueEventListener
 {
     /**
-     * @var \SplQueue[]
+     * @var array<string, \SplQueue<ProcessState>>
      */
     protected array $queues = [];
 
@@ -33,6 +39,9 @@ class DataQueueEventListener
         $queue->push(clone $event->getState());
     }
 
+    /**
+     * @return \SplQueue<ProcessState>
+     */
     public function getQueue(string $processName): \SplQueue
     {
         if (!\array_key_exists($processName, $this->queues)) {

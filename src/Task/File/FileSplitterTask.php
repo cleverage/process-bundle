@@ -21,6 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Split long file into smaller ones.
+ *
+ * @final since 5.4
  */
 class FileSplitterTask extends AbstractConfigurableTask implements IterableTaskInterface
 {

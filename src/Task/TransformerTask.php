@@ -24,6 +24,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Transform an array of data based on mapping and sub-transformers.
+ *
+ * @final since 5.4
  */
 class TransformerTask extends AbstractConfigurableTask
 {

@@ -56,6 +56,6 @@ Notes
 
 Keys of `set_properties` are property paths written with the PropertyAccessor on each item: use the `[key]` notation
 for array items and the `property` notation for objects. For `\stdClass` items, a property that cannot be written is
-added to the object.
+added to the object itself (a nested path such as `parent.id` is added as a `parent.id` property).
 
 Object items are modified in place, so the objects of the input are modified too.

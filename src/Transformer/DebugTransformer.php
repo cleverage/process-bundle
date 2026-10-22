@@ -17,9 +17,14 @@ use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Simple dump in a transformer, passthrough for value.
+ *
+ * @final since 5.4
  */
 class DebugTransformer implements TransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (class_exists(VarDumper::class)) {

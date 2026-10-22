@@ -19,6 +19,8 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 /**
  * Allow to skip the execution on empty input.
  * Useful when combined with an aggregator task.
+ *
+ * @final since 5.4
  */
 class SkipEmptyTask implements TaskInterface
 {

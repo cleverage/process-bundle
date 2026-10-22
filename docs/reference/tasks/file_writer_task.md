@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\FileWriterTask`
+* **Code**: `file_writer` (`task: file_writer`)
 
 Accepted inputs
 ---------------
@@ -32,7 +33,7 @@ Examples
 ```yaml
 # Task configuration level
 write_file:
-  service: '@CleverAge\ProcessBundle\Task\File\FileWriterTask'
+  task: file_writer
   options:
     filename: '%kernel.project_dir%/var/data/result.txt'
 ```

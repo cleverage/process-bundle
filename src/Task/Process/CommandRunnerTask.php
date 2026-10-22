@@ -21,12 +21,36 @@ use Symfony\Component\Process\Process;
 
 /**
  * Launch a system command for each input, passing input to command.
+ *
+ * @final since 5.4
  */
 class CommandRunnerTask extends AbstractConfigurableTask
 {
-    public function __construct(
-        protected KernelInterface $kernel,
-    ) {
+    /**
+     * @deprecated since 5.4, only set when the kernel is passed to the constructor
+     */
+    protected ?KernelInterface $kernel = null;
+
+    protected string $projectDir;
+
+    /**
+     * @param string|KernelInterface $projectDir default working directory of the commands; passing the kernel is
+     *                                           deprecated since 5.4
+     */
+    public function __construct(KernelInterface|string $projectDir)
+    {
+        if ($projectDir instanceof KernelInterface) {
+            trigger_deprecation(
+                'cleverage/process-bundle',
+                '5.4',
+                'Passing a "%s" to "%s::__construct()" is deprecated, pass the project directory instead. The argument will only accept a string in v6.0.',
+                KernelInterface::class,
+                self::class,
+            );
+            $this->kernel = $projectDir;
+            $projectDir = $projectDir->getProjectDir();
+        }
+        $this->projectDir = $projectDir;
     }
 
     public function execute(ProcessState $state): void
@@ -54,7 +78,7 @@ class CommandRunnerTask extends AbstractConfigurableTask
         $resolver->setAllowedTypes('commandline', ['string', 'array']);
         $resolver->setDefaults(
             [
-                'cwd' => $this->kernel->getProjectDir(), // This method is not actually in the interface, this is bad
+                'cwd' => $this->projectDir,
                 'env' => null,
                 'timeout' => 60,
                 'options' => null,

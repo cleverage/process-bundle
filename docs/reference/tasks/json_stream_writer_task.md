@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamWriterTask`
+* **Code**: `json_stream_writer` (`task: json_stream_writer`)
 * **Blocking task**
 
 Accepted inputs
@@ -26,7 +27,8 @@ Options
 
 | Code                    | Type          | Required | Default | Description                                                                                                                                                                                                                            |
 |-------------------------|---------------|:--------:|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `file_path`             | `string`      |  **X**   |         | Path of the file to write to, opened in `wb` mode (overwritten); missing parent directories are created.<br/>Placeholders `{date}`, `{date_time}`, `{timestamp}` and `{unique_token}` are replaced in the path |
+| `file_path`             | `string`      |  **X**   |         | Path of the file to write to; missing parent directories are created.<br/>Placeholders `{date}`, `{date_time}`, `{timestamp}` and `{unique_token}` are replaced in the path |
+| `mode`                  | `string`      |          | `wb`    | File open mode (see [fopen mode parameter](https://www.php.net/manual/en/function.fopen.php)): `wb` overwrites the file, `ab` appends to it |
 | `spl_file_object_flags` | `array\|null` |          | `null`  | List of `SplFileObject` flags, summed and passed to [SplFileObject::setFlags](https://www.php.net/manual/en/splfileobject.setflags.php).<br/>`null` means `DROP_NEW_LINE`, `READ_AHEAD` and `SKIP_EMPTY`; an empty array means no flag |
 | `json_flags`            | `array\|null` |          | `null`  | List of JSON flags, summed and passed to [json_encode](https://www.php.net/manual/en/function.json-encode.php).<br/>`null` means `JSON_THROW_ON_ERROR`; an empty array means no flag                                                   |
 
@@ -36,7 +38,7 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output:
       - column1: value1-1
@@ -45,7 +47,7 @@ entry:
         column2: value2-2
   outputs: [write]
 write:
-  service: '@CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamWriterTask'
+  task: json_stream_writer
   options:
     file_path: '%kernel.project_dir%/var/data/json_stream_writer_{date_time}.json'
     json_flags:
@@ -62,3 +64,4 @@ Notes
 * The parent directory of the file is created (recursively) if it does not exist.
 * Using `JSON_PRETTY_PRINT` produces multi-line documents: the file can no longer be read by
   [JsonStreamReaderTask](json_stream_reader_task.md).
+* The file is released at the end of the process.

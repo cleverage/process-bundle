@@ -8,6 +8,20 @@ Compatible with [Symfony stable version and latest Long-Term Support (LTS) relea
 
 Demo project can be found on [there](https://github.com/cleverage/process-bundle-demo).
 
+## Installation
+
+```bash
+composer require cleverage/process-bundle
+```
+
+Without Symfony Flex, register the bundle in `config/bundles.php`:
+
+```php
+CleverAge\ProcessBundle\CleverAgeProcessBundle::class => ['all' => true],
+```
+
+Then define your first process: see the [quick start](docs/01-quick_start.md) (optional dependencies, configuration, commands).
+
 ## Documentation
 
 For usage documentation, see:

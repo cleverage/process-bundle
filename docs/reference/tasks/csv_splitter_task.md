@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Csv\CsvSplitterTask`
+* **Code**: `csv_splitter` (`task: csv_splitter`)
 * **Iterable task**
 
 Accepted inputs
@@ -44,18 +45,18 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+  task: constant_output
   options:
     output: '%kernel.project_dir%/var/data/large_file.csv'
   outputs: [split]
 split:
-  service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvSplitterTask'
+  task: csv_splitter
   options:
     delimiter: ';'
     max_lines: 500
   outputs: [read_chunk]
 read_chunk:
-  service: '@CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask'
+  task: input_csv_reader
   options:
     delimiter: ';'
 ```

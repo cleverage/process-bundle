@@ -18,6 +18,9 @@ use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use Monolog\LogRecord;
 
+/**
+ * @internal
+ */
 class AbstractProcessor
 {
     public function __construct(
@@ -47,6 +50,11 @@ class AbstractProcessor
         return $record;
     }
 
+    /**
+     * @param array<string, mixed> $record
+     *
+     * @return array<string, mixed>
+     */
     protected function normalizeRecordData(array $record): array
     {
         $newRecord = [];
@@ -57,6 +65,9 @@ class AbstractProcessor
         return $newRecord;
     }
 
+    /**
+     * @param array<string, mixed> $record
+     */
     protected function addProcessInfoToRecord(array &$record): void
     {
         $processHistory = $this->processManager->getProcessHistory();
@@ -69,6 +80,9 @@ class AbstractProcessor
         $this->addToRecord($record, 'process_context', $processHistory->getContext());
     }
 
+    /**
+     * @param array<string, mixed> $record
+     */
     protected function addTaskInfoToRecord(array &$record): void
     {
         $taskConfiguration = $this->processManager->getTaskConfiguration();
@@ -89,6 +103,9 @@ class AbstractProcessor
         }
     }
 
+    /**
+     * @param array<string, mixed> $record
+     */
     protected function addToRecord(array &$record, string $name, mixed $data): void
     {
         $record[$name] = $data;

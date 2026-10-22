@@ -17,9 +17,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Cast a value to a different PHP type.
+ *
+ * @final since 5.4
  */
 class CastTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         settype($value, $options['type']);

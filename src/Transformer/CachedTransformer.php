@@ -21,6 +21,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @final since 5.4
+ */
 class CachedTransformer implements ConfigurableTransformerInterface
 {
     use TransformerTrait;
@@ -62,6 +65,9 @@ class CachedTransformer implements ConfigurableTransformerInterface
         $this->configureTransformersOptions($resolver, 'key_transformers');
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         $cacheKey = $this->generateCacheKey($options['cache_key'], $value, $options);
@@ -104,6 +110,11 @@ class CachedTransformer implements ConfigurableTransformerInterface
         return 'cached';
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return string|false
+     */
     protected function generateCacheKey(string $cacheKeyRoot, mixed $value, array $options): bool|string
     {
         $value = $this->applyTransformers($options['key_transformers'], $value);

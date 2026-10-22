@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -20,23 +22,28 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Merge every input array, and return the result.
+ *
+ * @final since 5.4
  */
 class ArrayMergeTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
     protected const MERGE_FUNC = ['array_merge', 'array_merge_recursive', 'array_replace', 'array_replace_recursive'];
 
+    /**
+     * @var array<mixed>
+     */
     protected array $mergedOutput = [];
 
     public function execute(ProcessState $state): void
     {
         $input = $state->getInput();
         if (!\is_array($input)) {
-            throw new \UnexpectedValueException('Input must be an array');
+            throw new UnexpectedValueException('Input must be an array');
         }
 
         $mergeFunction = $this->getOption($state, 'merge_function');
         if (!\in_array($mergeFunction, self::MERGE_FUNC, true)) {
-            throw new \InvalidArgumentException("Unknown merge function {$mergeFunction}");
+            throw new InvalidArgumentException("Unknown merge function {$mergeFunction}");
         }
         $this->mergedOutput = $mergeFunction($this->mergedOutput, $input);
     }

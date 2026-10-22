@@ -21,11 +21,15 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * A non-iterable input throws an exception, unless the "allow_not_iterable" option is true: it is then returned
  * unchanged.
+ *
+ * @final since 5.4
  */
 class ArrayFirstTransformer implements ConfigurableTransformerInterface
 {
     /**
      * Must return the transformed $value.
+     *
+     * @param array<string, mixed> $options
      */
     public function transform(mixed $value, array $options = []): mixed
     {

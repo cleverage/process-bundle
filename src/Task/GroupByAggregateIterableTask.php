@@ -22,6 +22,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 /**
  * Attempt to aggregate inputs in an associative array with a key formed by configurable fields of the input.
  * This task could be used to remove duplicates from the aggregate.
+ *
+ * @final since 5.4
  */
 class GroupByAggregateIterableTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
@@ -30,6 +32,9 @@ class GroupByAggregateIterableTask extends AbstractConfigurableTask implements B
      */
     final public const GROUP_BY_OPTION = 'group_by_accessors';
 
+    /**
+     * @var array<mixed>
+     */
     protected array $result = [];
 
     public function __construct(

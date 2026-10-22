@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer\Array;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use CleverAge\ProcessBundle\Transformer\TransformerTrait;
@@ -21,6 +22,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Applies transformers to each element of an array.
+ *
+ * @final since 5.4
  */
 class ArrayMapTransformer implements ConfigurableTransformerInterface
 {
@@ -33,11 +36,15 @@ class ArrayMapTransformer implements ConfigurableTransformerInterface
 
     /**
      * Must return the transformed $value.
+     *
+     * @param array<string, mixed> $options
+     *
+     * @return array<mixed>
      */
     public function transform(mixed $value, array $options = []): array
     {
         if (!\is_array($value) && !$value instanceof \Traversable) {
-            throw new \UnexpectedValueException('Input value must be an array or traversable');
+            throw new UnexpectedValueException('Input value must be an array or traversable');
         }
 
         $results = [];

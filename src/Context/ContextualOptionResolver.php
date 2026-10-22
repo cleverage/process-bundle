@@ -13,11 +13,16 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Context;
 
+/**
+ * @final since 5.4
+ */
 class ContextualOptionResolver
 {
     /**
      * Basic value inference
      * Replaces "{{ key }}" by context[key].
+     *
+     * @param array<string, mixed> $context
      */
     public function contextualizeOption(mixed $value, array $context): mixed
     {
@@ -26,8 +31,11 @@ class ContextualOptionResolver
             return $this->contextualizeOptions($value, $context);
         }
 
-        if (\is_string($value)) {
-            $pattern = \sprintf('/{{[ ]*(%s){1}[ ]*}}/', implode('|', array_keys($context)));
+        // Without context, there is nothing to replace ("{{ }}" would match an empty key)
+        if (\is_string($value) && [] !== $context) {
+            // The keys are free (console, process_executor, UI...): quoted, they cannot alter the pattern
+            $keys = array_map(static fn (int|string $key): string => preg_quote((string) $key, '/'), array_keys($context));
+            $pattern = \sprintf('/{{[ ]*(%s){1}[ ]*}}/', implode('|', $keys));
 
             $matches = [];
             $result = preg_match($pattern, $value, $matches);
@@ -46,6 +54,11 @@ class ContextualOptionResolver
 
     /**
      * Replace all contextualized values from options.
+     *
+     * @param array<string, mixed> $options
+     * @param array<string, mixed> $context
+     *
+     * @return array<string, mixed>
      */
     public function contextualizeOptions(array $options, array $context): array
     {

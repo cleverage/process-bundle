@@ -13,21 +13,36 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Reads the whole input file and outputs its content.
+ *
+ * @final since 5.4
  */
 class InputFileReaderTask extends FileReaderTask
 {
     #[\Override]
+    public function initialize(ProcessState $state): void
+    {
+        // Only validate the options: the file path comes from the input
+        parent::getOptions($state);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    #[\Override]
     protected function getOptions(ProcessState $state): array
     {
         $options = parent::getOptions($state);
-        if (null !== $state->getInput()) {
-            $options['filename'] = $state->getInput();
+        $filename = $state->getInput();
+        if (!\is_string($filename) || '' === $filename) {
+            throw new UnexpectedValueException('No file path given as input');
         }
+        $options['filename'] = $filename;
 
         return $options;
     }

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\Validation;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Validator\ConstraintLoader;
@@ -25,6 +26,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * Validate the input and pass it to the output.
+ *
+ * @final since 5.4
  */
 class ValidatorTask extends AbstractConfigurableTask
 {
@@ -61,7 +64,7 @@ class ValidatorTask extends AbstractConfigurableTask
                 return;
             }
 
-            throw new \UnexpectedValueException("{$violations->count()} constraint violations detected on validation");
+            throw new UnexpectedValueException("{$violations->count()} constraint violations detected on validation");
         }
 
         $state->setOutput($state->getInput());

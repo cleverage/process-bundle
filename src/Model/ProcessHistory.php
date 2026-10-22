@@ -17,6 +17,8 @@ use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 
 /**
  * Logs information about a process.
+ *
+ * @final since 5.4
  */
 class ProcessHistory implements \Stringable
 {
@@ -36,6 +38,9 @@ class ProcessHistory implements \Stringable
 
     protected string $state = self::STATE_STARTED;
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function __construct(
         ProcessConfiguration $processConfiguration,
         protected array $context = [],
@@ -64,6 +69,9 @@ class ProcessHistory implements \Stringable
         return $this->processCode;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getContext(): array
     {
         return $this->context;

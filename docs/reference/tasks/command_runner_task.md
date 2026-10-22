@@ -4,10 +4,13 @@ CommandRunnerTask
 Runs a system command (with the Symfony Process component) for each input. The input is passed to the command as
 stdin, and the command standard output becomes the task output.
 
+Requires `symfony/process` (`composer require symfony/process`): without it, the task fails with an explicit message.
+
 Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Process\CommandRunnerTask`
+* **Code**: `command_runner` (`task: command_runner`)
 
 Accepted inputs
 ---------------
@@ -41,7 +44,7 @@ Examples
 ```yaml
 # Task configuration level
 count_lines:
-  service: '@CleverAge\ProcessBundle\Task\Process\CommandRunnerTask'
+  task: command_runner
   options:
     commandline: ['wc', '-l']
     timeout: 30
@@ -53,7 +56,7 @@ count_lines:
 ```yaml
 # Task configuration level
 count_errors:
-  service: '@CleverAge\ProcessBundle\Task\Process\CommandRunnerTask'
+  task: command_runner
   options:
     commandline: 'grep "$PATTERN" | wc -l'
     env:
@@ -66,4 +69,6 @@ Notes
 
 An array `commandline` is run with `new Process()`: each argument is escaped and no shell is involved. A string
 `commandline` is run with `Process::fromShellCommandline()`: it is interpreted by the shell, so never build it from
-untrusted input.
+untrusted input, `{{ key }}` context placeholders included (a context value such as `x; id` would run `id`). To use a
+context value, pass it as an argument of an array `commandline`, or as an `env` variable quoted in the command
+(`commandline: 'grep "$PATTERN" | wc -l'`, `env: { PATTERN: '{{ pattern }}' }`).

@@ -24,9 +24,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Group input rows sharing the same value for the "aggregate_by" column. Each group is made of the first received row
  * (without the "aggregate_columns"), plus a sub-array under "aggregation_key" listing the "aggregate_columns" values of
  * every row of the group. The groups are output once all previous tasks are resolved.
+ *
+ * @final since 5.4
  */
 class RowAggregatorTask extends AbstractConfigurableTask implements BlockingTaskInterface
 {
+    /**
+     * @var array<mixed>
+     */
     protected array $result = [];
 
     public function __construct(

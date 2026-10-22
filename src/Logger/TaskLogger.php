@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Logger;
 
+/**
+ * @internal
+ */
 class TaskLogger extends AbstractLogger
 {
 }

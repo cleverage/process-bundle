@@ -27,6 +27,7 @@ use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
@@ -38,6 +39,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(ProcessManager::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessConfiguration::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TaskRegistry::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(TaskConfiguration::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ContextualOptionResolver::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessEvent::class)]
@@ -92,7 +94,7 @@ class ProcessManagerInitializationTest extends TestCase
 
     private function getExpectedDeprecation(): string
     {
-        return 'The initialization of the task "bad" of the process "test.process" has failed with message "Invalid configuration". Going on with the process after an initialization failure is deprecated since v5: in v6.0, the process will fail before executing any task.';
+        return 'Since cleverage/process-bundle 5.1: The initialization of the task "bad" of the process "test.process" has failed with message "Invalid configuration". Going on with the process after an initialization failure is deprecated: in v6.0, the process will fail before executing any task.';
     }
 
     private function execute(ProcessManager $processManager): void
@@ -183,6 +185,7 @@ class ProcessManagerInitializationTest extends TestCase
             $registry,
             new ContextualOptionResolver(),
             new EventDispatcher(),
+            taskRegistry: new TaskRegistry($container),
         );
     }
 

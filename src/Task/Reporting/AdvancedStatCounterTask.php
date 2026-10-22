@@ -20,6 +20,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Count the time between 2 iterations, and log statistics every N executions. The input is passed to the output.
+ *
+ * @final since 5.4
  */
 class AdvancedStatCounterTask extends AbstractConfigurableTask
 {
@@ -52,7 +54,7 @@ class AdvancedStatCounterTask extends AbstractConfigurableTask
         }
         ++$this->counter;
         if (0 === $this->counter % $this->getOption($state, 'show_every')) {
-            $diff = $now->diff($this->lastUpdate);
+            $diff = $now->diff($this->lastUpdate ?? $now);
             $fullText = "Last iteration {$diff->format('%H:%I:%S')} ago";
             $items = $this->getOption($state, 'num_items') * $this->counter;
             $seconds = $now->getTimestamp() - $this->startedAt->getTimestamp();

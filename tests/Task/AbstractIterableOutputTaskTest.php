@@ -102,6 +102,9 @@ class AbstractIterableOutputTaskTest extends TestCase
         self::assertSame([], $state->getErrorContext());
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options, mixed $input = null): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

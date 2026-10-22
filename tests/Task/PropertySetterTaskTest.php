@@ -77,6 +77,9 @@ class PropertySetterTaskTest extends TestCase
         self::assertNull($state->getOutput());
     }
 
+    /**
+     * @param array<string, mixed> $values
+     */
     private function execute(array $values, mixed $input): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

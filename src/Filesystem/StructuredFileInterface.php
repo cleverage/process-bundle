@@ -18,6 +18,9 @@ namespace CleverAge\ProcessBundle\Filesystem;
  */
 interface StructuredFileInterface extends FileStreamInterface
 {
+    /**
+     * @return list<string>
+     */
     public function getHeaders(): array;
 
     public function getHeaderCount(): int;

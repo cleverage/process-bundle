@@ -15,16 +15,29 @@ namespace CleverAge\ProcessBundle\Configuration;
 
 use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
+use Psr\Log\LogLevel;
 
 /**
  * Holds the processes configuration to launch a task.
+ *
+ * @final since 5.4
  */
 class ProcessConfiguration
 {
+    /**
+     * @var list<list<string>>|null
+     */
     protected ?array $dependencyGroups = null;
 
+    /**
+     * @var list<string>|null
+     */
     protected ?array $mainTaskGroup = null;
 
+    /**
+     * @param array<string, TaskConfiguration> $taskConfigurations
+     * @param array<string, mixed>             $options
+     */
     public function __construct(
         protected string $code,
         protected array $taskConfigurations,
@@ -34,6 +47,8 @@ class ProcessConfiguration
         protected string $description = '',
         protected string $help = '',
         protected bool $public = true,
+        protected string $successLogLevel = LogLevel::INFO,
+        protected string $failedLogLevel = LogLevel::DEBUG,
     ) {
     }
 
@@ -42,6 +57,9 @@ class ProcessConfiguration
         return $this->code;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getOptions(): array
     {
         return $this->options;
@@ -80,6 +98,22 @@ class ProcessConfiguration
         return $this->public;
     }
 
+    /**
+     * Level of the "Process <code> succeed" log.
+     */
+    public function getSuccessLogLevel(): string
+    {
+        return $this->successLogLevel;
+    }
+
+    /**
+     * Level of the "Process <code> failed" log.
+     */
+    public function getFailedLogLevel(): string
+    {
+        return $this->failedLogLevel;
+    }
+
     public function isPrivate(): bool
     {
         return !$this->public;
@@ -106,6 +140,8 @@ class ProcessConfiguration
      * Group all task by dependencies.
      *
      * If one task depend from another, it should come after
+     *
+     * @return list<list<string>>
      */
     public function getDependencyGroups(): array
     {
@@ -130,6 +166,8 @@ class ProcessConfiguration
      * It may be defined by the entry_point, or the end_point or simply the first task.
      *
      * If one task depend from another, it should come after
+     *
+     * @return list<string>
      */
     public function getMainTaskGroup(): array
     {
@@ -163,12 +201,8 @@ class ProcessConfiguration
 
         // By default use the first defined task
         if (!$entryTask instanceof TaskConfiguration) {
-            $entryTask = reset($this->taskConfigurations);
-        }
-
-        // May happen with an empty array
-        if (false === $entryTask) {
-            return null;
+            // null with an empty array
+            return array_first($this->taskConfigurations);
         }
 
         return $entryTask;
@@ -195,6 +229,10 @@ class ProcessConfiguration
 
     /**
      * Cross all relations of a task to find all dependencies, and append them to the given array.
+     *
+     * @param list<string> $dependencies
+     *
+     * @return list<string>
      */
     protected function buildDependencies(TaskConfiguration $taskConfig, array &$dependencies = []): array
     {
@@ -222,6 +260,10 @@ class ProcessConfiguration
 
     /**
      * Sort the tasks by dependencies.
+     *
+     * @param list<string> $dependencies
+     *
+     * @return list<string>
      */
     protected function sortDependencies(array $dependencies): array
     {

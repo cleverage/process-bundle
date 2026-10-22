@@ -20,10 +20,18 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Check the presence of the serializer (required for this bundle), and help the user to set it.
+ *
+ * @deprecated since 5.4, no longer used by the bundle, which compiles without the serializer: the services depending
+ *             on it fail when they are used (see UnavailableServicesCompilerPass). Will be removed in v6.0.
  */
 class CheckSerializerCompilerPass implements CompilerPassInterface
 {
     final public const MSG = 'The Symfony serializer component do not seem enabled, consider toggling framework.serializer.enable (see https://symfony.com/doc/current/reference/configuration/framework.html#reference-serializer-enabled)';
+
+    public function __construct()
+    {
+        trigger_deprecation('cleverage/process-bundle', '5.4', 'The "%s" class is deprecated, it will be removed in v6.0.', self::class);
+    }
 
     public function process(ContainerBuilder $container): void
     {

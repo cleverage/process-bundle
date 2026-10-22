@@ -4,10 +4,13 @@ StopwatchTask
 Logs (at `info` level, on the `cleverage_process_task` channel) every event of the `__root__` section of the Symfony
 [Stopwatch component](https://symfony.com/doc/current/components/stopwatch.html). Useful to profile a process.
 
+Requires `symfony/stopwatch` (`composer require symfony/stopwatch`): without it, the task fails with an explicit message.
+
 Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Debug\StopwatchTask`
+* **Code**: `stopwatch` (`task: stopwatch`)
 
 Accepted inputs
 ---------------
@@ -32,5 +35,5 @@ Examples
 ```yaml
 # Task configuration level
 stopwatch:
-  service: '@CleverAge\ProcessBundle\Task\Debug\StopwatchTask'
+  task: stopwatch
 ```

@@ -16,6 +16,9 @@ namespace CleverAge\ProcessBundle\Event;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Contracts\EventDispatcher\Event;
 
+/**
+ * @final since 5.4
+ */
 class EventDispatcherTaskEvent extends Event
 {
     public function __construct(

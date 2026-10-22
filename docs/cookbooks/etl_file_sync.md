@@ -11,14 +11,14 @@ clever_age_process:
             description: 'Normalize the catalog CSV file'
             tasks:
                 read_source:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
+                    task: csv_reader
                     options:
                         file_path: '%kernel.project_dir%/var/data/catalog.csv'
                         delimiter: ';'
                     outputs: [filter_valid]
 
                 filter_valid:
-                    service: '@CleverAge\ProcessBundle\Task\FilterTask'
+                    task: filter
                     options:
                         not_empty:
                             '[sku]': ~
@@ -26,13 +26,13 @@ clever_age_process:
                     error_outputs: [log_rejected] # Lines without sku
 
                 log_rejected:
-                    service: '@CleverAge\ProcessBundle\Task\Reporting\LoggerTask'
+                    task: logger
                     options:
                         level: warning
                         message: 'Line without sku'
 
                 normalize:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    task: transformer
                     error_strategy: skip # A line with an invalid date is logged and skipped
                     options:
                         transformers:
@@ -55,20 +55,20 @@ clever_age_process:
                     outputs: [deduplicate, count_rows]
 
                 count_rows:
-                    service: '@CleverAge\ProcessBundle\Task\Reporting\StatCounterTask'
+                    task: stat_counter
 
                 deduplicate:
-                    service: '@CleverAge\ProcessBundle\Task\GroupByAggregateIterableTask'
+                    task: group_by_aggregate_iterable
                     options:
                         group_by_accessors: ['[sku]'] # The last line of each sku is kept
                     outputs: [iterate]
 
                 iterate:
-                    service: '@CleverAge\ProcessBundle\Task\InputIteratorTask'
+                    task: input_iterator
                     outputs: [write_target]
 
                 write_target:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
+                    task: csv_writer
                     options:
                         file_path: '%kernel.project_dir%/var/exports/catalog_normalized_{date}.csv'
                         headers: [sku, price, updated_at]

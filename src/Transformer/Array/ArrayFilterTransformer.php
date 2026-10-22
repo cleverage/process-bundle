@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer\Array;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Transformer\ConditionTrait;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -22,6 +23,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
  * Array filtering transformer, should match native array_filter behavior.
  *
  * @see https://secure.php.net/manual/fr/function.array-filter.php
+ *
+ * @final since 5.4
  */
 class ArrayFilterTransformer implements ConfigurableTransformerInterface
 {
@@ -33,12 +36,14 @@ class ArrayFilterTransformer implements ConfigurableTransformerInterface
     }
 
     /**
+     * @param array<string, mixed> $options
+     *
      * @return array<int|string, mixed>
      */
     public function transform(mixed $value, array $options = []): array
     {
         if (!is_iterable($value)) {
-            throw new \UnexpectedValueException('Given value is not iterable');
+            throw new UnexpectedValueException('Given value is not iterable');
         }
 
         $result = [];

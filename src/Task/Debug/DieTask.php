@@ -20,6 +20,8 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
  * Class DieTask.
  *
  * Stops the process brutally
+ *
+ * @final since 5.4
  */
 class DieTask implements TaskInterface
 {

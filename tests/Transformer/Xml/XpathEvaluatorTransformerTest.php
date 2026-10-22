@@ -107,4 +107,41 @@ class XpathEvaluatorTransformerTest extends TestCase
 
         $this->assertEquals('xpath_evaluator', $code);
     }
+
+    public function testInvalidQueryThrows(): void
+    {
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML('<a>ok</a>');
+        $transformer = new XpathEvaluatorTransformer();
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage("Invalid xpath query '//[': Invalid expression");
+
+        $transformer->query($transformer->buildXpath($domDocument), '//[', $domDocument, ['unwrap_value' => false, 'single_result' => false]);
+    }
+
+    public function testNamespaceNodeCannotBeUnwrapped(): void
+    {
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML('<a xmlns:x="urn:x"/>');
+        $transformer = new XpathEvaluatorTransformer();
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage("Xpath result cannot be unwrapped for query '/a/namespace::x'");
+
+        $transformer->query(
+            $transformer->buildXpath($domDocument),
+            '/a/namespace::x',
+            $domDocument,
+            ['unwrap_value' => true, 'single_result' => true, 'ignore_missing' => false],
+        );
+    }
+
+    public function testNodeWithoutDocumentThrows(): void
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('The node does not belong to a document');
+
+        (new XpathEvaluatorTransformer())->buildXpath(new \DOMElement('a'));
+    }
 }

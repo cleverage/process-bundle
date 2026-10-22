@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask`
+* **Code**: `csv_reader` (`task: csv_reader`)
 * **Iterable task**
 
 Accepted inputs
@@ -35,7 +36,7 @@ Options
 | `escape`          | `string`      |          | `\`     | CSV escape character                                                                                                              |
 | `headers`         | `array\|null` |          | `null`  | Static list of CSV headers. If `null`, headers are read from the first line of the file; otherwise the first line is read as data |
 | `mode`            | `string`      |          | `rb`    | File open mode (see [fopen mode parameter](https://www.php.net/manual/en/function.fopen.php))                                     |
-| `log_empty_lines` | `bool`        |          | `false` | Log a warning when a line cannot be read (empty line)                                                                             |
+| `log_empty_lines` | `bool`        |          | `false` | Log a warning when a line cannot be read (empty line); cast to `bool`                                                             |
 
 Examples
 --------
@@ -46,7 +47,7 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
+  task: csv_reader
   options:
     file_path: '%kernel.project_dir%/var/data/sample.csv'
     delimiter: '{{ delimiter }}'
@@ -58,7 +59,7 @@ entry:
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
+  task: csv_reader
   options:
     file_path: '%kernel.project_dir%/var/data/no_header.csv'
     delimiter: ','
@@ -70,7 +71,8 @@ Notes
 -----
 
 * Each line must contain exactly as many columns as there are headers, otherwise an `\UnexpectedValueException` is thrown.
-* A UTF-8 BOM is removed from the first header when headers are read from the file.
+* A UTF-8 BOM is removed from the first header when headers are read from the file. If the first line is blank, an
+  `\UnexpectedValueException` is thrown.
 * `csv_file` and `csv_line` are added to the error context of the process.
 * The file is closed once fully read: if the task is executed again (e.g. for a new input), the file is read again
   from its beginning.

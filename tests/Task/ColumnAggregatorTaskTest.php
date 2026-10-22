@@ -67,6 +67,8 @@ class ColumnAggregatorTaskTest extends TestCase
 
     /**
      * @param list<array<string, mixed>> $inputs
+     * @param array<string, mixed>       $options
+     * @param array<string, mixed>       $extraOptions
      */
     private function aggregate(array $options, array $inputs, array $extraOptions = []): mixed
     {
@@ -86,6 +88,9 @@ class ColumnAggregatorTaskTest extends TestCase
         return $state->getOutput();
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(string $class, array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

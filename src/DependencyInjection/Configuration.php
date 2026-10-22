@@ -15,7 +15,6 @@ namespace CleverAge\ProcessBundle\DependencyInjection;
 
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use Psr\Log\LogLevel;
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -23,10 +22,23 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 /**
  * This is the class that validates and merges configuration from your app/config files.
  *
- * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/configuration.html}
+ * @see https://symfony.com/doc/current/bundles/configuration.html
+ *
+ * @internal
  */
 class Configuration implements ConfigurationInterface
 {
+    protected const LOG_LEVELS = [
+        LogLevel::EMERGENCY,
+        LogLevel::ALERT,
+        LogLevel::CRITICAL,
+        LogLevel::ERROR,
+        LogLevel::WARNING,
+        LogLevel::NOTICE,
+        LogLevel::INFO,
+        LogLevel::DEBUG,
+    ];
+
     public function __construct(
         protected string $root = 'clever_age_process',
     ) {
@@ -40,7 +52,21 @@ class Configuration implements ConfigurationInterface
         // Default error strategy
         $definition->enumNode('default_error_strategy')
             ->values([TaskConfiguration::STRATEGY_SKIP, TaskConfiguration::STRATEGY_STOP])
-            ->defaultValue(TaskConfiguration::STRATEGY_STOP);
+            ->defaultValue(TaskConfiguration::STRATEGY_STOP)
+            ->info('Error strategy of the tasks without "error_strategy": "skip" the item or "stop" the process');
+
+        // Default log levels of the end of the processes
+        $logsDefinition = $definition->arrayNode('logs')
+            ->addDefaultsIfNotSet()
+            ->children();
+        $logsDefinition->enumNode('success_level')
+            ->values(self::LOG_LEVELS)
+            ->defaultValue(LogLevel::INFO)
+            ->info('Level of the "Process <code> succeed" log');
+        $logsDefinition->enumNode('failed_level')
+            ->values(self::LOG_LEVELS)
+            ->defaultValue(LogLevel::DEBUG)
+            ->info('Level of the "Process <code> failed" log');
 
         $this->appendRootProcessConfigDefinition($definition);
         $this->appendRootTransformersConfigDefinition($definition);
@@ -53,16 +79,15 @@ class Configuration implements ConfigurationInterface
      */
     protected function appendRootTransformersConfigDefinition(NodeBuilder $definition): void
     {
-        /** @var ArrayNodeDefinition $transformersArrayDefinition */
         $transformersArrayDefinition = $definition->arrayNode('generic_transformers')
             ->useAttributeAsKey('code')
-            ->prototype('array');
+            ->arrayPrototype();
 
         // Process list
         $transformerListDefinition = $transformersArrayDefinition
             ->performNoDeepMerging()
             ->cannotBeOverwritten()
-            ->info('Unique custom transformer code')
+            ->info('Unique custom transformer code, usable as a transformer in the processes')
             ->children();
 
         $this->appendTransformerConfigDefinition($transformerListDefinition);
@@ -75,11 +100,15 @@ class Configuration implements ConfigurationInterface
     {
         $definition
             ->arrayNode('contextual_options')
-            ->prototype('variable')
+            ->info('Options of the transformer (code: definition with required, default, default_is_null), injected in the "transformers" with "{{ code }}"')
+            ->example(['delimiter' => ['default' => ',']])
+            ->variablePrototype()
             ->end()
             ->end()
             ->arrayNode('transformers')
-            ->prototype('variable')
+            ->info('Transformers applied in sequence, by code, with their options')
+            ->example(['explode' => ['delimiter' => '{{ separator }}']])
+            ->variablePrototype()
             ->end()
             ->end();
     }
@@ -89,10 +118,9 @@ class Configuration implements ConfigurationInterface
      */
     protected function appendRootProcessConfigDefinition(NodeBuilder $definition): void
     {
-        /** @var ArrayNodeDefinition $configurationsArrayDefinition */
         $configurationsArrayDefinition = $definition->arrayNode('configurations')
             ->useAttributeAsKey('code')
-            ->prototype('array');
+            ->arrayPrototype();
 
         // Process list
         $processListDefinition = $configurationsArrayDefinition
@@ -108,36 +136,59 @@ class Configuration implements ConfigurationInterface
     {
         $definition
             ->scalarNode('entry_point')
+            ->info('Code of the task receiving the input of the process (the input is ignored if not set)')
             ->defaultNull()
             ->end()
             ->scalarNode('end_point')
+            ->info('Code of the task whose last output is returned by the process (null if not set)')
             ->defaultNull()
             ->end()
             ->scalarNode('description')
+            ->info('Description of the process, shown by the cleverage:process:list command')
             ->defaultValue('')
             ->end()
             ->scalarNode('help')
+            ->info('Help of the process, shown by the cleverage:process:help command')
             ->defaultValue('')
             ->end()
-            ->scalarNode('public')
+            ->booleanNode('public')
+            ->info('Whether the process is listed by the cleverage:process:list command')
             ->defaultTrue()
             ->end()
             ->arrayNode('options')
-            ->prototype('variable')
+            ->info('Free options of the process, read by other bundles (e.g. "ui" for the CleverAge UI process bundle)')
+            ->variablePrototype()
+            ->end()
+            ->end()
+            ->arrayNode('logs')
+            ->info('Override the default log levels of the end of the process')
+            ->addDefaultsIfNotSet()
+            ->children()
+            ->enumNode('success_level')
+            ->values([...self::LOG_LEVELS, null])
+            ->defaultNull()
+            ->end()
+            ->enumNode('failed_level')
+            ->values([...self::LOG_LEVELS, null])
+            ->defaultNull()
+            ->end()
             ->end()
             ->end();
 
-        /** @var ArrayNodeDefinition $tasksArrayDefinition */
         $tasksArrayDefinition = $definition
             ->arrayNode('tasks')
             ->useAttributeAsKey('code')
-            ->prototype('array');
+            ->arrayPrototype();
 
         // Process list
         $taskListDefinition = $tasksArrayDefinition
             ->performNoDeepMerging()
             ->cannotBeOverwritten()
             ->info('Unique custom task code')
+            ->validate()
+            ->ifTrue(static fn (array $task): bool => (null === $task['service']) === (null === $task['task']))
+            ->thenInvalid('A task must define either its code ("task: <code>") or, deprecated, its "service", not both: %s')
+            ->end()
             ->children();
 
         $this->appendTaskConfigDefinition($taskListDefinition);
@@ -145,38 +196,55 @@ class Configuration implements ConfigurationInterface
 
     protected function appendTaskConfigDefinition(NodeBuilder $definition): void
     {
-        $logLevels = [
-            LogLevel::EMERGENCY,
-            LogLevel::ALERT,
-            LogLevel::CRITICAL,
-            LogLevel::ERROR,
-            LogLevel::WARNING,
-            LogLevel::NOTICE,
-            LogLevel::INFO,
-            LogLevel::DEBUG,
-        ];
-
         $definition->scalarNode('service')
-            ->isRequired();
+            ->info('Deprecated, use "task": service id or alias of the task, with or without a leading "@"')
+            ->setDeprecated(
+                'cleverage/process-bundle',
+                '5.4',
+                'The "%node%" option of the task "%path%" is deprecated, reference the task by its code instead ("task: <code>", given on the reference page of each task; give a code to your own tasks with #[AsTask] or a "cleverage.task" tag). It will be removed in v6.0.'
+            )
+            ->defaultNull();
+        $definition->scalarNode('task')
+            ->info('Code of the task (cleverage.task tag, #[AsTask])')
+            ->defaultNull();
         $definition->scalarNode('description')
+            ->info('Description of the task, shown by the cleverage:process:help command')
             ->defaultValue('');
         $definition->scalarNode('help')
+            ->info('Help of the task, shown by the cleverage:process:help command')
             ->defaultValue('');
         $definition->arrayNode('options')
-            ->prototype('variable')
+            ->info('Options of the task, given on the reference page of each task')
+            ->variablePrototype()
             ->end();
         $definition->scalarNode('error_strategy')
+            ->info('On error, "skip" the item or "stop" the process; "default_error_strategy" if not set')
             ->defaultNull();
         $definition->enumNode('log_level')
-            ->values($logLevels)
+            ->values(self::LOG_LEVELS)
+            ->info('Level of the log of the errors of the task')
             ->defaultValue(LogLevel::CRITICAL);
 
         foreach (['outputs', 'errors', 'error_outputs'] as $nodeName) {
-            $definition->arrayNode($nodeName)
-                ->beforeNormalization()
+            $node = $definition->arrayNode($nodeName);
+            if ('outputs' === $nodeName) {
+                $node->info('Codes of the tasks receiving the output of the task')
+                    ->example(['next_task', 'other_task']);
+            } elseif ('error_outputs' === $nodeName) {
+                $node->info('Codes of the tasks receiving the error output of the task (by default, its input)')
+                    ->example(['error_task']);
+            } elseif ('errors' === $nodeName) {
+                $node->info('Deprecated, use "error_outputs"')
+                    ->setDeprecated(
+                        'cleverage/process-bundle',
+                        '5.4',
+                        'The "%node%" option of the task "%path%" is deprecated, use "error_outputs" instead. It will be removed in v6.0.'
+                    );
+            }
+            $node->beforeNormalization()
                 ->ifString()
                 ->then(static fn ($item): array => [$item])->end()
-                ->prototype('scalar');
+                ->scalarPrototype();
         }
     }
 }

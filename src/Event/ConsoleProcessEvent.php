@@ -19,9 +19,14 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event object used during CLI process manipulation.
+ *
+ * @final since 5.4
  */
 class ConsoleProcessEvent extends Event
 {
+    /**
+     * @param array<string, mixed> $processContext
+     */
     public function __construct(
         private readonly InputInterface $consoleInput,
         private readonly OutputInterface $consoleOutput,
@@ -45,6 +50,9 @@ class ConsoleProcessEvent extends Event
         return $this->processInput;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getProcessContext(): array
     {
         return $this->processContext;

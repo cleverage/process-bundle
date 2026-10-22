@@ -18,9 +18,16 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Explode a string to an array based on a split character.
+ *
+ * @final since 5.4
  */
 class ExplodeTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return list<string>
+     */
     public function transform(mixed $value, array $options = []): array
     {
         if (null === $value || '' === $value) {

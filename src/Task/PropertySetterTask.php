@@ -21,6 +21,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Accepts an object or an array as input and sets values from configuration.
+ *
+ * @final since 5.4
  */
 class PropertySetterTask extends AbstractConfigurableTask
 {

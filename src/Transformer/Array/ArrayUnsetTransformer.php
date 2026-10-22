@@ -13,18 +13,24 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer\Array;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Unset a key from an array.
+ *
+ * @final since 5.4
  */
 class ArrayUnsetTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (!\is_array($value)) {
-            throw new \UnexpectedValueException('Given value is not an array');
+            throw new UnexpectedValueException('Given value is not an array');
         }
         unset($value[$options['key']]);
 

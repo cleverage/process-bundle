@@ -13,11 +13,14 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Unset a given property.
+ *
+ * @final since 5.4
  */
 class UnsetTransformer implements ConfigurableTransformerInterface
 {
@@ -28,14 +31,19 @@ class UnsetTransformer implements ConfigurableTransformerInterface
         $this->accessor = $accessor;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return array<mixed>
+     */
     public function transform(mixed $value, array $options = []): array
     {
         if (!\is_array($value)) {
-            throw new \UnexpectedValueException('Given value must be an array');
+            throw new UnexpectedValueException('Given value must be an array');
         }
 
         if (!\array_key_exists($options['property'], $value)) {
-            throw new \UnexpectedValueException("Property {$options['property']} does not exists");
+            throw new UnexpectedValueException("Property {$options['property']} does not exists");
         }
 
         if ($this->checkCondition($value, $options['condition'])) {

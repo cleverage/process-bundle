@@ -18,9 +18,14 @@ use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
 /**
  * Allow to inject a set of PHP function into an ExpressionLanguage instance.
+ *
+ * @internal
  */
 class PhpFunctionProvider implements ExpressionFunctionProviderInterface
 {
+    /**
+     * @param list<string> $functions
+     */
     public function __construct(
         protected array $functions,
     ) {

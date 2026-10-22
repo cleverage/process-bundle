@@ -16,9 +16,13 @@ namespace CleverAge\ProcessBundle\Model;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Exception\RuntimeException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 
 /**
  * Used to pass information between tasks.
+ *
+ * @final since 5.4
  */
 class ProcessState
 {
@@ -51,21 +55,35 @@ class ProcessState
 
     protected ?\Throwable $exception = null;
 
+    /**
+     * @var array<int|string, mixed>
+     */
     protected array $errorContext = [];
 
     protected ?int $returnCode = null;
 
     protected bool $skipped;
 
+    /**
+     * @var array<string, mixed>|null
+     */
     protected ?array $context = null;
 
     protected ?ContextualOptionResolver $contextualOptionResolver = null;
 
+    /**
+     * @var array<string, mixed>|null
+     */
     protected ?array $contextualizedOptions = null;
 
     protected ?ProcessState $previousState = null;
 
     protected string $status = self::STATUS_NEW;
+
+    /**
+     * Number of executions of the task (execute, proceed or flush), not reset between the items: tells the items apart.
+     */
+    protected int $executionCount = 0;
 
     public function __construct(
         protected ProcessConfiguration $processConfiguration,
@@ -191,11 +209,17 @@ class ProcessState
         $this->exception = $exception;
     }
 
+    /**
+     * @return array<int|string, mixed>
+     */
     public function getErrorContext(): array
     {
         return $this->errorContext;
     }
 
+    /**
+     * @param array<int|string, mixed> $errorContext
+     */
     public function setErrorContext(array $errorContext): void
     {
         $this->errorContext = $errorContext;
@@ -241,6 +265,23 @@ class ProcessState
         $this->previousState = $previousState;
     }
 
+    /**
+     * Number of executions of the task (execute, proceed or flush) since the beginning of the process: each output of a
+     * task follows an execution, so a task downstream can tell whether two inputs come from the same item.
+     */
+    public function getExecutionCount(): int
+    {
+        return $this->executionCount;
+    }
+
+    /**
+     * @internal called by the ProcessManager before each execution of the task
+     */
+    public function incrementExecutionCount(): void
+    {
+        ++$this->executionCount;
+    }
+
     public function getStatus(): string
     {
         return $this->status;
@@ -249,7 +290,7 @@ class ProcessState
     public function setStatus(string $status): void
     {
         if (!\in_array($status, self::STATUS, true)) {
-            throw new \UnexpectedValueException("Unknown status {$status}");
+            throw new UnexpectedValueException("Unknown status {$status}");
         }
 
         $this->status = $status;
@@ -260,28 +301,39 @@ class ProcessState
         return self::STATUS_RESOLVED === $this->status;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getContext(): array
     {
-        return $this->context;
+        return $this->context ?? [];
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     public function setContext(array $context): void
     {
         if ($this->context) {
-            throw new \RuntimeException('Once defined, context is immutable');
+            throw new RuntimeException('Once defined, context is immutable');
         }
 
         $this->context = $context;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
+    // @phpstan-ignore return.unusedType (narrowing the return type of a non-final class breaks the child classes, see #279)
     public function getContextualizedOptions(): ?array
     {
         if (!$this->contextualizedOptions) {
             $options = $this->getTaskConfiguration()
                 ->getOptions();
+            $this->contextualOptionResolver ??= new ContextualOptionResolver();
             $this->contextualizedOptions = $this->contextualOptionResolver->contextualizeOptions(
                 $options,
-                $this->context
+                $this->getContext()
             );
         }
 

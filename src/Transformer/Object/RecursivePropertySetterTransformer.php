@@ -22,6 +22,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 /**
  * Read an iterable from the input, then set one or more properties on each of its items, using values read from the
  * input itself.
+ *
+ * @final since 5.4
  */
 class RecursivePropertySetterTransformer implements ConfigurableTransformerInterface
 {
@@ -30,6 +32,9 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (null === $value && $options['ignore_null']) {
@@ -63,9 +68,8 @@ class RecursivePropertySetterTransformer implements ConfigurableTransformerInter
                     $this->accessor->setValue($item, $propertyPath, $propertyValue);
                 } catch (NoSuchPropertyException $e) {
                     if ($item instanceof \stdClass) {
-                        $item = (object) array_merge((array) $item, [
-                            $propertyPath => $propertyValue,
-                        ]);
+                        // Add the property to the item itself, to modify it in place
+                        $item->{$propertyPath} = $propertyValue;
                     } else {
                         throw $e;
                     }

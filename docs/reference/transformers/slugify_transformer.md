@@ -6,7 +6,7 @@ Convert a string into a slug. The value is transliterated with a
 tags are stripped, the result is trimmed and lowercased, every sequence of characters matching `replace` is replaced by
 `separator`, and leading and trailing separators are removed.
 
-Requires the `intl` PHP extension.
+Requires the `intl` PHP extension (suggested by the bundle): without it, the transformer fails with an explicit message.
 
 Transformer reference
 ---------------------
@@ -58,3 +58,5 @@ Notes
 An invalid `transliterator` identifier (rejected by `\Transliterator::create()`), or an option that is not a string,
 raises an `InvalidOptionsException` when the options are resolved, i.e. when the transformer is configured, not on the
 first transformed value.
+
+A value that cannot be transliterated (e.g. invalid UTF-8) throws an `\UnexpectedValueException`.

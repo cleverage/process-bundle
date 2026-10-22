@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Reporting\AdvancedStatCounterTask`
+* **Code**: `advanced_stat_counter` (`task: advanced_stat_counter`)
 
 Accepted inputs
 ---------------
@@ -43,7 +44,7 @@ Examples
 ```yaml
 # Task configuration level
 stats:
-  service: '@CleverAge\ProcessBundle\Task\Reporting\AdvancedStatCounterTask'
+  task: advanced_stat_counter
   options:
     num_items: 50
     show_every: 100

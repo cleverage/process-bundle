@@ -18,9 +18,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Return the nth element of an array.
+ *
+ * @final since 5.4
  */
 class ArrayElementTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         return array_values(\array_slice($value, $options['index'], 1))[0];

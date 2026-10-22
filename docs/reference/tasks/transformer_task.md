@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\TransformerTask`
+* **Code**: `transformer` (`task: transformer`)
 
 Accepted inputs
 ---------------
@@ -25,9 +26,9 @@ added to the error context as `error`) and handled according to the task `error_
 Options
 -------
 
-| Code           | Type    | Required | Default | Description                                                                                          |
-|----------------|---------|:--------:|---------|------------------------------------------------------------------------------------------------------|
-| `transformers` | `array` |          | `[]`    | Ordered map of `transformer code => options`, see [TransformerTrait](../traits/transformer_trait.md) |
+| Code           | Type    | Required | Default | Description                                                                                                                   |
+|----------------|---------|:--------:|---------|-------------------------------------------------------------------------------------------------------------------------------|
+| `transformers` | `array` |          | `[]`    | Ordered map of `transformer code => options`, or list of transformers, see [TransformerTrait](../traits/transformer_trait.md) |
 
 Examples
 --------
@@ -37,7 +38,7 @@ Examples
 ```yaml
 # Task configuration level
 json_decode:
-  service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+  task: transformer
   options:
     transformers:
       callback:
@@ -51,7 +52,7 @@ json_decode:
 ```yaml
 # Task configuration level
 transform:
-  service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+  task: transformer
   options:
     transformers:
       mapping:
@@ -64,6 +65,27 @@ transform:
         callback: array_filter
       callback#2:
         callback: array_reverse
+  outputs: [load]
+```
+
+* Same chain using the list syntax: the same transformer can be used several times without suffix
+
+```yaml
+# Task configuration level
+transform:
+  task: transformer
+  options:
+    transformers:
+      - mapping:
+          mapping:
+            name:
+              code: '[firstname]'
+              transformers:
+                - trim
+      - callback:
+          callback: array_filter
+      - callback:
+          callback: array_reverse
   outputs: [load]
 ```
 

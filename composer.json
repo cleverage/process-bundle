@@ -1,114 +1,116 @@
 {
-  "name": "cleverage/process-bundle",
-  "description": "Process, import/export, transform and validate data with a simple API with Symfony3",
-  "keywords": [
-    "process",
-    "task",
-    "etl",
-    "transformation",
-    "import",
-    "export"
-  ],
-  "homepage": "https://github.com/cleverage/process-bundle",
-  "type": "symfony-bundle",
-  "license": "MIT",
-  "authors": [
-    {
-      "name": "Vincent Chalnot",
-      "email": "vchalnot@clever-age.com",
-      "homepage": "https://github.com/VincentChalnot",
-      "role": "Lead Developer"
+    "name": "cleverage/process-bundle",
+    "description": "Configure series of tasks to process, import/export, transform and validate data in Symfony",
+    "keywords": [
+        "process",
+        "task",
+        "etl",
+        "transformation",
+        "import",
+        "export"
+    ],
+    "homepage": "https://github.com/cleverage/process-bundle",
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Joubert",
+            "email": "njoubert@clever-age.com",
+            "homepage": "https://github.com/njoubert-cleverage",
+            "role": "Maintainer"
+        },
+        {
+            "name": "Xavier Marchegay",
+            "email": "xmarchegay@clever-age.com",
+            "homepage": "https://github.com/xaviermarchegay",
+            "role": "Maintainer"
+        },
+        {
+            "name": "Grégory Tonon",
+            "email": "gtonon@clever-age.com",
+            "homepage": "https://github.com/clever-age-gtonon",
+            "role": "Maintainer"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "CleverAge\\ProcessBundle\\": "src/"
+        }
     },
-    {
-      "name": "Valentin Clavreul",
-      "email": "vclavreul@clever-age.com",
-      "role": "Developer"
+    "autoload-dev": {
+        "psr-4": {
+            "CleverAge\\ProcessBundle\\Tests\\": "tests/"
+        }
     },
-    {
-      "name": "Madeline Veyrenc",
-      "email": "mveyrenc@clever-age.com",
-      "homepage": "https://github.com/mveyrenc",
-      "role": "Developer"
+    "require": {
+        "php": "^8.2",
+        "ext-dom": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "ext-mbstring": "*",
+        "ext-xmlreader": "*",
+        "monolog/monolog": "^3",
+        "psr/cache": "^1|^2|^3",
+        "psr/container": "^1.1|^2",
+        "psr/log": "^2|^3",
+        "symfony/config": "^6.4|^7.4|^8",
+        "symfony/console": "^6.4|^7.4|^8",
+        "symfony/deprecation-contracts": "^2.5|^3",
+        "symfony/dependency-injection": "^6.4|^7.4|^8",
+        "symfony/event-dispatcher": "^6.4|^7.4|^8",
+        "symfony/event-dispatcher-contracts": "^3",
+        "symfony/expression-language": "^6.4|^7.4|^8",
+        "symfony/filesystem": "^6.4|^7.4|^8",
+        "symfony/finder": "^6.4|^7.4|^8",
+        "symfony/framework-bundle": "^6.4|^7.4|^8",
+        "symfony/http-kernel": "^6.4|^7.4|^8",
+        "symfony/options-resolver": "^6.4|^7.4|^8",
+        "symfony/polyfill-php83": "^1.33",
+        "symfony/polyfill-php84": "^1.33",
+        "symfony/polyfill-php85": "^1.33",
+        "symfony/property-access": "^6.4|^7.4|^8",
+        "symfony/serializer": "^6.4|^7.4|^8",
+        "symfony/service-contracts": "^2.5|^3",
+        "symfony/validator": "^6.4|^7.4|^8",
+        "symfony/yaml": "^6.4|^7.4|^8"
     },
-    {
-      "name": "Xavier Marchegay",
-      "email": "xmarchegay@clever-age.com",
-      "homepage": "https://github.com/xaviermarchegay",
-      "role": "Lead Developer"
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "*",
+        "phpstan/extension-installer": "*",
+        "phpstan/phpstan": "*",
+        "phpstan/phpstan-symfony": "*",
+        "phpunit/phpunit": "^10.5|^11|^12|^13",
+        "rector/rector": "*",
+        "roave/security-advisories": "dev-latest",
+        "symfony/cache": "^6.4|^7.4|^8",
+        "symfony/process": "^6.4|^7.4|^8",
+        "symfony/stopwatch": "^6.4|^7.4|^8",
+        "symfony/test-pack": "^1.1",
+        "symfony/var-dumper": "^6.4|^7.4|^8"
     },
-    {
-      "name": "Nicolas Joubert",
-      "email": "njoubert@clever-age.com",
-      "role": "Lead Developer"
+    "conflict": {
+        "cleverage/doctrine-process-bundle": "<3.3",
+        "cleverage/soap-process-bundle": "<3.3",
+        "cleverage/ui-process-bundle": "<3.3"
+    },
+    "suggest": {
+        "ext-intl": "Required by the slugify transformer",
+        "symfony/monolog-bundle": "To log in the dedicated cleverage_process, cleverage_process_task and cleverage_process_transformer channels, with the process and task data in the extra of the records",
+        "symfony/process": "Required by the CommandRunnerTask and the ProcessLauncherTask",
+        "symfony/stopwatch": "Required by the StopwatchTask",
+        "symfony/var-dumper": "To dump the values with the DebugTask, the DebugTransformer and the --output-format=dump option of cleverage:process:execute",
+        "cleverage/archive-process-bundle": "Dedicated bundle for Archive dependencies for the Process Bundle",
+        "cleverage/cache-process-bundle": "Dedicated bundle for Cache dependencies for the Process Bundle",
+        "cleverage/doctrine-process-bundle": "Dedicated bundle for Doctrine dependencies for the process bundle",
+        "cleverage/soap-process-bundle": "Dedicated bundle for Soap dependencies for the process bundle",
+        "cleverage/rest-process-bundle": "Dedicated bundle for Rest dependencies for the process bundle",
+        "cleverage/flysystem-process-bundle": "Dedicated bundle for Flysystem dependencies for the process bundle",
+        "cleverage/ui-process-bundle": "UI for the process bundle"
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        },
+        "sort-packages": true
     }
-  ],
-  "autoload": {
-    "psr-4": {
-      "CleverAge\\ProcessBundle\\": "src/"
-    }
-  },
-  "autoload-dev": {
-    "psr-4": {
-      "CleverAge\\ProcessBundle\\Tests\\": "tests/"
-    }
-  },
-  "require": {
-    "php": ">=8.2",
-    "ext-dom": "*",
-    "ext-intl": "*",
-    "ext-json": "*",
-    "ext-mbstring": "*",
-    "psr/cache": "^1|^2|^3",
-    "symfony/config": "^6.4|^7.4|^8",
-    "symfony/console": "^6.4|^7.4|^8",
-    "symfony/dependency-injection": "^6.4|^7.4|^8",
-    "symfony/dotenv": "^6.4|^7.4|^8",
-    "symfony/error-handler": "^6.4|^7.4|^8",
-    "symfony/event-dispatcher": "^6.4|^7.4|^8",
-    "symfony/event-dispatcher-contracts": "^3",
-    "symfony/expression-language": "^6.4|^7.4|^8",
-    "symfony/filesystem": "^6.4|^7.4|^8",
-    "symfony/finder": "^6.4|^7.4|^8",
-    "symfony/framework-bundle": "^6.4|^7.4|^8",
-    "symfony/http-kernel": "^6.4|^7.4|^8",
-    "symfony/monolog-bridge": "^6.4|^7.4|^8",
-    "symfony/monolog-bundle": "^3.11|^4",
-    "symfony/options-resolver": "^6.4|^7.4|^8",
-    "symfony/process": "^6.4|^7.4|^8",
-    "symfony/property-access": "^6.4|^7.4|^8",
-    "symfony/runtime": "^6.4|^7.4|^8",
-    "symfony/serializer": "^6.4|^7.4|^8",
-    "symfony/service-contracts": ">=1.0.0",
-    "symfony/stopwatch": "^6.4|^7.4|^8",
-    "symfony/validator": "^6.4|^7.4|^8",
-    "symfony/var-dumper": "^6.4|^7.4|^8",
-    "symfony/yaml": "^6.4|^7.4|^8"
-  },
-  "require-dev": {
-    "friendsofphp/php-cs-fixer": "*",
-    "phpstan/extension-installer": "*",
-    "phpstan/phpstan": "*",
-    "phpstan/phpstan-symfony": "*",
-    "phpunit/phpunit": "^10.5|^11|^12|^13",
-    "rector/rector": "*",
-    "roave/security-advisories": "dev-latest",
-    "symfony/test-pack": "^1.1"
-  },
-  "suggest": {
-    "cleverage/archive-process-bundle": "Dedicated bundle for Archive dependencies for the Process Bundle",
-    "cleverage/cache-process-bundle": "Dedicated bundle for Cache dependencies for the Process Bundle",
-    "cleverage/doctrine-process-bundle": "Dedicated bundle for Doctrine dependencies for the process bundle",
-    "cleverage/soap-process-bundle": "Dedicated bundle for Soap dependencies for the process bundle",
-    "cleverage/rest-process-bundle": "Dedicated bundle for Rest dependencies for the process bundle",
-    "cleverage/flysystem-process-bundle": "Dedicated bundle for Flysystem dependencies for the process bundle",
-    "cleverage/ui-process-bundle": "UI for the process bundle"
-  },
-  "config": {
-    "allow-plugins": {
-      "phpstan/extension-installer": true,
-      "symfony/flex": true,
-      "symfony/runtime": true
-    },
-    "sort-packages": true
-  }
 }

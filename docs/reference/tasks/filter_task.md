@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\FilterTask`
+* **Code**: `filter` (`task: filter`)
 
 Accepted inputs
 ---------------
@@ -45,7 +46,7 @@ Examples
 ```yaml
 # Task configuration level
 filter_active:
-  service: '@CleverAge\ProcessBundle\Task\FilterTask'
+  task: filter
   options:
     match:
       '[status]': active

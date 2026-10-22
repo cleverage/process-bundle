@@ -15,10 +15,17 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @final since 5.4
+ */
 class WrapperTransformer implements ConfigurableTransformerInterface
 {
     /**
      * Must return the transformed $value.
+     *
+     * @param array<string, mixed> $options
+     *
+     * @return array<mixed>
      */
     public function transform(mixed $value, array $options = []): array
     {

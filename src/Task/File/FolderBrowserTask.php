@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -30,7 +31,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 class FolderBrowserTask extends AbstractConfigurableTask implements IterableTaskInterface
 {
     /**
-     * @var \Iterator|SplFileInfo[]|null
+     * @var \Iterator<string, SplFileInfo>|array<SplFileInfo>|null
      */
     protected \Iterator|array|null $files = null;
 
@@ -51,8 +52,9 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
             $this->files = $finder->in($options['folder_path'])->sortByName()->getIterator();
             $this->files->rewind();
         }
+        $files = $this->getFilesIterator();
 
-        if (!$this->files->valid()) {
+        if (!$files->valid()) {
             $this->logger->log($options['empty_log_level'], "No item found in path {$options['folder_path']}");
             $state->setSkipped(true);
             $state->setErrorOutput($options['folder_path']);
@@ -61,7 +63,7 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
             return;
         }
         /** @var SplFileInfo $fileInfo */
-        $fileInfo = $this->files->current();
+        $fileInfo = $files->current();
         $filePath = $fileInfo->getPathname();
         $state->addErrorContextValue('current_file_path', $filePath);
         $state->setOutput($filePath);
@@ -77,10 +79,11 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
         if (!$this->files) {
             return false;
         }
-        $this->files->next();
+        $files = $this->getFilesIterator();
+        $files->next();
         $state->removeErrorContext('current_file_path');
 
-        if (!$this->files->valid()) {
+        if (!$files->valid()) {
             // Reset the iterator to allow the following iteration
             $this->files = null;
 
@@ -125,5 +128,20 @@ class FolderBrowserTask extends AbstractConfigurableTask implements IterableTask
                 LogLevel::WARNING,
             ]
         );
+    }
+
+    /**
+     * @return \Iterator<SplFileInfo>
+     */
+    private function getFilesIterator(): \Iterator
+    {
+        if (\is_array($this->files)) {
+            $this->files = new \ArrayIterator($this->files);
+        }
+        if (!$this->files instanceof \Iterator) {
+            throw new LogicException('No folder browsed');
+        }
+
+        return $this->files;
     }
 }

@@ -13,12 +13,16 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\DependencyInjection\Compiler;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * Generic compiler pass to add tagged services to a registry.
+ *
+ * @deprecated since 5.4, no longer used by the bundle (the transformers are registered by
+ *             TransformerLocatorCompilerPass), will be removed in v6.0
  */
 class RegistryCompilerPass implements CompilerPassInterface
 {
@@ -27,6 +31,7 @@ class RegistryCompilerPass implements CompilerPassInterface
         protected ?string $tag = null,
         protected ?string $method = null,
     ) {
+        trigger_deprecation('cleverage/process-bundle', '5.4', 'The "%s" class is deprecated, it will be removed in v6.0.', self::class);
     }
 
     /**
@@ -34,6 +39,10 @@ class RegistryCompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container): void
     {
+        if (\in_array(null, [$this->registry, $this->tag, $this->method], true)) {
+            throw new LogicException('The registry, tag and method of the RegistryCompilerPass must be defined');
+        }
+
         if (!$container->has($this->registry)) {
             return;
         }

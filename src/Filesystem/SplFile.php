@@ -15,6 +15,8 @@ namespace CleverAge\ProcessBundle\Filesystem;
 
 /**
  * Wrapper around files to read/write them.
+ *
+ * @final since 5.4
  */
 class SplFile
 {
@@ -24,6 +26,9 @@ class SplFile
 
     protected int $lineNumber = 1;
 
+    /**
+     * @param list<int>|null $splFileObjectFlags
+     */
     public function __construct(
         string $filename,
         string $mode = 'rb',

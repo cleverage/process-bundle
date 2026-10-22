@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -26,6 +27,8 @@ trait ConditionTrait
     /**
      * Test the input with the given set of conditions
      * True by default.
+     *
+     * @param array<string, mixed> $conditions
      */
     protected function checkCondition(mixed $input, array $conditions): bool
     {
@@ -159,7 +162,8 @@ trait ConditionTrait
     {
         if ('' === $key) {
             $currentValue = $input;
-        } elseif ((\is_array($input) || \is_object($input)) && $this->accessor->isReadable($input, $key)) {
+        } elseif ((\is_array($input) || \is_object($input))
+            && ($this->accessor ??= PropertyAccess::createPropertyAccessor())->isReadable($input, $key)) {
             $currentValue = $this->accessor->getValue($input, $key);
         } else {
             $currentValue = null;

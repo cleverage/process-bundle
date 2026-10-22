@@ -21,9 +21,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * ##### Options
  *
  * * `replace_mapping` (`array`, _required_): a list of _pattern_ => _replacement_ to apply on input strings
+ *
+ * @final since 5.4
  */
 class MultiReplaceTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         foreach ($options['replace_mapping'] as $pattern => $replacement) {

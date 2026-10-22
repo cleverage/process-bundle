@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Serialization\DeserializerTask`
+* **Code**: `deserializer` (`task: deserializer`)
 
 Accepted inputs
 ---------------
@@ -35,7 +36,7 @@ Examples
 ```yaml
 # Task configuration level
 deserialize:
-  service: '@CleverAge\ProcessBundle\Task\Serialization\DeserializerTask'
+  task: deserializer
   options:
     type: App\Entity\Author
     format: json

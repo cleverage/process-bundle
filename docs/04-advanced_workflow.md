@@ -27,20 +27,26 @@ Note that a task error handled by the `stop` strategy does not surface as the or
 throws a `CleverAge\ProcessBundle\Exception\ProcessFailedException` (a `\RuntimeException`), whose message contains
 the process code, the task code and the original message. The original exception is available with `getPrevious()`.
 
+The exceptions thrown by the bundle implement `CleverAge\ProcessBundle\Exception\ProcessExceptionInterface` (since 5.4 for
+the `UnexpectedValueException`, `RuntimeException`, `InvalidArgumentException` and `LogicException` of the same
+namespace, which extend the SPL exceptions thrown before), so that they can all be caught at once. Not concerned: the
+exceptions of the Symfony components (e.g. `InvalidOptionsException` for an invalid task option) and the ones of your
+own tasks and transformers.
+
 ### Executing a process from PHP
 
-The process manager service id is `cleverage_process.manager.process`. It is private and has no class alias, so it
-cannot be autowired by type: inject it explicitly (or declare the alias yourself).
+The process manager service (`cleverage_process.manager.process`, private) can be autowired by its interface,
+`CleverAge\ProcessBundle\Manager\ProcessManagerInterface` (or by its class, `ProcessManager`), or injected
+explicitly. Type your services on the interface: the class will be `final` in v6.0 (the services of the bundle will
+then be typed on the interfaces, so that they can be decorated). The registries have their interface too: `ProcessConfigurationRegistryInterface`,
+`TransformerRegistryInterface` and `TaskRegistryInterface` (namespace `CleverAge\ProcessBundle\Registry`).
 
 ```yaml
 # config/services.yaml
 services:
     App\Service\ProductImporter:
         arguments:
-            $processManager: '@cleverage_process.manager.process'
-
-    # Or, to enable autowiring of the ProcessManager type everywhere:
-    CleverAge\ProcessBundle\Manager\ProcessManager: '@cleverage_process.manager.process'
+            $processManager: '@cleverage_process.manager.process' # not needed with autowiring
 ```
 
 ```php
@@ -72,12 +78,12 @@ clever_age_process:
         app.csv_copy:
             tasks:
                 read:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask'
+                    task: csv_reader
                     options:
                         file_path: '%kernel.project_dir%/var/data/input.csv'
                     outputs: [transform]
                 transform:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    task: transformer
                     options:
                         transformers:
                             mapping:
@@ -86,12 +92,12 @@ clever_age_process:
                                     name: { code: '[name]' }
                     outputs: [write]
                 write:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
+                    task: csv_writer
                     options:
                         file_path: '%kernel.project_dir%/var/data/output.csv'
                     outputs: [log]
                 log:
-                    service: '@CleverAge\ProcessBundle\Task\Debug\DebugTask'
+                    task: debug
 ```
 
 ### Orphan tasks
@@ -123,7 +129,7 @@ stops.
 
 ```yaml
 transform:
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+    task: transformer
     error_strategy: skip          # Continue with the next item on error
     log_level: warning            # Log errors as warning instead of critical
     options:
@@ -134,7 +140,7 @@ transform:
     outputs: [write]
     error_outputs: [write_errors] # Receives the input that failed
 write_errors:
-    service: '@CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamWriterTask'
+    task: json_stream_writer
     options:
         file_path: '%kernel.project_dir%/var/data/errors_{date_time}.json-stream'
 ```
@@ -165,13 +171,13 @@ clever_age_process:
         app.import_all:
             tasks:
                 list_files:
-                    service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
+                    task: folder_browser
                     options:
                         folder_path: '%kernel.project_dir%/var/import'
                         name_pattern: '*.csv'
                     outputs: [import_file]
                 import_file:
-                    service: '@CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask'
+                    task: process_executor
                     options:
                         process: app.import_file
                         context:
@@ -182,10 +188,10 @@ clever_age_process:
             entry_point: read
             tasks:
                 read:
-                    service: '@CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask'
+                    task: input_csv_reader
                     outputs: [save]
                 save:
-                    service: '@App\Task\SaveProductTask'
+                    task: app_save_product # code of an application task, see #[AsTask]
 ```
 
 If the parent process is executed without a `dry_run` context value, the placeholder is not replaced and the
@@ -241,6 +247,60 @@ of a process: it dispatches a `CleverAge\ProcessBundle\Event\EventDispatcherTask
 `ProcessState`. The event is dispatched under the `event_name` option or, when it is not set, under its class name
 (`CleverAge\ProcessBundle\Event\EventDispatcherTaskEvent`).
 
+## Stopping a running process
+
+A running process can be stopped from the outside (e.g. on a request made from a UI) by a service implementing
+`CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface`. Such services are autoconfigured (tag
+`cleverage_process.stop_checker`) and injected into the process manager, which calls their `shouldStop()` method
+before **each task execution**: once per item for the iterable tasks and their children, and before proceeding or
+flushing a task.
+
+When a checker returns `true`, the task is not executed and the process is stopped as if the task had failed with the
+`stop` error strategy, whatever its `error_strategy` (its error outputs are not executed): the process fails with a
+`ProcessFailedException` whose previous exception is a `CleverAge\ProcessBundle\Exception\ProcessStoppedException`,
+and the `cleverage_process.fail` event is dispatched. As for any failure, the remaining items are not flushed and the
+tasks are not finalized.
+
+```php
+namespace App\Process;
+
+use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
+
+class FileStopChecker implements ProcessStopCheckerInterface
+{
+    private float $lastCheck = 0;
+
+    private bool $stop = false;
+
+    public function __construct(private string $stopDirectory)
+    {
+    }
+
+    public function shouldStop(ProcessState $state): bool
+    {
+        // Called very often: check at most every 2 seconds
+        if (!$this->stop && microtime(true) - $this->lastCheck >= 2) {
+            $this->lastCheck = microtime(true);
+            $this->stop = file_exists($this->stopDirectory.'/'.$state->getProcessConfiguration()->getCode());
+        }
+
+        return $this->stop;
+    }
+}
+```
+
+Keep in mind that:
+- `shouldStop()` is called very often: it must be fast, e.g. query an external storage at most every few seconds.
+- The process stops between two task executions: a task blocked in a single long call (SQL query, HTTP request,
+  sub-process launched by the [ProcessLauncherTask](reference/tasks/process_launcher_task.md)) stops only when the
+  call returns. Sub-processes launched by the `ProcessLauncherTask` are separate PHP processes, which are not stopped.
+- Sub-processes executed by the [ProcessExecutorTask](reference/tasks/process_executor_task.md) run in the same
+  process manager: the checkers receive the states of their tasks. Their failure is a task error of the parent
+  process (handled according to the `error_strategy` of the `ProcessExecutorTask`): keep returning `true` until the
+  parent process has failed. To recognize a stopped process, look for a `ProcessStoppedException` in the chain of the
+  previous exceptions of the process error.
+
 ## Parallelization
 
 PHP executes a process in a single thread. To use several CPU cores, the
@@ -259,7 +319,7 @@ PHP executes a process in a single thread. To use several CPU cores, the
 
 ```yaml
 parallel_import:
-    service: '@CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask'
+    task: process_launcher
     options:
         process: app.import_file
         max_processes: 4

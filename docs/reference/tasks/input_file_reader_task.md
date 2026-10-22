@@ -8,12 +8,13 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\InputFileReaderTask`
+* **Code**: `input_file_reader` (`task: input_file_reader`)
 
 Accepted inputs
 ---------------
 
-`string`: path of the file to read. An `\UnexpectedValueException` is thrown if the file does not exist or is not
-readable.
+`string`: path of the file to read. An `\UnexpectedValueException` is thrown if the input is not a non-empty string
+(e.g. `null`, `''`), or if the file does not exist or is not readable.
 
 Possible outputs
 ----------------
@@ -34,11 +35,11 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
+  task: folder_browser
   options:
     folder_path: '%kernel.project_dir%/var/data'
   outputs: [read]
 read:
-  service: '@CleverAge\ProcessBundle\Task\File\InputFileReaderTask'
+  task: input_file_reader
   outputs: [debug]
 ```

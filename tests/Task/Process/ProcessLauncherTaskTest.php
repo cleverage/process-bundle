@@ -65,16 +65,68 @@ class ProcessLauncherTaskTest extends TestCase
         $this->createTask()->initialize($state);
     }
 
+    public function testPassingTheKernelIsDeprecated(): void
+    {
+        $kernel = $this->createStub(KernelInterface::class);
+        $kernel->method('getProjectDir')->willReturn('/app');
+        $kernel->method('getEnvironment')->willReturn('prod');
+        $task = null;
+
+        $deprecations = $this->collectDeprecations(function () use ($kernel, &$task): void {
+            $task = new ProcessLauncherTask(new NullLogger(), $this->createRegistry(), $kernel);
+        });
+
+        $this->assertSame(
+            ['Since cleverage/process-bundle 5.4: Passing a "Symfony\Component\HttpKernel\KernelInterface" to "CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask::__construct()" is deprecated, pass the path of the console and the environment instead. The argument will only accept a string in v6.0.'],
+            $deprecations
+        );
+        $this->assertInstanceOf(ProcessLauncherTask::class, $task);
+        $this->assertSame(['/app/bin/console', 'prod'], [
+            (new \ReflectionProperty($task, 'consolePath'))->getValue($task),
+            (new \ReflectionProperty($task, 'environment'))->getValue($task),
+        ]);
+    }
+
     private function createTask(): ProcessLauncherTask
+    {
+        return new ProcessLauncherTask(new NullLogger(), $this->createRegistry(), '/app/bin/console', 'test');
+    }
+
+    private function createRegistry(): ProcessConfigurationRegistry
     {
         $registry = $this->createStub(ProcessConfigurationRegistry::class);
         $registry->method('hasProcessConfiguration')->willReturnCallback(
             static fn (string $processCode): bool => 'child' === $processCode
         );
 
-        return new ProcessLauncherTask(new NullLogger(), $registry, $this->createStub(KernelInterface::class));
+        return $registry;
     }
 
+    /**
+     * @param callable(): mixed $callback
+     *
+     * @return list<string>
+     */
+    private function collectDeprecations(callable $callback): array
+    {
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            $callback();
+        } finally {
+            restore_error_handler();
+        }
+
+        return $deprecations;
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
     private function createState(array $options): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

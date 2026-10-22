@@ -1,14 +1,366 @@
 services:
     _defaults:
-        bind:
-            $processManager: '@cleverage_process.manager.process'
-            $processRegistry: '@cleverage_process.registry.process_configuration'
-            $transformerRegistry: '@cleverage_process.registry.transformer'
-
-    CleverAge\ProcessBundle\Task\:
-        resource: '../../src/Task/*'
-        autowire: true
+        # Public for the deprecated direct access from the service container (fallback of TaskRegistry, service: of the
+        # task configurations), private in v6.0
         public: true
-        shared: false
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }
+            - { name: container.private, package: cleverage/process-bundle, version: '5.4' }
+
+    CleverAge\ProcessBundle\Task\AggregateIterableTask:
+        tags:
+            - { name: cleverage.task, code: aggregate_iterable }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\ArrayMergeTask:
+        tags:
+            - { name: cleverage.task, code: array_merge }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\ColumnAggregatorTask:
+        tags:
+            - { name: cleverage.task, code: column_aggregator }
+        shared: false
+        arguments:
+            - '@property_accessor'
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\ConstantIterableOutputTask:
+        tags:
+            - { name: cleverage.task, code: constant_iterable_output }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\ConstantOutputTask:
+        tags:
+            - { name: cleverage.task, code: constant_output }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\CounterTask:
+        tags:
+            - { name: cleverage.task, code: counter }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\Debug\DebugTask:
+        tags:
+            - { name: cleverage.task, code: debug }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\Debug\DieTask:
+        tags:
+            - { name: cleverage.task, code: die }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\Debug\ErrorForwarderTask:
+        tags:
+            - { name: cleverage.task, code: error_forwarder }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\Debug\StopwatchTask:
+        tags:
+            - { name: cleverage.task, code: stopwatch }
+        shared: false
+        arguments:
+            - '@logger'
+            - '@debug.stopwatch'
+
+    CleverAge\ProcessBundle\Task\DummyTask:
+        tags:
+            - { name: cleverage.task, code: dummy }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\Event\EventDispatcherTask:
+        tags:
+            - { name: cleverage.task, code: event_dispatcher }
+        shared: false
+        arguments:
+            - '@event_dispatcher'
+
+    CleverAge\ProcessBundle\Task\File\Csv\CsvReaderTask:
+        tags:
+            - { name: cleverage.task, code: csv_reader }
+        shared: false
+        arguments:
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\File\Csv\CsvSplitterTask:
+        tags:
+            - { name: cleverage.task, code: csv_splitter }
+        shared: false
+        arguments:
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask:
+        tags:
+            - { name: cleverage.task, code: csv_writer }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask:
+        tags:
+            - { name: cleverage.task, code: input_csv_reader }
+        shared: false
+        arguments:
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\File\FileMoverTask:
+        tags:
+            - { name: cleverage.task, code: file_mover }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\FileReaderTask:
+        tags:
+            - { name: cleverage.task, code: file_reader }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\FileRemoverTask:
+        tags:
+            - { name: cleverage.task, code: file_remover }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\FileSplitterTask:
+        tags:
+            - { name: cleverage.task, code: file_splitter }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\FileWriterTask:
+        tags:
+            - { name: cleverage.task, code: file_writer }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\FolderBrowserTask:
+        tags:
+            - { name: cleverage.task, code: folder_browser }
+        shared: false
+        arguments:
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\File\InputFileReaderTask:
+        tags:
+            - { name: cleverage.task, code: input_file_reader }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\InputFolderBrowserTask:
+        tags:
+            - { name: cleverage.task, code: input_folder_browser }
+        shared: false
+        arguments:
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\File\InputLineReaderTask:
+        tags:
+            - { name: cleverage.task, code: input_line_reader }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamReaderTask:
+        tags:
+            - { name: cleverage.task, code: json_stream_reader }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamWriterTask:
+        tags:
+            - { name: cleverage.task, code: json_stream_writer }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\LineReaderTask:
+        tags:
+            - { name: cleverage.task, code: line_reader }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\Xml\XmlReaderTask:
+        tags:
+            - { name: cleverage.task, code: xml_reader }
+        shared: false
+        arguments:
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\File\Xml\XmlStreamReaderTask:
+        tags:
+            - { name: cleverage.task, code: xml_stream_reader }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\Xml\XmlWriterTask:
+        tags:
+            - { name: cleverage.task, code: xml_writer }
+        shared: false
+        arguments:
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\File\Yaml\YamlReaderTask:
+        tags:
+            - { name: cleverage.task, code: yaml_reader }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\File\Yaml\YamlWriterTask:
+        tags:
+            - { name: cleverage.task, code: yaml_writer }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\FilterTask:
+        tags:
+            - { name: cleverage.task, code: filter }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\GroupByAggregateIterableTask:
+        tags:
+            - { name: cleverage.task, code: group_by_aggregate_iterable }
+        shared: false
+        arguments:
+            - '@property_accessor'
+
+    CleverAge\ProcessBundle\Task\InputAggregatorTask:
+        tags:
+            - { name: cleverage.task, code: input_aggregator }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\InputIteratorTask:
+        tags:
+            - { name: cleverage.task, code: input_iterator }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\IterableBatchTask:
+        tags:
+            - { name: cleverage.task, code: iterable_batch }
+        shared: false
+        arguments:
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\ObjectUpdaterTask:
+        tags:
+            - { name: cleverage.task, code: object_updater }
+        shared: false
+        arguments:
+            - '@property_accessor'
+
+    CleverAge\ProcessBundle\Task\Process\CommandRunnerTask:
+        tags:
+            - { name: cleverage.task, code: command_runner }
+        shared: false
+        arguments:
+            - '%kernel.project_dir%'
+
+    CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask:
+        tags:
+            - { name: cleverage.task, code: process_executor }
+        shared: false
+        arguments:
+            - '@cleverage_process.manager.process'
+            - '@cleverage_process.registry.process_configuration'
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask:
+        tags:
+            - { name: cleverage.task, code: process_launcher }
+        shared: false
+        arguments:
+            - '@logger'
+            - '@cleverage_process.registry.process_configuration'
+            - '%kernel.project_dir%/bin/console'
+            - '%kernel.environment%'
+
+    CleverAge\ProcessBundle\Task\PropertyGetterTask:
+        tags:
+            - { name: cleverage.task, code: property_getter }
+        shared: false
+        arguments:
+            - '@logger'
+            - '@property_accessor'
+
+    CleverAge\ProcessBundle\Task\PropertySetterTask:
+        tags:
+            - { name: cleverage.task, code: property_setter }
+        shared: false
+        arguments:
+            - '@logger'
+            - '@property_accessor'
+
+    CleverAge\ProcessBundle\Task\Reporting\AdvancedStatCounterTask:
+        tags:
+            - { name: cleverage.task, code: advanced_stat_counter }
+        shared: false
+        arguments:
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\Reporting\LoggerTask:
+        tags:
+            - { name: cleverage.task, code: logger }
+        shared: false
+        arguments:
+            - '@logger'
+            - '@property_accessor'
+
+    CleverAge\ProcessBundle\Task\Reporting\StatCounterTask:
+        tags:
+            - { name: cleverage.task, code: stat_counter }
+        shared: false
+        arguments:
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\RowAggregatorTask:
+        tags:
+            - { name: cleverage.task, code: row_aggregator }
+        shared: false
+        arguments:
+            - '@logger'
+
+    CleverAge\ProcessBundle\Task\Serialization\DenormalizerTask:
+        tags:
+            - { name: cleverage.task, code: denormalizer }
+        shared: false
+        arguments:
+            - '@serializer'
+
+    CleverAge\ProcessBundle\Task\Serialization\DeserializerTask:
+        tags:
+            - { name: cleverage.task, code: deserializer }
+        shared: false
+        arguments:
+            - '@serializer'
+
+    CleverAge\ProcessBundle\Task\Serialization\NormalizerTask:
+        tags:
+            - { name: cleverage.task, code: normalizer }
+        shared: false
+        arguments:
+            - '@serializer'
+
+    CleverAge\ProcessBundle\Task\Serialization\SerializerTask:
+        tags:
+            - { name: cleverage.task, code: serializer }
+        shared: false
+        arguments:
+            - '@serializer'
+
+    CleverAge\ProcessBundle\Task\SimpleBatchTask:
+        tags:
+            - { name: cleverage.task, code: simple_batch }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\SkipEmptyTask:
+        tags:
+            - { name: cleverage.task, code: skip_empty }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\SplitJoinLineTask:
+        tags:
+            - { name: cleverage.task, code: split_join_line }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\StopTask:
+        tags:
+            - { name: cleverage.task, code: stop }
+        shared: false
+
+    CleverAge\ProcessBundle\Task\TransformerTask:
+        tags:
+            - { name: cleverage.task, code: transformer }
+        shared: false
+        arguments:
+            - '@logger'
+            - '@cleverage_process.registry.transformer'
+
+    CleverAge\ProcessBundle\Task\Validation\ValidatorTask:
+        tags:
+            - { name: cleverage.task, code: validator }
+        shared: false
+        arguments:
+            - '@logger'
+            - '@validator'

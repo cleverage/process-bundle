@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer\Date;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -23,9 +24,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * transformers:
  *     date_parser:
  *         format: Y-m-d
+ *
+ * @final since 5.4
  */
 class DateParserTransformer implements ConfigurableTransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (!$value || $value instanceof \DateTime) {
@@ -39,7 +45,7 @@ class DateParserTransformer implements ConfigurableTransformerInterface
         $date = \DateTime::createFromFormat($options['format'], $value);
 
         if (!$date) {
-            throw new \UnexpectedValueException('Given value cannot be parsed into a date');
+            throw new UnexpectedValueException('Given value cannot be parsed into a date');
         }
 
         return $date;

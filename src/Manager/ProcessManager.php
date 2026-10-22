@@ -19,6 +19,9 @@ use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Event\ProcessEvent;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Exception\ProcessFailedException;
+use CleverAge\ProcessBundle\Exception\ProcessStoppedException;
+use CleverAge\ProcessBundle\Exception\RuntimeException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Logger\ProcessLogger;
 use CleverAge\ProcessBundle\Logger\TaskLogger;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
@@ -28,15 +31,20 @@ use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Contracts\Service\ResetInterface;
 
 /**
  * Execute processes.
+ *
+ * @final since 5.4
  */
-class ProcessManager
+class ProcessManager implements ProcessManagerInterface, ResetInterface
 {
     protected const EXECUTE_PROCESS = 1;
 
@@ -58,6 +66,11 @@ class ProcessManager
 
     protected ?TaskConfiguration $taskConfiguration = null;
 
+    protected TaskRegistry $taskRegistry;
+
+    /**
+     * @param iterable<ProcessStopCheckerInterface> $stopCheckers
+     */
     public function __construct(
         protected ContainerInterface $container,
         protected ProcessLogger $processLogger,
@@ -65,7 +78,32 @@ class ProcessManager
         protected ProcessConfigurationRegistry $processConfigurationRegistry,
         protected ContextualOptionResolver $contextualOptionResolver,
         protected EventDispatcherInterface $eventDispatcher,
+        protected iterable $stopCheckers = [],
+        ?TaskRegistry $taskRegistry = null,
     ) {
+        if (!$taskRegistry instanceof TaskRegistry) {
+            trigger_deprecation(
+                'cleverage/process-bundle',
+                '5.4',
+                'Not passing a "%s" to "%s::__construct()" is deprecated: the tasks are fetched from the service container. The argument will be required in v6.0.',
+                TaskRegistry::class,
+                self::class,
+            );
+            // Same behaviour as before the task registry: any service of the container
+            $taskRegistry = new TaskRegistry($this->container, $this->container);
+        }
+        $this->taskRegistry = $taskRegistry;
+    }
+
+    /**
+     * Forget the state of the previous executions, e.g. between two messages of a long-running worker.
+     */
+    public function reset(): void
+    {
+        $this->processedIterables = [];
+        $this->processedBlockings = [];
+        $this->processHistory = null;
+        $this->taskConfiguration = null;
     }
 
     public function getProcessHistory(): ?ProcessHistory
@@ -84,9 +122,12 @@ class ProcessManager
      * This method decorates the real execution to add event & error handling
      *
      * @see ProcessManager::doExecute
+     *
+     * @param array<string, mixed> $context
      */
     public function execute(string $processCode, mixed $input = null, array $context = []): mixed
     {
+        $parentProcessHistory = $this->processHistory;
         try {
             $this->eventDispatcher->dispatch(
                 new ProcessEvent($processCode, $input, $context),
@@ -111,6 +152,10 @@ class ProcessManager
             );
 
             throw $error;
+        } finally {
+            // When the process has failed, doExecute() did not restore the history of the parent process (if any): the
+            // logs above are still attributed to the failed process, the next ones to the parent process
+            $this->processHistory = $parentProcessHistory;
         }
 
         return $result;
@@ -118,6 +163,8 @@ class ProcessManager
 
     /**
      * Real process execution, with a given input and context.
+     *
+     * @param array<string, mixed> $context
      */
     protected function doExecute(string $processCode, mixed $input = null, array $context = []): mixed
     {
@@ -125,44 +172,54 @@ class ProcessManager
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
         $processHistory = $this->initializeStates($processConfiguration, $context);
         $this->processHistory = $processHistory;
-        $this->checkProcess($processConfiguration);
 
-        // First initialize the whole stack in a linear way, tasks are initialized in the order they are configured
-        foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
-            $this->initialize($taskConfiguration);
-        }
+        try {
+            $this->checkProcess($processConfiguration);
 
-        // If defined, set the input of a task
-        if ($processConfiguration->getEntryPoint() instanceof TaskConfiguration) {
-            $processConfiguration->getEntryPoint()
-                ->getState()
-                ->setInput($input);
-        } elseif (null !== $input) {
-            $this->processLogger->warning('Process has no entry point for input');
-        }
-
-        // Resolve task from main branch, starting by the end
-        $taskList = array_reverse($processConfiguration->getTaskConfigurations());
-        $allowedTasks = $processConfiguration->getMainTaskGroup();
-        foreach ($taskList as $taskConfiguration) {
-            if (\in_array($taskConfiguration->getCode(), $allowedTasks, true)) {
-                $this->resolve($taskConfiguration);
+            // First initialize the whole stack in a linear way, tasks are initialized in the order they are configured
+            foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
+                $this->initialize($taskConfiguration);
             }
-        }
 
-        // Finalize the process in a linear way
-        foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
-            $this->finalize($taskConfiguration);
-        }
+            // If defined, set the input of a task
+            if ($processConfiguration->getEntryPoint() instanceof TaskConfiguration) {
+                $processConfiguration->getEntryPoint()
+                    ->getState()
+                    ->setInput($input);
+            } elseif (null !== $input) {
+                $this->processLogger->warning('Process has no entry point for input');
+            }
 
-        $this->endProcess($processHistory);
+            // Resolve task from main branch, starting by the end
+            $taskList = array_reverse($processConfiguration->getTaskConfigurations());
+            $allowedTasks = $processConfiguration->getMainTaskGroup();
+            foreach ($taskList as $taskConfiguration) {
+                if (\in_array($taskConfiguration->getCode(), $allowedTasks, true)) {
+                    $this->resolve($taskConfiguration);
+                }
+            }
 
-        // If defined, return the output of a task
-        $returnValue = null;
-        if ($processConfiguration->getEndPoint() instanceof TaskConfiguration) {
-            $returnValue = $processConfiguration->getEndPoint()
-                ->getState()
-                ->getOutput();
+            // Finalize the process in a linear way
+            foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
+                $this->finalize($taskConfiguration);
+            }
+
+            $this->endProcess($processHistory);
+
+            // If defined, return the output of a task
+            $returnValue = null;
+            if ($processConfiguration->getEndPoint() instanceof TaskConfiguration) {
+                $returnValue = $processConfiguration->getEndPoint()
+                    ->getState()
+                    ->getOutput();
+            }
+        } catch (\Throwable $error) {
+            if ($processHistory->isStarted()) {
+                $processHistory->setFailed();
+            }
+            $this->endProcess($processHistory);
+
+            throw $error;
         }
 
         $this->processHistory = $parentProcessHistory;
@@ -192,7 +249,7 @@ class ProcessManager
         }
 
         if (!$allParentsResolved) {
-            throw new \UnexpectedValueException('Cannot resolve all parents');
+            throw new UnexpectedValueException('Cannot resolve all parents');
         }
 
         $state->setStatus(ProcessState::STATUS_PROCESSING);
@@ -230,19 +287,7 @@ class ProcessManager
             $m .= "but it's error strategy 'stop' implies they will never be reached.";
             $this->taskLogger->debug($m);
         }
-        // @todo Refactor this using a Registry with this feature:
-        // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
-        $serviceReference = $taskConfiguration->getServiceReference();
-        if (str_starts_with($serviceReference, '@')) {
-            $task = $this->container->get(ltrim($serviceReference, '@'));
-        } elseif ($this->container->has($serviceReference)) {
-            $task = $this->container->get($serviceReference);
-        } else {
-            throw new \UnexpectedValueException("Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'");
-        }
-        if (!$task instanceof TaskInterface) {
-            throw new \UnexpectedValueException("Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface");
-        }
+        $task = $this->taskRegistry->getTask($taskConfiguration);
         $taskConfiguration->setTask($task);
 
         if ($task instanceof InitializableTaskInterface) {
@@ -256,14 +301,13 @@ class ProcessManager
                 $this->taskLogger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
                 // @deprecated since v5, in v6.0 the process will fail right away, before any task is executed
-                @trigger_error(
-                    \sprintf(
-                        'The initialization of the task "%s" of the process "%s" has failed with message "%s". Going on with the process after an initialization failure is deprecated since v5: in v6.0, the process will fail before executing any task.',
-                        $taskConfiguration->getCode(),
-                        $state->getProcessConfiguration()->getCode(),
-                        $e->getMessage(),
-                    ),
-                    \E_USER_DEPRECATED
+                trigger_deprecation(
+                    'cleverage/process-bundle',
+                    '5.1',
+                    'The initialization of the task "%s" of the process "%s" has failed with message "%s". Going on with the process after an initialization failure is deprecated: in v6.0, the process will fail before executing any task.',
+                    $taskConfiguration->getCode(),
+                    $state->getProcessConfiguration()->getCode(),
+                    $e->getMessage(),
                 );
             }
         }
@@ -359,10 +403,19 @@ class ProcessManager
     {
         $task = $taskConfiguration->getTask();
         if (!$task instanceof TaskInterface) {
-            throw new \RuntimeException("Missing task for configuration {$taskConfiguration->getCode()}");
+            throw new RuntimeException("Missing task for configuration {$taskConfiguration->getCode()}");
         }
         $state = $taskConfiguration->getState();
 
+        if ($this->isStopRequested($state)) {
+            $state->reset(self::EXECUTE_PROCESS !== $executionFlag);
+            $this->processLogger->info("Process stop requested, the task {$taskConfiguration->getCode()} is not executed");
+            $state->stop(ProcessStoppedException::create($state->getProcessConfiguration()->getCode(), $taskConfiguration->getCode()));
+
+            return;
+        }
+
+        $state->incrementExecutionCount();
         try {
             if (self::EXECUTE_PROCESS === $executionFlag) {
                 $state->reset(false);
@@ -375,7 +428,7 @@ class ProcessManager
                 $state->reset(true);
                 if (!$task instanceof BlockingTaskInterface) {
                     // This exception should never be thrown
-                    throw new \UnexpectedValueException("Task {$taskConfiguration->getCode()} is not blocking");
+                    throw new UnexpectedValueException("Task {$taskConfiguration->getCode()} is not blocking");
                 }
                 $this->processLogger->debug("Proceeding task {$taskConfiguration->getCode()}");
                 $task->proceed($state);
@@ -384,12 +437,12 @@ class ProcessManager
                 $state->reset(true);
                 if (!$task instanceof FlushableTaskInterface) {
                     // This exception should never be thrown
-                    throw new \UnexpectedValueException("Task {$taskConfiguration->getCode()} is not flushable");
+                    throw new UnexpectedValueException("Task {$taskConfiguration->getCode()} is not flushable");
                 }
                 $this->processLogger->debug("Flushing task {$taskConfiguration->getCode()}");
                 $task->flush($state);
             } else {
-                throw new \UnexpectedValueException("Unknown execution flag: {$executionFlag}");
+                throw new UnexpectedValueException("Unknown execution flag: {$executionFlag}");
             }
 
             $exception = $state->getException();
@@ -413,9 +466,20 @@ class ProcessManager
             } elseif (TaskConfiguration::STRATEGY_STOP === $taskConfiguration->getErrorStrategy()) {
                 $state->stop($exception);
             } else {
-                throw new \UnexpectedValueException("Unknown error strategy '{$taskConfiguration->getErrorStrategy()}'");
+                throw new UnexpectedValueException("Unknown error strategy '{$taskConfiguration->getErrorStrategy()}'");
             }
         }
+    }
+
+    protected function isStopRequested(ProcessState $state): bool
+    {
+        foreach ($this->stopCheckers as $stopChecker) {
+            if ($stopChecker->shouldStop($state)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -463,6 +527,9 @@ class ProcessManager
         }
     }
 
+    /**
+     * @param array<string, mixed> $context
+     */
     protected function initializeStates(
         ProcessConfiguration $processConfiguration,
         array $context = [],
@@ -512,12 +579,23 @@ class ProcessManager
 
     protected function endProcess(ProcessHistory $history): void
     {
+        $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($history->getProcessCode());
+
         // Do not change state if already set
         if ($history->isStarted()) {
             $history->setSuccess();
 
-            $this->processLogger->info(
+            $this->processLogger->log(
+                $processConfiguration->getSuccessLogLevel(),
                 "Process {$history->getProcessCode()} succeed",
+                [
+                    'duration' => $history->getDuration(),
+                ]
+            );
+        } elseif ($history->isFailed()) {
+            $this->processLogger->log(
+                $processConfiguration->getFailedLogLevel(),
+                "Process {$history->getProcessCode()} failed",
                 [
                     'duration' => $history->getDuration(),
                 ]

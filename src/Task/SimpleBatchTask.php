@@ -20,9 +20,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Simple example of how to manage an internal buffer for batch processing.
+ *
+ * @final since 5.4
  */
 class SimpleBatchTask extends AbstractConfigurableTask implements FlushableTaskInterface
 {
+    /**
+     * @var list<mixed>
+     */
     protected array $elements = [];
 
     public function flush(ProcessState $state): void

@@ -17,9 +17,14 @@ use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 
 /**
  * Return the last element of an array.
+ *
+ * @final since 5.4
  */
 class ArrayLastTransformer implements TransformerInterface
 {
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         return array_values(\array_slice($value, -1))[0];

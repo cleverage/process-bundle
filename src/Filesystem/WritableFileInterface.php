@@ -18,5 +18,8 @@ namespace CleverAge\ProcessBundle\Filesystem;
  */
 interface WritableFileInterface extends FileStreamInterface
 {
+    /**
+     * @param array<mixed> $fields
+     */
     public function writeLine(array $fields): int;
 }

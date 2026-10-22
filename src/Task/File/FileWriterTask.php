@@ -18,6 +18,9 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @final since 5.4
+ */
 class FileWriterTask extends AbstractConfigurableTask
 {
     public function execute(ProcessState $state): void

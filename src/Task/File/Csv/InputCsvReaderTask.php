@@ -21,6 +21,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class InputCsvReaderTask extends CsvReaderTask
 {
+    /**
+     * @return array<string, mixed>
+     */
     #[\Override]
     protected function getOptions(ProcessState $state): array
     {
@@ -45,6 +48,8 @@ class InputCsvReaderTask extends CsvReaderTask
 
     /**
      * If there is no base_path, then the given path from input should be absolute.
+     *
+     * @param array<string, mixed> $options
      */
     protected function getFilePath(array $options, string $input): string
     {

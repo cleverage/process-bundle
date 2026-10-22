@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer;
 
 use CleverAge\ProcessBundle\Exception\TransformerException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
@@ -24,6 +25,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Maps properties of an array/object to an other array/object.
+ *
+ * @final since 5.4
  */
 class MappingTransformer implements ConfigurableTransformerInterface
 {
@@ -37,6 +40,9 @@ class MappingTransformer implements ConfigurableTransformerInterface
         $this->transformerRegistry = $transformerRegistry;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (!empty($options['initial_value']) && $options['keep_input']) {
@@ -111,9 +117,21 @@ class MappingTransformer implements ConfigurableTransformerInterface
             } elseif ($this->accessor->isWritable($result, $targetProperty)) {
                 $this->accessor->setValue($result, $targetProperty, $transformedValue);
             } elseif (\is_array($result)) {
+                if (!$this->isSimplePropertyName($targetProperty)) {
+                    trigger_deprecation(
+                        'cleverage/process-bundle',
+                        '5.2',
+                        "Setting the target property '%s' as a literal key of an array destination is deprecated, it will throw an \\UnexpectedValueException in v6.0. Use '[%s]' to keep a literal key, or the index notation for nested arrays (e.g. '[a][b]').",
+                        $targetProperty,
+                        $targetProperty
+                    );
+                }
                 $result[$targetProperty] = $transformedValue;
+            } elseif ($result instanceof \stdClass && $this->isSimplePropertyName($targetProperty)) {
+                // Only a simple property name can be added to a \stdClass, nested paths are not created
+                $result->{$targetProperty} = $transformedValue;
             } else {
-                throw new \UnexpectedValueException("Property '{$targetProperty}' is not writable");
+                throw new UnexpectedValueException("Property '{$targetProperty}' is not writable");
             }
         }
 
@@ -142,7 +160,7 @@ class MappingTransformer implements ConfigurableTransformerInterface
                 $resolvedMapping = [];
                 $mappingResolver = new OptionsResolver();
                 $this->configureMappingOptions($mappingResolver);
-                /** @var array $value */
+                /** @var array<string, array<string, mixed>|null> $value */
                 foreach ($value as $property => $mappingConfig) {
                     $resolvedMapping[$property] = $mappingResolver->resolve($mappingConfig ?? []);
                 }
@@ -187,6 +205,15 @@ class MappingTransformer implements ConfigurableTransformerInterface
         }
 
         return $this->accessor->getValue($input, $sourceProperty);
+    }
+
+    /**
+     * A simple property name (e.g. "name") is neither a nested path (e.g. "address.city") nor an index notation (e.g.
+     * "[name]").
+     */
+    private function isSimplePropertyName(string $property): bool
+    {
+        return 1 === preg_match('/^[^.[\]]+$/', $property);
     }
 
     /**

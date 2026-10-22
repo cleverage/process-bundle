@@ -21,6 +21,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Get a property on the input and return it with PropertyAccessor.
+ *
+ * @final since 5.4
  */
 class PropertyGetterTask extends AbstractConfigurableTask
 {
@@ -38,7 +40,7 @@ class PropertyGetterTask extends AbstractConfigurableTask
 
         try {
             $output = $this->accessor->getValue($input, $property);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             $state->addErrorContextValue('property', $property);
             $state->setException($e);
 

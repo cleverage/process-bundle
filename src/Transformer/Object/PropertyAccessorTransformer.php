@@ -19,6 +19,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
  * Read a property from the input value and return it.
+ *
+ * @final since 5.4
  */
 class PropertyAccessorTransformer implements ConfigurableTransformerInterface
 {
@@ -27,6 +29,9 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         if (null === $value && $options['ignore_null']) {

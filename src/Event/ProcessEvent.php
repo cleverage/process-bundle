@@ -17,6 +17,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event object for process start/stop/fail.
+ *
+ * @final since 5.4
  */
 class ProcessEvent extends Event
 {
@@ -26,6 +28,9 @@ class ProcessEvent extends Event
 
     final public const EVENT_PROCESS_FAILED = 'cleverage_process.fail';
 
+    /**
+     * @param array<string, mixed> $processContext
+     */
     public function __construct(
         protected string $processCode,
         protected mixed $processInput = null,
@@ -50,6 +55,9 @@ class ProcessEvent extends Event
         return $this->processOutput;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getProcessContext(): array
     {
         return $this->processContext;

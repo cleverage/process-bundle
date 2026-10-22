@@ -78,8 +78,10 @@ class EventDispatcherTaskTest extends TestCase
         $this->execute($dispatcher, ['event_name' => 'myapp.myevent']);
 
         self::assertSame(['myapp.myevent', EventDispatcherTaskEvent::class], $this->calledListeners);
-        self::assertCount(1, $this->deprecations);
-        self::assertStringContainsString('listen to "myapp.myevent" instead', $this->deprecations[0]);
+        self::assertSame(
+            ['Since cleverage/process-bundle 5.1: Listening to "'.EventDispatcherTaskEvent::class.'" for an EventDispatcherTask with the "event_name" option set is deprecated and will not work anymore in v6.0, listen to "myapp.myevent" instead.'],
+            $this->deprecations
+        );
     }
 
     public function testPassiveTaskOutputsInput(): void
@@ -110,6 +112,9 @@ class EventDispatcherTaskTest extends TestCase
         return $dispatcher;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     private function execute(EventDispatcher $dispatcher, array $options, mixed $input = null): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

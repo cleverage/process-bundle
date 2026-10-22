@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\InputLineReaderTask`
+* **Code**: `input_line_reader` (`task: input_line_reader`)
 * **Iterable task**
 
 Accepted inputs
@@ -37,11 +38,11 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
+  task: folder_browser
   options:
     folder_path: '%kernel.project_dir%/var/data'
   outputs: [read]
 read:
-  service: '@CleverAge\ProcessBundle\Task\File\InputLineReaderTask'
+  task: input_line_reader
   outputs: [log_line]
 ```

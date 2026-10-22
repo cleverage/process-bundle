@@ -7,12 +7,13 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\InputIteratorTask`
+* **Code**: `input_iterator` (`task: input_iterator`)
 * **Iterable task**
 
 Accepted inputs
 ---------------
 
-`array`, `\Iterator` or `\IteratorAggregate`: any other type throws an `\UnexpectedValueException`
+`array`, `\Iterator` or `\IteratorAggregate` (whatever `\Traversable` its `getIterator()` returns): any other type throws an `\UnexpectedValueException`
 
 Possible outputs
 ----------------
@@ -32,9 +33,9 @@ Examples
 ```yaml
 # Task configuration level
 aggregate:
-  service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
+  task: aggregate_iterable
   outputs: [iterate]
 iterate:
-  service: '@CleverAge\ProcessBundle\Task\InputIteratorTask'
+  task: input_iterator
   outputs: [next_task]
 ```

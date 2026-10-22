@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Xml\XmlWriterTask`
+* **Code**: `xml_writer` (`task: xml_writer`)
 
 Accepted inputs
 ---------------
@@ -34,7 +35,7 @@ Examples
 ```yaml
 # Task configuration level
 write_xml:
-  service: '@CleverAge\ProcessBundle\Task\File\Xml\XmlWriterTask'
+  task: xml_writer
   options:
     file_path: '%kernel.project_dir%/var/data/file.xml'
 ```

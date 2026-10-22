@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -29,10 +30,14 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
     public function execute(ProcessState $state): void
     {
         $this->handleIteratorFromInput($state);
+        $iterator = $this->iterator;
+        if (!$iterator instanceof \Iterator) {
+            throw new LogicException('No iterator initialized');
+        }
 
-        if ($this->iterator->valid()) {
-            $state->addErrorContextValue('iterator_key', $this->iterator->key());
-            $state->setOutput($this->iterator->current());
+        if ($iterator->valid()) {
+            $state->addErrorContextValue('iterator_key', $iterator->key());
+            $state->setOutput($iterator->current());
         } else {
             $state->setSkipped(true);
             $this->iterator = null;
@@ -74,12 +79,6 @@ abstract class AbstractIterableOutputTask extends AbstractConfigurableTask imple
             }
             // Cleanup invalid iterator => prepare for new iteration cycle
             $this->iterator = null;
-        }
-
-        // This should never be reached
-        /* @phpstan-ignore-next-line */
-        if (null !== $this->iterator) {
-            throw new \UnexpectedValueException("At this point iterator should have been null, maybe it's a wrong type...");
         }
 
         $this->iterator = $this->initializeIterator($state);

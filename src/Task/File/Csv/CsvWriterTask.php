@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -24,6 +25,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  * Ignores any input.
  *
  * @property CsvFile $csv
+ *
+ * @final since 5.4
  */
 class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 {
@@ -52,6 +55,9 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
             'split_character' => '|',
             'write_headers' => true,
         ]);
+        $resolver->setAllowedTypes('split_character', ['string']);
+        // Any value used to be evaluated as a boolean: cast it instead of rejecting it
+        $resolver->setNormalizer('write_headers', static fn (Options $options, mixed $value): bool => (bool) $value);
 
         $resolver->setNormalizer(
             'file_path',
@@ -67,11 +73,14 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         );
     }
 
+    /**
+     * @return array<mixed>
+     */
     protected function getInput(ProcessState $state): array
     {
         $input = $state->getInput();
         if (!\is_array($input)) {
-            throw new \UnexpectedValueException('Input value is not an array');
+            throw new UnexpectedValueException('Input value is not an array');
         }
         $splitCharacter = $this->getOption($state, 'split_character');
 
@@ -84,11 +93,22 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         return $input;
     }
 
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return list<string>|null
+     */
     protected function getHeaders(ProcessState $state, array $options): ?array
     {
         $headers = $options['headers'];
         if (null === $headers) {
-            return array_keys($state->getInput());
+            $input = $state->getInput();
+            if (!\is_array($input)) {
+                throw new UnexpectedValueException('Input value is not an array');
+            }
+
+            // Keys of a list are integers: the CSV output is the same with their string value
+            return array_map(strval(...), array_keys($input));
         }
 
         return $headers;

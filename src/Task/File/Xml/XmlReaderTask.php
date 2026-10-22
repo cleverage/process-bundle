@@ -21,6 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Read an XML file.
+ *
+ * @final since 5.4
  */
 class XmlReaderTask extends AbstractConfigurableTask
 {

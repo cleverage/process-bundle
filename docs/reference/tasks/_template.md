@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `Fully\Qualified\ClassName`
+* **Code**: `task_code` (`task: task_code`)
 * **Iterable task** _(only if it implements `IterableTaskInterface`)_
 * **Blocking task** _(only if it implements `BlockingTaskInterface`)_
 * **Flushable task** _(only if it implements `FlushableTaskInterface`)_
@@ -39,7 +40,7 @@ Examples
 ```yaml
 # Task configuration level
 code:
-  service: '@Fully\Qualified\ClassName'
+  task: task_code
   options:
     a: 1
     b: 2

@@ -19,6 +19,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Denormalize the given value based on options.
+ *
+ * @final since 5.4
  */
 class DenormalizeTransformer implements ConfigurableTransformerInterface
 {
@@ -39,6 +41,9 @@ class DenormalizeTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('context', ['array']);
     }
 
+    /**
+     * @param array<string, mixed> $options
+     */
     public function transform(mixed $value, array $options = []): mixed
     {
         return $this->denormalizer->denormalize($value, $options['class'], $options['format'], $options['context']);
