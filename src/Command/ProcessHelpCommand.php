@@ -23,6 +23,7 @@ use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
+use CleverAge\ProcessBundle\Registry\TaskRegistryInterface;
 use CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask;
 use CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask;
 use Psr\Container\ContainerInterface;
@@ -64,7 +65,7 @@ class ProcessHelpCommand extends Command
 
     protected const INDENT_SIZE = 4;
 
-    protected TaskRegistry $taskRegistry;
+    protected TaskRegistryInterface $taskRegistry;
 
     /**
      * @deprecated since 5.4, only set when a container is passed to the constructor, will be removed in v6.0
@@ -73,7 +74,7 @@ class ProcessHelpCommand extends Command
 
     public function __construct(
         protected ProcessConfigurationRegistry $processConfigRegistry,
-        TaskRegistry|ContainerInterface $taskRegistry,
+        TaskRegistryInterface|ContainerInterface $taskRegistry,
     ) {
         parent::__construct();
         if ($taskRegistry instanceof ContainerInterface) {

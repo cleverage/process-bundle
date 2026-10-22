@@ -35,6 +35,7 @@ use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
+use CleverAge\ProcessBundle\Registry\TaskRegistryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Service\ResetInterface;
@@ -66,7 +67,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
 
     protected ?TaskConfiguration $taskConfiguration = null;
 
-    protected TaskRegistry $taskRegistry;
+    protected TaskRegistryInterface $taskRegistry;
 
     /**
      * @param iterable<ProcessStopCheckerInterface> $stopCheckers
@@ -79,9 +80,9 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
         protected ContextualOptionResolver $contextualOptionResolver,
         protected EventDispatcherInterface $eventDispatcher,
         protected iterable $stopCheckers = [],
-        ?TaskRegistry $taskRegistry = null,
+        ?TaskRegistryInterface $taskRegistry = null,
     ) {
-        if (!$taskRegistry instanceof TaskRegistry) {
+        if (!$taskRegistry instanceof TaskRegistryInterface) {
             trigger_deprecation(
                 'cleverage/process-bundle',
                 '5.4',

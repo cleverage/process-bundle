@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#351](https://github.com/cleverage/process-bundle/issues/351) `ProcessManager` and `ProcessHelpCommand` are typed on `TaskRegistryInterface` instead of the final `TaskRegistry` class: the task registry can be decorated or replaced. Add tests.
+
 v5.4.1
 -----
 
