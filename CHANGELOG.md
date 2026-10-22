@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#335](https://github.com/cleverage/process-bundle/issues/335) `LineReaderTask` (`line_reader`) and `InputLineReaderTask` (`input_line_reader`): the last line of a file that does not end with a line break is no longer lost. Add tests.
+
 v5.4.1
 -----
 
