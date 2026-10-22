@@ -5,10 +5,24 @@ parameters:
         - tests
     inferPrivatePropertyTypeFromConstructor: true
     treatPhpDocTypesAsCertain: false
+    # Same ignores in all the process bundles: not all of them match in each bundle
+    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
+        # PHPUnit 13 deprecates expectExceptionMessage() (sebastianbergmann/phpunit#6560), still needed with PHPUnit 11 and 12
+        - message: '#^Call to deprecated method expectExceptionMessage\(\) of class PHPUnit\\Framework\\TestCase#'
+          path: tests/*
         # Symfony 8.1 deprecates HttpKernel\Bundle\BundleInterface: its replacement does not exist in Symfony 6.4 and 7.4
         - message: '#typehint with deprecated interface Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface#'
           path: tests/*
         # The tests of the deprecated code of the bundles use it
         - message: '#deprecated .*CleverAge\\#'
+          path: tests/*
+        # Assertions on values already known by PHPStan, kept as regression checks (or values changed by reference)
+        - identifier: staticMethod.alreadyNarrowedType
+          path: tests/*
+        - identifier: method.alreadyNarrowedType
+          path: tests/*
+        - identifier: staticMethod.impossibleType
+          path: tests/*
+        - identifier: method.impossibleType
           path: tests/*
