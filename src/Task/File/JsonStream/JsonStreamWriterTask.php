@@ -13,14 +13,19 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\JsonStream;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
+use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class JsonStreamWriterTask extends AbstractConfigurableTask implements BlockingTaskInterface
+/**
+ * @final since 5.4
+ */
+class JsonStreamWriterTask extends AbstractConfigurableTask implements BlockingTaskInterface, FinalizableTaskInterface
 {
     protected ?JsonStreamFile $file = null;
 
@@ -30,7 +35,7 @@ class JsonStreamWriterTask extends AbstractConfigurableTask implements BlockingT
             $options = $this->getOptions($state);
             $this->file = new JsonStreamFile(
                 $options['file_path'],
-                'wb',
+                $options['mode'],
                 $options['spl_file_object_flags'],
                 $options['json_flags'],
             );
@@ -38,7 +43,7 @@ class JsonStreamWriterTask extends AbstractConfigurableTask implements BlockingT
 
         $input = $state->getInput();
         if (!\is_array($input)) {
-            throw new \UnexpectedValueException('Input value is not an array');
+            throw new UnexpectedValueException('Input value is not an array');
         }
         $this->file->writeLine($input);
     }
@@ -47,6 +52,14 @@ class JsonStreamWriterTask extends AbstractConfigurableTask implements BlockingT
     {
         $options = $this->getOptions($state);
         $state->setOutput($options['file_path']);
+    }
+
+    /**
+     * Release the file at the end of the process, so that the task can write it again on its next execution.
+     */
+    public function finalize(ProcessState $state): void
+    {
+        $this->file = null;
     }
 
     protected function configureOptions(OptionsResolver $resolver): void
@@ -66,9 +79,11 @@ class JsonStreamWriterTask extends AbstractConfigurableTask implements BlockingT
             )
         );
         $resolver->setDefaults([
+            'mode' => 'wb',
             'spl_file_object_flags' => null,
             'json_flags' => null,
         ]);
+        $resolver->setAllowedTypes('mode', ['string']);
         $resolver->setAllowedTypes('spl_file_object_flags', ['array', 'null']);
         $resolver->setAllowedTypes('json_flags', ['array', 'null']);
     }

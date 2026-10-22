@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Tests\Transformer;
 
+use CleverAge\ProcessBundle\Tests\IgnoreDeprecationsTrait;
 use CleverAge\ProcessBundle\Transformer\CallbackTransformer;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -23,6 +24,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 #[\PHPUnit\Framework\Attributes\CoversClass(CallbackTransformer::class)]
 class CallbackTransformerTest extends TestCase
 {
+    use IgnoreDeprecationsTrait;
+
     public static function doCallback(mixed ...$args): string
     {
         return implode('-', $args);
@@ -82,22 +85,50 @@ class CallbackTransformerTest extends TestCase
     public function testAdditionalParametersAreUsedAsRightParameters(): void
     {
         $transformer = new CallbackTransformer();
-        $options = $this->resolveOptions($transformer, [
+        $options = self::ignoreDeprecations(fn (): array => $this->resolveOptions($transformer, [
             'callback' => [self::class, 'doCallback'],
             'additional_parameters' => [7, 8],
-        ]);
+        ]));
 
         self::assertSame('6-7-8', $transformer->transform('6', $options));
+    }
+
+    public function testAdditionalParametersAreDeprecated(): void
+    {
+        $transformer = new CallbackTransformer();
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            $this->resolveOptions($transformer, [
+                'callback' => [self::class, 'doCallback'],
+                'additional_parameters' => [7, 8],
+            ]);
+            $this->resolveOptions($transformer, [
+                'callback' => [self::class, 'doCallback'],
+                'right_parameters' => [4],
+            ]);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame(
+            ['Since cleverage/process-bundle 2.0.4: The "additional_parameters" option is deprecated. Use "right_parameters" instead.'],
+            $deprecations
+        );
     }
 
     public function testAdditionalParametersAreIgnoredWhenRightParametersAreSet(): void
     {
         $transformer = new CallbackTransformer();
-        $options = $this->resolveOptions($transformer, [
+        $options = self::ignoreDeprecations(fn (): array => $this->resolveOptions($transformer, [
             'callback' => [self::class, 'doCallback'],
             'right_parameters' => [4],
             'additional_parameters' => [7, 8],
-        ]);
+        ]));
 
         self::assertSame('6-4', $transformer->transform('6', $options));
     }

@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\FileSplitterTask`
+* **Code**: `file_splitter` (`task: file_splitter`)
 * **Iterable task**
 
 Accepted inputs
@@ -36,13 +37,13 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\FileSplitterTask'
+  task: file_splitter
   options:
     file_path: '%kernel.project_dir%/var/data/json_stream_reader.json'
     max_lines: 100
   outputs: [read_chunk]
 read_chunk:
-  service: '@CleverAge\ProcessBundle\Task\File\InputLineReaderTask'
+  task: input_line_reader
 ```
 
 Notes

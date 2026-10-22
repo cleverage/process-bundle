@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\Filesystem\Filesystem;
@@ -20,6 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Move the file passed as input, requires the destination path in options.
+ *
+ * @final since 5.4
  */
 class FileMoverTask extends AbstractConfigurableTask
 {
@@ -29,7 +32,7 @@ class FileMoverTask extends AbstractConfigurableTask
         $fs = new Filesystem();
         $file = $state->getInput();
         if (!$fs->exists($file)) {
-            throw new \UnexpectedValueException("File does not exists: '{$file}'");
+            throw new UnexpectedValueException("File does not exists: '{$file}'");
         }
         $dest = $options['destination'];
         if (is_dir($dest)) {

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\Xml;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Filesystem\XmlFile;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -21,6 +22,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Write an XML file.
+ *
+ * @final since 5.4
  */
 class XmlWriterTask extends AbstractConfigurableTask
 {
@@ -33,7 +36,7 @@ class XmlWriterTask extends AbstractConfigurableTask
     {
         $input = $state->getInput();
         if (!$input instanceof \DOMDocument) {
-            throw new \UnexpectedValueException('Input must be a \DOMDocument');
+            throw new UnexpectedValueException('Input must be a \DOMDocument');
         }
 
         $file = new XmlFile($this->getOption($state, 'file_path'), $this->getOption($state, 'mode'));

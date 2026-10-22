@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\AggregateIterableTask`
+* **Code**: `aggregate_iterable` (`task: aggregate_iterable`)
 * **Blocking task**
 
 Accepted inputs
@@ -33,10 +34,10 @@ Examples
 ```yaml
 # Task configuration level
 data:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output: [1, 2, 3]
   outputs: [aggregate]
 aggregate:
-  service: '@CleverAge\ProcessBundle\Task\AggregateIterableTask'
+  task: aggregate_iterable
 ```

@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\ColumnAggregatorTask`
+* **Code**: `column_aggregator` (`task: column_aggregator`)
 * **Blocking task**
 
 Accepted inputs
@@ -47,10 +48,10 @@ Examples
 ```yaml
 # Task configuration level
 iterate:
-  service: '@CleverAge\ProcessBundle\Task\InputIteratorTask'
+  task: input_iterator
   outputs: [aggregate_a]
 aggregate_a:
-  service: '@CleverAge\ProcessBundle\Task\ColumnAggregatorTask'
+  task: column_aggregator
   options:
     columns: [col1]
     condition:

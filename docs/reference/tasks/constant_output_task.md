@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\ConstantOutputTask`
+* **Code**: `constant_output` (`task: constant_output`)
 
 Accepted inputs
 ---------------
@@ -34,7 +35,7 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+  task: constant_output
   options:
     output:
       id: 123

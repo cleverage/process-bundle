@@ -17,6 +17,8 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 /**
  * Event object for process start/stop/fail.
+ *
+ * @final since 5.4
  */
 class ProcessEvent extends Event
 {

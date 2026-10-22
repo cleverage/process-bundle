@@ -13,6 +13,9 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Context;
 
+/**
+ * @final since 5.4
+ */
 class ContextualOptionResolver
 {
     /**
@@ -28,8 +31,11 @@ class ContextualOptionResolver
             return $this->contextualizeOptions($value, $context);
         }
 
-        if (\is_string($value)) {
-            $pattern = \sprintf('/{{[ ]*(%s){1}[ ]*}}/', implode('|', array_keys($context)));
+        // Without context, there is nothing to replace ("{{ }}" would match an empty key)
+        if (\is_string($value) && [] !== $context) {
+            // The keys are free (console, process_executor, UI...): quoted, they cannot alter the pattern
+            $keys = array_map(static fn (int|string $key): string => preg_quote((string) $key, '/'), array_keys($context));
+            $pattern = \sprintf('/{{[ ]*(%s){1}[ ]*}}/', implode('|', $keys));
 
             $matches = [];
             $result = preg_match($pattern, $value, $matches);

@@ -16,25 +16,30 @@ namespace CleverAge\ProcessBundle\Registry;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Exception\MissingProcessException;
 use Psr\Log\LogLevel;
 
 /**
  * Build and holds all the process configurations.
+ *
+ * @final since 5.4
  */
-class ProcessConfigurationRegistry
+class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterface
 {
     /**
-     * @var ProcessConfiguration[]
+     * @var array<string, ProcessConfiguration>
      */
     protected array $processConfigurations = [];
 
     /**
-     * @param array<string, array<string, mixed>> $rawConfiguration
+     * @param array<string, array<string, mixed>>                  $rawConfiguration
+     * @param array{success_level?: string, failed_level?: string} $defaultLogLevels
      */
     public function __construct(
         protected array $rawConfiguration,
         protected string $defaultErrorStrategy,
+        protected array $defaultLogLevels = [],
     ) {
     }
 
@@ -49,7 +54,7 @@ class ProcessConfigurationRegistry
     }
 
     /**
-     * @return ProcessConfiguration[]
+     * @return array<string, ProcessConfiguration>
      */
     public function getProcessConfigurations(): array
     {
@@ -80,9 +85,13 @@ class ProcessConfigurationRegistry
                 ) : 0) > 0) {
                     $m = "Don't define both 'errors' and 'error_outputs' for task {$taskCode}, these options ";
                     $m .= "are the same, 'errors' is deprecated, just use the new one 'error_outputs'";
-                    throw new \LogicException($m);
+                    throw new LogicException($m);
                 }
                 $rawTaskConfiguration['error_outputs'] = $rawTaskConfiguration['errors'];
+            }
+            if (!\is_string($rawTaskConfiguration['service'] ?? null)) {
+                // The "task" codes are resolved into services when the container is compiled (TaskLocatorCompilerPass)
+                throw new LogicException("The task {$taskCode} of the process {$processCode} has no service: a \"task\" code can only be used in the configurations known when the container is compiled");
             }
             $taskConfigurations[$taskCode] = new TaskConfiguration(
                 $taskCode,
@@ -105,7 +114,9 @@ class ProcessConfigurationRegistry
             $rawProcessConfiguration['end_point'],
             $rawProcessConfiguration['description'],
             $rawProcessConfiguration['help'],
-            $rawProcessConfiguration['public']
+            $rawProcessConfiguration['public'],
+            $rawProcessConfiguration['logs']['success_level'] ?? $this->defaultLogLevels['success_level'] ?? LogLevel::INFO,
+            $rawProcessConfiguration['logs']['failed_level'] ?? $this->defaultLogLevels['failed_level'] ?? LogLevel::DEBUG
         );
 
         // Set links between tasks

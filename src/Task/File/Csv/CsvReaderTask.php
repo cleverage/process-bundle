@@ -13,10 +13,12 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -42,7 +44,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         }
         $csv = $this->csv;
         if (!$csv instanceof CsvFile) {
-            throw new \LogicException('No CSV File initialized');
+            throw new LogicException('No CSV File initialized');
         }
         $lineNumber = $csv->getLineNumber();
         $output = $csv->readLine();
@@ -72,7 +74,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
     public function next(ProcessState $state): bool
     {
         if (!$this->csv instanceof CsvFile) {
-            throw new \LogicException('No CSV File initialized');
+            throw new LogicException('No CSV File initialized');
         }
 
         $state->removeErrorContext('csv_file');
@@ -105,5 +107,7 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
         $resolver->setDefaults([
             'log_empty_lines' => false,
         ]);
+        // Any value used to be evaluated as a boolean: cast it instead of rejecting it
+        $resolver->setNormalizer('log_empty_lines', static fn (Options $options, mixed $value): bool => (bool) $value);
     }
 }

@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File;
 
+use CleverAge\ProcessBundle\Exception\LogicException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -20,6 +22,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Browse a folder with the path as an input and iterate each file for output.
+ *
+ * @final since 5.4
  */
 class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskInterface
 {
@@ -71,13 +75,13 @@ class InputFolderBrowserTask extends FolderBrowserTask implements FlushableTaskI
         if ($state->getInput()) {
             $folderPath = $options['base_folder_path'].$state->getInput();
             if ($this->folderPath && $folderPath !== $this->folderPath) {
-                throw new \LogicException("Folder path '{$folderPath}' already initialized with a different value {$this->folderPath}");
+                throw new LogicException("Folder path '{$folderPath}' already initialized with a different value {$this->folderPath}");
             }
             $this->folderPath = $folderPath;
         }
 
         if (null === $this->folderPath) {
-            throw new \UnexpectedValueException('No folder path given as input');
+            throw new UnexpectedValueException('No folder path given as input');
         }
         if (!is_dir($this->folderPath)) {
             throw new InvalidConfigurationException("Folder path does not exists or is not a folder: '{$this->folderPath}'");

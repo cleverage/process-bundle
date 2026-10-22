@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
@@ -21,6 +22,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Uses a set of rules to conditionally transform a value.
+ *
+ * @final since 5.4
  */
 class RulesTransformer implements ConfigurableTransformerInterface
 {
@@ -79,13 +82,13 @@ class RulesTransformer implements ConfigurableTransformerInterface
             foreach ($rules as $rule) {
                 if ($rule['default']) {
                     if ($hasFoundDefault) {
-                        throw new \InvalidArgumentException('Rules set cannot have more than one default rule');
+                        throw new InvalidArgumentException('Rules set cannot have more than one default rule');
                     }
                     $hasFoundDefault = true;
                 }
 
                 if ($hasFoundDefault && null !== $rule['condition']) {
-                    throw new \InvalidArgumentException('A conditional rule cannot be placed after a default rule');
+                    throw new InvalidArgumentException('A conditional rule cannot be placed after a default rule');
                 }
             }
 
@@ -121,7 +124,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
         $resolver->setNormalizer('condition', $expressionNormalizer);
         $resolver->setNormalizer('default', static function (Options $options, $value) {
             if ($value && $options['condition']) {
-                throw new \InvalidArgumentException('A rule cannot have a condition and be the default in the same time');
+                throw new InvalidArgumentException('A rule cannot have a condition and be the default in the same time');
             }
 
             return $value;

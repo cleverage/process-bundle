@@ -20,6 +20,8 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 /**
  * Denormalize input to output with configurable class and format.
+ *
+ * @final since 5.4
  */
 class DenormalizerTask extends AbstractConfigurableTask
 {

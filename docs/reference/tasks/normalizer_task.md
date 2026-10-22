@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Serialization\NormalizerTask`
+* **Code**: `normalizer` (`task: normalizer`)
 
 Accepted inputs
 ---------------
@@ -35,7 +36,7 @@ Examples
 ```yaml
 # Task configuration level
 normalize:
-  service: '@CleverAge\ProcessBundle\Task\Serialization\NormalizerTask'
+  task: normalizer
   options:
     format: json
     context:

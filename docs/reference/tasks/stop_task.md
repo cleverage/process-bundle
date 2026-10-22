@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\StopTask`
+* **Code**: `stop` (`task: stop`)
 
 Accepted inputs
 ---------------
@@ -33,9 +34,9 @@ Examples
 ```yaml
 # Task configuration level
 validate:
-  service: '@CleverAge\ProcessBundle\Task\Validation\ValidatorTask'
+  task: validator
   error_strategy: skip
   error_outputs: [abort]
 abort:
-  service: '@CleverAge\ProcessBundle\Task\StopTask'
+  task: stop
 ```

@@ -19,6 +19,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Convert input based on a callback.
+ *
+ * @final since 5.4
  */
 class CallbackTransformer implements ConfigurableTransformerInterface
 {
@@ -77,9 +79,10 @@ class CallbackTransformer implements ConfigurableTransformerInterface
             'additional_parameters',
             static function (Options $options, $value) {
                 if ($value) {
-                    @trigger_error(
-                        'The "additional_parameters" option is deprecated. Use "right_parameters" instead.',
-                        \E_USER_DEPRECATED
+                    trigger_deprecation(
+                        'cleverage/process-bundle',
+                        '2.0.4',
+                        'The "additional_parameters" option is deprecated. Use "right_parameters" instead.'
                     );
                 }
 

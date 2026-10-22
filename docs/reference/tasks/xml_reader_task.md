@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Xml\XmlReaderTask`
+* **Code**: `xml_reader` (`task: xml_reader`)
 
 Accepted inputs
 ---------------
@@ -34,7 +35,7 @@ Examples
 ```yaml
 # Task configuration level
 read_xml:
-  service: '@CleverAge\ProcessBundle\Task\File\Xml\XmlReaderTask'
+  task: xml_reader
   options:
     file_path: '%kernel.project_dir%/var/data/file.xml'
   outputs: [transform]
@@ -47,3 +48,5 @@ Notes
 * An invalid XML content (not well-formed, undefined namespace prefix...) throws an `\UnexpectedValueException` whose
   message contains the libxml error(s) with their line and column. libxml warnings are tolerated. The libxml internal
   errors setting is restored after loading.
+* The whole file is loaded in memory. Use [XmlStreamReaderTask](xml_stream_reader_task.md) to iterate over the elements
+  of a large file.

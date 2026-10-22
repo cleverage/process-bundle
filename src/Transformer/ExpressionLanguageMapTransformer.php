@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Symfony\Component\ExpressionLanguage\ParsedExpression;
 use Symfony\Component\OptionsResolver\Options;
@@ -20,6 +21,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Parse an input using the Expression Language and returning a specific value upon a specific condition.
+ *
+ * @final since 5.4
  */
 class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterface
 {
@@ -42,7 +45,7 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
             'map',
             function (Options $options, $values): array {
                 if (!\is_array($values)) {
-                    throw new \UnexpectedValueException('The map must be an array');
+                    throw new UnexpectedValueException('The map must be an array');
                 }
                 $resolver = new OptionsResolver();
                 $resolver->setRequired(['condition', 'output']);
@@ -83,7 +86,7 @@ class ExpressionLanguageMapTransformer implements ConfigurableTransformerInterfa
         }
         if (!$options['ignore_missing']) {
             $printableValue = \is_scalar($value) || $value instanceof \Stringable ? (string) $value : get_debug_type($value);
-            throw new \UnexpectedValueException("No expression accepting value '{$printableValue}' in map");
+            throw new UnexpectedValueException("No expression accepting value '{$printableValue}' in map");
         }
 
         return null;

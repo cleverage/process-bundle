@@ -1,7 +1,0 @@
-imports:
-    - { resource: process/* }
-    - { resource: task/* }
-    - { resource: transfomer/* }
-
-clever_age_process:
-    default_error_strategy: stop

@@ -35,7 +35,7 @@ class TransformerTraitHolder
     }
 
     /**
-     * @param array<string, mixed> $transformers
+     * @param array<int|string, mixed> $transformers
      *
      * @return array<string, \Closure>
      */

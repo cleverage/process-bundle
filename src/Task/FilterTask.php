@@ -23,6 +23,8 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
  * Skip inputs under given matching conditions
  * - equality is strictly checked
  * - unexisting key is the same as null.
+ *
+ * @final since 5.4
  */
 class FilterTask extends AbstractConfigurableTask
 {

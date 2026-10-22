@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamReaderTask`
+* **Code**: `json_stream_reader` (`task: json_stream_reader`)
 * **Iterable task**
 
 Accepted inputs
@@ -40,12 +41,12 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantOutputTask'
+  task: constant_output
   options:
     output: '%kernel.project_dir%/var/data/json_stream_reader.json'
   outputs: [read]
 read:
-  service: '@CleverAge\ProcessBundle\Task\File\JsonStream\JsonStreamReaderTask'
+  task: json_stream_reader
   options:
     json_flags:
       - !php/const JSON_THROW_ON_ERROR

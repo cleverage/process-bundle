@@ -9,6 +9,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask`
+* **Code**: `process_executor` (`task: process_executor`)
 
 Accepted inputs
 ---------------
@@ -36,7 +37,7 @@ Examples
 ```yaml
 # Task configuration level
 run_subprocess:
-  service: '@CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask'
+  task: process_executor
   options:
     process: app.import_product
     context:

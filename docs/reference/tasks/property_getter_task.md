@@ -10,6 +10,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\PropertyGetterTask`
+* **Code**: `property_getter` (`task: property_getter`)
 
 Accepted inputs
 ---------------
@@ -39,7 +40,7 @@ Examples
 ```yaml
 # Task configuration level
 get_file_path:
-  service: '@CleverAge\ProcessBundle\Task\PropertyGetterTask'
+  task: property_getter
   options:
     property: 'path'
   outputs: [remove_input]
@@ -50,7 +51,7 @@ get_file_path:
 ```yaml
 # Task configuration level
 get_sku:
-  service: '@CleverAge\ProcessBundle\Task\PropertyGetterTask'
+  task: property_getter
   options:
     property: '[sku]'
   outputs: [next_task]

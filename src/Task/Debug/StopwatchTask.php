@@ -20,6 +20,8 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 /**
  * Log all the __root__ events of the Stopwatch component.
+ *
+ * @final since 5.4
  */
 class StopwatchTask implements TaskInterface
 {

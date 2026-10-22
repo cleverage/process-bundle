@@ -1,15 +1,182 @@
 services:
     _defaults:
-        bind:
-            $language: '@cleverage_process.expression_language'
-            $transformerRegistry: '@cleverage_process.registry.transformer'
-
-    CleverAge\ProcessBundle\Transformer\:
-        resource: '../../src/Transformer/*'
-        exclude: '../../src/Transformer/GenericTransformer.php'
-        autowire: true
-        autoconfigure: true
+        # Public for the direct access from the service container (deprecated), private in v6.0
         public: true
         tags:
-            - { name: cleverage.transformer }
             - { name: monolog.logger, channel: cleverage_process_transformer }
+            - { name: container.private, package: cleverage/process-bundle, version: '5.4' }
+
+    CleverAge\ProcessBundle\Transformer\Array\ArrayElementTransformer:
+        tags:
+            - { name: cleverage.transformer, code: array_element }
+
+    CleverAge\ProcessBundle\Transformer\Array\ArrayFilterTransformer:
+        tags:
+            - { name: cleverage.transformer, code: array_filter }
+        arguments:
+            - '@property_accessor'
+
+    CleverAge\ProcessBundle\Transformer\Array\ArrayFirstTransformer:
+        tags:
+            - { name: cleverage.transformer, code: array_first }
+
+    CleverAge\ProcessBundle\Transformer\Array\ArrayLastTransformer:
+        tags:
+            - { name: cleverage.transformer, code: array_last }
+
+    CleverAge\ProcessBundle\Transformer\Array\ArrayMapTransformer:
+        tags:
+            - { name: cleverage.transformer, code: array_map }
+        arguments:
+            - '@cleverage_process.registry.transformer'
+
+    CleverAge\ProcessBundle\Transformer\Array\ArrayUnsetTransformer:
+        tags:
+            - { name: cleverage.transformer, code: array_unset }
+
+    CleverAge\ProcessBundle\Transformer\CachedTransformer:
+        tags:
+            - { name: cleverage.transformer, code: cached }
+        arguments:
+            - '@cleverage_process.registry.transformer'
+            - '@cache.app'
+            - '@logger'
+
+    CleverAge\ProcessBundle\Transformer\CallbackTransformer:
+        tags:
+            - { name: cleverage.transformer, code: callback }
+
+    CleverAge\ProcessBundle\Transformer\CastTransformer:
+        tags:
+            - { name: cleverage.transformer, code: cast }
+
+    CleverAge\ProcessBundle\Transformer\ConstantTransformer:
+        tags:
+            - { name: cleverage.transformer, code: constant }
+
+    CleverAge\ProcessBundle\Transformer\ConvertValueTransformer:
+        tags:
+            - { name: cleverage.transformer, code: convert_value }
+
+    CleverAge\ProcessBundle\Transformer\Date\DateFormatTransformer:
+        tags:
+            - { name: cleverage.transformer, code: date_format }
+
+    CleverAge\ProcessBundle\Transformer\Date\DateParserTransformer:
+        tags:
+            - { name: cleverage.transformer, code: date_parser }
+
+    CleverAge\ProcessBundle\Transformer\DebugTransformer:
+        tags:
+            - { name: cleverage.transformer, code: dump }
+
+    CleverAge\ProcessBundle\Transformer\DefaultTransformer:
+        tags:
+            - { name: cleverage.transformer, code: default }
+
+    CleverAge\ProcessBundle\Transformer\EvaluatorTransformer:
+        tags:
+            - { name: cleverage.transformer, code: evaluator }
+
+    CleverAge\ProcessBundle\Transformer\ExpressionLanguageMapTransformer:
+        tags:
+            - { name: cleverage.transformer, code: expression_language_map }
+        arguments:
+            - '@cleverage_process.expression_language'
+
+    CleverAge\ProcessBundle\Transformer\MappingTransformer:
+        tags:
+            - { name: cleverage.transformer, code: mapping }
+        arguments:
+            - '@cleverage_process.registry.transformer'
+            - '@logger'
+            - '@property_accessor'
+
+    CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer:
+        tags:
+            - { name: cleverage.transformer, code: multi_replace }
+
+    CleverAge\ProcessBundle\Transformer\Object\InstantiateTransformer:
+        tags:
+            - { name: cleverage.transformer, code: instantiate }
+
+    CleverAge\ProcessBundle\Transformer\Object\PropertyAccessorTransformer:
+        tags:
+            - { name: cleverage.transformer, code: property_accessor }
+        arguments:
+            - '@property_accessor'
+
+    CleverAge\ProcessBundle\Transformer\Object\RecursivePropertySetterTransformer:
+        tags:
+            - { name: cleverage.transformer, code: recursive_property_setter }
+        arguments:
+            - '@property_accessor'
+
+    CleverAge\ProcessBundle\Transformer\PregFilterTransformer:
+        tags:
+            - { name: cleverage.transformer, code: preg_filter }
+
+    CleverAge\ProcessBundle\Transformer\RulesTransformer:
+        tags:
+            - { name: cleverage.transformer, code: rules }
+        arguments:
+            - '@cleverage_process.registry.transformer'
+            - '@cleverage_process.expression_language'
+
+    CleverAge\ProcessBundle\Transformer\Serialization\DenormalizeTransformer:
+        tags:
+            - { name: cleverage.transformer, code: denormalize }
+        arguments:
+            - '@serializer'
+
+    CleverAge\ProcessBundle\Transformer\Serialization\NormalizeTransformer:
+        tags:
+            - { name: cleverage.transformer, code: normalize }
+        arguments:
+            - '@serializer'
+
+    CleverAge\ProcessBundle\Transformer\String\ExplodeTransformer:
+        tags:
+            - { name: cleverage.transformer, code: explode }
+
+    CleverAge\ProcessBundle\Transformer\String\HashTransformer:
+        tags:
+            - { name: cleverage.transformer, code: hash }
+
+    CleverAge\ProcessBundle\Transformer\String\ImplodeTransformer:
+        tags:
+            - { name: cleverage.transformer, code: implode }
+
+    CleverAge\ProcessBundle\Transformer\String\PregMatchTransformer:
+        tags:
+            - { name: cleverage.transformer, code: preg_match }
+
+    CleverAge\ProcessBundle\Transformer\String\SlugifyTransformer:
+        tags:
+            - { name: cleverage.transformer, code: slugify }
+
+    CleverAge\ProcessBundle\Transformer\String\SprintfTransformer:
+        tags:
+            - { name: cleverage.transformer, code: sprintf }
+
+    CleverAge\ProcessBundle\Transformer\String\TrimTransformer:
+        tags:
+            - { name: cleverage.transformer, code: trim }
+
+    CleverAge\ProcessBundle\Transformer\TypeSetterTransformer:
+        tags:
+            - { name: cleverage.transformer, code: type_setter }
+
+    CleverAge\ProcessBundle\Transformer\UnsetTransformer:
+        tags:
+            - { name: cleverage.transformer, code: unset }
+        arguments:
+            - '@property_accessor'
+
+    CleverAge\ProcessBundle\Transformer\WrapperTransformer:
+        tags:
+            - { name: cleverage.transformer, code: wrapper }
+
+    CleverAge\ProcessBundle\Transformer\Xml\XpathEvaluatorTransformer:
+        tags:
+            - { name: cleverage.transformer, code: xpath_evaluator }

@@ -13,8 +13,13 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Filesystem;
 
+use CleverAge\ProcessBundle\Exception\RuntimeException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
+
 /**
  * Read and write XML files.
+ *
+ * @final since 5.4
  */
 class XmlFile
 {
@@ -31,12 +36,12 @@ class XmlFile
         // fstat() on the open handle, as getSize() may return a stale size from the stat cache
         $fileSize = $this->file->fstat()['size'];
         if (0 === $fileSize) {
-            throw new \UnexpectedValueException(\sprintf('XML file "%s" is empty', $this->file->getPathname()));
+            throw new UnexpectedValueException(\sprintf('XML file "%s" is empty', $this->file->getPathname()));
         }
 
         $fileContent = $this->file->fread($fileSize);
         if (false === $fileContent) {
-            throw new \RuntimeException(\sprintf('Could not read content from XML file "%s"', $this->file->getPathname()));
+            throw new RuntimeException(\sprintf('Could not read content from XML file "%s"', $this->file->getPathname()));
         }
 
         $dom = new \DOMDocument();
@@ -58,7 +63,7 @@ class XmlFile
                 $errors,
             );
 
-            throw new \UnexpectedValueException(\sprintf('Invalid XML in file "%s": %s', $this->file->getPathname(), [] !== $messages ? implode('; ', $messages) : 'unknown error'));
+            throw new UnexpectedValueException(\sprintf('Invalid XML in file "%s": %s', $this->file->getPathname(), [] !== $messages ? implode('; ', $messages) : 'unknown error'));
         }
 
         return $dom;
@@ -68,12 +73,12 @@ class XmlFile
     {
         $content = $dom->saveXML();
         if (false === $content) {
-            throw new \RuntimeException('Could not generate the XML content');
+            throw new RuntimeException('Could not generate the XML content');
         }
         $result = $this->file->fwrite($content);
 
         if (false === $result) {
-            throw new \RuntimeException('Could not write content to file');
+            throw new RuntimeException('Could not write content to file');
         }
     }
 }

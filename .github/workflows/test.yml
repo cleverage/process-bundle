@@ -29,6 +29,12 @@ jobs:
         symfony-require: ['']
         variant: [normal]
         include:
+          # Lowest versions allowed by composer.json, on the lowest supported PHP version
+          - php-version: '8.2'
+            dependencies: lowest
+            allowed-to-fail: false
+            symfony-require: ''
+            variant: normal
           - php-version: '8.2'
             dependencies: highest
             allowed-to-fail: false

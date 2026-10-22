@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\FileRemoverTask`
+* **Code**: `file_remover` (`task: file_remover`)
 
 Accepted inputs
 ---------------
@@ -32,10 +33,10 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
+  task: folder_browser
   options:
     folder_path: '%kernel.project_dir%/var/tmp'
   outputs: [cleanup]
 cleanup:
-  service: '@CleverAge\ProcessBundle\Task\File\FileRemoverTask'
+  task: file_remover
 ```

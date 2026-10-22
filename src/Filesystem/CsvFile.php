@@ -13,8 +13,13 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Filesystem;
 
+use CleverAge\ProcessBundle\Exception\RuntimeException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
+
 /**
  * Read and write CSV files through a simple API.
+ *
+ * @final since 5.4
  */
 class CsvFile extends CsvResource
 {
@@ -35,19 +40,19 @@ class CsvFile extends CsvResource
         if (!\in_array($filePath, ['php://stdin', 'php://stdout', 'php://stderr'], true)) {
             $dirname = \dirname($this->filePath);
             if (!@mkdir($dirname, 0o755, true) && !is_dir($dirname)) {
-                throw new \RuntimeException(\sprintf('Directory "%s" was not created', $dirname));
+                throw new RuntimeException(\sprintf('Directory "%s" was not created', $dirname));
             }
         }
 
         $resource = fopen($filePath, $mode);
         if (false === $resource) {
-            throw new \UnexpectedValueException("Unable to open file: '{$filePath}' in {$mode} mode");
+            throw new UnexpectedValueException("Unable to open file: '{$filePath}' in {$mode} mode");
         }
         // All modes allowing file reading, binary safe modes are handled by stripping out the b during test
         $readAllowedModes = ['r', 'r+', 'w+', 'a+', 'x+', 'c+'];
         if (null === $headers && !\in_array(str_replace('b', '', $mode), $readAllowedModes, true)) {
             // Cannot read headers if the file was just created
-            throw new \UnexpectedValueException("Invalid headers for {$this->getResourceName()}, you need to pass the headers manually");
+            throw new UnexpectedValueException("Invalid headers for {$this->getResourceName()}, you need to pass the headers manually");
         }
 
         parent::__construct($resource, $delimiter, $enclosure, $escape, $headers);

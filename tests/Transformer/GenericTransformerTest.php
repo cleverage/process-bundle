@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Transformer\CallbackTransformer;
 use CleverAge\ProcessBundle\Transformer\GenericTransformer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -71,6 +72,24 @@ class GenericTransformerTest extends TestCase
         $this->assertSame('ello', $transformer->transform('hello', $options));
     }
 
+    public function testTransformersCanBeGivenAsAList(): void
+    {
+        $registry = new TransformerRegistry(new ServiceLocator([
+            'callback' => static fn (): CallbackTransformer => new CallbackTransformer(),
+        ]));
+
+        $transformer = new GenericTransformer(new ContextualOptionResolver(), $registry);
+        $transformer->initialize('substr_upper', [
+            'contextual_options' => ['offset' => ['required' => true]],
+            'transformers' => [
+                ['callback' => ['callback' => 'substr', 'right_parameters' => ['{{ offset }}']]],
+                ['callback' => ['callback' => 'strtoupper']],
+            ],
+        ]);
+
+        $this->assertSame('LLO', $transformer->transform('hello', $this->resolveOptions($transformer, ['offset' => 2])));
+    }
+
     public function testGetCodeRequiresInitialization(): void
     {
         $transformer = new GenericTransformer(new ContextualOptionResolver(), new TransformerRegistry());
@@ -88,8 +107,9 @@ class GenericTransformerTest extends TestCase
      */
     private function createSubstrTransformer(array $contextualOptions): GenericTransformer
     {
-        $registry = new TransformerRegistry();
-        $registry->addTransformer(new CallbackTransformer());
+        $registry = new TransformerRegistry(new ServiceLocator([
+            'callback' => static fn (): CallbackTransformer => new CallbackTransformer(),
+        ]));
 
         $transformer = new GenericTransformer(new ContextualOptionResolver(), $registry);
         $transformer->initialize('substr', [

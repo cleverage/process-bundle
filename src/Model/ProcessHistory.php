@@ -17,6 +17,8 @@ use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 
 /**
  * Logs information about a process.
+ *
+ * @final since 5.4
  */
 class ProcessHistory implements \Stringable
 {

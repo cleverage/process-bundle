@@ -17,6 +17,8 @@ use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Simple dump in a transformer, passthrough for value.
+ *
+ * @final since 5.4
  */
 class DebugTransformer implements TransformerInterface
 {

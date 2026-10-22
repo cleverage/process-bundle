@@ -16,9 +16,13 @@ namespace CleverAge\ProcessBundle\Model;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Exception\RuntimeException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 
 /**
  * Used to pass information between tasks.
+ *
+ * @final since 5.4
  */
 class ProcessState
 {
@@ -75,6 +79,11 @@ class ProcessState
     protected ?ProcessState $previousState = null;
 
     protected string $status = self::STATUS_NEW;
+
+    /**
+     * Number of executions of the task (execute, proceed or flush), not reset between the items: tells the items apart.
+     */
+    protected int $executionCount = 0;
 
     public function __construct(
         protected ProcessConfiguration $processConfiguration,
@@ -256,6 +265,23 @@ class ProcessState
         $this->previousState = $previousState;
     }
 
+    /**
+     * Number of executions of the task (execute, proceed or flush) since the beginning of the process: each output of a
+     * task follows an execution, so a task downstream can tell whether two inputs come from the same item.
+     */
+    public function getExecutionCount(): int
+    {
+        return $this->executionCount;
+    }
+
+    /**
+     * @internal called by the ProcessManager before each execution of the task
+     */
+    public function incrementExecutionCount(): void
+    {
+        ++$this->executionCount;
+    }
+
     public function getStatus(): string
     {
         return $this->status;
@@ -264,7 +290,7 @@ class ProcessState
     public function setStatus(string $status): void
     {
         if (!\in_array($status, self::STATUS, true)) {
-            throw new \UnexpectedValueException("Unknown status {$status}");
+            throw new UnexpectedValueException("Unknown status {$status}");
         }
 
         $this->status = $status;
@@ -289,7 +315,7 @@ class ProcessState
     public function setContext(array $context): void
     {
         if ($this->context) {
-            throw new \RuntimeException('Once defined, context is immutable');
+            throw new RuntimeException('Once defined, context is immutable');
         }
 
         $this->context = $context;

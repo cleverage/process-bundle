@@ -9,14 +9,26 @@ create your own.
 
 As stated before, tasks are simple services implementing `CleverAge\ProcessBundle\Model\TaskInterface`, so you can
 design them like any other service, with only small specificities:
-- the service must be **public**: the process manager fetches it from the container using the `service` reference of
-  the task configuration (with or without the leading `@`)
+- the service should have a **code**, to reference it in the process configurations (`task: <code>`, see
+  [task code](#task-code))
+- the service does **not need to be public**: the process manager fetches it from a service locator built from the
+  process configurations when the container is compiled. Only a service that is not referenced by these configurations
+  (e.g. a configuration added at runtime) is fetched from the service container, which requires a public service and
+  is deprecated
 - the service should **not be shared** ([`shared: false`](https://symfony.com/doc/current/service_container/shared.html))
 
 Most of the time you don't want a task declared in a process to share some data with another declaration using the
 same service, or even with another instance of your process. Since a task is a service, by default, Symfony will only
 create one instance (keeping values in every attribute of your class). With `shared: false`, a new instance is created
 each time a task configuration is initialized.
+
+With autoconfiguration (`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton), the bundle applies
+these settings to every service implementing `TaskInterface`: `shared: false` and a `monolog.logger` tag on the
+`cleverage_process_task` channel (see [logging](#logging)), as well as `public: true`, only kept for the deprecated
+fallback on the service container: fetching such a task directly from the service container is deprecated since 5.4
+(the task will be private in v6.0), unless the application makes it public itself (`public: true` on the service, in
+`_defaults` or `_instanceof`, or `#[Autoconfigure(public: true)]`). A setting explicitly defined on the service wins
+(e.g. `shared: true`).
 
 ```yaml
 # config/services.yaml
@@ -25,7 +37,16 @@ services:
         resource: '../src/Task/*'
         autowire: true
         autoconfigure: true
-        public: true
+```
+
+Without autoconfiguration, declare them explicitly:
+
+```yaml
+# config/services.yaml
+services:
+    App\Task\:
+        resource: '../src/Task/*'
+        autowire: true
         shared: false
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }
@@ -33,6 +54,42 @@ services:
 
 If your `services.yaml` also has the default `App\:` resource (which includes `src/Task/`), declare `App\Task\:` after
 it: the last definition of a service wins.
+
+### Task code
+
+A task is referenced in the process configurations by its code (`task: app_my_task`, see
+[task definition](reference/02-task_definition.md#task-attributes); referencing it by its service,
+`service: '@App\Task\MyTask'`, is deprecated since 5.4). Give your task a code: with autoconfiguration, add the
+`CleverAge\ProcessBundle\Attribute\AsTask` attribute to the class; without, add a `cleverage.task` tag with a `code`
+attribute to the service. Use an internal prefix in your codes to avoid conflicts
+with the tasks of the bundles. Two services cannot share the same code (the container compilation fails).
+
+```php
+namespace App\Task;
+
+use CleverAge\ProcessBundle\Attribute\AsTask;
+use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Model\TaskInterface;
+
+#[AsTask(code: 'app_my_task')]
+class MyTask implements TaskInterface
+{
+    public function execute(ProcessState $state): void
+    {
+        // ...
+    }
+}
+```
+
+```yaml
+# Without autoconfiguration
+services:
+    App\Task\MyTask:
+        autowire: true
+        shared: false
+        tags:
+            - { name: cleverage.task, code: app_my_task }
+```
 
 ## Using the state object
 
@@ -123,7 +180,7 @@ class PrefixTask extends AbstractConfigurableTask
 
 ```yaml
 prefix:
-    service: '@App\Task\PrefixTask'
+    task: app_prefix                # with #[AsTask(code: 'app_prefix')] on the class, see "task code" above
     options:
         prefix: 'SKU-'
 ```
@@ -183,7 +240,10 @@ must skip the state (`ProcessState::setSkipped(true)`) instead of outputting the
 Transformers are another kind of service. They implement `CleverAge\ProcessBundle\Transformer\TransformerInterface`
 (`transform(mixed $value, array $options = []): mixed` and `getCode(): string`) or
 `CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface` (which adds
-`configureOptions(OptionsResolver $resolver): void`) and are declared with a `cleverage.transformer` tag.
+`configureOptions(OptionsResolver $resolver): void`) and are declared with a `cleverage.transformer` tag whose `code`
+attribute is the code returned by `getCode()`: with autoconfiguration, add the
+`CleverAge\ProcessBundle\Attribute\AsTransformer` attribute to the class (the `cleverage.transformer` and
+`monolog.logger` tags are added for you).
 
 They're meant to be lightweight, composable, and stateless pieces of your process. Feel free to implement custom ones
 as soon as provided ones don't fit your goal.
@@ -191,9 +251,11 @@ as soon as provided ones don't fit your goal.
 ```php
 namespace App\Transformer;
 
+use CleverAge\ProcessBundle\Attribute\AsTransformer;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+#[AsTransformer(code: 'app_vat')]
 class VatTransformer implements ConfigurableTransformerInterface
 {
     public function transform(mixed $value, array $options = []): mixed
@@ -220,18 +282,34 @@ services:
     App\Transformer\:
         resource: '../src/Transformer/*'
         autowire: true
+        autoconfigure: true
+
+    # or, without autoconfiguration, one definition per transformer:
+    App\Transformer\VatTransformer:
+        autowire: true
         tags:
-            - { name: cleverage.transformer }
+            - { name: cleverage.transformer, code: app_vat }
 ```
 
 Once properly set up, they are registered in the `CleverAge\ProcessBundle\Registry\TransformerRegistry` (used by the
-`TransformerTask` and every transformer using a sub-list of transformers), using the code from
-`TransformerInterface::getCode`. Two transformers cannot share the same code. When creating a new transformer for your
-project you should use an internal prefix in your codes to avoid conflicts with potential standard additions.
+`TransformerTask` and every transformer using a sub-list of transformers) under their code, in a service locator: a
+transformer is only instantiated when a process uses it. The code of the tag must be the one returned by
+`TransformerInterface::getCode()` (an exception is thrown otherwise when the transformer is used). Two transformers
+cannot share the same code (the container compilation fails).
+
+`TransformerInterface::getCode()` is deprecated since 5.4: the code is given by the tag or the attribute, and the method
+will be removed from the interface in v6.0. Until then, keep implementing it, returning the same code.
+
+A transformer tagged without `code` (e.g. autoconfigured without the attribute) still works, but it is instantiated with
+the registry and registered with `TransformerRegistry::addTransformer()`, which is deprecated since 5.4: the `code` will
+be required in v6.0.
+
+When creating a new transformer for your project, use an internal prefix in your codes to avoid conflicts with potential
+standard additions.
 
 ```yaml
 transform:
-    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+    task: transformer
     options:
         transformers:
             app_vat:
@@ -240,7 +318,9 @@ transform:
 
 ## Logging
 
-The bundle declares three [Monolog channels](https://symfony.com/doc/current/logging/channels_handlers.html):
+The bundle declares three [Monolog channels](https://symfony.com/doc/current/logging/channels_handlers.html), created
+when the MonologBundle is installed (`composer require symfony/monolog-bundle`, otherwise every log goes to the default
+Symfony logger, without the `extra` values below):
 
 | Channel | Used by |
 | ------- | ------- |
@@ -253,14 +333,13 @@ Each channel has a Monolog processor that adds the following values in the `extr
 if any) for the task and transformer channels.
 
 To benefit from those in your own tasks, inject a `Psr\Log\LoggerInterface` and bind it to the task channel with the
-`monolog.logger` tag:
+`monolog.logger` tag (added by autoconfiguration, see [service declaration](#service-declaration)):
 
 ```yaml
 services:
     App\Task\:
         resource: '../src/Task/*'
         autowire: true
-        public: true
         shared: false
         tags:
             - { name: monolog.logger, channel: cleverage_process_task }

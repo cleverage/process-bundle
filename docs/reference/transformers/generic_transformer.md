@@ -7,9 +7,10 @@ instance is created per declared generic transformer, and it simply applies a pr
 optionally parametrized by `contextual_options`.
 
 For each entry of `generic_transformers`, the bundle extension (`CleverAgeProcessExtension`) registers a private
-service `CleverAge\ProcessBundle\Transformer\GenericTransformer\<code>`, tagged `cleverage.transformer`, and calls
-`initialize(<code>, <configuration>)` on it. The instance is then added to the transformer registry like any other
-transformer, under the configured code (which must not collide with an existing transformer code).
+service `CleverAge\ProcessBundle\Transformer\GenericTransformer\<code>`, tagged `cleverage.transformer` with its code
+(`code` attribute), and calls `initialize(<code>, <configuration>)` on it. It is then registered in the transformer
+registry like any other transformer, under the configured code (which must not collide with an existing transformer
+code: the container compilation fails), and only instantiated when used.
 
 When the generic transformer is used, its options are the declared contextual options. The `{{ option_code }}`
 placeholders in the preconfigured `transformers` (keys and values, recursively) are replaced by the option values,

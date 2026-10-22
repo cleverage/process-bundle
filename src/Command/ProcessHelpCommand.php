@@ -15,11 +15,14 @@ namespace CleverAge\ProcessBundle\Command;
 
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
+use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use CleverAge\ProcessBundle\Task\Process\ProcessExecutorTask;
 use CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask;
 use Psr\Container\ContainerInterface;
@@ -33,6 +36,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Describe a process configuration
  * This is a POC, waiting to evolve properly.
+ *
+ * @internal
  */
 #[AsCommand(name: 'cleverage:process:help', description: 'Describe a process', )]
 class ProcessHelpCommand extends Command
@@ -59,11 +64,32 @@ class ProcessHelpCommand extends Command
 
     protected const INDENT_SIZE = 4;
 
+    protected TaskRegistry $taskRegistry;
+
+    /**
+     * @deprecated since 5.4, only set when a container is passed to the constructor, will be removed in v6.0
+     */
+    protected ?ContainerInterface $container = null;
+
     public function __construct(
         protected ProcessConfigurationRegistry $processConfigRegistry,
-        protected ContainerInterface $container,
+        TaskRegistry|ContainerInterface $taskRegistry,
     ) {
         parent::__construct();
+        if ($taskRegistry instanceof ContainerInterface) {
+            trigger_deprecation(
+                'cleverage/process-bundle',
+                '5.4',
+                'Passing a service container to "%s::__construct()" is deprecated, pass a "%s" instead: the tasks are fetched from the service container. Only a "%s" will be accepted in v6.0.',
+                self::class,
+                TaskRegistry::class,
+                TaskRegistry::class,
+            );
+            $this->container = $taskRegistry;
+            // Same behaviour as before the task registry: any service of the container
+            $taskRegistry = new TaskRegistry($taskRegistry, $taskRegistry);
+        }
+        $this->taskRegistry = $taskRegistry;
     }
 
     protected function configure(): void
@@ -161,7 +187,7 @@ class ProcessHelpCommand extends Command
         }
 
         if ([] === $taskCandidates) {
-            throw new \UnexpectedValueException('Cannot find a task to output');
+            throw new UnexpectedValueException('Cannot find a task to output');
         }
 
         // Try to find the task the most on the right
@@ -174,7 +200,7 @@ class ProcessHelpCommand extends Command
 
                 // Should never be non-numeric...
                 if (!is_numeric($key)) {
-                    throw new \UnexpectedValueException('Invalid key type');
+                    throw new UnexpectedValueException('Invalid key type');
                 }
                 $weight += $key;
             }
@@ -252,7 +278,7 @@ class ProcessHelpCommand extends Command
         if ([] === $previousTasks) {
             $branches[] = $task->getCode();
         } elseif (1 === \count($previousTasks)) {
-            $prevTask = current($previousTasks)
+            $prevTask = array_first($previousTasks)
                 ->getCode();
             foreach (array_reverse($branches, true) as $i => $branchTask) {
                 if ($branchTask === $prevTask) {
@@ -384,7 +410,7 @@ class ProcessHelpCommand extends Command
             array_shift($nextTasks);
             $origin = array_search($taskCode, $branches, true);
             if (false === $origin) {
-                throw new \UnexpectedValueException("Task '{$taskCode}' is not in any branch");
+                throw new UnexpectedValueException("Task '{$taskCode}' is not in any branch");
             }
             $expandBranches = [];
             foreach ($nextTasks as $nextTask) {
@@ -478,7 +504,7 @@ class ProcessHelpCommand extends Command
                 } elseif (\is_callable($char)) {
                     $str = $char($branchTask, $i);
                 } else {
-                    throw new \InvalidArgumentException('Char must be string|callable');
+                    throw new InvalidArgumentException('Char must be string|callable');
                 }
             } elseif (null !== $branchTask) {
                 $str = self::CHAR_DOWN;
@@ -534,21 +560,6 @@ class ProcessHelpCommand extends Command
 
     protected function getTaskService(TaskConfiguration $taskConfiguration): TaskInterface
     {
-        // Duplicate code from \CleverAge\ProcessBundle\Manager\ProcessManager::initialize
-        // @todo Refactor this using a Registry with this feature:
-        // https://symfony.com/doc/current/service_container/service_subscribers_locators.html
-        $serviceReference = $taskConfiguration->getServiceReference();
-        if (str_starts_with($serviceReference, '@')) {
-            $task = $this->container->get(ltrim($serviceReference, '@'));
-        } elseif ($this->container->has($serviceReference)) {
-            $task = $this->container->get($serviceReference);
-        } else {
-            throw new \UnexpectedValueException("Unable to resolve service reference for Task '{$taskConfiguration->getCode()}'");
-        }
-        if (!$task instanceof TaskInterface) {
-            throw new \UnexpectedValueException("Service defined in Task '{$taskConfiguration->getCode()}' is not a TaskInterface");
-        }
-
-        return $task;
+        return $this->taskRegistry->getTask($taskConfiguration);
     }
 }

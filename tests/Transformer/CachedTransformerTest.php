@@ -19,6 +19,7 @@ use CleverAge\ProcessBundle\Transformer\CastTransformer;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CachedTransformer::class)]
@@ -36,8 +37,9 @@ class CachedTransformerTest extends TestCase
 
     protected function setUp(): void
     {
-        $registry = new TransformerRegistry();
-        $registry->addTransformer(new CastTransformer());
+        $registry = new TransformerRegistry(new ServiceLocator([
+            'cast' => static fn (): CastTransformer => new CastTransformer(),
+        ]));
         $this->cache = new ArrayAdapter();
         $this->transformer = new CachedTransformer($registry, $this->cache, new NullLogger());
     }

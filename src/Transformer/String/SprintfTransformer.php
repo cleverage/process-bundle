@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Use sprintf() function to format string.
+ *
+ * @final since 5.4
  */
 class SprintfTransformer implements ConfigurableTransformerInterface
 {

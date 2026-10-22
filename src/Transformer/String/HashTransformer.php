@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Use hash() function to generate hash value.
+ *
+ * @final since 5.4
  */
 class HashTransformer implements ConfigurableTransformerInterface
 {

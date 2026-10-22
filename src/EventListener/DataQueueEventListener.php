@@ -20,6 +20,11 @@ use CleverAge\ProcessBundle\Model\ProcessState;
  * Class DataQueueEventListener
  * This is a basic queue, mainly aiming to catch data coming out of a process
  * Used mostly for testing purpose.
+ *
+ * @internal
+ *
+ * @deprecated since cleverage/process-bundle 5.4, will be removed in 6.0: write your own listener of the event
+ *             dispatched by the event_dispatcher task
  */
 class DataQueueEventListener
 {

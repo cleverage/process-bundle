@@ -116,7 +116,7 @@ clever_age_process:
             end_point: transform
             tasks:
                 transform:
-                    service: '@CleverAge\ProcessBundle\Task\TransformerTask'
+                    task: transformer
                     options:
                         transformers:
                             app_vat:

@@ -151,6 +151,54 @@ class InputAggregatorTaskTest extends TestCase
         $task->initialize($this->createState([]));
     }
 
+    public function testInputsOfAnItemSkippedByTheFirstBranchAreDropped(): void
+    {
+        $task = new InputAggregatorTask();
+        $options = ['input_codes' => self::INPUT_CODES];
+        [$entry, $branchA, $branchB] = $this->createBranches();
+
+        self::assertSame(['a' => 'a1', 'b' => 'b1'], $this->receiveItem($task, $options, $entry, [[$branchA, 'a1'], [$branchB, 'b1']]));
+        // The item 2 is skipped by branch_a: b2 waits for a2
+        self::assertNull($this->receiveItem($task, $options, $entry, [[$branchB, 'b2']]));
+        // b2 is not joined with a3
+        self::assertSame(['a' => 'a3', 'b' => 'b3'], $this->receiveItem($task, $options, $entry, [[$branchA, 'a3'], [$branchB, 'b3']]));
+    }
+
+    public function testInputsOfAnItemSkippedByTheLastBranchAreDropped(): void
+    {
+        $task = new InputAggregatorTask();
+        $options = ['input_codes' => self::INPUT_CODES];
+        [$entry, $branchA, $branchB] = $this->createBranches();
+
+        self::assertNull($this->receiveItem($task, $options, $entry, [[$branchA, 'a1']]));
+        self::assertSame(['a' => 'a2', 'b' => 'b2'], $this->receiveItem($task, $options, $entry, [[$branchA, 'a2'], [$branchB, 'b2']]));
+    }
+
+    public function testKeptInputsAreJoinedWithTheNextItems(): void
+    {
+        $task = new InputAggregatorTask();
+        $options = ['input_codes' => self::INPUT_CODES, 'keep_inputs' => ['a']];
+        [$entry, $branchA, $branchB] = $this->createBranches();
+
+        self::assertSame(['a' => 'a1', 'b' => 'b1'], $this->receiveItem($task, $options, $entry, [[$branchA, 'a1'], [$branchB, 'b1']]));
+        self::assertSame(['a' => 'a1', 'b' => 'b2'], $this->receiveItem($task, $options, $entry, [[$branchB, 'b2']]));
+    }
+
+    public function testInputsWithoutCommonAncestorAreJoined(): void
+    {
+        $task = new InputAggregatorTask();
+        $options = ['input_codes' => self::INPUT_CODES];
+        [, $branchA] = $this->createBranches();
+        [, , $branchB] = $this->createBranches();
+
+        $branchA->incrementExecutionCount();
+        $this->receiveFrom($task, $options, $branchA, 'a1');
+        $branchA->incrementExecutionCount();
+        $branchB->incrementExecutionCount();
+
+        self::assertSame(['a' => 'a1', 'b' => 'b1'], $this->receiveFrom($task, $options, $branchB, 'b1')->getOutput());
+    }
+
     /**
      * @return iterable<string, array{array<string, mixed>}>
      */
@@ -180,6 +228,63 @@ class InputAggregatorTaskTest extends TestCase
     private function receive(InputAggregatorTask $task, array $options, string $previousTaskCode, mixed $input): ProcessState
     {
         $previousState = $this->createState([], $previousTaskCode);
+        $state = $this->createState($options);
+        $state->setPreviousState($previousState);
+        $state->setInput($input);
+
+        $task->initialize($state);
+        $task->execute($state);
+
+        return $state;
+    }
+
+    /**
+     * An entry task whose outputs go to branch_a and branch_b.
+     *
+     * @return array{ProcessState, ProcessState, ProcessState}
+     */
+    private function createBranches(): array
+    {
+        $entry = $this->createState([], 'entry');
+        $branchA = $this->createState([], 'branch_a');
+        $branchA->setPreviousState($entry);
+        $branchB = $this->createState([], 'branch_b');
+        $branchB->setPreviousState($entry);
+
+        return [$entry, $branchA, $branchB];
+    }
+
+    /**
+     * A new item of the entry task, sent to the branches that do not skip it (in the order of the outputs).
+     *
+     * @param array<string, mixed>              $options
+     * @param list<array{ProcessState, string}> $inputs  branch state, input
+     *
+     * @return array<mixed>|null the output of the task after the last input, null if it is skipped
+     */
+    private function receiveItem(InputAggregatorTask $task, array $options, ProcessState $entry, array $inputs): ?array
+    {
+        $entry->incrementExecutionCount();
+        $state = null;
+        foreach ($inputs as [$branch, $input]) {
+            $branch->incrementExecutionCount();
+            $state = $this->receiveFrom($task, $options, $branch, $input);
+        }
+        self::assertInstanceOf(ProcessState::class, $state);
+        if ($state->isSkipped()) {
+            return null;
+        }
+        $output = $state->getOutput();
+        self::assertIsArray($output);
+
+        return $output;
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    private function receiveFrom(InputAggregatorTask $task, array $options, ProcessState $previousState, string $input): ProcessState
+    {
         $state = $this->createState($options);
         $state->setPreviousState($previousState);
         $state->setInput($input);

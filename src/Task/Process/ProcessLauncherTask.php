@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\Process;
 
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
+use CleverAge\ProcessBundle\Exception\RuntimeException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
@@ -27,6 +29,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Launch a new process for each input received, input must be a scalar, a resource or a \Traversable.
+ *
+ * @final since 5.4
  */
 class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
 {
@@ -42,12 +46,39 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
 
     protected bool $flushMode = false;
 
+    /**
+     * @deprecated since 5.4, only set when the kernel is passed to the constructor
+     */
+    protected ?KernelInterface $kernel = null;
+
+    protected string $consolePath;
+
+    /**
+     * @param string|KernelInterface $consolePath path of the Symfony console running the sub-processes; passing the
+     *                                            kernel is deprecated since 5.4
+     * @param string|null            $environment environment of the sub-processes (--env), the default one of the
+     *                                            console if null; taken from the kernel when it is passed
+     */
     public function __construct(
         protected LoggerInterface $logger,
         protected ProcessConfigurationRegistry $processRegistry,
-        protected KernelInterface $kernel,
+        KernelInterface|string $consolePath,
+        protected ?string $environment = null,
     ) {
         $this->finishedBuffers = new \SplQueue();
+        if ($consolePath instanceof KernelInterface) {
+            trigger_deprecation(
+                'cleverage/process-bundle',
+                '5.4',
+                'Passing a "%s" to "%s::__construct()" is deprecated, pass the path of the console and the environment instead. The argument will only accept a string in v6.0.',
+                KernelInterface::class,
+                self::class,
+            );
+            $this->kernel = $consolePath;
+            $this->environment ??= $consolePath->getEnvironment();
+            $consolePath = $consolePath->getProjectDir().'/bin/console';
+        }
+        $this->consolePath = $consolePath;
     }
 
     public function execute(ProcessState $state): void
@@ -132,13 +163,14 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         $input = null !== $state->getInput() ? (string) $state->getInput() : null;
 
         $subprocess = new SubprocessInstance(
-            $this->kernel,
+            $this->consolePath,
             $this->getOption($state, 'process'),
             $input,
             $this->getOption($state, 'context'),
             [
                 SubprocessInstance::OPTION_JSON_BUFFERING => $this->getOption($state, 'json_buffering'),
-            ]
+            ],
+            $this->environment,
         );
 
         return $subprocess->buildProcess()
@@ -172,7 +204,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
                 $this->logger->critical($process->getProcess()->getErrorOutput(), $logContext);
                 $this->killProcesses();
 
-                throw new \RuntimeException("Sub-process has failed: {$process->getProcess()->getExitCodeText()}");
+                throw new RuntimeException("Sub-process has failed: {$process->getProcess()->getExitCodeText()}");
             }
 
             $result = $process->getResult();
@@ -225,7 +257,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             static function (Options $options, array $value): array {
                 if ([] !== $value) {
                     // Todo deprecation trigger
-                    throw new \InvalidArgumentException('Deprecated option, please contact support for help');
+                    throw new InvalidArgumentException('Deprecated option, please contact support for help');
                 }
 
                 return $value;

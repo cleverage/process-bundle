@@ -15,6 +15,9 @@ namespace CleverAge\ProcessBundle\Transformer;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @final since 5.4
+ */
 class WrapperTransformer implements ConfigurableTransformerInterface
 {
     /**

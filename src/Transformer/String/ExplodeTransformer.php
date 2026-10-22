@@ -18,6 +18,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Explode a string to an array based on a split character.
+ *
+ * @final since 5.4
  */
 class ExplodeTransformer implements ConfigurableTransformerInterface
 {

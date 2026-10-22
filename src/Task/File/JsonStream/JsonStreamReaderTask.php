@@ -19,6 +19,9 @@ use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @final since 5.4
+ */
 class JsonStreamReaderTask extends AbstractConfigurableTask implements IterableTaskInterface
 {
     protected ?JsonStreamFile $file = null;

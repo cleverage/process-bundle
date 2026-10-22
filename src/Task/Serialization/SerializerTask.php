@@ -18,6 +18,9 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Serializer\SerializerInterface;
 
+/**
+ * @final since 5.4
+ */
 class SerializerTask extends AbstractConfigurableTask
 {
     public function __construct(

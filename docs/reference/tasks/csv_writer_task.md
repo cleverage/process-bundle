@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask`
+* **Code**: `csv_writer` (`task: csv_writer`)
 * **Blocking task**
 
 Accepted inputs
@@ -34,7 +35,7 @@ Options
 | `headers`         | `array\|null` |          | `null`  | Static list of CSV headers. If `null`, the keys of the first input are used                                                                                                                 |
 | `mode`            | `string`      |          | `wb`    | File open mode (see [fopen mode parameter](https://www.php.net/manual/en/function.fopen.php))                                                                                               |
 | `split_character` | `string`      |          | `\|`    | Used to implode array values                                                                                                                                                                |
-| `write_headers`   | `bool`        |          | `true`  | Write the headers as first line, only if the file is empty (useful with an append `mode`)                                                                                                   |
+| `write_headers`   | `bool`        |          | `true`  | Write the headers as first line, only if the file is empty (useful with an append `mode`); cast to `bool`                                                                                   |
 
 Examples
 --------
@@ -44,7 +45,7 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\ConstantIterableOutputTask'
+  task: constant_iterable_output
   options:
     output:
       - column1: value1-1
@@ -53,7 +54,7 @@ entry:
         column2: value2-2
   outputs: [write]
 write:
-  service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
+  task: csv_writer
   options:
     file_path: '%kernel.project_dir%/var/data/csv_writer_{date_time}.csv'
 ```
@@ -63,7 +64,7 @@ write:
 ```yaml
 # Task configuration level
 write:
-  service: '@CleverAge\ProcessBundle\Task\File\Csv\CsvWriterTask'
+  task: csv_writer
   options:
     file_path: '%kernel.project_dir%/var/data/export.csv'
     mode: 'ab'

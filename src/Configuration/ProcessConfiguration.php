@@ -15,9 +15,12 @@ namespace CleverAge\ProcessBundle\Configuration;
 
 use CleverAge\ProcessBundle\Exception\CircularProcessException;
 use CleverAge\ProcessBundle\Exception\MissingTaskConfigurationException;
+use Psr\Log\LogLevel;
 
 /**
  * Holds the processes configuration to launch a task.
+ *
+ * @final since 5.4
  */
 class ProcessConfiguration
 {
@@ -44,6 +47,8 @@ class ProcessConfiguration
         protected string $description = '',
         protected string $help = '',
         protected bool $public = true,
+        protected string $successLogLevel = LogLevel::INFO,
+        protected string $failedLogLevel = LogLevel::DEBUG,
     ) {
     }
 
@@ -91,6 +96,22 @@ class ProcessConfiguration
     public function isPublic(): bool
     {
         return $this->public;
+    }
+
+    /**
+     * Level of the "Process <code> succeed" log.
+     */
+    public function getSuccessLogLevel(): string
+    {
+        return $this->successLogLevel;
+    }
+
+    /**
+     * Level of the "Process <code> failed" log.
+     */
+    public function getFailedLogLevel(): string
+    {
+        return $this->failedLogLevel;
     }
 
     public function isPrivate(): bool
@@ -180,12 +201,8 @@ class ProcessConfiguration
 
         // By default use the first defined task
         if (!$entryTask instanceof TaskConfiguration) {
-            $entryTask = reset($this->taskConfigurations);
-        }
-
-        // May happen with an empty array
-        if (false === $entryTask) {
-            return null;
+            // null with an empty array
+            return array_first($this->taskConfigurations);
         }
 
         return $entryTask;

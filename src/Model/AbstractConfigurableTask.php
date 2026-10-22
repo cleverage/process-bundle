@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Model;
 
+use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Contracts\Service\ResetInterface;
 
@@ -57,7 +58,7 @@ abstract class AbstractConfigurableTask implements InitializableTaskInterface, R
     {
         $options = $this->getOptions($state);
         if (!\array_key_exists($code, $options)) {
-            throw new \InvalidArgumentException("Missing option {$code}");
+            throw new InvalidArgumentException("Missing option {$code}");
         }
 
         return $options[$code];

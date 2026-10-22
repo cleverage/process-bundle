@@ -17,6 +17,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Return a default value when the input is falsy, otherwise return the input unchanged.
+ *
+ * @final since 5.4
  */
 class DefaultTransformer implements ConfigurableTransformerInterface
 {

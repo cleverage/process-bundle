@@ -40,6 +40,14 @@ make quality
 make tests
 ```
 
+## PHP version
+
+The bundle supports PHP 8.2 and later: do not use a syntax introduced by a later version (typed class constants,
+property hooks, pipe operator...). The functions of PHP 8.3 to 8.5 (`json_validate()`, `array_find()`, `array_any()`,
+`mb_trim()`, `array_first()`...) can be used: they are provided by the required `symfony/polyfill-php83`,
+`symfony/polyfill-php84` and `symfony/polyfill-php85` packages on the older versions. Rector (`make quality`) is
+configured accordingly.
+
 ## Deprecations notices
 
 When a feature should be deprecated, or when you have a breaking change for a future version, please :

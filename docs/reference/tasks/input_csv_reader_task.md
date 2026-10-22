@@ -8,6 +8,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask`
+* **Code**: `input_csv_reader` (`task: input_csv_reader`)
 * **Iterable task**
 
 Accepted inputs
@@ -49,13 +50,13 @@ Examples
 ```yaml
 # Task configuration level
 entry:
-  service: '@CleverAge\ProcessBundle\Task\File\FolderBrowserTask'
+  task: folder_browser
   options:
     folder_path: '%kernel.project_dir%/var/data'
     name_pattern: '*.csv'
   outputs: [read]
 read:
-  service: '@CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask'
+  task: input_csv_reader
   outputs: [dump]
 ```
 
@@ -65,7 +66,7 @@ read:
 ```yaml
 # Task configuration level
 read:
-  service: '@CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask'
+  task: input_csv_reader
   options:
     delimiter: '{{ delimiter }}'
   outputs: [dump]

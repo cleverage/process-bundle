@@ -24,4 +24,4 @@ services:
             - { name: console.command }
         arguments:
             - '@cleverage_process.registry.process_configuration'
-            - '@service_container'
+            - '@cleverage_process.registry.task'

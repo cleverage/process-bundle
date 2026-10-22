@@ -7,6 +7,7 @@ Task reference
 --------------
 
 * **Service**: `CleverAge\ProcessBundle\Task\Validation\ValidatorTask`
+* **Code**: `validator` (`task: validator`)
 
 Accepted inputs
 ---------------
@@ -48,7 +49,7 @@ Examples
 ```yaml
 # Task configuration level
 validate:
-  service: '@CleverAge\ProcessBundle\Task\Validation\ValidatorTask'
+  task: validator
   options:
     groups: [import]
   outputs: [save]
@@ -59,7 +60,7 @@ validate:
 ```yaml
 # Task configuration level
 validate:
-  service: '@CleverAge\ProcessBundle\Task\Validation\ValidatorTask'
+  task: validator
   options:
     log_errors: warning
     error_output_violations: true
