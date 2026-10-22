@@ -70,6 +70,7 @@ class TaskConfiguration
         protected string $errorStrategy = self::STRATEGY_SKIP,
         protected string $logLevel = LogLevel::CRITICAL,
     ) {
+        // @phpstan-ignore property.deprecated (kept for BC until v6.0)
         $this->logErrors = LogLevel::DEBUG !== $logLevel;
     }
 

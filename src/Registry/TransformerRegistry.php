@@ -91,7 +91,9 @@ class TransformerRegistry implements TransformerRegistryInterface
         if (!$transformer instanceof TransformerInterface) {
             throw new UnexpectedValueException(\sprintf('The service of the transformer "%s" must implement "%s".', $code, TransformerInterface::class));
         }
+        // @phpstan-ignore method.deprecated (the code returned by getCode() must stay the same until v6.0)
         if ($code !== $transformer->getCode()) {
+            // @phpstan-ignore method.deprecated (the code returned by getCode() must stay the same until v6.0)
             throw new UnexpectedValueException(\sprintf('The transformer "%s" is registered with the code "%s" but its getCode() method returns "%s": both must be the same.', $transformer::class, $code, $transformer->getCode()));
         }
 

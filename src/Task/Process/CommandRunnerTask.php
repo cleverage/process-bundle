@@ -47,6 +47,7 @@ class CommandRunnerTask extends AbstractConfigurableTask
                 KernelInterface::class,
                 self::class,
             );
+            // @phpstan-ignore property.deprecated (kept for BC until v6.0)
             $this->kernel = $projectDir;
             $projectDir = $projectDir->getProjectDir();
         }

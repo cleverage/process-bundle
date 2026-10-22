@@ -5,3 +5,10 @@ parameters:
         - tests
     inferPrivatePropertyTypeFromConstructor: true
     treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        # Symfony 8.1 deprecates HttpKernel\Bundle\BundleInterface: its replacement does not exist in Symfony 6.4 and 7.4
+        - message: '#typehint with deprecated interface Symfony\\Component\\HttpKernel\\Bundle\\BundleInterface#'
+          path: tests/*
+        # The tests of the deprecated code of the bundles use it
+        - message: '#deprecated .*CleverAge\\#'
+          path: tests/*
