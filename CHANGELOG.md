@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#331](https://github.com/cleverage/process-bundle/issues/331) `ProcessManager`: the iterable tasks that produced items and the blocking tasks waiting for `proceed()` are tracked by task configuration instead of task code, and forgotten when their process ends. A task of a sub-process (`process_executor`) with the same code as a task of the parent no longer makes the parent lose the output of its blocking task (without error) or skip the flush at the end of its iteration (merged batches), and a failed sub-process no longer leaves its tasks to its next execution. Add tests.
+
 v5.4.1
 -----
 
