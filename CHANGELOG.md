@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#345](https://github.com/cleverage/process-bundle/issues/345) `YamlWriterTask` (`yaml_writer`): a write failure throws a `RuntimeException` instead of a PHP warning (an exception in debug mode only: in production, the path was output as if the file had been written), and the parent directory is created if needed, as for the other writers. Update documentation, add tests.
+
 v5.4.1
 -----
 

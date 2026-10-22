@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\Yaml;
 
+use CleverAge\ProcessBundle\Exception\RuntimeException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -28,8 +29,17 @@ class YamlWriterTask extends AbstractConfigurableTask
     public function execute(ProcessState $state): void
     {
         $options = $this->getOptions($state);
-        file_put_contents($options['file_path'], Yaml::dump($state->getInput(), $options['inline']));
-        $state->setOutput($options['file_path']);
+        $filePath = $options['file_path'];
+        // Same as the other writers: the parent directory is created if needed
+        $dirname = \dirname($filePath);
+        if (!@mkdir($dirname, 0o755, true) && !is_dir($dirname)) {
+            throw new RuntimeException(\sprintf('Directory "%s" was not created', $dirname));
+        }
+        // The PHP warning is replaced by the exception below, also outside of the debug mode
+        if (false === @file_put_contents($filePath, Yaml::dump($state->getInput(), $options['inline']))) {
+            throw new RuntimeException(\sprintf('Unable to write file "%s": %s', $filePath, error_get_last()['message'] ?? 'unknown error'));
+        }
+        $state->setOutput($filePath);
     }
 
     protected function configureOptions(OptionsResolver $resolver): void
