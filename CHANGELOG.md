@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#333](https://github.com/cleverage/process-bundle/issues/333) `ProcessManager`: restore the previous task configuration (`getTaskConfiguration()`, read by the log processors for `task_code` and `task_service`) when a task, an initialization, a finalization or a sub-process ends. The logs of an iterable task no longer lose their task after its first item, and the logs of a parent process are no longer attributed to a task of its sub-process; the failing task is kept for the logs of the process failure. Add tests.
+
 v5.4.1
 -----
 
