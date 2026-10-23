@@ -50,11 +50,13 @@ configured accordingly.
 
 ## Deprecations notices
 
-When a feature should be deprecated, or when you have a breaking change for a future version, please :
+When a feature should be deprecated, or when you have a breaking change for a future version, please:
 * [Fill an issue](https://github.com/cleverage/process-bundle/issues/new)
-* Add TODO comments with the following format: `@TODO deprecated v4.0`
-* Trigger a deprecation error: `@trigger_error('This feature will be deprecated in v4.0', E_USER_DEPRECATED);`
+* Trigger a deprecation notice with `trigger_deprecation('cleverage/process-bundle', '<version>', '...')`
+  (`symfony/deprecation-contracts`), `<version>` being the next minor version, and add a `@deprecated` tag stating
+  the version of the removal (the next major version)
+* Describe the deprecation in the CHANGELOG and in `UPGRADE.md`
 
-You can check which deprecation notice is triggered in tests
+The tests fail on any deprecation notice (`failOnDeprecation` in `phpunit.xml.dist`):
 * `make bash`
-* `SYMFONY_DEPRECATIONS_HELPER=0 ./vendor/bin/phpunit`
+* `vendor/bin/phpunit`

@@ -32,6 +32,12 @@
             "role": "Maintainer"
         }
     ],
+    "support": {
+        "issues": "https://github.com/cleverage/process-bundle/issues",
+        "source": "https://github.com/cleverage/process-bundle",
+        "docs": "https://github.com/cleverage/process-bundle/blob/main/docs/index.md",
+        "security": "https://github.com/cleverage/process-bundle/security/policy"
+    },
     "autoload": {
         "psr-4": {
             "CleverAge\\ProcessBundle\\": "src/"

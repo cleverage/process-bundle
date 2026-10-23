@@ -1,6 +1,10 @@
 CleverAge/ProcessBundle
 =======================
 
+[![Test](https://github.com/cleverage/process-bundle/actions/workflows/test.yml/badge.svg)](https://github.com/cleverage/process-bundle/actions/workflows/test.yml)
+[![Packagist Version](https://img.shields.io/packagist/v/cleverage/process-bundle)](https://packagist.org/packages/cleverage/process-bundle)
+[![License](https://img.shields.io/packagist/l/cleverage/process-bundle)](LICENSE)
+
 This bundle allows to configure series of tasks to be performed on a certain order.
 Basically, it will greatly ease the configuration of import and exports but can do much more.
 
