@@ -20,7 +20,7 @@ Possible outputs
 
 `any`: the input, unchanged.
 
-At finalization, the message `Processed item count: <count>` is logged.
+At finalization, the message `Processed item count: <count>` is logged, also when the process fails.
 
 Options
 -------

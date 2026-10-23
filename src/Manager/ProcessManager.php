@@ -183,12 +183,18 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
         $processHistory = $this->initializeStates($processConfiguration, $context);
         $this->processHistory = $processHistory;
 
+        // Finalized if the process fails: the initialized tasks that are not finalized yet (indexed by spl_object_id())
+        $tasksToFinalize = [];
         try {
             $this->checkProcess($processConfiguration);
 
             // First initialize the whole stack in a linear way, tasks are initialized in the order they are configured
             foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
                 $this->initialize($taskConfiguration);
+                // A task whose initialization has failed is stopped: it is not finalized if the process fails
+                if (!$taskConfiguration->getState()->isStopped()) {
+                    $tasksToFinalize[spl_object_id($taskConfiguration)] = $taskConfiguration;
+                }
             }
 
             // If defined, set the input of a task
@@ -211,6 +217,8 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
 
             // Finalize the process in a linear way
             foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
+                // Never finalized twice, even if the process fails after this point
+                unset($tasksToFinalize[spl_object_id($taskConfiguration)]);
                 $this->finalize($taskConfiguration);
             }
 
@@ -224,8 +232,15 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                     ->getOutput();
             }
         } catch (\Throwable $error) {
+            // Before the finalization: the tasks can tell the process has failed (ProcessHistory::isFailed())
             if ($processHistory->isStarted() || $processHistory->isStopped()) {
                 $processHistory->setFailed();
+            }
+
+            // Release the resources of the tasks (files, database cursors...), e.g. for the next executions of a
+            // long-running worker. A finalization failure is logged by finalize(), and does not hide the original error
+            foreach ($tasksToFinalize as $taskConfiguration) {
+                $this->finalize($taskConfiguration);
             }
             $this->endProcess($processHistory);
 
