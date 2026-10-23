@@ -6,8 +6,10 @@ services:
             - ~
             - ~
             - ~
+            - '@logger' # Processes left out of the listings because their configuration is not valid
         tags:
             - { name: kernel.reset, method: reset }
+            - { name: monolog.logger, channel: cleverage_process }
     CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry:
         alias: cleverage_process.registry.process_configuration
     CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistryInterface:

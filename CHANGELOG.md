@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#372](https://github.com/cleverage/process-bundle/issues/372) `ProcessConfigurationRegistry`: an unknown task in the `outputs` or `error_outputs` of a task, or in the `entry_point` or `end_point` of a process, throws an `InvalidProcessConfigurationException` naming the process, the task and the key holding the reference, instead of a `MissingTaskConfigurationException` (`No task configuration with code : <code>`). A process whose configuration is not valid is left out of `getProcessConfigurations()` (`cleverage:process:list`, lists of the UI) with an error log on the `cleverage_process` channel, instead of making every listing fail; getting or executing this process still throws. Update documentation, add tests.
+
 v5.5
 -----
 
