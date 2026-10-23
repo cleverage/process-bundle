@@ -30,10 +30,13 @@ class YamlWriterTask extends AbstractConfigurableTask
     {
         $options = $this->getOptions($state);
         $filePath = $options['file_path'];
-        // Same as the other writers: the parent directory is created if needed
-        $dirname = \dirname($filePath);
-        if (!@mkdir($dirname, 0o755, true) && !is_dir($dirname)) {
-            throw new RuntimeException(\sprintf('Directory "%s" was not created', $dirname));
+        // Same as the other writers: the parent directory is created if needed, for a local path only (not for a stream
+        // wrapper such as compress.zlib://, s3:// or php://stdout)
+        if (!preg_match('#^[a-z][a-z0-9+.-]*://#i', $filePath) || str_starts_with(strtolower($filePath), 'file://')) {
+            $dirname = \dirname($filePath);
+            if (!@mkdir($dirname, 0o755, true) && !is_dir($dirname)) {
+                throw new RuntimeException(\sprintf('Directory "%s" was not created', $dirname));
+            }
         }
         // The PHP warning is replaced by the exception below, also outside of the debug mode
         if (false === @file_put_contents($filePath, Yaml::dump($state->getInput(), $options['inline']))) {

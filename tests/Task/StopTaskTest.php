@@ -44,4 +44,17 @@ class StopTaskTest extends TestCase
         self::assertNull($state->getOutput());
         self::assertNull($state->getException());
     }
+
+    public function testFailedProcessStaysFailedButIsStopped(): void
+    {
+        $processConfiguration = new ProcessConfiguration('test', []);
+        $state = new ProcessState($processConfiguration, new ProcessHistory($processConfiguration));
+        $state->getProcessHistory()->setFailed();
+
+        (new StopTask())->execute($state);
+
+        self::assertTrue($state->isStopped());
+        self::assertTrue($state->getProcessHistory()->isFailed());
+        self::assertFalse($state->getProcessHistory()->isStopped());
+    }
 }
