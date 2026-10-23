@@ -17,7 +17,7 @@ Accepted inputs
 * `\DateTimeImmutable`, converted to a `\DateTime` (same date, time and timezone)
 * Any falsy value (`null`, `''`, `false`…), returned unchanged
 
-A string that cannot be parsed with the given format throws an `\UnexpectedValueException`.
+A string that cannot be parsed with the given format throws an `UnexpectedValueException`.
 
 Possible outputs
 ----------------

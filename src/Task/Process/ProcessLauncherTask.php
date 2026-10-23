@@ -256,7 +256,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
             'process_options',
             static function (Options $options, array $value): array {
                 if ([] !== $value) {
-                    // Todo deprecation trigger
+                    // Deprecated option, removed in v6.0: a non-empty value is not supported anymore
                     throw new InvalidArgumentException('Deprecated option, please contact support for help');
                 }
 

@@ -35,7 +35,7 @@ Options
 | `reference_key`   | `string` |          | `column` | Key holding the column name in each output group                                                                                                |
 | `aggregation_key` | `string` |          | `values` | Key holding the aggregated rows in each output group                                                                                            |
 | `condition`       | `array`  |          | `[]`     | Conditions (`match`, `not_match`, `empty`, `not_empty`, `match_regexp`, `not_match_regexp`), see [ConditionTrait](../traits/condition_trait.md) |
-| `ignore_missing`  | `bool`   |          | `false`  | If `true`, missing columns only log a warning instead of throwing an `\UnexpectedValueException`                                                |
+| `ignore_missing`  | `bool`   |          | `false`  | If `true`, missing columns only log a warning instead of throwing an `UnexpectedValueException`                                                |
 
 The condition is checked, for each column, against an array with two keys: `input_column_value` (the value of the
 column) and `input` (the whole row). Use property paths such as `[input_column_value]` or `[input][status]`.

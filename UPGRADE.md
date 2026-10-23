@@ -131,6 +131,11 @@ for such a task is deprecated, listen to the `event_name` instead.
 When the initialization of a task fails, the process goes on with a deprecation. In 6.0, it will fail before executing
 any task.
 
+### Process launcher task
+
+The `process_options` option of the `process_launcher` task is deprecated (any non-empty value already throws an
+exception): remove it from your configurations, it will be removed in 6.0.
+
 ## v2.0.4
 
 ### Callback transformer

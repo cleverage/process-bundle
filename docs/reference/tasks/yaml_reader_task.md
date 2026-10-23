@@ -26,7 +26,7 @@ Options
 
 | Code        | Type     | Required | Default | Description                                                                                                          |
 |-------------|----------|:--------:|---------|----------------------------------------------------------------------------------------------------------------------|
-| `file_path` | `string` |  **X**   |         | Path of the YAML file to read. An `\UnexpectedValueException` is thrown at initialization if the file does not exist |
+| `file_path` | `string` |  **X**   |         | Path of the YAML file to read. An `UnexpectedValueException` is thrown at initialization if the file does not exist (with process-bundle v5, the process fails when the task is first executed, see [initializable tasks](../../02-task_types.md#initializable-tasks)) |
 
 Examples
 --------
@@ -43,6 +43,6 @@ read_yaml:
 Notes
 -----
 
-* The root of the file must be a mapping or a sequence, otherwise an `\InvalidArgumentException` is thrown (e.g. for an
+* The root of the file must be a mapping or a sequence, otherwise an `InvalidArgumentException` is thrown (e.g. for an
   empty file). An empty root mapping or sequence (`{}` or `[]`) produces no output: the task is skipped.
 * The current root key is added to the error context of the process as `iterator_key`.

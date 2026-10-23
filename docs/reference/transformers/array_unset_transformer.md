@@ -12,7 +12,7 @@ Transformer reference
 Accepted inputs
 ---------------
 
-`array`. Any other value throws an `\UnexpectedValueException`.
+`array`. Any other value throws an `UnexpectedValueException`.
 
 Possible outputs
 ----------------

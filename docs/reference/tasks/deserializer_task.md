@@ -3,6 +3,8 @@ DeserializerTask
 
 Deserializes a string input into a PHP value (object, array...) using the Symfony Serializer `SerializerInterface`.
 
+Requires the Symfony serializer (`framework.serializer`): without it, the task fails with an explicit message.
+
 Task reference
 --------------
 

@@ -14,7 +14,7 @@ Task reference
 Accepted inputs
 ---------------
 
-`array`: a line containing all the `split_columns` keys. An `\UnexpectedValueException` is thrown if one is missing.
+`array`: a line containing all the `split_columns` keys. An `UnexpectedValueException` is thrown if one is missing.
 
 Possible outputs
 ----------------

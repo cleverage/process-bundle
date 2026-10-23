@@ -18,7 +18,7 @@ Accepted inputs
 ---------------
 
 `\DOMNode` (including `\DOMDocument`). Any other value, a node that does not belong to a document or an invalid xpath
-query throws an `\UnexpectedValueException`.
+query throws an `UnexpectedValueException`.
 
 Possible outputs
 ----------------
@@ -39,8 +39,8 @@ Options
 | Code             | Type            | Required | Default | Description                                                                                                                              |
 |------------------|-----------------|:--------:|---------|------------------------------------------------------------------------------------------------------------------------------------------|
 | `query`          | `string\|array` |  **X**   |         | An XPath query, or an array of subqueries (see below)                                                                                    |
-| `single_result`  | `bool`          |          | `true`  | Return a single value instead of a list; more than one result throws an `\UnexpectedValueException`                                      |
-| `ignore_missing` | `bool`          |          | `true`  | Only used with `single_result`: return `null` when nothing matches, instead of throwing an `\UnexpectedValueException`                   |
+| `single_result`  | `bool`          |          | `true`  | Return a single value instead of a list; more than one result throws an `UnexpectedValueException`                                      |
+| `ignore_missing` | `bool`          |          | `true`  | Only used with `single_result`: return `null` when nothing matches, instead of throwing an `UnexpectedValueException`                   |
 | `unwrap_value`   | `bool`          |          | `true`  | Return the text value of each result; only `\DOMText` (use the `text()` selector) and `\DOMAttr` results are supported, others throw     |
 
 Each element of an array `query` is either a string (the subquery itself, using the root level options), or an array

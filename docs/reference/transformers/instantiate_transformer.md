@@ -14,7 +14,7 @@ Accepted inputs
 ---------------
 
 `array`: the constructor arguments. A list is passed positionally; string keys are used as named arguments. Any other
-value throws an `\UnexpectedValueException`.
+value throws an `UnexpectedValueException`.
 
 Possible outputs
 ----------------

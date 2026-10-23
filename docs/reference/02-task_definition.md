@@ -36,7 +36,7 @@ of its code: its service id, with or without a leading `@` (quote the value when
 e.g. `service: '@CleverAge\ProcessBundle\Task\TransformerTask'` (the tasks of this bundle have their class name as
 service id). The service must implement `CleverAge\ProcessBundle\Model\TaskInterface`. With an unknown service, a
 reference with `@` throws the `ServiceNotFoundException` of the service container, a reference without `@` an
-`\UnexpectedValueException` (`Unable to resolve service reference for Task '<task code>'`). A task defines either `task`
+`UnexpectedValueException` (`Unable to resolve service reference for Task '<task code>'`). A task defines either `task`
 or `service`, not both.
 
 Only a service that is not referenced by the configurations known when the container is compiled (e.g. a configuration

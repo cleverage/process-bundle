@@ -14,8 +14,10 @@ Task reference
 Accepted inputs
 ---------------
 
-`array`: optional, merged over the task options (e.g. `{ file_path: ..., max_lines: ... }`), which allows to give the
-file path as input. Any other input is ignored.
+`array`: optional, its `file_path` and `max_lines` values replace the ones of the task options (e.g.
+`{ file_path: ..., max_lines: ... }`). The `file_path` option is still required in the task configuration (the options
+are resolved before the input is merged): to give the file path as input only, set a placeholder value in the options.
+Any other input is ignored.
 
 Possible outputs
 ----------------

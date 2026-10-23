@@ -14,7 +14,7 @@ Accepted inputs
 ---------------
 
 `\DOMDocument`: document to dump with [DOMDocument::saveXML](https://www.php.net/manual/en/domdocument.savexml.php).
-An `\UnexpectedValueException` is thrown for any other type.
+An `UnexpectedValueException` is thrown for any other type.
 
 Possible outputs
 ----------------
@@ -44,4 +44,4 @@ Notes
 -----
 
 * The file is opened on each execution: with the default `wb` mode, each input overwrites the file.
-* If the XML content cannot be generated (`\DOMDocument::saveXML()` fails) or written, a `\RuntimeException` is thrown.
+* If the XML content cannot be generated (`\DOMDocument::saveXML()` fails) or written, a `RuntimeException` is thrown.

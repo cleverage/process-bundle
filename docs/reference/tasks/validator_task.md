@@ -3,6 +3,8 @@ ValidatorTask
 
 Validates the input with the Symfony Validator component and outputs it unchanged when it is valid.
 
+Requires the Symfony validator (`framework.validation`): without it, the task fails with an explicit message.
+
 Task reference
 --------------
 
@@ -24,7 +26,7 @@ When violations are found, each one is logged (if `log_errors` is enabled) with 
 
 * if `error_output_violations` is `true`: the `ConstraintViolationListInterface` is sent to the error output and the
   task is skipped (nothing is sent to the outputs)
-* otherwise: an `\UnexpectedValueException` is thrown (`N constraint violations detected on validation`), handled
+* otherwise: an `UnexpectedValueException` is thrown (`N constraint violations detected on validation`), handled
   according to the task `error_strategy`
 
 Options

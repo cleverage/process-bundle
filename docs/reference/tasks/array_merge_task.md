@@ -14,7 +14,7 @@ Task reference
 Accepted inputs
 ---------------
 
-`array`: any other type throws an `\UnexpectedValueException`
+`array`: any other type throws an `UnexpectedValueException`
 
 Possible outputs
 ----------------

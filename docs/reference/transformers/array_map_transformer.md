@@ -12,7 +12,7 @@ Transformer reference
 Accepted inputs
 ---------------
 
-`array` or `\Traversable`. Any other value throws an `\UnexpectedValueException`.
+`array` or `\Traversable`. Any other value throws an `UnexpectedValueException`.
 
 Possible outputs
 ----------------

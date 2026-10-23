@@ -14,7 +14,7 @@ Task reference
 Accepted inputs
 ---------------
 
-`array`: data to encode. An `\UnexpectedValueException` is thrown for any other type.
+`array`: data to encode. An `UnexpectedValueException` is thrown for any other type.
 Underlying method is [json_encode](https://www.php.net/manual/en/function.json-encode.php).
 
 Possible outputs
@@ -60,7 +60,7 @@ Notes
 -----
 
 * `{date}` is replaced by `Ymd`, `{date_time}` by `Ymd_His`, `{timestamp}` by the Unix timestamp and `{unique_token}`
-  by a `uniqid()` value.
+  by a `uniqid('', true)` value (23 characters, containing a dot).
 * The parent directory of the file is created (recursively) if it does not exist.
 * Using `JSON_PRETTY_PRINT` produces multi-line documents: the file can no longer be read by
   [JsonStreamReaderTask](json_stream_reader_task.md).

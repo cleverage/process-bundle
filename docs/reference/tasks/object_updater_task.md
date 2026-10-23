@@ -18,7 +18,7 @@ Accepted inputs
 * `object`: the object (or array) to update
 * `value`: the value to set
 
-An `\UnexpectedValueException` is thrown if one of these keys is missing.
+An `UnexpectedValueException` is thrown if one of these keys is missing.
 
 Possible outputs
 ----------------
@@ -30,7 +30,7 @@ Options
 
 | Code            | Type     | Required | Default | Description                                                 |
 |-----------------|----------|:--------:|---------|-------------------------------------------------------------|
-| `property_path` | `string` |  **X**   |         | Property path of the `object` where the `value` will be set |
+| `property_path` | `string\|PropertyPathInterface` |  **X**   |         | Property path of the `object` where the `value` will be set |
 
 Examples
 --------

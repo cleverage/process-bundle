@@ -66,10 +66,10 @@ Notes
   `node_name` nested inside a matching element is part of its parent output, and is not output on its own.
 * Namespaces declared on ancestors are copied to the expanded element, so prefixed queries (e.g. `g:price/text()`)
   still work.
-* An invalid XML content (not well-formed, empty file...) throws an `\UnexpectedValueException` whose message contains
+* An invalid XML content (not well-formed, empty file...) throws an `UnexpectedValueException` whose message contains
   the libxml error(s) with their line and column, handled by the task `error_strategy`. As the file is read as a
   stream, the elements located before the error have already been output. libxml warnings are tolerated.
-* A missing or unreadable file, or no file path in the option nor in the input, throws an `\UnexpectedValueException`.
+* A missing or unreadable file, or no file path in the option nor in the input, throws an `UnexpectedValueException`.
 * The file is released at the end of the iteration (and on `finalize()`), so that the task can read it again on its next
   input.
 * Use [XmlReaderTask](xml_reader_task.md) to get the whole document at once (small files).

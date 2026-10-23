@@ -52,8 +52,9 @@ cached:
 Notes
 -----
 
-* The cache pool is the autowired `Psr\Cache\CacheItemPoolInterface` service (`cache.app` in a standard Symfony
-  application). Items are saved with `saveDeferred()`, a warning is logged if the save fails.
+* The cache pool is the `cache.app` service, passed explicitly. To use another pool, override the `$cache` argument
+  of the `CleverAge\ProcessBundle\Transformer\CachedTransformer` service in your application
+  (`arguments: { $cache: '@cache.my_pool' }`). Items are saved with `saveDeferred()`, a warning is logged if the save fails.
 * A string `ttl` is converted to a date when the options are resolved (i.e. once, when the transformer is configured),
   not each time an item is saved: all items share the same absolute expiration date.
 * If the key value is not a string after `key_transformers` (e.g. an `int` input without a `cast` key transformer),

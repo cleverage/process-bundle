@@ -20,14 +20,15 @@ Possible outputs
 
 `string`: for each line, its raw content. The line break is not removed.
 Underlying class is [SplFileObject](https://www.php.net/manual/en/class.splfileobject.php), with the `READ_AHEAD` and
-`SKIP_EMPTY` flags.
+`SKIP_EMPTY` flags. Without `DROP_NEW_LINE`, the lines keep their line break, so an empty line is output as `"\n"`
+(only the empty string after the last line break is skipped).
 
 Options
 -------
 
 | Code       | Type     | Required | Default | Description                                                                                                      |
 |------------|----------|:--------:|---------|------------------------------------------------------------------------------------------------------------------|
-| `filename` | `string` |  **X**   |         | Path of the file to read. An `\UnexpectedValueException` is thrown if the file does not exist or is not readable |
+| `filename` | `string` |  **X**   |         | Path of the file to read. An `UnexpectedValueException` is thrown if the file does not exist or is not readable |
 
 Examples
 --------

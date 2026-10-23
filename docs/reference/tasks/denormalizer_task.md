@@ -4,6 +4,8 @@ DenormalizerTask
 Denormalizes the input (usually an array) into an object of the configured class, using the Symfony Serializer
 `DenormalizerInterface`.
 
+Requires the Symfony serializer (`framework.serializer`): without it, the task fails with an explicit message.
+
 Task reference
 --------------
 

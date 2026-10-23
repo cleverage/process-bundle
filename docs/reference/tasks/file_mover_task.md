@@ -13,7 +13,7 @@ Task reference
 Accepted inputs
 ---------------
 
-`string`: path of the file to move. An `\UnexpectedValueException` is thrown if it does not exist.
+`string`: path of the file to move. An `UnexpectedValueException` is thrown if it does not exist.
 
 Possible outputs
 ----------------

@@ -4,6 +4,8 @@ NormalizeTransformer
 Normalize the input (typically an object) into an array or a scalar, using the Symfony
 [Serializer](https://symfony.com/doc/current/components/serializer.html) normalizer.
 
+Requires the Symfony serializer (`framework.serializer`): without it, the transformer fails with an explicit message.
+
 See also [NormalizerTask](../tasks/normalizer_task.md) for the task equivalent.
 
 Transformer reference

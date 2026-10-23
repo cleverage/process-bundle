@@ -139,10 +139,10 @@ Notes
 * When a sub-transformer fails, the thrown `TransformerException` reports the target property.
 * On an array destination, a target property that is not an index notation is added as a literal key: a simple
   property name (e.g. `name`) gives the `name` key. Doing so with a nested path (e.g. `address.city`, `address[city]`)
-  is deprecated and will throw an `\UnexpectedValueException` in v6.0: use `[address.city]` to keep a literal key, or
+  is deprecated and will throw an `UnexpectedValueException` in v6.0: use `[address.city]` to keep a literal key, or
   `[address][city]` to write in a nested array.
 * A missing property of a `\stdClass` destination is added only for a simple target property name (e.g. `name`): a
   nested path (e.g. `address.city`) or an index notation (e.g. `[name]`) that is not writable throws an
-  `\UnexpectedValueException` (`Property '...' is not writable`), as for any other object.
+  `UnexpectedValueException` (`Property '...' is not writable`), as for any other object.
 * `merge_callback` receives the destination by value: to modify an array destination, the callable must take its
   first argument by reference.
