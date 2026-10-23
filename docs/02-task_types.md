@@ -24,7 +24,7 @@ A task is *resolved* when all its executions are over, as well as those of all i
 | `BlockingTaskInterface` | `proceed(ProcessState $state): void` | Once, when all parent tasks are resolved, only if the task received at least one input |
 | `FlushableTaskInterface` | `flush(ProcessState $state): void` | When an ancestor (or the task itself) is resolved or finishes iterating: possibly several times |
 | `InitializableTaskInterface` | `initialize(ProcessState $state): void` | Once, before the process starts |
-| `FinalizableTaskInterface` | `finalize(ProcessState $state): void` | Once, at the end of the process |
+| `FinalizableTaskInterface` | `finalize(ProcessState $state): void` | Once, at the end of the process, whether it succeeds or fails |
 
 ## Iterable tasks
 
@@ -162,9 +162,20 @@ temporary folder, log some statistics).
 Finalizable tasks implement `CleverAge\ProcessBundle\Model\FinalizableTaskInterface`. Their `finalize` method is
 called once all tasks are resolved, for every task of the process, in the order they are configured.
 
-Note that finalization only happens when the process reaches its end: if a task stops the process because of an
-exception (error strategy `stop`), the process fails immediately and `finalize` is not called. A process stopped
-without exception (e.g. by the [StopTask](reference/tasks/stop_task.md)) is still finalized.
+A process stopped without exception (e.g. by the [StopTask](reference/tasks/stop_task.md)) is finalized the same way.
+
+`finalize` is also called when the process fails (e.g. a task stops the process because of an exception with the error
+strategy `stop`), so that the resources are released (files, database cursors...), e.g. for the next executions of a
+long-running worker (Messenger, UI). In this case:
+* only the tasks that have been initialized are finalized: not the tasks whose `initialize` has failed, nor the tasks
+  that were not reached because the process failed during the initialization;
+* the tasks are finalized after the failure, in the order they are configured: `finalize` must not assume that the
+  data are complete (e.g. a writer must only close its file, not write a footer or move a partial file to its
+  destination), nor take long: `$state->getProcessHistory()->isFailed()` tells whether the process has failed;
+* an exception thrown by `finalize` is logged as critical and the next tasks are still finalized: the process fails
+  with its original exception.
+
+Each task is finalized only once: a task already finalized when the process fails is not finalized again.
 
 Examples of finalizable tasks: [CsvReaderTask](reference/tasks/csv_reader_task.md) and the other CSV tasks (close the
 file), [StatCounterTask](reference/tasks/stat_counter_task.md) (logs the number of processed items).

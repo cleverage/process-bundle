@@ -23,7 +23,9 @@ When a process is executed (with the `cleverage:process:execute` command or with
    `cleverage_process.end` event (`ProcessEvent::isProcessStopped()` tells whether the process was stopped on purpose by
    a [StopTask](reference/tasks/stop_task.md))
 
-If an exception is thrown at any point, the `cleverage_process.fail` event is dispatched and the exception is rethrown.
+If an exception is thrown at any point, the tasks that have been initialized (and not finalized yet) are finalized,
+the `cleverage_process.fail` event is dispatched and the exception is rethrown (see
+[finalizable tasks](02-task_types.md#finalizable-tasks)).
 Note that a task error handled by the `stop` strategy does not surface as the original exception: the process manager
 throws a `CleverAge\ProcessBundle\Exception\ProcessFailedException` (a `\RuntimeException`), whose message contains
 the process code, the task code and the original message. The original exception is available with `getPrevious()`.
@@ -262,7 +264,7 @@ When a checker returns `true`, the task is not executed and the process is stopp
 `stop` error strategy, whatever its `error_strategy` (its error outputs are not executed): the process fails with a
 `ProcessFailedException` whose previous exception is a `CleverAge\ProcessBundle\Exception\ProcessStoppedException`,
 and the `cleverage_process.fail` event is dispatched. As for any failure, the remaining items are not flushed and the
-tasks are not finalized.
+initialized tasks are finalized.
 
 ```php
 namespace App\Process;

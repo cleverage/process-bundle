@@ -1,6 +1,19 @@
 Upgrade Guide
 =============
 
+## v5.6
+
+Some behaviours change: check the points below.
+
+### Finalization of the tasks when the process fails
+
+`FinalizableTaskInterface::finalize()` is now also called when the process fails, on every task that has been
+initialized (not on a task whose `initialize()` failed, nor on the tasks not reached). A custom finalizable task must not
+assume that the process succeeded nor that its data are complete: only release its resources (close files, free
+cursors), do not write a footer, move / publish a partial file or run long operations. Check
+`$state->getProcessHistory()->isFailed()` in `finalize()` to skip such work when the process has failed.
+`StatCounterTask` (`stat_counter`) now logs its count when the process fails too.
+
 ## v5.5
 
 No deprecation in this version. Some behaviours change: check the points below.
