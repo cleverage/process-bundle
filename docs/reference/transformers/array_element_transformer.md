@@ -18,7 +18,7 @@ Accepted inputs
 Possible outputs
 ----------------
 
-`any`: the element found at the given position
+`any`: the element found at the given position, `null` when the position is outside the array (at either end)
 
 Options
 -------
@@ -46,7 +46,10 @@ array_element:
   index: -2
 ```
 
-Notes
------
+* An index outside the array: `['foo']` becomes `null`
 
-There is no bound check: an index outside the array triggers an "Undefined array key" warning.
+```yaml
+# Transformer options level
+array_element:
+  index: 3
+```

@@ -17,7 +17,7 @@ Accepted inputs
 Possible outputs
 ----------------
 
-`any`: the last element of the array
+`any`: the last element of the array, `null` for an empty array
 
 Options
 -------
@@ -33,8 +33,3 @@ Examples
 # Transformer options level
 array_last: ~
 ```
-
-Notes
------
-
-An empty array triggers an "Undefined array key" warning.

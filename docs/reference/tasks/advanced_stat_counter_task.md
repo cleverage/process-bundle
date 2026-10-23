@@ -27,6 +27,8 @@ The logged message has the following format:
 Last iteration 00:00:12 ago - 1,50 items/s - 500 items processed in 00:05:33
 ```
 
+The rate is `n/a items/s` when less than one second has elapsed since the first counted execution.
+
 Options
 -------
 

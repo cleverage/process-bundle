@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests\Transformer\Array;
 
 use CleverAge\ProcessBundle\Transformer\Array\ArrayElementTransformer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -32,6 +33,26 @@ class ArrayElementTransformerTest extends TestCase
         $result = $transformer->transform($value, $options);
 
         $this->assertEquals('bar', $result);
+    }
+
+    /**
+     * @return iterable<string, array{array<mixed>, int}>
+     */
+    public static function outsideIndexProvider(): iterable
+    {
+        yield 'index after the end' => [['foo', 'bar'], 2];
+        yield 'negative index before the start' => [['foo', 'bar'], -3];
+        yield 'empty array' => [[], 0];
+    }
+
+    /**
+     * @param array<mixed> $value
+     */
+    #[DataProvider('outsideIndexProvider')]
+    public function testIndexOutsideTheArrayReturnsNullWithoutWarning(array $value, int $index): void
+    {
+        // A PHP warning would fail the test (failOnWarning)
+        $this->assertNull((new ArrayElementTransformer())->transform($value, ['index' => $index]));
     }
 
     public function testConfigureOptionsSetsRequiredOptions(): void

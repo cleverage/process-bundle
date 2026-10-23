@@ -47,6 +47,12 @@ class ArrayLastTransformerTest extends TestCase
         self::assertSame($expected, (new ArrayLastTransformer())->transform($value));
     }
 
+    public function testEmptyArrayReturnsNullWithoutWarning(): void
+    {
+        // A PHP warning would fail the test (failOnWarning)
+        self::assertNull((new ArrayLastTransformer())->transform([]));
+    }
+
     public function testNonArrayInputThrows(): void
     {
         $this->expectException(\TypeError::class);

@@ -39,7 +39,7 @@ Each rule of `rules_set` has the following options:
 
 | Code           | Type           | Required | Default | Description                                                                                                                           |
 |----------------|----------------|:--------:|---------|---------------------------------------------------------------------------------------------------------------------------------------|
-| `condition`    | `string\|null` |          | `null`  | Expression; the rule matches if it is truthy                                                                                          |
+| `condition`    | `string\|ParsedExpression\|null` |          | `null`  | Expression (or an already parsed `Symfony\Component\ExpressionLanguage\ParsedExpression`); the rule matches if it is truthy |
 | `default`      | `bool`         |          | `false` | Mark the rule as the default one (always matches). It cannot have a `condition`, no conditional rule may follow it, only one allowed  |
 | `set_null`     | `bool`         |          | `false` | If `true`, return `null` (takes precedence on `constant` and `transformers`)                                                          |
 | `constant`     | `any`          |          | `null`  | If not `null`, return this value (takes precedence on `transformers`)                                                                 |

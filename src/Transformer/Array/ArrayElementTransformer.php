@@ -28,7 +28,14 @@ class ArrayElementTransformer implements ConfigurableTransformerInterface
      */
     public function transform(mixed $value, array $options = []): mixed
     {
-        return array_values(\array_slice($value, $options['index'], 1))[0];
+        $index = $options['index'];
+        // null when the index is outside the array, at either end: no "Undefined array key" warning after the end, and
+        // not the first element (as array_slice() would give) before the start
+        if ($index >= \count($value) || $index < -\count($value)) {
+            return null;
+        }
+
+        return array_values(\array_slice($value, $index, 1))[0];
     }
 
     public function getCode(): string
