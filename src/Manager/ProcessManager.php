@@ -53,11 +53,15 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
     protected const EXECUTE_FLUSH = 4;
 
     /**
+     * Indexed by task configuration (spl_object_id()): a sub-process may have a task with the same code.
+     *
      * @var TaskConfiguration[]
      */
     protected array $processedIterables = [];
 
     /**
+     * Indexed by task configuration (spl_object_id()): a sub-process may have a task with the same code.
+     *
      * @var TaskConfiguration[]
      */
     protected array $processedBlockings = [];
@@ -220,6 +224,12 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             $this->endProcess($processHistory);
 
             throw $error;
+        } finally {
+            // A failed or stopped process may leave tasks in the registries, seen by its next execution
+            foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
+                $this->removeProcessedIterable($taskConfiguration);
+                $this->removeProcessedBlocking($taskConfiguration);
+            }
         }
 
         $this->processHistory = $parentProcessHistory;
@@ -646,7 +656,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function addProcessedIterable(TaskConfiguration $taskConfiguration): void
     {
-        $this->processedIterables[$taskConfiguration->getCode()] = $taskConfiguration;
+        $this->processedIterables[spl_object_id($taskConfiguration)] = $taskConfiguration;
     }
 
     /**
@@ -654,7 +664,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function hasProcessedIterable(TaskConfiguration $taskConfiguration): bool
     {
-        return \array_key_exists($taskConfiguration->getCode(), $this->processedIterables);
+        return \array_key_exists(spl_object_id($taskConfiguration), $this->processedIterables);
     }
 
     /**
@@ -662,7 +672,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function removeProcessedIterable(TaskConfiguration $taskConfiguration): void
     {
-        unset($this->processedIterables[$taskConfiguration->getCode()]);
+        unset($this->processedIterables[spl_object_id($taskConfiguration)]);
     }
 
     /**
@@ -670,7 +680,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function addProcessedBlocking(TaskConfiguration $taskConfiguration): void
     {
-        $this->processedBlockings[$taskConfiguration->getCode()] = $taskConfiguration;
+        $this->processedBlockings[spl_object_id($taskConfiguration)] = $taskConfiguration;
     }
 
     /**
@@ -678,7 +688,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function hasProcessedBlocking(TaskConfiguration $taskConfiguration): bool
     {
-        return \array_key_exists($taskConfiguration->getCode(), $this->processedBlockings);
+        return \array_key_exists(spl_object_id($taskConfiguration), $this->processedBlockings);
     }
 
     /**
@@ -686,6 +696,6 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function removeProcessedBlocking(TaskConfiguration $taskConfiguration): void
     {
-        unset($this->processedBlockings[$taskConfiguration->getCode()]);
+        unset($this->processedBlockings[spl_object_id($taskConfiguration)]);
     }
 }
