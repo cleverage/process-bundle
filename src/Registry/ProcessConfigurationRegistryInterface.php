@@ -29,9 +29,10 @@ interface ProcessConfigurationRegistryInterface
     public function getProcessConfiguration(string $processCode): ProcessConfiguration;
 
     /**
-     * @return array<string, ProcessConfiguration> indexed by process code
+     * The processes whose configuration is not valid are left out (ProcessConfigurationRegistry logs an error), they
+     * do not prevent listing the other ones.
      *
-     * @throws InvalidProcessConfigurationException when a process configuration is not valid
+     * @return array<string, ProcessConfiguration> indexed by process code
      */
     public function getProcessConfigurations(): array;
 
