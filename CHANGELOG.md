@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#369](https://github.com/cleverage/process-bundle/issues/369) `StopTask` (`stop`): a process that has already failed (e.g. after a task initialization failure, going on being deprecated) stays failed instead of being flagged as stopped: the `Process <code> failed` log is written at the `failed_level` and `ProcessEvent::isProcessStopped()` is `false`, as before #337. Update documentation, add tests.
+
 v5.5
 -----
 
