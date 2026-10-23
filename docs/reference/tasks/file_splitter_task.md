@@ -20,8 +20,9 @@ file path as input. Any other input is ignored.
 Possible outputs
 ----------------
 
-`string`: path of a temporary file (created in the system temporary directory, with a `.tmp` extension) containing the
-next `max_lines` lines of the source file (the last file may contain fewer lines).
+`string`: path of a temporary file (created in the system temporary directory, with a random name, a `.tmp` extension
+and readable by its owner only) containing the next `max_lines` lines of the source file (the last file may contain
+fewer lines).
 
 Options
 -------

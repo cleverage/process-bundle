@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Model;
 
 use CleverAge\ProcessBundle\Exception\RuntimeException;
+use CleverAge\ProcessBundle\Filesystem\TemporaryFile;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -29,7 +30,10 @@ class SubprocessInstance
 
     protected Process $process;
 
-    protected string $bufferPath;
+    /**
+     * JSON buffer, in the system temporary directory (the project directory may be read-only, e.g. in a container).
+     */
+    protected string $bufferPath = '';
 
     /**
      * @var array<string, mixed>
@@ -75,8 +79,6 @@ class SubprocessInstance
             $consolePath = $consolePath->getProjectDir().'/bin/console';
         }
         $this->consolePath = $consolePath;
-        // The project directory may be read-only (e.g. in a container)
-        $this->bufferPath = sys_get_temp_dir().'/cdm_buffer_'.uniqid('', true).'.json-stream';
     }
 
     /**
@@ -104,6 +106,8 @@ class SubprocessInstance
         }
 
         if ($this->options[self::OPTION_JSON_BUFFERING]) {
+            // Created before the sub-process writes into it: random name, exclusive creation, owner only
+            $this->bufferPath = TemporaryFile::create('cdm_buffer_', '.json-stream');
             $arguments = [...$arguments, '--output='.$this->bufferPath, '--output-format=json-stream'];
         }
 

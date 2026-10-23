@@ -267,7 +267,7 @@ Process 'project_prefix.process_name' executed successfully
 | `--input-from-stdin` | | Read the input value from STDIN instead (e.g. `cat file.json \| bin/console cleverage:process:execute ...`) |
 | `--context=<key>:<value>` | `-c` | Contextual value, can be repeated. The key must only contain word characters (`\w+`: letters, digits, `_`). The value is parsed as YAML, so `-c limit:10` gives an integer and `-c name:"'foo'"` forces a string (also needed for dates: `-c date:2024-01-01` gives an integer timestamp) |
 | `--output=<path>` | `-o` | Where to dump the value returned by the task defined by the process `end_point`: `-` (default) for STDOUT, or a file path |
-| `--output-format=<format>` | `-t` | Format of the dumped output: `dump` (Symfony VarDumper, STDOUT only, requires `-vv`) or `json-stream` (written to STDOUT with `-vv`, or into the `--output` file, only if the value is an array). Nothing is dumped when this option is omitted. Without `end_point`, the output is `null` |
+| `--output-format=<format>` | `-t` | Format of the dumped output: `dump` (Symfony VarDumper, STDOUT only) or `json-stream` (written to STDOUT, or into the `--output` file if the value is an array: otherwise a warning is written on the error output). Nothing is dumped when this option is omitted. Without `end_point`, the output is `null`. The format and the process codes are checked before any process is executed |
 
 Example:
 
