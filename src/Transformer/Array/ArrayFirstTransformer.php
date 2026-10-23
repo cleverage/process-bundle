@@ -17,7 +17,10 @@ use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Return the first element of an array.
+ * Return the first element of an array (or of any iterable).
+ *
+ * A non-iterable input throws an exception, unless the "allow_not_iterable" option is true: it is then returned
+ * unchanged.
  *
  * @final since 5.4
  */
@@ -30,11 +33,23 @@ class ArrayFirstTransformer implements ConfigurableTransformerInterface
      */
     public function transform(mixed $value, array $options = []): mixed
     {
-        if (false === $options['allow_not_iterable'] && !is_iterable($value)) {
-            return $value;
+        if (!is_iterable($value)) {
+            if ($options['allow_not_iterable']) {
+                return $value;
+            }
+
+            throw new \UnexpectedValueException(\sprintf('Given value is not iterable (%s), set the "allow_not_iterable" option to true to return it unchanged', get_debug_type($value)));
         }
 
-        return reset($value);
+        if (\is_array($value)) {
+            return reset($value);
+        }
+
+        foreach ($value as $item) {
+            return $item;
+        }
+
+        return false;
     }
 
     /**
@@ -50,5 +65,6 @@ class ArrayFirstTransformer implements ConfigurableTransformerInterface
         $resolver->setDefaults([
             'allow_not_iterable' => false,
         ]);
+        $resolver->setAllowedTypes('allow_not_iterable', ['bool']);
     }
 }

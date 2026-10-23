@@ -1,7 +1,7 @@
 ArrayFirstTransformer
 =====================
 
-Return the first element of an array, using `reset()`.
+Return the first element of an array, or of any iterable.
 
 Transformer reference
 ---------------------
@@ -12,21 +12,22 @@ Transformer reference
 Accepted inputs
 ---------------
 
-`array`. With the default options, any non-iterable value is accepted and returned unchanged.
+`iterable` (`array`, `\Traversable`). Any other value throws an `\UnexpectedValueException`, unless
+`allow_not_iterable` is `true`.
 
 Possible outputs
 ----------------
 
-* `any`: the first element of the array
-* `false` if the array is empty
-* the input value itself if it is not iterable and `allow_not_iterable` is `false`
+* `any`: the first element of the iterable
+* `false` if the iterable is empty
+* the input value itself if it is not iterable and `allow_not_iterable` is `true`
 
 Options
 -------
 
-| Code                 | Type   | Required | Default | Description                                                                      |
-|----------------------|--------|:--------:|---------|----------------------------------------------------------------------------------|
-| `allow_not_iterable` | `bool` |          | `false` | When `false`, a non-iterable input is returned unchanged (see [Notes](#notes))   |
+| Code                 | Type   | Required | Default | Description                                                                              |
+|----------------------|--------|:--------:|---------|------------------------------------------------------------------------------------------|
+| `allow_not_iterable` | `bool` |          | `false` | When `true`, a non-iterable input is returned unchanged instead of throwing an exception |
 
 Examples
 --------
@@ -38,9 +39,18 @@ Examples
 array_first: ~
 ```
 
+* Get the first element of a list, or keep a single value as is: `['foo', 'bar']` becomes `'foo'`, `'foo'` stays
+  `'foo'`
+
+```yaml
+# Transformer options level
+array_first:
+  allow_not_iterable: true
+```
+
 Notes
 -----
 
-The `allow_not_iterable` option behaves counter-intuitively: when set to `true`, the non-iterable check is skipped and
-`reset()` is called on the raw value, which throws a `\TypeError` for scalar or `null` inputs (objects are accepted by
-`reset()`, which then returns their first public property). Keep the default value.
+Since v6.0, a non-iterable input throws an exception by default. From v4.0 to v5.x, the option was inverted (a
+non-iterable input was returned unchanged by default, and `allow_not_iterable: true` threw a `\TypeError`): to keep the
+former default behaviour, set `allow_not_iterable: true`.
