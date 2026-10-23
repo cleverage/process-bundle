@@ -24,8 +24,10 @@ use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
+use CleverAge\ProcessBundle\Registry\TaskRegistryInterface;
 use CleverAge\ProcessBundle\Task\ConstantOutputTask;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -65,6 +67,21 @@ class ProcessManagerTaskRegistryTest extends TestCase
         self::assertSame([], $this->deprecations);
     }
 
+    public function testAnyTaskRegistryCanBeUsed(): void
+    {
+        // E.g. a decorator of the task registry of the bundle
+        $taskRegistry = new class implements TaskRegistryInterface {
+            public function getTask(TaskConfiguration $taskConfiguration): TaskInterface
+            {
+                return new ConstantOutputTask();
+            }
+        };
+        $processManager = $this->collectDeprecations(fn (): ProcessManager => $this->createProcessManager($taskRegistry));
+
+        self::assertSame('ok', $this->collectDeprecations(static fn (): mixed => $processManager->execute('test.process')));
+        self::assertSame([], $this->deprecations);
+    }
+
     public function testWithoutTaskRegistryTheTasksAreFetchedFromTheContainerWithADeprecation(): void
     {
         $processManager = $this->collectDeprecations(fn (): ProcessManager => $this->createProcessManager(null));
@@ -76,7 +93,7 @@ class ProcessManagerTaskRegistryTest extends TestCase
         );
     }
 
-    private function createProcessManager(?TaskRegistry $taskRegistry): ProcessManager
+    private function createProcessManager(?TaskRegistryInterface $taskRegistry): ProcessManager
     {
         $container = new Container();
         $container->set('app.constant', new ConstantOutputTask());
