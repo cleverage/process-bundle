@@ -20,7 +20,8 @@ design them like any other service, with only small specificities:
 Most of the time you don't want a task declared in a process to share some data with another declaration using the
 same service, or even with another instance of your process. Since a task is a service, by default, Symfony will only
 create one instance (keeping values in every attribute of your class). With `shared: false`, a new instance is created
-each time a task configuration is initialized.
+each time a task configuration is initialized. A shared service referenced by several tasks of the same process is
+rejected when the container is compiled.
 
 With autoconfiguration (`autoconfigure: true`, set in the `_defaults` of the Symfony skeleton), the bundle applies
 these settings to every service implementing `TaskInterface`: `shared: false` and a `monolog.logger` tag on the

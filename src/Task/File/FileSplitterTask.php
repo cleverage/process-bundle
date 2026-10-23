@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Task\File;
 
 use CleverAge\ProcessBundle\Filesystem\SplFile;
+use CleverAge\ProcessBundle\Filesystem\TemporaryFile;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -78,7 +79,7 @@ class FileSplitterTask extends AbstractConfigurableTask implements IterableTaskI
 
     protected function splitFile(SplFile $file, int $maxLines): string
     {
-        $tmpFilePath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_'.uniqid('process', false).'.tmp';
+        $tmpFilePath = TemporaryFile::create('php_process', '.tmp');
         $splitFile = new SplFile($tmpFilePath, 'wb', []);
 
         $writtenLines = 0;
