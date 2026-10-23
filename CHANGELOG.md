@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#373](https://github.com/cleverage/process-bundle/issues/373) `ProcessManager`: the tasks are finalized (`FinalizableTaskInterface::finalize()`) when the process fails too, so that a long-running worker (Messenger, UI bundle) no longer keeps the resources of a failed process open (files of the CSV, JSON stream and XML tasks, cursor of `doctrine_database_reader` blocking the next queries with MySQL unbuffered queries). Only the initialized tasks are finalized, each one once; a finalization failure is logged as critical and the process fails with its original exception. `StatCounterTask` (`stat_counter`) logs its count when the process fails too. Update documentation, add tests.
+
 v5.5
 -----
 
