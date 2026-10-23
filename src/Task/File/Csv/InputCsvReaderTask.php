@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -21,6 +22,18 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class InputCsvReaderTask extends CsvReaderTask
 {
+    #[\Override]
+    public function execute(ProcessState $state): void
+    {
+        // Without a path, the file_path option (removed) would be read: "Undefined array key" warning, then TypeError
+        $input = $state->getInput();
+        if (!\is_string($input)) {
+            throw new UnexpectedValueException(\sprintf('The input of the input_csv_reader task must be the path of the file to read, "%s" given.', get_debug_type($input)));
+        }
+
+        parent::execute($state);
+    }
+
     /**
      * @return array<string, mixed>
      */

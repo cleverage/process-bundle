@@ -14,7 +14,8 @@ Task reference
 Accepted inputs
 ---------------
 
-`string`: path of the file to read, prefixed by the `base_path` option if set.
+`string`: path of the file to read, prefixed by the `base_path` option if set. Any other input (e.g. `null`) throws an
+`UnexpectedValueException`.
 The file is closed once fully read, so each input (the same path again or a different one) is read from its
 beginning.
 
