@@ -54,3 +54,10 @@ Notes
 * The `process` option is checked when the task is initialized: with an unknown process, the initialization fails, the
   error is logged and, with process-bundle v5, the parent process fails when the task is first executed (see
   [initializable tasks](../../02-task_types.md#initializable-tasks)).
+* Executing a process while it is already running, by itself or through its sub-processes (`A → B → A`), is
+  deprecated since 5.6 and will throw an exception in 6.0: a process has only one set of task instances and states,
+  which the second execution resets while the first one is running (the running process then returns the output of the
+  deepest execution). A deprecation naming the chain of processes (`A -> B -> A`) is triggered, and the execution goes
+  on. Iterate with an iterable task instead of recursing, or use the [ProcessLauncherTask](process_launcher_task.md),
+  which runs the process in a separate PHP process. Executing the same sub-process several times in a row (e.g. for
+  each input) is not concerned.

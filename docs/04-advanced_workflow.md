@@ -206,6 +206,9 @@ values when executing the parent process.
 This is a good way to split a big workflow into small, testable processes. Private processes (`public: false`) are
 hidden from `cleverage:process:list` (unless `--all` is used) but can still be executed.
 
+Executing a process while it is already running, by itself or through its sub-processes, is deprecated and will throw
+an exception in 6.0 (see the [ProcessExecutorTask](reference/tasks/process_executor_task.md#notes)).
+
 ## Events
 
 Events are dispatched around process execution (see `CleverAge\ProcessBundle\Event\ProcessEvent`, which gives access
