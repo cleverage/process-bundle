@@ -42,18 +42,36 @@ final class TaskLocatorCompilerPass implements CompilerPassInterface
 
         $configurations = $container->getParameterBag()->resolveValue($processConfigurationRegistry->getArgument(0));
         $services = [];
-        foreach (\is_array($configurations) ? $configurations : [] as $configuration) {
-            foreach ($configuration['tasks'] ?? [] as $task) {
+        foreach (\is_array($configurations) ? $configurations : [] as $processCode => $configuration) {
+            $taskCodesByService = [];
+            foreach ($configuration['tasks'] ?? [] as $taskCode => $task) {
                 $id = ltrim((string) ($task['service'] ?? ''), '@');
                 // Unknown services keep failing at runtime, with the same message
                 if ('' !== $id && $container->has($id)) {
                     $services[$id] = new Reference($id);
+                    $taskCodesByService[$id][] = (string) $taskCode;
                 }
             }
+            $this->checkSharedServices($container, (string) $processCode, $taskCodesByService);
         }
 
         $container->getDefinition('cleverage_process.registry.task')
             ->replaceArgument(0, ServiceLocatorTagPass::register($container, $services));
+    }
+
+    /**
+     * A shared service referenced by several tasks of a process would run all of them with the same instance: the
+     * options of the last initialization would apply to every task, and their states would be mixed.
+     *
+     * @param array<string, list<string>> $taskCodesByService
+     */
+    private function checkSharedServices(ContainerBuilder $container, string $processCode, array $taskCodesByService): void
+    {
+        foreach ($taskCodesByService as $id => $taskCodes) {
+            if (\count($taskCodes) > 1 && $container->findDefinition($id)->isShared()) {
+                throw new InvalidArgumentException(\sprintf('The service "%s" is used by the tasks "%s" of the process "%s", but it is shared: all these tasks would run with the same instance (and the options of one of them). Declare the service with "shared: false".', $id, implode('", "', $taskCodes), $processCode));
+            }
+        }
     }
 
     /**
