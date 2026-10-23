@@ -109,6 +109,46 @@ class YamlWriterTaskTest extends TestCase
         self::assertSame(self::DATA, Yaml::parseFile($filePath));
     }
 
+    public function testTheParentDirectoryOfAFileUrlIsCreated(): void
+    {
+        $filePath = $this->tmpDir.'/url/file.yaml';
+        $this->execute(['file_path' => 'file://'.$filePath], self::DATA);
+
+        self::assertSame(self::DATA, Yaml::parseFile($filePath));
+    }
+
+    public function testAStreamWrapperPathIsWritten(): void
+    {
+        $filePath = 'compress.zlib://'.$this->tmpDir.'/file.yaml.gz';
+        $state = $this->execute(['file_path' => $filePath], self::DATA);
+
+        self::assertSame($filePath, $state->getOutput());
+        self::assertSame(self::DATA, Yaml::parse((string) file_get_contents($filePath)));
+        self::assertSame("\x1f\x8b", substr((string) file_get_contents($this->tmpDir.'/file.yaml.gz'), 0, 2));
+    }
+
+    public function testAStreamWrapperPathDoesNotCreateADirectory(): void
+    {
+        $cwd = getcwd();
+        self::assertNotFalse($cwd);
+        chdir($this->tmpDir);
+        try {
+            $this->execute(['file_path' => 'php://memory'], self::DATA);
+            ob_start();
+            try {
+                $this->execute(['file_path' => 'php://output'], self::DATA);
+            } finally {
+                $output = ob_get_clean();
+            }
+        } finally {
+            chdir($cwd);
+        }
+
+        self::assertSame(self::DATA, Yaml::parse((string) $output));
+
+        self::assertSame([], glob($this->tmpDir.'/*'));
+    }
+
     public function testAWriteFailureThrows(): void
     {
         // A directory cannot be written as a file

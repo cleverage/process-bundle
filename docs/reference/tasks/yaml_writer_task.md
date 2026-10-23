@@ -24,7 +24,7 @@ Options
 
 | Code        | Type     | Required | Default | Description                                                            |
 |-------------|----------|:--------:|---------|------------------------------------------------------------------------|
-| `file_path` | `string` |  **X**   |         | Path of the file to write to. Its parent directory is created if needed |
+| `file_path` | `string` |  **X**   |         | Path of the file to write to. Its parent directory is created if needed (local path only) |
 | `inline`    | `int`    |          | `4`     | Level at which the dumper switches to inline YAML (see `Yaml::dump()`) |
 
 Examples
@@ -44,4 +44,6 @@ Notes
 
 * This task is not blocking: when receiving several inputs, each one overwrites the file. Aggregate the data first
   (e.g. with [AggregateIterableTask](aggregate_iterable_task.md)) if needed.
+* The parent directory is created only for a local path (no scheme, or `file://`): a stream wrapper path
+  (`compress.zlib://`, `s3://`, `php://stdout`...) is written as is, its directory is never created.
 * When the file cannot be written (e.g. not writable directory), the task fails with a `RuntimeException`.
