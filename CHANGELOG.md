@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#343](https://github.com/cleverage/process-bundle/issues/343) The temporary files of `FileSplitterTask` (`file_splitter`), `CsvSplitterTask` (`csv_splitter`) and of the JSON buffer of `ProcessLauncherTask` (`json_buffering`) are created with a random name, exclusively (an existing path, symbolic links included, is never reused) and readable by their owner only, instead of a name derived from the time (`uniqid()`), opened in `w` mode with the permissions of the umask. Update documentation, add tests.
+
 v5.4.1
 -----
 
