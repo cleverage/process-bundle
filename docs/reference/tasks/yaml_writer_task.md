@@ -24,7 +24,7 @@ Options
 
 | Code        | Type     | Required | Default | Description                                                            |
 |-------------|----------|:--------:|---------|------------------------------------------------------------------------|
-| `file_path` | `string` |  **X**   |         | Path of the file to write to. Its parent directory must exist          |
+| `file_path` | `string` |  **X**   |         | Path of the file to write to. Its parent directory is created if needed |
 | `inline`    | `int`    |          | `4`     | Level at which the dumper switches to inline YAML (see `Yaml::dump()`) |
 
 Examples
@@ -44,3 +44,4 @@ Notes
 
 * This task is not blocking: when receiving several inputs, each one overwrites the file. Aggregate the data first
   (e.g. with [AggregateIterableTask](aggregate_iterable_task.md)) if needed.
+* When the file cannot be written (e.g. not writable directory), the task fails with a `RuntimeException`.
