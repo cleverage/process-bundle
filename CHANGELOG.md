@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#371](https://github.com/cleverage/process-bundle/issues/371) `ProcessManager`: executing a process while it is already running, by itself or through its sub-processes (`A → B → A` with `ProcessExecutorTask` (`process_executor`)), is deprecated and will throw an exception in 6.0: the second execution resets the states and task instances of the running process (one configuration per process code), which then returns the output of the deepest execution. The deprecation names the chain of processes; the execution goes on as before. The same sub-process executed several times in a row, or a process executed again by a listener of the process events, is not concerned. Update documentation, add tests.
+
 ## Fixes
 * [#367](https://github.com/cleverage/process-bundle/issues/367) `ProcessLauncherTask` (`process_launcher`) with `json_buffering`: when the sub-process writes nothing into its JSON buffer (no `end_point`, or an output that is not an array), the task outputs nothing again, as before 5.5, instead of the path of an empty file, and the empty buffer is removed. The buffer of a failed sub-process, and those of the still running sub-processes stopped because of it, are removed too (one file was left in the temporary directory for each launch). Update documentation, add tests.
 * [#368](https://github.com/cleverage/process-bundle/issues/368) `YamlWriterTask` (`yaml_writer`): the parent directory is created for a local path only (no scheme, or `file://`), not for a stream wrapper (`compress.zlib://`, `s3://`...), which failed, or `php://stdout`, which created a `php:` directory. Update documentation, add tests.

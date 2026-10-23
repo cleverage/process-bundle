@@ -3,7 +3,19 @@ Upgrade Guide
 
 ## v5.6
 
-Some behaviours change: check the points below.
+One deprecation, and some behaviours change: check the points below.
+
+### Recursive process execution
+
+Executing a process while it is already running, by itself or through its sub-processes (`A → B → A` with the
+`process_executor` task), is deprecated since 5.6 (`Since cleverage/process-bundle 5.6: Executing the process "A" while
+it is already running (A -> B -> A) is deprecated...`) and will throw an exception in 6.0. A process has only one set of
+task instances and states: the second execution resets them while the first one is running, which then returns the
+output of the deepest execution.
+
+Iterate with an iterable task (e.g. a reader or `constant_iterable_output` followed by `process_executor`) instead of
+recursing, or use the `process_launcher` task, which runs the process in a separate PHP process. Executing the same
+sub-process several times in a row is not concerned.
 
 ### Finalization of the tasks when the process fails
 

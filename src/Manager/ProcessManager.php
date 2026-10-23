@@ -67,6 +67,14 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected array $processedBlockings = [];
 
+    /**
+     * Codes of the processes being executed, a sub-process after its parent: a process has only one configuration (task
+     * instances and states), executing it again while it is running resets them.
+     *
+     * @var list<string>
+     */
+    protected array $runningProcessCodes = [];
+
     protected ?ProcessHistory $processHistory = null;
 
     protected ?TaskConfiguration $taskConfiguration = null;
@@ -107,6 +115,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
     {
         $this->processedIterables = [];
         $this->processedBlockings = [];
+        $this->runningProcessCodes = [];
         $this->processHistory = null;
         $this->taskConfiguration = null;
     }
@@ -141,7 +150,22 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             );
             $this->processLogger->debug('Process start');
 
-            $result = $this->doExecute($processCode, $input, $context);
+            // @deprecated since 5.6, in v6.0 an exception will be thrown
+            if (\in_array($processCode, $this->runningProcessCodes, true)) {
+                trigger_deprecation(
+                    'cleverage/process-bundle',
+                    '5.6',
+                    'Executing the process "%s" while it is already running (%s) is deprecated: it resets the states and task instances of the running process. In v6.0, an exception will be thrown.',
+                    $processCode,
+                    implode(' -> ', [...$this->runningProcessCodes, $processCode]),
+                );
+            }
+            $this->runningProcessCodes[] = $processCode;
+            try {
+                $result = $this->doExecute($processCode, $input, $context);
+            } finally {
+                array_pop($this->runningProcessCodes);
+            }
             // doExecute() leaves the history of the executed process, read before restoring the one of the parent
             $processStopped = $this->processHistory?->isStopped() ?? false;
             $this->processHistory = $parentProcessHistory;
