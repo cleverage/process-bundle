@@ -42,6 +42,7 @@ class LineReaderTaskTest extends TestCase
         $filesystem = new Filesystem();
         $filesystem->dumpFile($this->tmpDir.'/a.txt', "a1\na2\n");
         $filesystem->dumpFile($this->tmpDir.'/b.txt', "b1\n");
+        $filesystem->dumpFile($this->tmpDir.'/no_final_line_break.txt', "l1\n\nl3\r\nl4");
     }
 
     protected function tearDown(): void
@@ -57,6 +58,18 @@ class LineReaderTaskTest extends TestCase
         self::assertSame(
             [["a1\n", "a2\n"], ["a1\n", "a2\n"]],
             [$this->iterate($task, $state), $this->iterate($task, $state)],
+        );
+    }
+
+    public function testTheLastLineIsReadWithoutFinalLineBreak(): void
+    {
+        self::assertSame(
+            ["l1\n", "\n", "l3\r\n", 'l4'],
+            $this->iterate(new LineReaderTask(), $this->createState(['filename' => $this->tmpDir.'/no_final_line_break.txt'])),
+        );
+        self::assertSame(
+            ["l1\n", "\n", "l3\r\n", 'l4'],
+            $this->iterate(new InputLineReaderTask(), $this->createState([]), $this->tmpDir.'/no_final_line_break.txt'),
         );
     }
 
