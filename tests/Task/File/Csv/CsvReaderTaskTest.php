@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle\Tests\Task\File\Csv;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Filesystem\CsvResource;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
@@ -31,6 +32,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CsvReaderTask::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(InputCsvReaderTask::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(UnexpectedValueException::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(AbstractCsvTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(AbstractCsvResourceTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(CsvFile::class)]
@@ -95,6 +97,18 @@ class CsvReaderTaskTest extends TestCase
         );
         self::assertSame([['id' => '3', 'name' => 'baz']], $this->iterate($task, $state, $this->tmpDir.'/b.csv'));
         $task->finalize($state);
+    }
+
+    public function testInputCsvReaderWithoutPathThrows(): void
+    {
+        $task = new InputCsvReaderTask(new NullLogger());
+        $state = $this->createState([]);
+        $state->setInput(null);
+
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('The input of the input_csv_reader task must be the path of the file to read, "null" given.');
+
+        $task->execute($state);
     }
 
     /**

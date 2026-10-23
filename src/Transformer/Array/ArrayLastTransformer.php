@@ -27,7 +27,8 @@ class ArrayLastTransformer implements TransformerInterface
      */
     public function transform(mixed $value, array $options = []): mixed
     {
-        return array_values(\array_slice($value, -1))[0];
+        // null for an empty array (no "Undefined array key" warning)
+        return array_values(\array_slice($value, -1))[0] ?? null;
     }
 
     public function getCode(): string

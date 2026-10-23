@@ -35,7 +35,8 @@ of `preg_match()` is converted into an exception by the Symfony error handler: t
 
 * Call `ConditionTrait::configureConditionOptions` to add the condition options at the root of your `OptionsResolver`,
   or `ConditionTrait::configureWrappedConditionOptions` to add them under a single option (e.g. `condition`)
-* Set the `$accessor` property with a `PropertyAccessorInterface` (e.g. in the constructor)
+* Optionally set the `$accessor` property with a `PropertyAccessorInterface` (e.g. in the constructor): otherwise a
+  default property accessor is created on first use
 * Call `ConditionTrait::checkCondition` with the input and the resolved conditions; it returns `true` if all
   conditions match
 
