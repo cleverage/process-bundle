@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle\Tests\Command;
 use CleverAge\ProcessBundle\Command\ListProcessCommand;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
+use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -26,6 +27,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[UsesClass(ProcessConfiguration::class)]
 #[UsesClass(TaskConfiguration::class)]
 #[UsesClass(ProcessConfigurationRegistry::class)]
+#[UsesClass(InvalidProcessConfigurationException::class)]
 class ListProcessCommandTest extends TestCase
 {
     public function testThePublicProcessesAreListedSortedByCode(): void
@@ -82,6 +84,8 @@ class ListProcessCommandTest extends TestCase
             [
                 'test.private' => $process('Private process', false),
                 'test.b' => $process('', true),
+                // Left out of the list (with an error log) instead of making the command fail
+                'test.invalid' => ['entry_point' => 'missing'] + $process('Invalid process', true),
                 'test.a' => $process('First process', true, [
                     'task' => [
                         'service' => '@app.task',
