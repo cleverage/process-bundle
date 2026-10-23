@@ -152,8 +152,8 @@ A task may also control the flow without any error:
   signal goes back up to the root task, which stops iterating. The rest of the resolution still happens: other root
   tasks are executed, blocking tasks that already received inputs are proceeded, flushable tasks are flushed and every
   task is finalized. It is not a failure for the process manager: the `cleverage_process.end` event is dispatched (not
-  `cleverage_process.fail`) and the command exits with code 0. To stop the whole process with a failure, use the
-  [StopTask](reference/tasks/stop_task.md), or `ProcessState::stop()` with an exception
+  `cleverage_process.fail`) and the command exits with code 0. The [StopTask](reference/tasks/stop_task.md) also flags
+  the process history as failed, but this does not change the event nor the exit code
 
 The legacy `errors` key is a deprecated alias of `error_outputs` (defining both throws an exception).
 

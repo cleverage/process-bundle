@@ -163,8 +163,8 @@ Finalizable tasks implement `CleverAge\ProcessBundle\Model\FinalizableTaskInterf
 called once all tasks are resolved, for every task of the process, in the order they are configured.
 
 Note that finalization only happens when the process reaches its end: if a task stops the process because of an
-exception (error strategy `stop`, [StopTask](reference/tasks/stop_task.md)), the process fails immediately and
-`finalize` is not called. A flow stopped without exception (`ProcessState::setStopped(true)`) is still finalized.
+exception (error strategy `stop`), the process fails immediately and `finalize` is not called. A process stopped
+without exception (e.g. by the [StopTask](reference/tasks/stop_task.md)) is still finalized.
 
 Examples of finalizable tasks: [CsvReaderTask](reference/tasks/csv_reader_task.md) and the other CSV tasks (close the
 file), [StatCounterTask](reference/tasks/stat_counter_task.md) (logs the number of processed items).
