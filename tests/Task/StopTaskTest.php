@@ -25,20 +25,21 @@ use PHPUnit\Framework\TestCase;
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
 class StopTaskTest extends TestCase
 {
-    public function testProcessIsStoppedAndMarkedAsFailed(): void
+    public function testProcessIsStoppedAndMarkedAsStopped(): void
     {
         $processConfiguration = new ProcessConfiguration('test', []);
         $state = new ProcessState($processConfiguration, new ProcessHistory($processConfiguration));
         $state->setInput(['ignored']);
         $state->reset(false);
         self::assertFalse($state->isStopped());
-        self::assertFalse($state->getProcessHistory()->isFailed());
+        self::assertFalse($state->getProcessHistory()->isStopped());
 
         (new StopTask())->execute($state);
 
         self::assertTrue($state->isStopped());
-        self::assertTrue($state->getProcessHistory()->isFailed());
-        self::assertSame(ProcessHistory::STATE_FAILED, $state->getProcessHistory()->getState());
+        self::assertTrue($state->getProcessHistory()->isStopped());
+        self::assertFalse($state->getProcessHistory()->isFailed());
+        self::assertSame(ProcessHistory::STATE_STOPPED, $state->getProcessHistory()->getState());
         self::assertNotNull($state->getProcessHistory()->getEndDate());
         self::assertNull($state->getOutput());
         self::assertNull($state->getException());

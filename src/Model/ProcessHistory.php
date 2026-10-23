@@ -28,6 +28,8 @@ class ProcessHistory implements \Stringable
 
     final public const STATE_FAILED = 'failed';
 
+    final public const STATE_STOPPED = 'stopped';
+
     protected float $id;
 
     protected string $processCode;
@@ -102,6 +104,15 @@ class ProcessHistory implements \Stringable
     }
 
     /**
+     * Set the process as stopped on purpose (e.g. by the StopTask): it is not a failure.
+     */
+    public function setStopped(): void
+    {
+        $this->endDate = new \DateTime();
+        $this->state = self::STATE_STOPPED;
+    }
+
+    /**
      * Set the process as succeded.
      */
     public function setSuccess(): void
@@ -121,6 +132,11 @@ class ProcessHistory implements \Stringable
     public function isFailed(): bool
     {
         return self::STATE_FAILED === $this->state;
+    }
+
+    public function isStopped(): bool
+    {
+        return self::STATE_STOPPED === $this->state;
     }
 
     /**

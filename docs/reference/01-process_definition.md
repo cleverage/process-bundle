@@ -33,10 +33,10 @@ not define its own `error_strategy` (see [task definition](02-task_definition.md
 
 **logs**: optional [RFC 5424](https://datatracker.ietf.org/doc/html/rfc5424) severities of the logs written at the end
 of each process (channel `cleverage_process`, with the `duration` of the process in seconds in the record context):
-* `success_level` (default *info*): level of the `Process <process_code> succeed` log
-* `failed_level` (default *debug*): level of the `Process <process_code> failed` log, written when the process fails,
-  either with an exception (in addition to the `Critical process failure` log) or when it is stopped without exception
-  (e.g. by a [StopTask](tasks/stop_task.md))
+* `success_level` (default *info*): level of the `Process <process_code> succeed` log, and of the
+  `Process <process_code> stopped` log of a process stopped on purpose by a [StopTask](tasks/stop_task.md)
+* `failed_level` (default *debug*): level of the `Process <process_code> failed` log, written when the process fails
+  (in addition to the `Critical process failure` log)
 
 Without UI, the success log is the only trace of a succeeded process: lower its level (e.g. *debug*) only if processes
 are followed by other means.

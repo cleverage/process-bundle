@@ -20,7 +20,8 @@ When a process is executed (with the `cleverage:process:execute` command or with
 6. **finalizes** every task, in the order they are configured (see
    [finalizable tasks](02-task_types.md#finalizable-tasks))
 7. returns the last output of the `end_point` task (or `null` if there is none) and dispatches the
-   `cleverage_process.end` event
+   `cleverage_process.end` event (`ProcessEvent::isProcessStopped()` tells whether the process was stopped on purpose by
+   a [StopTask](reference/tasks/stop_task.md))
 
 If an exception is thrown at any point, the `cleverage_process.fail` event is dispatched and the exception is rethrown.
 Note that a task error handled by the `stop` strategy does not surface as the original exception: the process manager
@@ -155,7 +156,7 @@ A task may also control the flow without any error:
   tasks are executed, blocking tasks that already received inputs are proceeded, flushable tasks are flushed and every
   task is finalized. It is not a failure for the process manager: the `cleverage_process.end` event is dispatched (not
   `cleverage_process.fail`) and the command exits with code 0. The [StopTask](reference/tasks/stop_task.md) also flags
-  the process history as failed, but this does not change the event nor the exit code
+  the process history as stopped: the process ends as stopped on purpose, not as a failure
 
 The legacy `errors` key is a deprecated alias of `error_outputs` (defining both throws an exception).
 
@@ -211,7 +212,7 @@ to the process code, input, context and, depending on the event, output or error
 | Event name | Constant | Dispatched |
 | ---------- | -------- | ---------- |
 | `cleverage_process.start` | `ProcessEvent::EVENT_PROCESS_STARTED` | on process start |
-| `cleverage_process.end` | `ProcessEvent::EVENT_PROCESS_ENDED` | on successful process end (with the process output) |
+| `cleverage_process.end` | `ProcessEvent::EVENT_PROCESS_ENDED` | on successful process end (with the process output), including a process stopped on purpose (`isProcessStopped()`) |
 | `cleverage_process.fail` | `ProcessEvent::EVENT_PROCESS_FAILED` | on failed process end (with the associated error) |
 
 Those events are also dispatched for sub-processes executed with the `ProcessExecutorTask`.
