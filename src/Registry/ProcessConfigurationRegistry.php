@@ -65,6 +65,15 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
         return $this->processConfigurations;
     }
 
+    /**
+     * Forgets the resolved configurations, with the task instances and states of their last execution, e.g. between
+     * two messages of a long-running worker: they are resolved again when needed.
+     */
+    public function reset(): void
+    {
+        $this->processConfigurations = [];
+    }
+
     public function hasProcessConfiguration(string $processCode): bool
     {
         return \array_key_exists($processCode, $this->rawConfiguration);

@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle\Task\File\Csv;
 use CleverAge\ProcessBundle\Exception\RuntimeException;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Filesystem\CsvResource;
+use CleverAge\ProcessBundle\Filesystem\TemporaryFile;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -93,7 +94,7 @@ class CsvSplitterTask extends InputCsvReaderTask
 
     protected function splitCsv(CsvResource $csv, int $maxLines): string
     {
-        $tmpFilePath = sys_get_temp_dir().\DIRECTORY_SEPARATOR.'php_'.uniqid('process', false).'.csv';
+        $tmpFilePath = TemporaryFile::create('php_process', '.csv');
         $tmpFile = fopen($tmpFilePath, 'wb+');
         if (false === $tmpFile) {
             throw new RuntimeException("Unable to open temporary file {$tmpFilePath}");
