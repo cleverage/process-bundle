@@ -142,10 +142,13 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             $this->processLogger->debug('Process start');
 
             $result = $this->doExecute($processCode, $input, $context);
+            // doExecute() leaves the history of the executed process, read before restoring the one of the parent
+            $processStopped = $this->processHistory?->isStopped() ?? false;
+            $this->processHistory = $parentProcessHistory;
 
             $this->processLogger->debug('Process end');
             $this->eventDispatcher->dispatch(
-                new ProcessEvent($processCode, $input, $context, $result),
+                new ProcessEvent($processCode, $input, $context, $result, null, $processStopped),
                 ProcessEvent::EVENT_PROCESS_ENDED
             );
         } catch (\Throwable $error) {
@@ -159,8 +162,8 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
 
             throw $error;
         } finally {
-            // When the process has failed, doExecute() did not restore the history of the parent process (if any): the
-            // logs above are still attributed to the failed process, the next ones to the parent process
+            // When the process has failed, the history of the parent process (if any) is not restored yet: the logs
+            // above are still attributed to the failed process, the next ones to the parent process
             $this->processHistory = $parentProcessHistory;
             // The logs of the parent process are attributed to the task that has executed this process (if any)
             $this->taskConfiguration = $parentTaskConfiguration;
@@ -176,7 +179,6 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function doExecute(string $processCode, mixed $input = null, array $context = []): mixed
     {
-        $parentProcessHistory = $this->processHistory;
         $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
         $processHistory = $this->initializeStates($processConfiguration, $context);
         $this->processHistory = $processHistory;
@@ -222,7 +224,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                     ->getOutput();
             }
         } catch (\Throwable $error) {
-            if ($processHistory->isStarted()) {
+            if ($processHistory->isStarted() || $processHistory->isStopped()) {
                 $processHistory->setFailed();
             }
             $this->endProcess($processHistory);
@@ -235,8 +237,6 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 $this->removeProcessedBlocking($taskConfiguration);
             }
         }
-
-        $this->processHistory = $parentProcessHistory;
 
         return $returnValue;
     }
@@ -613,6 +613,14 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             $this->processLogger->log(
                 $processConfiguration->getSuccessLogLevel(),
                 "Process {$history->getProcessCode()} succeed",
+                [
+                    'duration' => $history->getDuration(),
+                ]
+            );
+        } elseif ($history->isStopped()) {
+            $this->processLogger->log(
+                $processConfiguration->getSuccessLogLevel(),
+                "Process {$history->getProcessCode()} stopped",
                 [
                     'duration' => $history->getDuration(),
                 ]

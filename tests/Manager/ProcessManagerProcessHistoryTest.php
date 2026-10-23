@@ -29,6 +29,7 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use CleverAge\ProcessBundle\Task\ConstantOutputTask;
+use CleverAge\ProcessBundle\Task\StopTask;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
@@ -50,6 +51,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessConfigurationRegistry::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ConstantOutputTask::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(StopTask::class)]
 class ProcessManagerProcessHistoryTest extends TestCase
 {
     private Container $container;
@@ -61,10 +63,20 @@ class ProcessManagerProcessHistoryTest extends TestCase
      */
     private mixed $observedHistory = null;
 
+    private string $subProcessCode = 'test.failing';
+
+    /**
+     * Code of each ended process => whether it was stopped.
+     *
+     * @var list<array{string, bool}>
+     */
+    private array $endedProcesses = [];
+
     protected function setUp(): void
     {
         $this->container = new Container();
         $this->container->set('test.constant', new ConstantOutputTask());
+        $this->container->set('test.stop', new StopTask());
         $this->container->set('test.failing', new class implements TaskInterface {
             public function execute(ProcessState $state): void
             {
@@ -97,9 +109,18 @@ class ProcessManagerProcessHistoryTest extends TestCase
                     'entry' => $this->createTaskConfiguration('@test.constant', ['output' => 'value'], ['fail']),
                     'fail' => $this->createTaskConfiguration('@test.failing'),
                 ]),
+                'test.stopped' => $this->createProcessConfiguration([
+                    'entry' => $this->createTaskConfiguration('@test.constant', ['output' => 'value'], ['stop']),
+                    'stop' => $this->createTaskConfiguration('@test.stop'),
+                ]),
             ],
             'stop'
         );
+
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_ENDED, function (ProcessEvent $event): void {
+            $this->endedProcesses[] = [$event->getProcessCode(), $event->isProcessStopped()];
+        });
 
         $this->processManager = new ProcessManager(
             $this->container,
@@ -107,7 +128,7 @@ class ProcessManagerProcessHistoryTest extends TestCase
             new TaskLogger(new NullLogger()),
             $registry,
             new ContextualOptionResolver(),
-            new EventDispatcher(),
+            $eventDispatcher,
             taskRegistry: new TaskRegistry($this->container),
         );
     }
@@ -115,7 +136,7 @@ class ProcessManagerProcessHistoryTest extends TestCase
     public function executeSubProcess(): void
     {
         try {
-            $this->processManager->execute('test.failing');
+            $this->processManager->execute($this->subProcessCode);
         } catch (ProcessFailedException) {
         }
         $this->observedHistory = $this->processManager->getProcessHistory()?->getProcessCode();
@@ -126,6 +147,17 @@ class ProcessManagerProcessHistoryTest extends TestCase
         $this->processManager->execute('test.parent');
 
         self::assertSame('test.parent', $this->observedHistory);
+        self::assertNull($this->processManager->getProcessHistory());
+    }
+
+    public function testOnlyTheStoppedSubProcessEndsAsStopped(): void
+    {
+        $this->subProcessCode = 'test.stopped';
+
+        $this->processManager->execute('test.parent');
+
+        self::assertSame('test.parent', $this->observedHistory);
+        self::assertSame([['test.stopped', true], ['test.parent', false]], $this->endedProcesses);
         self::assertNull($this->processManager->getProcessHistory());
     }
 

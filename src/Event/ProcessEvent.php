@@ -37,6 +37,7 @@ class ProcessEvent extends Event
         protected array $processContext = [],
         protected mixed $processOutput = null,
         protected ?\Throwable $processError = null,
+        protected bool $processStopped = false,
     ) {
     }
 
@@ -66,5 +67,13 @@ class ProcessEvent extends Event
     public function getProcessError(): ?\Throwable
     {
         return $this->processError;
+    }
+
+    /**
+     * The process has ended because it was stopped on purpose (e.g. by the StopTask), see ProcessHistory::isStopped().
+     */
+    public function isProcessStopped(): bool
+    {
+        return $this->processStopped;
     }
 }

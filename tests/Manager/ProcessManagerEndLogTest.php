@@ -58,11 +58,18 @@ class ProcessManagerEndLogTest extends TestCase
      */
     private array $records = [];
 
+    /**
+     * @var list<ProcessEvent>
+     */
+    private array $endedEvents = [];
+
     public function testSucceededProcessIsLoggedAsInfoByDefault(): void
     {
         $this->createProcessManager('@test.constant')->execute('test.process');
 
         self::assertSame([[LogLevel::INFO, 'Process test.process succeed']], $this->getEndRecords());
+        self::assertCount(1, $this->endedEvents);
+        self::assertFalse($this->endedEvents[0]->isProcessStopped());
     }
 
     public function testSucceededProcessUsesTheDefaultSuccessLevel(): void
@@ -91,19 +98,25 @@ class ProcessManagerEndLogTest extends TestCase
         self::assertSame([[LogLevel::INFO, 'Process test.process succeed']], $this->getEndRecords());
     }
 
-    public function testStoppedProcessIsLoggedAsFailedAsDebugByDefault(): void
+    public function testStoppedProcessEndsAsStoppedAndIsLoggedAsInfoByDefault(): void
     {
         $this->createProcessManager('@test.stop')->execute('test.process');
 
-        self::assertSame([[LogLevel::DEBUG, 'Process test.process failed']], $this->getEndRecords());
+        self::assertSame([[LogLevel::INFO, 'Process test.process stopped']], $this->getEndRecords());
+        self::assertCount(1, $this->endedEvents);
+        self::assertSame('test.process', $this->endedEvents[0]->getProcessCode());
+        self::assertTrue($this->endedEvents[0]->isProcessStopped());
+        self::assertNull($this->endedEvents[0]->getProcessError());
     }
 
-    public function testStoppedProcessUsesTheDefaultFailedLevel(): void
+    public function testStoppedProcessUsesTheDefaultSuccessLevel(): void
     {
-        $this->createProcessManager('@test.stop', defaultLogLevels: ['failed_level' => LogLevel::ERROR])
-            ->execute('test.process');
+        $this->createProcessManager(
+            '@test.stop',
+            defaultLogLevels: ['success_level' => LogLevel::NOTICE, 'failed_level' => LogLevel::ERROR]
+        )->execute('test.process');
 
-        self::assertSame([[LogLevel::ERROR, 'Process test.process failed']], $this->getEndRecords());
+        self::assertSame([[LogLevel::NOTICE, 'Process test.process stopped']], $this->getEndRecords());
     }
 
     public function testFailingProcessIsLoggedAsFailedWithTheLevelOfTheProcess(): void
@@ -178,13 +191,18 @@ class ProcessManagerEndLogTest extends TestCase
             }
         };
 
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_ENDED, function (ProcessEvent $event): void {
+            $this->endedEvents[] = $event;
+        });
+
         return new ProcessManager(
             $container,
             new ProcessLogger($logger),
             new TaskLogger(new NullLogger()),
             new ProcessConfigurationRegistry(['test.process' => $rawConfiguration], 'stop', $defaultLogLevels),
             new ContextualOptionResolver(),
-            new EventDispatcher(),
+            $eventDispatcher,
             taskRegistry: new TaskRegistry($container),
         );
     }
@@ -198,7 +216,7 @@ class ProcessManagerEndLogTest extends TestCase
     {
         $endRecords = [];
         foreach ($this->records as [$level, $message, $context]) {
-            if (str_ends_with($message, ' succeed') || str_ends_with($message, ' failed')) {
+            if (str_ends_with($message, ' succeed') || str_ends_with($message, ' failed') || str_ends_with($message, ' stopped')) {
                 self::assertIsInt($context['duration'] ?? null);
                 $endRecords[] = [$level, $message];
             }
