@@ -26,7 +26,10 @@ class StopTask implements TaskInterface
     public function execute(ProcessState $state): void
     {
         $state->setStopped(true);
-        $state->getProcessHistory()
-            ->setStopped();
+        $processHistory = $state->getProcessHistory();
+        // A process already failed (e.g. by a task initialization failure) stays failed
+        if (!$processHistory->isFailed()) {
+            $processHistory->setStopped();
+        }
     }
 }

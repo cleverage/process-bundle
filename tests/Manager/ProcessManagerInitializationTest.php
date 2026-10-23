@@ -28,6 +28,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
+use CleverAge\ProcessBundle\Task\StopTask;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\DependencyInjection\Container;
@@ -48,10 +49,14 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessHistory::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessConfigurationRegistry::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(StopTask::class)]
 class ProcessManagerInitializationTest extends TestCase
 {
     /** @var list<string> */
     private array $executedTasks = [];
+
+    /** @var list<ProcessEvent> */
+    private array $endedEvents = [];
 
     /** @var list<string> */
     private array $deprecations = [];
@@ -92,6 +97,18 @@ class ProcessManagerInitializationTest extends TestCase
         self::assertSame([], $this->deprecations);
     }
 
+    public function testStopTaskDoesNotTurnAFailedProcessIntoAStoppedOne(): void
+    {
+        $processManager = $this->createProcessManager(skipBeforeBadTask: false, withStopTask: true);
+
+        $this->execute($processManager);
+
+        self::assertSame(['entry'], $this->executedTasks, 'The stop signal still prevents the next tasks from running');
+        self::assertSame([$this->getExpectedDeprecation()], $this->deprecations);
+        self::assertCount(1, $this->endedEvents);
+        self::assertFalse($this->endedEvents[0]->isProcessStopped(), 'The failed process must not be flagged as stopped');
+    }
+
     private function getExpectedDeprecation(): string
     {
         return 'Since cleverage/process-bundle 5.1: The initialization of the task "bad" of the process "test.process" has failed with message "Invalid configuration". Going on with the process after an initialization failure is deprecated: in v6.0, the process will fail before executing any task.';
@@ -111,7 +128,7 @@ class ProcessManagerInitializationTest extends TestCase
         }
     }
 
-    private function createProcessManager(bool $skipBeforeBadTask, bool $failInitialization = true): ProcessManager
+    private function createProcessManager(bool $skipBeforeBadTask, bool $failInitialization = true, bool $withStopTask = false): ProcessManager
     {
         $recorder = function (string $taskCode): void {
             $this->executedTasks[] = $taskCode;
@@ -159,6 +176,7 @@ class ProcessManagerInitializationTest extends TestCase
         $container = new Container();
         $container->set('test.entry', $entryTask);
         $container->set('test.bad', $badTask);
+        $container->set('test.stop', new StopTask());
 
         $registry = new ProcessConfigurationRegistry(
             [
@@ -170,13 +188,22 @@ class ProcessManagerInitializationTest extends TestCase
                     'help' => '',
                     'public' => true,
                     'tasks' => [
-                        'entry' => $this->createTaskConfiguration('@test.entry', ['bad']),
+                        'entry' => $this->createTaskConfiguration('@test.entry', $withStopTask ? ['stop', 'bad'] : ['bad']),
                         'bad' => $this->createTaskConfiguration('@test.bad'),
+                        ...($withStopTask ? ['stop' => $this->createTaskConfiguration('@test.stop')] : []),
                     ],
                 ],
             ],
             'stop'
         );
+
+        $eventDispatcher = new EventDispatcher();
+        $eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_ENDED, function (ProcessEvent $event): void {
+            $this->endedEvents[] = $event;
+        });
+        $eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_FAILED, function (ProcessEvent $event): void {
+            $this->endedEvents[] = $event;
+        });
 
         return new ProcessManager(
             $container,
@@ -184,7 +211,7 @@ class ProcessManagerInitializationTest extends TestCase
             new TaskLogger(new NullLogger()),
             $registry,
             new ContextualOptionResolver(),
-            new EventDispatcher(),
+            $eventDispatcher,
             taskRegistry: new TaskRegistry($container),
         );
     }

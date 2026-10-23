@@ -13,6 +13,10 @@ file does not exist. Unlike [DieTask](die_task.md), the stop is handled by the p
 * `cleverage:process:execute` exits with code 0, and the task running a sub-process
   ([ProcessExecutorTask](process_executor_task.md)) goes on.
 
+A process that has already failed (e.g. a task whose initialization failed, see the
+[initializable tasks](../../02-task_types.md)) stays **failed**: the `StopTask` still stops the flow of the
+tasks, but it does not turn the failure into a stop.
+
 To stop a process because of an error, let the error fail the process instead (error strategy `stop`).
 
 Task reference
