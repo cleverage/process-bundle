@@ -5,102 +5,57 @@ on:
     branches:
       - main
   pull_request:
+  # Weekly build: the dependencies are not locked, a new version of a dependency may break the build
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+# A new push cancels the build of the previous one, on a pull request
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   test:
-    name: PHP ${{ matrix.php-version }} + ${{ matrix.dependencies }} + ${{ matrix.variant }}
+    name: PHP ${{ matrix.php-version }} + ${{ matrix.dependencies }}${{ matrix.symfony-require && format(' + Symfony {0}', matrix.symfony-require) || '' }}
     runs-on: ubuntu-latest
-    continue-on-error: ${{ matrix.allowed-to-fail }}
+    timeout-minutes: 20
     env:
       SYMFONY_REQUIRE: ${{matrix.symfony-require}}
 
     strategy:
+      fail-fast: false
       matrix:
-        php-version:
-          - '8.2'
-          - '8.3'
-          - '8.4'
-          - '8.5'
-        dependencies: [highest]
-        allowed-to-fail: [false]
-        symfony-require: ['']
-        variant: [normal]
         include:
           # Lowest versions allowed by composer.json, on the lowest supported PHP version
-          - php-version: '8.2'
-            dependencies: lowest
-            allowed-to-fail: false
-            symfony-require: ''
-            variant: normal
-          - php-version: '8.2'
-            dependencies: highest
-            allowed-to-fail: false
-            symfony-require: 6.4.*
-            variant: symfony/symfony:"6.4.*"
-          - php-version: '8.2'
-            dependencies: highest
-            allowed-to-fail: false
-            symfony-require: 7.4.*
-            variant: symfony/symfony:"7.4.*"
-          - php-version: '8.3'
-            dependencies: highest
-            allowed-to-fail: false
-            symfony-require: 6.4.*
-            variant: symfony/symfony:"6.4.*"
-          - php-version: '8.3'
-            dependencies: highest
-            allowed-to-fail: false
-            symfony-require: 7.4.*
-            variant: symfony/symfony:"7.4.*"
-          - php-version: '8.4'
-            dependencies: highest
-            allowed-to-fail: false
-            symfony-require: 6.4.*
-            variant: symfony/symfony:"6.4.*"
-          - php-version: '8.4'
-            dependencies: highest
-            allowed-to-fail: false
-            symfony-require: 7.4.*
-            variant: symfony/symfony:"7.4.*"
-          - php-version: '8.4'
-            dependencies: highest
-            allowed-to-fail: false
-            symfony-require: 8.*
-            variant: symfony/symfony:"8.*"
-          - php-version: '8.5'
-            dependencies: highest
-            allowed-to-fail: false
-            symfony-require: 6.4.*
-            variant: symfony/symfony:"6.4.*"
-          - php-version: '8.5'
-            dependencies: highest
-            allowed-to-fail: false
-            symfony-require: 7.4.*
-            variant: symfony/symfony:"7.4.*"
-          - php-version: '8.5'
-            dependencies: highest
-            allowed-to-fail: false
-            symfony-require: 8.*
-            variant: symfony/symfony:"8.*"
+          - { php-version: '8.2', dependencies: lowest, symfony-require: '' }
+          # Highest versions, for each supported Symfony version (8.x requires PHP 8.4)
+          - { php-version: '8.2', dependencies: highest, symfony-require: 6.4.* }
+          - { php-version: '8.2', dependencies: highest, symfony-require: 7.4.* }
+          - { php-version: '8.3', dependencies: highest, symfony-require: 6.4.* }
+          - { php-version: '8.3', dependencies: highest, symfony-require: 7.4.* }
+          - { php-version: '8.4', dependencies: highest, symfony-require: 6.4.* }
+          - { php-version: '8.4', dependencies: highest, symfony-require: 7.4.* }
+          - { php-version: '8.4', dependencies: highest, symfony-require: 8.* }
+          - { php-version: '8.5', dependencies: highest, symfony-require: 6.4.* }
+          - { php-version: '8.5', dependencies: highest, symfony-require: 7.4.* }
+          - { php-version: '8.5', dependencies: highest, symfony-require: 8.* }
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - name: Install PHP with extensions
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # v2
         with:
           php-version: ${{ matrix.php-version }}
           coverage: pcov
           tools: composer:v2, flex
       - name: Add PHPUnit matcher
         run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-      - name: Install variant
-        if: matrix.variant != 'normal' && !startsWith(matrix.variant, 'symfony/symfony')
-        run: composer require ${{ matrix.variant }} --no-update
       - name: Install Composer dependencies (${{ matrix.dependencies }})
-        uses: ramsey/composer-install@v4
+        uses: ramsey/composer-install@26d8a556604053a9612623447203a691f406fbe6 # v4
         with:
           dependency-versions: ${{ matrix.dependencies }}
       - name: Run Tests with coverage
@@ -109,3 +64,14 @@ jobs:
       #  uses: codecov/codecov-action@v4
       #  with:
       #    files: build/logs/clover.xml
+
+  # Single check to require in the branch protection of main: its name does not depend on the matrix
+  tests-passed:
+    name: Tests passed
+    if: always()
+    needs: [test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check the result of the jobs
+        run: test "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped') }}" = false
