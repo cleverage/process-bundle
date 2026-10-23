@@ -4,7 +4,7 @@ Security Policy
 Supported versions
 ------------------
 
-Security fixes are released for the latest minor version of the current major version (5.x).
+Security fixes are released for the latest minor version of the current major version.
 
 Reporting a vulnerability
 -------------------------
