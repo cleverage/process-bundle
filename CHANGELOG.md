@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#367](https://github.com/cleverage/process-bundle/issues/367) `ProcessLauncherTask` (`process_launcher`) with `json_buffering`: when the sub-process writes nothing into its JSON buffer (no `end_point`, or an output that is not an array), the task outputs nothing again, as before 5.5, instead of the path of an empty file, and the empty buffer is removed. The buffer of a failed sub-process, and those of the still running sub-processes stopped because of it, are removed too (one file was left in the temporary directory for each launch). Update documentation, add tests.
+
 v5.5
 -----
 

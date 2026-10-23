@@ -316,7 +316,8 @@ PHP executes a process in a single thread. To use several CPU cores, the
   of its `end_point` is written to a JSON stream file whose path is outputted by the task once the sub-process is over
   (use a [JsonStreamReaderTask](reference/tasks/json_stream_reader_task.md) to read it back). The file is only written
   if the sub-process has an `end_point` whose last output is an array; otherwise, as when `json_buffering` is disabled,
-  the task outputs nothing
+  the task outputs nothing (and removes the empty file). The task does not remove the files it outputs: remove them
+  once read
 - if a sub-process fails (non-zero exit code), all the running sub-processes are stopped and the task throws an
   exception
 
