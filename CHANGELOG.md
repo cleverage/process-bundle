@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#368](https://github.com/cleverage/process-bundle/issues/368) `YamlWriterTask` (`yaml_writer`): the parent directory is created for a local path only (no scheme, or `file://`), not for a stream wrapper (`compress.zlib://`, `s3://`...), which failed, or `php://stdout`, which created a `php:` directory. Update documentation, add tests.
+
 v5.5
 -----
 
