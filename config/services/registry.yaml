@@ -6,6 +6,8 @@ services:
             - ~
             - ~
             - ~
+        tags:
+            - { name: kernel.reset, method: reset }
     CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry:
         alias: cleverage_process.registry.process_configuration
     CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistryInterface:

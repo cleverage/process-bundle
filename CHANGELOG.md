@@ -12,6 +12,7 @@ Latest
 * [#335](https://github.com/cleverage/process-bundle/issues/335) `LineReaderTask` (`line_reader`) and `InputLineReaderTask` (`input_line_reader`): the last line of a file that does not end with a line break is no longer lost. Add tests.
 * [#345](https://github.com/cleverage/process-bundle/issues/345) `YamlWriterTask` (`yaml_writer`): a write failure throws a `RuntimeException` instead of a PHP warning (an exception in debug mode only: in production, the path was output as if the file had been written), and the parent directory is created if needed, as for the other writers. Update documentation, add tests.
 * [#353](https://github.com/cleverage/process-bundle/issues/353) `cleverage:process:execute`: the process codes and the output format are checked before any process is executed (explicit message for `dump` without `symfony/var-dumper`); the output is printed to STDOUT whatever the verbosity when `--output-format` is given (it required `-vv`); a non-array output that cannot be stored as JSON stream is reported on the error output instead of being silently lost. Update documentation, add tests.
+* [#355](https://github.com/cleverage/process-bundle/issues/355) `ProcessConfigurationRegistry::reset()`, tagged `kernel.reset`: a long-running worker (Messenger, UI bundle) releases the resolved process configurations, with the task instances and states (inputs, outputs, aggregated data) of their last execution, between two messages. Add tests.
 
 v5.4.1
 -----
