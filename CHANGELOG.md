@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#339](https://github.com/cleverage/process-bundle/issues/339) A shared service referenced by several tasks of the same process is rejected when the container is compiled (`InvalidArgumentException` naming the service, the tasks and the process): all these tasks ran with the same instance, initialized with the options of each task in turn, without error. Declare the task services with `shared: false` (applied by the autoconfiguration of `TaskInterface` since 5.4). Update documentation, add tests.
+
 ## Fixes
 * [#343](https://github.com/cleverage/process-bundle/issues/343) The temporary files of `FileSplitterTask` (`file_splitter`), `CsvSplitterTask` (`csv_splitter`) and of the JSON buffer of `ProcessLauncherTask` (`json_buffering`) are created with a random name, exclusively (an existing path, symbolic links included, is never reused) and readable by their owner only, instead of a name derived from the time (`uniqid()`), opened in `w` mode with the permissions of the umask. Update documentation, add tests.
 * [#331](https://github.com/cleverage/process-bundle/issues/331) `ProcessManager`: the iterable tasks that produced items and the blocking tasks waiting for `proceed()` are tracked by task configuration instead of task code, and forgotten when their process ends. A task of a sub-process (`process_executor`) with the same code as a task of the parent no longer makes the parent lose the output of its blocking task (without error) or skip the flush at the end of its iteration (merged batches), and a failed sub-process no longer leaves its tasks to its next execution. Add tests.
