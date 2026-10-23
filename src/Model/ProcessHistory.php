@@ -34,7 +34,7 @@ class ProcessHistory implements \Stringable
 
     protected string $processCode;
 
-    protected ?\DateTimeInterface $startDate;
+    protected \DateTimeInterface $startDate;
 
     protected ?\DateTimeInterface $endDate = null;
 

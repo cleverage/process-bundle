@@ -89,6 +89,9 @@ v5.2
 * [#244](https://github.com/cleverage/process-bundle/issues/244) Fix MappingTransformer: a missing target property of a `\stdClass` destination (`initial_value` or `keep_input`) threw `Property '...' is not writable`, it is now added when the target is a simple property name (nested paths still throw). Update documentation, add tests.
 * [#143](https://github.com/cleverage/process-bundle/issues/143) Type the remaining untyped task options: `split_character` of CsvWriterTask and SplitJoinLineTask must be a `string` (a wrong type used to fail later with a `TypeError`), `write_headers` of CsvWriterTask and `log_empty_lines` of CsvReaderTask are cast to `bool` (any value used to be evaluated as a boolean, so it is still accepted). Update documentation, add tests.
 
+## BC breaks
+* [#143](https://github.com/cleverage/process-bundle/issues/143) Narrow native types that were never `null` in practice: `AbstractConfigurableTask::getOptions()` and `ProcessState::getContextualizedOptions()` return `array` (instead of `?array`), `CsvResource::$lineNumber` is an `int` and `ProcessHistory::$startDate` a `\DateTimeInterface` (instead of nullable types). Overrides of `getOptions()` must declare an `array` return type (e.g. cleverage/archive-process-bundle >= v2.3). Improve PHPStan level from 7 to 8.
+
 v5.1
 -----
 

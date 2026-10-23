@@ -322,10 +322,9 @@ class ProcessState
     }
 
     /**
-     * @return array<string, mixed>|null
+     * @return array<string, mixed>
      */
-    // @phpstan-ignore return.unusedType (narrowing the return type of a non-final class breaks the child classes, see #279)
-    public function getContextualizedOptions(): ?array
+    public function getContextualizedOptions(): array
     {
         if (!$this->contextualizedOptions) {
             $options = $this->getTaskConfiguration()
