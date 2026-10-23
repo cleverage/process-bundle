@@ -145,7 +145,7 @@ class RulesTransformer implements ConfigurableTransformerInterface
                 'value' => $value,
             ];
 
-            return $this->language->evaluate($rule['condition'], $expressionValues);
+            return (bool) $this->language->evaluate($rule['condition'], $expressionValues);
         }
 
         /* @noinspection PhpStrictTypeCheckingInspection */

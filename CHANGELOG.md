@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#370](https://github.com/cleverage/process-bundle/issues/370) `RulesTransformer` (`rules`): the result of a `condition` is cast to `bool`, so a condition returning an `int` (`preg_match()`), a string, `null` or any other non-boolean value (a single variable) no longer throws a `TypeError`: the rule matches if the result is truthy. Update documentation, add tests.
+
 v5.5
 -----
 

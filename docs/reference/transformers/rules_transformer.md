@@ -39,7 +39,7 @@ Each rule of `rules_set` has the following options:
 
 | Code           | Type           | Required | Default | Description                                                                                                                           |
 |----------------|----------------|:--------:|---------|---------------------------------------------------------------------------------------------------------------------------------------|
-| `condition`    | `string\|ParsedExpression\|null` |          | `null`  | Expression (or an already parsed `Symfony\Component\ExpressionLanguage\ParsedExpression`); the rule matches if it is truthy |
+| `condition`    | `string\|ParsedExpression\|null` |          | `null`  | Expression (or an already parsed `Symfony\Component\ExpressionLanguage\ParsedExpression`); the rule matches if its result is truthy (cast to `bool`: `1` of `preg_match()` matches, `0`, `''`, `null` do not) |
 | `default`      | `bool`         |          | `false` | Mark the rule as the default one (always matches). It cannot have a `condition`, no conditional rule may follow it, only one allowed  |
 | `set_null`     | `bool`         |          | `false` | If `true`, return `null` (takes precedence on `constant` and `transformers`)                                                          |
 | `constant`     | `any`          |          | `null`  | If not `null`, return this value (takes precedence on `transformers`)                                                                 |
@@ -88,4 +88,6 @@ Notes
 -----
 
 Conditions are parsed with the bundle's `cleverage_process.expression_language` service, which also exposes the PHP
-`preg_match` function.
+`preg_match` function. The result of a condition does not need to be a boolean: it is cast to `bool`, so a
+`preg_match('/^foo/', value)` (`1` or `0`), a `matches` expression or a single variable (`value`) can be used as is.
+Beware that PHP truthiness applies: the strings `"0"` and `""`, `0`, `[]` and `null` do not match.
