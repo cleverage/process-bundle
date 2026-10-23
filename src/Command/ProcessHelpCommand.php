@@ -86,6 +86,7 @@ class ProcessHelpCommand extends Command
                 TaskRegistry::class,
                 TaskRegistry::class,
             );
+            // @phpstan-ignore property.deprecated (kept for BC until v6.0)
             $this->container = $taskRegistry;
             // Same behaviour as before the task registry: any service of the container
             $taskRegistry = new TaskRegistry($taskRegistry, $taskRegistry);

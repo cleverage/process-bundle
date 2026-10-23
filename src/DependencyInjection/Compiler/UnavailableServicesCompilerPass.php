@@ -107,6 +107,7 @@ final readonly class UnavailableServicesCompilerPass implements CompilerPassInte
                 // The code is needed by the transformer registry: the one of the tag (see TransformerLocatorCompilerPass),
                 // or, for a definition tagged without code (deprecated), the one returned by the bundle transformer
                 $code = $this->getTagCode($original)
+                    // @phpstan-ignore method.deprecated (transformer registered without code, until v6.0)
                     ?? (new \ReflectionClass($class))->newInstanceWithoutConstructor()->getCode();
                 $definition = new Definition(UnavailableTransformer::class, [$code, $text]);
             } else {

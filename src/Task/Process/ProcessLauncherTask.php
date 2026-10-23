@@ -74,6 +74,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
                 KernelInterface::class,
                 self::class,
             );
+            // @phpstan-ignore property.deprecated (kept for BC until v6.0)
             $this->kernel = $consolePath;
             $this->environment ??= $consolePath->getEnvironment();
             $consolePath = $consolePath->getProjectDir().'/bin/console';

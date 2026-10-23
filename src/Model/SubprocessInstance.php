@@ -75,6 +75,7 @@ class SubprocessInstance
                 self::class,
             );
             $this->environment ??= $consolePath->getEnvironment();
+            // @phpstan-ignore property.deprecated (kept for BC until v6.0)
             $this->logDir = $consolePath->getLogDir().'/process';
             $consolePath = $consolePath->getProjectDir().'/bin/console';
         }
