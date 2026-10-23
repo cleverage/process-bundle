@@ -53,11 +53,15 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
     protected const EXECUTE_FLUSH = 4;
 
     /**
+     * Indexed by task configuration (spl_object_id()): a sub-process may have a task with the same code.
+     *
      * @var TaskConfiguration[]
      */
     protected array $processedIterables = [];
 
     /**
+     * Indexed by task configuration (spl_object_id()): a sub-process may have a task with the same code.
+     *
      * @var TaskConfiguration[]
      */
     protected array $processedBlockings = [];
@@ -128,6 +132,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
     public function execute(string $processCode, mixed $input = null, array $context = []): mixed
     {
         $parentProcessHistory = $this->processHistory;
+        $parentTaskConfiguration = $this->taskConfiguration;
         try {
             $this->eventDispatcher->dispatch(
                 new ProcessEvent($processCode, $input, $context),
@@ -156,6 +161,8 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             // When the process has failed, doExecute() did not restore the history of the parent process (if any): the
             // logs above are still attributed to the failed process, the next ones to the parent process
             $this->processHistory = $parentProcessHistory;
+            // The logs of the parent process are attributed to the task that has executed this process (if any)
+            $this->taskConfiguration = $parentTaskConfiguration;
         }
 
         return $result;
@@ -220,6 +227,12 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             $this->endProcess($processHistory);
 
             throw $error;
+        } finally {
+            // A failed or stopped process may leave tasks in the registries, seen by its next execution
+            foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
+                $this->removeProcessedIterable($taskConfiguration);
+                $this->removeProcessedBlocking($taskConfiguration);
+            }
         }
 
         $this->processHistory = $parentProcessHistory;
@@ -279,6 +292,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function initialize(TaskConfiguration $taskConfiguration): void
     {
+        $previousTaskConfiguration = $this->taskConfiguration;
         $this->taskConfiguration = $taskConfiguration;
 
         if (TaskConfiguration::STRATEGY_STOP === $taskConfiguration->getErrorStrategy()
@@ -313,90 +327,99 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
         }
         $this->handleState($taskConfiguration->getState());
 
-        $this->taskConfiguration = null;
+        $this->taskConfiguration = $previousTaskConfiguration;
     }
 
     protected function process(TaskConfiguration $taskConfiguration, int $executionFlag = self::EXECUTE_PROCESS): void
     {
+        // Restored when the task ends: the parent task (if any) goes on with its next items
+        $previousTaskConfiguration = $this->taskConfiguration;
         $this->taskConfiguration = $taskConfiguration;
 
-        $state = $taskConfiguration->getState();
-        do {
-            // Execute the current task, and fetch status
-            $this->processExecution($taskConfiguration, $executionFlag);
+        try {
+            $state = $taskConfiguration->getState();
+            do {
+                // Execute the current task, and fetch status
+                $this->processExecution($taskConfiguration, $executionFlag);
 
-            $this->handleState($state);
+                $this->handleState($state);
 
-            // An error feed cannot be blocked or skipped (even if the process has been stopped)
-            if ($state->hasErrorOutput()) {
-                foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTask) {
-                    $this->prepareNextProcess($taskConfiguration, $errorTask, true);
-                    $this->process($errorTask);
+                // An error feed cannot be blocked or skipped (even if the process has been stopped)
+                if ($state->hasErrorOutput()) {
+                    foreach ($taskConfiguration->getErrorTasksConfigurations() as $errorTask) {
+                        $this->prepareNextProcess($taskConfiguration, $errorTask, true);
+                        $this->process($errorTask);
 
-                    // Bubble up the stop signal
-                    if ($errorTask->getState()->isStopped()) {
-                        $state->setStopped(true);
+                        // Bubble up the stop signal
+                        if ($errorTask->getState()->isStopped()) {
+                            $state->setStopped(true);
 
-                        return;
+                            return;
+                        }
                     }
                 }
-            }
-            if ($state->isStopped()) {
-                $exception = $state->getException();
-                if ($exception instanceof \Throwable) {
-                    throw ProcessFailedException::create($state->getProcessConfiguration()->getCode(), $state->getTaskConfiguration()->getCode(), $exception);
+                if ($state->isStopped()) {
+                    $exception = $state->getException();
+                    if ($exception instanceof \Throwable) {
+                        throw ProcessFailedException::create($state->getProcessConfiguration()->getCode(), $state->getTaskConfiguration()->getCode(), $exception);
+                    }
+
+                    return;
                 }
 
-                return;
-            }
+                // Run child items only if the state is not "skipped" and task is not blocking
+                $task = $taskConfiguration->getTask();
+                $shouldContinue =
+                    (!$task instanceof BlockingTaskInterface || self::EXECUTE_PROCEED === $executionFlag)
+                    && !$state->isSkipped();
 
-            // Run child items only if the state is not "skipped" and task is not blocking
-            $task = $taskConfiguration->getTask();
-            $shouldContinue =
-                (!$task instanceof BlockingTaskInterface || self::EXECUTE_PROCEED === $executionFlag)
-                && !$state->isSkipped();
+                if ($shouldContinue) {
+                    if ($task instanceof IterableTaskInterface) {
+                        // Register the task as not empty
+                        $this->addProcessedIterable($taskConfiguration);
+                    }
+                    foreach ($taskConfiguration->getNextTasksConfigurations() as $nextTaskConfiguration) {
+                        $this->prepareNextProcess($taskConfiguration, $nextTaskConfiguration);
+                        $this->process($nextTaskConfiguration);
 
-            if ($shouldContinue) {
+                        // Bubble up the stop signal
+                        if ($nextTaskConfiguration->getState()->isStopped()) {
+                            $state->setStopped(true);
+
+                            return;
+                        }
+                    }
+                    $state->setSkipped(false); // Reset skipped state
+                }
+
+                $hasMoreItem = false; // By default, a task is not iterable
                 if ($task instanceof IterableTaskInterface) {
-                    // Register the task as not empty
-                    $this->addProcessedIterable($taskConfiguration);
-                }
-                foreach ($taskConfiguration->getNextTasksConfigurations() as $nextTaskConfiguration) {
-                    $this->prepareNextProcess($taskConfiguration, $nextTaskConfiguration);
-                    $this->process($nextTaskConfiguration);
-
-                    // Bubble up the stop signal
-                    if ($nextTaskConfiguration->getState()->isStopped()) {
-                        $state->setStopped(true);
-
-                        return;
+                    // Check if task has more items
+                    $hasMoreItem = $task->next($state);
+                    if (!$hasMoreItem) {
+                        if (!$this->hasProcessedIterable($taskConfiguration)) {
+                            return; // This means the task is empty
+                        }
+                        // This means we are over iterating this task so we can remove it from registry
+                        $this->removeProcessedIterable($taskConfiguration);
+                        if (self::EXECUTE_FLUSH !== $executionFlag) {
+                            // This task is now finished, we may flush it to test if there is anything lasting
+                            $this->flush($taskConfiguration);
+                        }
+                        if ($state->isStopped()) {
+                            return;
+                        }
                     }
                 }
-                $state->setSkipped(false); // Reset skipped state
-            }
+            } while ($hasMoreItem);
+        } catch (\Throwable $error) {
+            // Keep the failing task for the logs of the failure, execute() restores the task of the parent process
+            $previousTaskConfiguration = $this->taskConfiguration;
 
-            $hasMoreItem = false; // By default, a task is not iterable
-            if ($task instanceof IterableTaskInterface) {
-                // Check if task has more items
-                $hasMoreItem = $task->next($state);
-                if (!$hasMoreItem) {
-                    if (!$this->hasProcessedIterable($taskConfiguration)) {
-                        return; // This means the task is empty
-                    }
-                    // This means we are over iterating this task so we can remove it from registry
-                    $this->removeProcessedIterable($taskConfiguration);
-                    if (self::EXECUTE_FLUSH !== $executionFlag) {
-                        // This task is now finished, we may flush it to test if there is anything lasting
-                        $this->flush($taskConfiguration);
-                    }
-                    if ($state->isStopped()) {
-                        return;
-                    }
-                }
-            }
-        } while ($hasMoreItem);
-
-        $this->taskConfiguration = null;
+            throw $error;
+        } finally {
+            $this->taskConfiguration = $previousTaskConfiguration;
+        }
     }
 
     protected function processExecution(TaskConfiguration $taskConfiguration, int $executionFlag): void
@@ -511,6 +534,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
     {
         $task = $taskConfiguration->getTask();
         if ($task instanceof FinalizableTaskInterface) {
+            $previousTaskConfiguration = $this->taskConfiguration;
             $this->taskConfiguration = $taskConfiguration;
             $state = $taskConfiguration->getState();
             try {
@@ -523,7 +547,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 $state->stop($e);
             }
             $this->handleState($state);
-            $this->taskConfiguration = null;
+            $this->taskConfiguration = $previousTaskConfiguration;
         }
     }
 
@@ -646,7 +670,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function addProcessedIterable(TaskConfiguration $taskConfiguration): void
     {
-        $this->processedIterables[$taskConfiguration->getCode()] = $taskConfiguration;
+        $this->processedIterables[spl_object_id($taskConfiguration)] = $taskConfiguration;
     }
 
     /**
@@ -654,7 +678,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function hasProcessedIterable(TaskConfiguration $taskConfiguration): bool
     {
-        return \array_key_exists($taskConfiguration->getCode(), $this->processedIterables);
+        return \array_key_exists(spl_object_id($taskConfiguration), $this->processedIterables);
     }
 
     /**
@@ -662,7 +686,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function removeProcessedIterable(TaskConfiguration $taskConfiguration): void
     {
-        unset($this->processedIterables[$taskConfiguration->getCode()]);
+        unset($this->processedIterables[spl_object_id($taskConfiguration)]);
     }
 
     /**
@@ -670,7 +694,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function addProcessedBlocking(TaskConfiguration $taskConfiguration): void
     {
-        $this->processedBlockings[$taskConfiguration->getCode()] = $taskConfiguration;
+        $this->processedBlockings[spl_object_id($taskConfiguration)] = $taskConfiguration;
     }
 
     /**
@@ -678,7 +702,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function hasProcessedBlocking(TaskConfiguration $taskConfiguration): bool
     {
-        return \array_key_exists($taskConfiguration->getCode(), $this->processedBlockings);
+        return \array_key_exists(spl_object_id($taskConfiguration), $this->processedBlockings);
     }
 
     /**
@@ -686,6 +710,6 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected function removeProcessedBlocking(TaskConfiguration $taskConfiguration): void
     {
-        unset($this->processedBlockings[$taskConfiguration->getCode()]);
+        unset($this->processedBlockings[spl_object_id($taskConfiguration)]);
     }
 }
