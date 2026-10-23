@@ -1,6 +1,9 @@
 Latest
 ------
 
+v5.5
+-----
+
 ## Changes
 * [#365](https://github.com/cleverage/process-bundle/issues/365) `ArrayElementTransformer` (`array_element`) and `ArrayLastTransformer` (`array_last`) return `null` when the position is outside the array (or the array is empty), without the "Undefined array key" PHP warning (it was an exception in debug mode, `null` in production); a negative `index` before the start of the array no longer returns its first element. `InputCsvReaderTask` (`input_csv_reader`): an input that is not a path (e.g. `null`) throws an explicit `UnexpectedValueException` instead of an "Undefined array key" PHP warning followed by a `TypeError`. Documentation: rate `n/a` of `advanced_stat_counter`, `headers: []` of `csv_reader` / `input_csv_reader`, optional `$accessor` of `ConditionTrait`, `ParsedExpression` accepted by the `condition` of `rules`. Add tests.
 * [#337](https://github.com/cleverage/process-bundle/issues/337) `StopTask` (`stop`): a process stopped on purpose is identified as stopped, not as failed. Its history is flagged as stopped (new `ProcessHistory::STATE_STOPPED`, `setStopped()`, `isStopped()`) instead of failed, the `Process <code> stopped` log is written at the `success_level` (instead of `Process <code> failed` at the `failed_level`), and the `cleverage_process.end` event tells it with the new `ProcessEvent::isProcessStopped()`. The process still ends normally (tasks finalized, exit code 0, parent process going on). Update documentation, add tests.

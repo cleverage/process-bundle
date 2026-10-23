@@ -1,6 +1,66 @@
 Upgrade Guide
 =============
 
+## v5.5
+
+No deprecation in this version. Some behaviours change: check the points below.
+
+### Shared task services
+
+A shared service referenced by several tasks of the same process is rejected when the container is compiled
+(`InvalidArgumentException` naming the service, the tasks and the process): all these tasks ran with the same instance,
+initialized with the options of each task in turn. Declare your task services with `shared: false`, as the
+autoconfiguration of `TaskInterface` does since 5.4:
+
+```yaml
+# config/services.yaml
+services:
+    App\Task\MyTask:
+        shared: false
+```
+
+### `stop` task
+
+A process stopped by the `stop` task (`StopTask`) is no longer flagged as failed: it is stopped on purpose (e.g. the
+source file does not exist). It still ends normally (tasks finalized, `cleverage_process.end` event, exit code 0, parent
+process going on), but:
+
+| Before                                                   | After                                                     |
+|----------------------------------------------------------|-----------------------------------------------------------|
+| `ProcessHistory::getState()` returns `failed`            | it returns `stopped` (`ProcessHistory::isStopped()`)      |
+| `Process <code> failed` log, at the `failed_level`       | `Process <code> stopped` log, at the `success_level`      |
+| nothing tells a stopped process on the end event         | `ProcessEvent::isProcessStopped()` returns `true`         |
+
+To be alerted when a process is stopped, listen to `cleverage_process.end` and check `isProcessStopped()`. To stop a
+process because of an error, let the error fail it (error strategy `stop`).
+
+### `cleverage:process:execute`
+
+- The process codes and the output format are checked before any process is executed.
+- With `--output-format`, the output is printed to STDOUT whatever the verbosity (it required `-vv`): a script reading
+  STDOUT now receives it.
+- A non-array output that cannot be stored as JSON stream is reported on the error output.
+
+### Tasks and transformers
+
+- `line_reader` / `input_line_reader`: the last line of a file that does not end with a line break is read (it was
+  lost).
+- `yaml_writer`: a write failure throws a `RuntimeException` (in production, it was ignored), the parent directory is
+  created if needed.
+- `input_csv_reader`: an input that is not a path (e.g. `null`) throws an `UnexpectedValueException` (instead of a PHP
+  warning followed by a `TypeError`).
+- `array_element` / `array_last`: a position outside the array (or an empty array) gives `null`, also in debug mode
+  (it failed with an "Undefined array key" warning); a negative `index` of `array_element` before the start of the
+  array gives `null` instead of the first element.
+- `file_splitter`, `csv_splitter` and the `json_buffering` of `process_launcher` create their temporary files readable
+  by their owner only (`0600`): a process reading them must run with the same user.
+
+### Long-running workers
+
+`ProcessConfigurationRegistry` is reset between two messages of a worker (`kernel.reset`): the task instances and their
+states (inputs, outputs, aggregated data) of the last execution are released. A task must not rely on data kept from a
+previous message.
+
 ## v5.4
 
 Unless stated otherwise, the deprecations below trigger a notice (`Since cleverage/process-bundle 5.4: ...`) and will be
