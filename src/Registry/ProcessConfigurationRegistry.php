@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
 use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Exception\MissingProcessException;
+use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
@@ -40,6 +41,7 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
         protected array $rawConfiguration,
         protected string $defaultErrorStrategy,
         protected array $defaultLogLevels = [],
+        protected ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -54,15 +56,29 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
     }
 
     /**
+     * The processes whose configuration is not valid are left out (with an error log): they do not prevent listing the
+     * other ones, getProcessConfiguration() throws when such a process is requested (e.g. to be executed).
+     *
      * @return array<string, ProcessConfiguration>
      */
     public function getProcessConfigurations(): array
     {
+        $processConfigurations = [];
         foreach (array_keys($this->rawConfiguration) as $processCode) {
-            $this->resolveConfiguration($processCode);
+            try {
+                $this->resolveConfiguration($processCode);
+            } catch (InvalidProcessConfigurationException|LogicException $exception) {
+                $this->logger?->error(
+                    "The process {$processCode} is left out of the process list, its configuration is not valid: {$exception->getMessage()}",
+                    ['process_code' => $processCode, 'exception' => $exception]
+                );
+
+                continue;
+            }
+            $processConfigurations[$processCode] = $this->processConfigurations[$processCode];
         }
 
-        return $this->processConfigurations;
+        return $processConfigurations;
     }
 
     /**
@@ -87,6 +103,8 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
         $rawProcessConfiguration = $this->rawConfiguration[$processCode];
         /** @var TaskConfiguration[] $taskConfigurations */
         $taskConfigurations = [];
+        /** @var array<string, string> $errorOutputsKeys */
+        $errorOutputsKeys = [];
         foreach ($rawProcessConfiguration['tasks'] as $taskCode => $rawTaskConfiguration) {
             if ((is_countable($rawTaskConfiguration['errors']) ? \count($rawTaskConfiguration['errors']) : 0) > 0) {
                 if ((is_countable($rawTaskConfiguration['error_outputs']) ? \count(
@@ -97,6 +115,7 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
                     throw new LogicException($m);
                 }
                 $rawTaskConfiguration['error_outputs'] = $rawTaskConfiguration['errors'];
+                $errorOutputsKeys[$taskCode] = 'errors';
             }
             if (!\is_string($rawTaskConfiguration['service'] ?? null)) {
                 // The "task" codes are resolved into services when the container is compiled (TaskLocatorCompilerPass)
@@ -127,6 +146,9 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
             $rawProcessConfiguration['logs']['success_level'] ?? $this->defaultLogLevels['success_level'] ?? LogLevel::INFO,
             $rawProcessConfiguration['logs']['failed_level'] ?? $this->defaultLogLevels['failed_level'] ?? LogLevel::DEBUG
         );
+
+        // Check the task references, the links below would fail with a message naming neither the process nor the task
+        $this->checkTaskReferences($processCode, $rawProcessConfiguration, $taskConfigurations, $errorOutputsKeys);
 
         // Set links between tasks
         foreach ($taskConfigurations as $taskConfig) {
@@ -164,6 +186,37 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
         }
 
         $this->processConfigurations[$processCode] = $processConfig;
+    }
+
+    /**
+     * @param array<string, mixed>  $rawProcessConfiguration
+     * @param TaskConfiguration[]   $taskConfigurations      indexed by task code
+     * @param array<string, string> $errorOutputsKeys        "errors" for the tasks using this deprecated key
+     */
+    protected function checkTaskReferences(
+        string $processCode,
+        array $rawProcessConfiguration,
+        array $taskConfigurations,
+        array $errorOutputsKeys,
+    ): void {
+        foreach ($taskConfigurations as $taskCode => $taskConfig) {
+            foreach ($taskConfig->getOutputs() as $nextTaskCode) {
+                if (!\array_key_exists($nextTaskCode, $taskConfigurations)) {
+                    throw InvalidProcessConfigurationException::createUnknownTaskReference($processCode, 'outputs', $nextTaskCode, $taskCode);
+                }
+            }
+            foreach ($taskConfig->getErrorOutputs() as $errorTaskCode) {
+                if (!\array_key_exists($errorTaskCode, $taskConfigurations)) {
+                    throw InvalidProcessConfigurationException::createUnknownTaskReference($processCode, $errorOutputsKeys[$taskCode] ?? 'error_outputs', $errorTaskCode, $taskCode);
+                }
+            }
+        }
+        foreach (['entry_point', 'end_point'] as $key) {
+            $referencedTaskCode = $rawProcessConfiguration[$key] ?? null;
+            if (\is_string($referencedTaskCode) && !\array_key_exists($referencedTaskCode, $taskConfigurations)) {
+                throw InvalidProcessConfigurationException::createUnknownTaskReference($processCode, $key, $referencedTaskCode);
+            }
+        }
     }
 
     protected function markErrorBranch(TaskConfiguration $taskConfig, bool $isErrorBranch = true): void
