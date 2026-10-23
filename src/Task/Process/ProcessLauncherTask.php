@@ -202,6 +202,7 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
 
             unset($this->launchedProcesses[$key]);
             if (0 !== $process->getProcess()->getExitCode()) {
+                $process->removeBuffer();
                 $this->logger->critical($process->getProcess()->getErrorOutput(), $logContext);
                 $this->killProcesses();
 
@@ -272,7 +273,12 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
     protected function killProcesses(): void
     {
         foreach ($this->launchedProcesses as $process) {
+            // An already terminated sub-process keeps its buffer: it is handled normally at the next call
+            $running = !$process->getProcess()->isTerminated();
             $process->stop(5);
+            if ($running) {
+                $process->removeBuffer();
+            }
         }
     }
 }

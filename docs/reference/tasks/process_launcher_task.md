@@ -26,8 +26,9 @@ Possible outputs
 
 Nothing is output when an input is received (the task is skipped). When `json_buffering` is enabled, the sub-process
 end point output (only if it is an array) is written to a JSON stream file of the system temporary directory (`<sys_get_temp_dir()>/cdm_buffer_*.json-stream`, in `var/` of the project before 5.4) and, once the sub-process is
-finished, the task outputs the path of this file (`string`), during the next iterations or when flushed. Without
-`json_buffering`, the task outputs nothing.
+finished, the task outputs the path of this file (`string`), during the next iterations or when flushed. If nothing
+was written (no `end_point`, or an output that is not an array), the empty file is removed and the task outputs
+nothing for this sub-process. Without `json_buffering`, the task outputs nothing.
 
 If a sub-process exits with a non-zero code, its error output is logged as critical, all running sub-processes are
 stopped and a `RuntimeException` is thrown.
@@ -69,5 +70,7 @@ Notes
 
 * Sub-processes are run with the console of the project (`%kernel.project_dir%/bin/console`) and the same Symfony
   environment as the current one (`--env`), the arguments of the service.
-* The JSON stream files are not removed by the task: remove them once read (e.g. with a [file remover](file_remover_task.md) task).
+* The JSON stream files output by the task are not removed by it: remove them once read (e.g. with a
+  [file remover](file_remover_task.md) task). The task only removes the files it does not output: empty ones, and
+  those of a failed sub-process and of the still running sub-processes stopped because of it.
 * The incremental error output (stderr) of the running sub-processes is echoed directly.

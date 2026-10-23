@@ -175,14 +175,36 @@ class SubprocessInstance
         return $this->context;
     }
 
+    /**
+     * Path of the JSON buffer once the sub-process is terminated, null if nothing was written into it (no end point,
+     * output that is not an array): the empty buffer is then removed.
+     */
     public function getResult(): ?string
     {
         $fs = new Filesystem();
-        if ($this->process->isTerminated() && $fs->exists($this->bufferPath)) {
-            return $this->bufferPath;
+        if (!$this->process->isTerminated() || !$fs->exists($this->bufferPath)) {
+            return null;
         }
 
-        return null;
+        // Created before the launch, the buffer exists even when the sub-process wrote nothing into it
+        clearstatcache(true, $this->bufferPath);
+        if (0 === filesize($this->bufferPath)) {
+            $this->removeBuffer();
+
+            return null;
+        }
+
+        return $this->bufferPath;
+    }
+
+    /**
+     * Remove the JSON buffer, e.g. when the sub-process has failed or was stopped: it is never output.
+     */
+    public function removeBuffer(): void
+    {
+        if ('' !== $this->bufferPath) {
+            (new Filesystem())->remove($this->bufferPath);
+        }
     }
 
     /**

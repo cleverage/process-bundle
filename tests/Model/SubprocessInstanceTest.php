@@ -75,6 +75,49 @@ class SubprocessInstanceTest extends TestCase
         unlink($bufferPath);
     }
 
+    public function testEmptyJsonBufferIsRemovedAndNotReturned(): void
+    {
+        // The console outputs nothing: no end point, or an output that is not an array
+        $subprocess = $this->runWithJsonBuffering();
+        $bufferPath = $this->getBufferPath($subprocess);
+
+        $this->assertNull($subprocess->getResult());
+        $this->assertFileDoesNotExist($bufferPath);
+    }
+
+    public function testWrittenJsonBufferIsReturned(): void
+    {
+        file_put_contents($this->projectDir.'/bin/console', '<?php file_put_contents(substr($argv[array_key_last($argv) - 2], 9), "[\"a\"]\n");');
+        $subprocess = $this->runWithJsonBuffering();
+        $bufferPath = $this->getBufferPath($subprocess);
+
+        $this->assertSame($bufferPath, $subprocess->getResult());
+        $this->assertStringEqualsFile($bufferPath, "[\"a\"]\n");
+        unlink($bufferPath);
+    }
+
+    public function testNoResultWithoutJsonBuffering(): void
+    {
+        $subprocess = (new SubprocessInstance($this->projectDir.'/bin/console', 'child', null))->buildProcess()->start();
+        $subprocess->getProcess()->wait();
+
+        $this->assertNull($subprocess->getResult());
+        // Nothing to remove
+        $subprocess->removeBuffer();
+    }
+
+    public function testRemoveBuffer(): void
+    {
+        $subprocess = (new SubprocessInstance($this->projectDir.'/bin/console', 'child', null, [], [SubprocessInstance::OPTION_JSON_BUFFERING => true]))
+            ->buildProcess();
+        $bufferPath = $this->getBufferPath($subprocess);
+        $this->assertFileExists($bufferPath);
+
+        $subprocess->removeBuffer();
+
+        $this->assertFileDoesNotExist($bufferPath);
+    }
+
     public function testMissingConsoleThrows(): void
     {
         $this->expectException(\RuntimeException::class);
@@ -109,5 +152,23 @@ class SubprocessInstanceTest extends TestCase
         $this->assertStringContainsString("'{$this->projectDir}/bin/console' '--env=prod'", $commandLine);
         // The log directory of the kernel is no longer created
         $this->assertDirectoryDoesNotExist($this->projectDir.'/var');
+    }
+
+    private function runWithJsonBuffering(): SubprocessInstance
+    {
+        $subprocess = (new SubprocessInstance($this->projectDir.'/bin/console', 'child', null, [], [SubprocessInstance::OPTION_JSON_BUFFERING => true]))
+            ->buildProcess()
+            ->start();
+        $subprocess->getProcess()->wait();
+        $this->assertSame(0, $subprocess->getProcess()->getExitCode(), $subprocess->getProcess()->getErrorOutput());
+
+        return $subprocess;
+    }
+
+    private function getBufferPath(SubprocessInstance $subprocess): string
+    {
+        preg_match('#--output=([^\']+)#', $subprocess->getProcess()->getCommandLine(), $matches);
+
+        return $matches[1] ?? '';
     }
 }
