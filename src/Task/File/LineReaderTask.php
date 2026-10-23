@@ -61,7 +61,8 @@ class LineReaderTask extends AbstractConfigurableTask implements IterableTaskInt
             throw new LogicException('No File initialized');
         }
 
-        $endOfFile = $this->file->eof();
+        // Not eof(): with READ_AHEAD, the end of the file is reached when the last line is read, before it is emitted
+        $endOfFile = !$this->file->valid();
         if ($endOfFile) {
             // Release the file to allow the following iteration to read it again
             $this->file = null;

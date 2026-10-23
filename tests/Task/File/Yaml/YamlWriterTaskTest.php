@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle\Tests\Task\File\Yaml;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Exception\RuntimeException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -98,6 +99,23 @@ class YamlWriterTaskTest extends TestCase
         $task->execute($state);
 
         self::assertSame("second: 2\n", file_get_contents($filePath));
+    }
+
+    public function testTheParentDirectoryIsCreated(): void
+    {
+        $filePath = $this->tmpDir.'/sub/dir/file.yaml';
+        $this->execute(['file_path' => $filePath], self::DATA);
+
+        self::assertSame(self::DATA, Yaml::parseFile($filePath));
+    }
+
+    public function testAWriteFailureThrows(): void
+    {
+        // A directory cannot be written as a file
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage(\sprintf('Unable to write file "%s": ', $this->tmpDir));
+
+        $this->execute(['file_path' => $this->tmpDir], self::DATA);
     }
 
     public function testScalarInputIsDumped(): void

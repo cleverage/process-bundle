@@ -18,6 +18,7 @@ use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Filesystem\CsvResource;
+use CleverAge\ProcessBundle\Filesystem\TemporaryFile;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -33,6 +34,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CsvSplitterTask::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TemporaryFile::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(CsvReaderTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(InputCsvReaderTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(AbstractCsvTask::class)]

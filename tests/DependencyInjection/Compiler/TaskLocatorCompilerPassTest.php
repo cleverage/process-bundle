@@ -134,6 +134,37 @@ class TaskLocatorCompilerPassTest extends TestCase
         (new TaskLocatorCompilerPass())->process($container);
     }
 
+    public function testSharedServiceUsedBySeveralTasksOfAProcessThrows(): void
+    {
+        $container = $this->createContainerWithTasks(['test.process' => ['first' => 'app_task', 'second' => 'app_task']]);
+        $container->setDefinition('app.task', (new Definition(DummyTask::class))->addTag('cleverage.task', ['code' => 'app_task']));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The service "app.task" is used by the tasks "first", "second" of the process "test.process", but it is shared: all these tasks would run with the same instance (and the options of one of them). Declare the service with "shared: false".');
+
+        (new TaskLocatorCompilerPass())->process($container);
+    }
+
+    public function testNonSharedServiceCanBeUsedBySeveralTasksOfAProcess(): void
+    {
+        $container = $this->createContainerWithTasks(['test.process' => ['first' => 'app_task', 'second' => 'app_task']]);
+        $container->setDefinition('app.task', (new Definition(DummyTask::class))->setShared(false)->addTag('cleverage.task', ['code' => 'app_task']));
+
+        (new TaskLocatorCompilerPass())->process($container);
+
+        self::assertInstanceOf(Reference::class, $container->getDefinition('cleverage_process.registry.task')->getArgument(0));
+    }
+
+    public function testSharedServiceCanBeUsedOnceByEachProcess(): void
+    {
+        $container = $this->createContainerWithTasks(['test.first' => ['task' => 'app_task'], 'test.second' => ['task' => 'app_task']]);
+        $container->setDefinition('app.task', (new Definition(DummyTask::class))->addTag('cleverage.task', ['code' => 'app_task']));
+
+        (new TaskLocatorCompilerPass())->process($container);
+
+        self::assertInstanceOf(Reference::class, $container->getDefinition('cleverage_process.registry.task')->getArgument(0));
+    }
+
     public function testNothingIsDoneWithoutTheRegistries(): void
     {
         $container = new ContainerBuilder();
@@ -150,6 +181,27 @@ class TaskLocatorCompilerPassTest extends TestCase
     {
         $container = new ContainerBuilder();
         (new CleverAgeProcessExtension())->load([['configurations' => ['test.process' => ['tasks' => ['my_task' => $task]]]]], $container);
+
+        return $this->clearTaskTags($container);
+    }
+
+    /**
+     * @param array<string, array<string, string>> $taskCodesByProcess task code by task, for each process
+     */
+    private function createContainerWithTasks(array $taskCodesByProcess): ContainerBuilder
+    {
+        $configurations = [];
+        foreach ($taskCodesByProcess as $processCode => $taskCodes) {
+            $configurations[$processCode]['tasks'] = array_map(static fn (string $code): array => ['task' => $code], $taskCodes);
+        }
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([['configurations' => $configurations]], $container);
+
+        return $this->clearTaskTags($container);
+    }
+
+    private function clearTaskTags(ContainerBuilder $container): ContainerBuilder
+    {
         // Only the tasks of the test
         foreach (array_keys($container->findTaggedServiceIds('cleverage.task')) as $id) {
             $container->getDefinition($id)->clearTag('cleverage.task');

@@ -13,12 +13,15 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Tests\Model;
 
+use CleverAge\ProcessBundle\Filesystem\TemporaryFile;
 use CleverAge\ProcessBundle\Model\SubprocessInstance;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 #[CoversClass(SubprocessInstance::class)]
+#[UsesClass(TemporaryFile::class)]
 class SubprocessInstanceTest extends TestCase
 {
     private string $projectDir;
@@ -61,9 +64,15 @@ class SubprocessInstanceTest extends TestCase
             ->buildProcess();
 
         $this->assertMatchesRegularExpression(
-            '#\'--output='.preg_quote(sys_get_temp_dir(), '#').'/cdm_buffer_[^/\']+\.json-stream\' \'--output-format=json-stream\'#',
+            '#\'--output=('.preg_quote(sys_get_temp_dir(), '#').'/cdm_buffer_[0-9a-f]{32}\.json-stream)\' \'--output-format=json-stream\'#',
             $subprocess->getProcess()->getCommandLine()
         );
+        preg_match('#--output=([^\']+)#', $subprocess->getProcess()->getCommandLine(), $matches);
+        $bufferPath = $matches[1] ?? '';
+        // Created before the sub-process writes into it, readable by its owner only
+        $this->assertFileExists($bufferPath);
+        $this->assertSame(0o600, fileperms($bufferPath) & 0o777);
+        unlink($bufferPath);
     }
 
     public function testMissingConsoleThrows(): void

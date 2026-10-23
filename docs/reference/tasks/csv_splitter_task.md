@@ -20,8 +20,9 @@ Accepted inputs
 Possible outputs
 ----------------
 
-`string`: path of a temporary CSV file (created in the system temporary directory) containing the headers and the next
-`max_lines` data lines of the source file (the last file may contain fewer lines).
+`string`: path of a temporary CSV file (created in the system temporary directory, with a random name and readable by
+its owner only) containing the headers and the next `max_lines` data lines of the source file (the last file may
+contain fewer lines).
 
 Options
 -------

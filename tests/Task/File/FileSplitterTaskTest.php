@@ -17,6 +17,7 @@ use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Filesystem\SplFile;
+use CleverAge\ProcessBundle\Filesystem\TemporaryFile;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Task\File\FileSplitterTask;
@@ -25,6 +26,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(FileSplitterTask::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(TemporaryFile::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(SplFile::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessConfiguration::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(TaskConfiguration::class)]

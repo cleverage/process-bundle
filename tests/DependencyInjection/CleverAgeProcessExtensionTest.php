@@ -212,6 +212,11 @@ class CleverAgeProcessExtensionTest extends TestCase
             [['method' => 'reset']],
             $container->getDefinition('cleverage_process.manager.process')->getTag('kernel.reset')
         );
+        // The task instances and states of the last executions are released
+        self::assertSame(
+            [['method' => 'reset']],
+            $container->getDefinition('cleverage_process.registry.process_configuration')->getTag('kernel.reset')
+        );
     }
 
     public function testTheDataQueueListenerIsDeprecated(): void

@@ -19,8 +19,8 @@ in several places, declare it once as a [generic transformer](reference/03-gener
 
 Task services should be `shared: false`: a task often keeps state in its properties (an
 open file, a buffer, a counter...). A shared service would share this state between two tasks using the same service
-in a process, or between two executions of a process in the same PHP process (sub-processes, workers, tests). See
-[service declaration](03-custom_tasks.md#service-declaration).
+in a process (this is rejected when the container is compiled), or between two executions of a process in the same PHP
+process (sub-processes, workers, tests). See [service declaration](03-custom_tasks.md#service-declaration).
 
 ## Split big workflows into small processes
 
