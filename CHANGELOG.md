@@ -4,6 +4,7 @@ Latest
 ## Fixes
 * [#367](https://github.com/cleverage/process-bundle/issues/367) `ProcessLauncherTask` (`process_launcher`) with `json_buffering`: when the sub-process writes nothing into its JSON buffer (no `end_point`, or an output that is not an array), the task outputs nothing again, as before 5.5, instead of the path of an empty file, and the empty buffer is removed. The buffer of a failed sub-process, and those of the still running sub-processes stopped because of it, are removed too (one file was left in the temporary directory for each launch). Update documentation, add tests.
 * [#368](https://github.com/cleverage/process-bundle/issues/368) `YamlWriterTask` (`yaml_writer`): the parent directory is created for a local path only (no scheme, or `file://`), not for a stream wrapper (`compress.zlib://`, `s3://`...), which failed, or `php://stdout`, which created a `php:` directory. Update documentation, add tests.
+* [#369](https://github.com/cleverage/process-bundle/issues/369) `StopTask` (`stop`): a process that has already failed (e.g. after a task initialization failure, going on being deprecated) stays failed instead of being flagged as stopped: the `Process <code> failed` log is written at the `failed_level` and `ProcessEvent::isProcessStopped()` is `false`, as before #337. Update documentation, add tests.
 
 v5.5
 -----
