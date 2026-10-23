@@ -6,6 +6,9 @@ on:
     tags:
       - '*'
 
+# The job only calls a webhook: no permission for the GITHUB_TOKEN
+permissions: {}
+
 jobs:
   notification:
     runs-on: ubuntu-latest
