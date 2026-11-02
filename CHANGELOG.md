@@ -1,8 +1,12 @@
 Latest
 ------
 
+v5.6
+-----
+
 ## Changes
 * [#371](https://github.com/cleverage/process-bundle/issues/371) `ProcessManager`: executing a process while it is already running, by itself or through its sub-processes (`A → B → A` with `ProcessExecutorTask` (`process_executor`)), is deprecated and will throw an exception in 6.0: the second execution resets the states and task instances of the running process (one configuration per process code), which then returns the output of the deepest execution. The deprecation names the chain of processes; the execution goes on as before. The same sub-process executed several times in a row, or a process executed again by a listener of the process events, is not concerned. Update documentation, add tests.
+* [#382](https://github.com/cleverage/process-bundle/issues/382) A shared service referenced by several tasks of the same process is deprecated instead of being rejected when the container is compiled (5.5, #339): this configuration worked before 5.5, all these tasks running with the same instance. The deprecation names the service, the tasks and the process; it will be rejected in 6.0. Declare the task services with `shared: false`. Update documentation, update tests.
 
 ## Fixes
 * [#367](https://github.com/cleverage/process-bundle/issues/367) `ProcessLauncherTask` (`process_launcher`) with `json_buffering`: when the sub-process writes nothing into its JSON buffer (no `end_point`, or an output that is not an array), the task outputs nothing again, as before 5.5, instead of the path of an empty file, and the empty buffer is removed. The buffer of a failed sub-process, and those of the still running sub-processes stopped because of it, are removed too (one file was left in the temporary directory for each launch). Update documentation, add tests.
@@ -11,7 +15,6 @@ Latest
 * [#370](https://github.com/cleverage/process-bundle/issues/370) `RulesTransformer` (`rules`): the result of a `condition` is cast to `bool`, so a condition returning an `int` (`preg_match()`), a string, `null` or any other non-boolean value (a single variable) no longer throws a `TypeError`: the rule matches if the result is truthy. Update documentation, add tests.
 * [#372](https://github.com/cleverage/process-bundle/issues/372) `ProcessConfigurationRegistry`: an unknown task in the `outputs` or `error_outputs` of a task, or in the `entry_point` or `end_point` of a process, throws an `InvalidProcessConfigurationException` naming the process, the task and the key holding the reference, instead of a `MissingTaskConfigurationException` (`No task configuration with code : <code>`). A process whose configuration is not valid is left out of `getProcessConfigurations()` (`cleverage:process:list`, lists of the UI) with an error log on the `cleverage_process` channel, instead of making every listing fail; getting or executing this process still throws. Update documentation, add tests.
 * [#373](https://github.com/cleverage/process-bundle/issues/373) `ProcessManager`: the tasks are finalized (`FinalizableTaskInterface::finalize()`) when the process fails too, so that a long-running worker (Messenger, UI bundle) no longer keeps the resources of a failed process open (files of the CSV, JSON stream and XML tasks, cursor of `doctrine_database_reader` blocking the next queries with MySQL unbuffered queries). Only the initialized tasks are finalized, each one once; a finalization failure is logged as critical and the process fails with its original exception. `StatCounterTask` (`stat_counter`) logs its count when the process fails too. Update documentation, add tests.
-* [#382](https://github.com/cleverage/process-bundle/issues/382) A shared service referenced by several tasks of the same process is deprecated instead of being rejected when the container is compiled (5.5, #339): this configuration worked before 5.5, all these tasks running with the same instance. The deprecation names the service, the tasks and the process; it will be rejected in 6.0. Declare the task services with `shared: false`. Update documentation, update tests.
 
 v5.5
 -----
