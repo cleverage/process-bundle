@@ -636,7 +636,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
     protected function handleState(ProcessState $state): void
     {
         $processHistory = $state->getProcessHistory();
-        if ($state->getException() && $state->isStopped()) {
+        if ($state->getException() instanceof \Throwable && $state->isStopped()) {
             $processHistory->setFailed();
         }
     }
@@ -705,10 +705,10 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
 
         // Check coherence for entry/end points
         $processConfiguration->getEndPoint();
-        if ($entryPoint && !\in_array($entryPoint->getCode(), $mainTaskList, true)) {
+        if ($entryPoint instanceof TaskConfiguration && !\in_array($entryPoint->getCode(), $mainTaskList, true)) {
             throw InvalidProcessConfigurationException::createNotInMain($processConfiguration, $entryPoint, $mainTaskList);
         }
-        if ($endPoint && !\in_array($endPoint->getCode(), $mainTaskList, true)) {
+        if ($endPoint instanceof TaskConfiguration && !\in_array($endPoint->getCode(), $mainTaskList, true)) {
             throw InvalidProcessConfigurationException::createNotInMain($processConfiguration, $endPoint, $mainTaskList);
         }
     }

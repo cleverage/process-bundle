@@ -181,7 +181,7 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
         }
 
         // #106 - entry point should not have an ancestor
-        if ($processConfig->getEntryPoint() && $processConfig->getEntryPoint()->getPreviousTasksConfigurations()) {
+        if ($processConfig->getEntryPoint() instanceof TaskConfiguration && $processConfig->getEntryPoint()->getPreviousTasksConfigurations()) {
             throw InvalidProcessConfigurationException::createEntryPointHasAncestors($processConfig, $processConfig->getEntryPoint());
         }
 
