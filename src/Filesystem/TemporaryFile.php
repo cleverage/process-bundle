@@ -29,7 +29,13 @@ final class TemporaryFile
     public static function create(string $prefix, string $suffix = ''): string
     {
         $path = sys_get_temp_dir().\DIRECTORY_SEPARATOR.$prefix.bin2hex(random_bytes(16)).$suffix;
-        $file = @fopen($path, 'x');
+        // Never readable by other users, not even before the chmod()
+        $umask = umask(0o077);
+        try {
+            $file = @fopen($path, 'x');
+        } finally {
+            umask($umask);
+        }
         if (false === $file) {
             throw new RuntimeException("Unable to create temporary file {$path}");
         }
