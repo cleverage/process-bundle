@@ -1,7 +1,7 @@
 Upgrade Guide
 =============
 
-## v5.6
+## v5.5.1
 
 Some behaviours change: check the points below.
 
