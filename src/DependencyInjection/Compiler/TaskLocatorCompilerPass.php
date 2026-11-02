@@ -60,8 +60,8 @@ final class TaskLocatorCompilerPass implements CompilerPassInterface
     }
 
     /**
-     * A shared service referenced by several tasks of a process would run all of them with the same instance: the
-     * options of the last initialization would apply to every task, and their states would be mixed.
+     * A shared service referenced by several tasks of a process runs all of them with the same instance: the options of
+     * the last initialization apply to every task, and their states are mixed. Deprecated, rejected in v6.0.
      *
      * @param array<string, list<string>> $taskCodesByService
      */
@@ -69,7 +69,14 @@ final class TaskLocatorCompilerPass implements CompilerPassInterface
     {
         foreach ($taskCodesByService as $id => $taskCodes) {
             if (\count($taskCodes) > 1 && $container->findDefinition($id)->isShared()) {
-                throw new InvalidArgumentException(\sprintf('The service "%s" is used by the tasks "%s" of the process "%s", but it is shared: all these tasks would run with the same instance (and the options of one of them). Declare the service with "shared: false".', $id, implode('", "', $taskCodes), $processCode));
+                trigger_deprecation(
+                    'cleverage/process-bundle',
+                    '5.5.1',
+                    'The service "%s" is used by the tasks "%s" of the process "%s", but it is shared: all these tasks run with the same instance (and the options of one of them). Declare the service with "shared: false". Shared services used by several tasks of a process are deprecated, they will be rejected in v6.0.',
+                    $id,
+                    implode('", "', $taskCodes),
+                    $processCode
+                );
             }
         }
     }

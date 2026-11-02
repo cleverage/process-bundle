@@ -3,7 +3,7 @@ Upgrade Guide
 
 ## v5.6
 
-One deprecation, and some behaviours change: check the points below.
+Two deprecations, and some behaviours change: check the points below.
 
 ### Recursive process execution
 
@@ -16,6 +16,12 @@ output of the deepest execution.
 Iterate with an iterable task (e.g. a reader or `constant_iterable_output` followed by `process_executor`) instead of
 recursing, or use the `process_launcher` task, which runs the process in a separate PHP process. Executing the same
 sub-process several times in a row is not concerned.
+
+### Shared task services
+
+A shared service referenced by several tasks of the same process is no longer rejected when the container is compiled
+(5.5): it is deprecated since 5.5.1, and will be rejected in v6.0. The deprecation names the service, the tasks and the
+process: declare the service with `shared: false` (see v5.5 below).
 
 ### Finalization of the tasks when the process fails
 
@@ -33,9 +39,9 @@ No deprecation in this version. Some behaviours change: check the points below.
 ### Shared task services
 
 A shared service referenced by several tasks of the same process is rejected when the container is compiled
-(`InvalidArgumentException` naming the service, the tasks and the process): all these tasks ran with the same instance,
-initialized with the options of each task in turn. Declare your task services with `shared: false`, as the
-autoconfiguration of `TaskInterface` does since 5.4:
+(`InvalidArgumentException` naming the service, the tasks and the process; deprecated instead since 5.5.1, see above):
+all these tasks ran with the same instance, initialized with the options of each task in turn. Declare your task
+services with `shared: false`, as the autoconfiguration of `TaskInterface` does since 5.4:
 
 ```yaml
 # config/services.yaml
