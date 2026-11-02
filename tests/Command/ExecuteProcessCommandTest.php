@@ -87,6 +87,26 @@ class ExecuteProcessCommandTest extends TestCase
         self::assertStringContainsString('{"foo":"bar"}', $tester->getDisplay());
     }
 
+    public function testInvalidUtf8IsReplacedInTheJsonOutput(): void
+    {
+        $tester = $this->createTester($this->once(), ['name' => "Caf\xe9"]);
+
+        self::assertSame(0, $tester->execute(['processCodes' => ['test.process'], '--output-format' => 'json-stream']));
+        self::assertStringContainsString('{"name":"Caf\ufffd"}', $tester->getDisplay());
+    }
+
+    public function testAnOutputThatCannotBeEncodedAsJsonIsReportedAndTheNextProcessesAreExecuted(): void
+    {
+        $tester = $this->createTester($this->exactly(2), ['value' => \NAN]);
+
+        self::assertSame(0, $tester->execute(
+            ['processCodes' => ['test.process', 'test.process'], '--output-format' => 'json-stream'],
+            ['capture_stderr_separately' => true],
+        ));
+        self::assertSame(2, substr_count($tester->getErrorOutput(), 'Output not printed: it cannot be encoded as JSON (Inf and NaN cannot be JSON encoded)'));
+        self::assertSame(2, substr_count($tester->getDisplay(), "Process 'test.process' executed successfully"));
+    }
+
     public function testAnArrayOutputIsStoredInTheFile(): void
     {
         $tester = $this->createTester($this->once(), ['foo' => 'bar']);

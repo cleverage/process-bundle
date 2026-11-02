@@ -171,7 +171,14 @@ class ExecuteProcessCommand extends Command
             if (self::OUTPUT_FORMAT_DUMP === $input->getOption('output-format')) {
                 VarDumper::dump($data);
             } else {
-                $output->writeln(json_encode($data, \JSON_THROW_ON_ERROR));
+                // Invalid UTF-8 replaced: the output of a process reading a non UTF-8 file can still be printed
+                $json = json_encode($data, \JSON_INVALID_UTF8_SUBSTITUTE);
+                if (false === $json) {
+                    // Reported, as before 5.5 without -vv: the next processes are executed
+                    $this->getErrorOutput($output)->writeln(\sprintf('<comment>Output not printed: it cannot be encoded as JSON (%s)</comment>', json_last_error_msg()));
+                } else {
+                    $output->writeln($json);
+                }
             }
 
             return;
@@ -179,8 +186,7 @@ class ExecuteProcessCommand extends Command
 
         // JsonStreamFile::writeLine() only takes an array
         if (!\is_array($data)) {
-            $errorOutput = $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
-            $errorOutput->writeln(\sprintf("<comment>Output not stored in '%s': the JSON stream format requires an array, %s given</comment>", $input->getOption('output'), get_debug_type($data)));
+            $this->getErrorOutput($output)->writeln(\sprintf("<comment>Output not stored in '%s': the JSON stream format requires an array, %s given</comment>", $input->getOption('output'), get_debug_type($data)));
 
             return;
         }
@@ -189,5 +195,10 @@ class ExecuteProcessCommand extends Command
         if ($output->isVerbose()) {
             $output->writeln(\sprintf("Output stored in '%s'", $input->getOption('output')));
         }
+    }
+
+    private function getErrorOutput(OutputInterface $output): OutputInterface
+    {
+        return $output instanceof ConsoleOutputInterface ? $output->getErrorOutput() : $output;
     }
 }
