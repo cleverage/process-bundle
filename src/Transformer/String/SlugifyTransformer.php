@@ -73,7 +73,7 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
             'transliterator',
             static function (Options $options, $value): \Transliterator {
                 $transliterator = \Transliterator::create($value);
-                if (null === $transliterator) {
+                if (!$transliterator instanceof \Transliterator) {
                     throw new InvalidOptionsException(\sprintf('Invalid "transliterator" option: %s', intl_get_error_message()));
                 }
 
