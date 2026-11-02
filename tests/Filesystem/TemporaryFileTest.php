@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Tests\Filesystem;
 
+use CleverAge\ProcessBundle\Exception\RuntimeException;
 use CleverAge\ProcessBundle\Filesystem\TemporaryFile;
 use PHPUnit\Framework\TestCase;
 
@@ -32,6 +33,24 @@ class TemporaryFileTest extends TestCase
             self::assertSame(0o600, fileperms($path) & 0o777);
         } finally {
             unlink($path);
+        }
+    }
+
+    public function testTheUmaskIsRestored(): void
+    {
+        $umask = umask(0o022);
+        try {
+            unlink(TemporaryFile::create('temporary_file_test_'));
+            self::assertSame(0o022, umask());
+
+            try {
+                TemporaryFile::create('missing_directory/temporary_file_test_');
+                self::fail('The file should not be created');
+            } catch (RuntimeException) {
+                self::assertSame(0o022, umask());
+            }
+        } finally {
+            umask($umask);
         }
     }
 

@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#388](https://github.com/cleverage/process-bundle/issues/388) The temporary files of `file_splitter`, `csv_splitter` and of the JSON buffer of `process_launcher` (#343) are created with the `0077` umask: they are no longer readable by other users before their permissions are set to `0600`. Add tests.
+
 v5.6
 -----
 
