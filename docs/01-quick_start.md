@@ -78,7 +78,7 @@ Some features rely on optional packages, suggested by the bundle:
 | `ext-intl` (PHP extension) | the [SlugifyTransformer](reference/transformers/slugify_transformer.md) |
 | `symfony/process` | the [CommandRunnerTask](reference/tasks/command_runner_task.md) and the [ProcessLauncherTask](reference/tasks/process_launcher_task.md) |
 | `symfony/stopwatch` | the [StopwatchTask](reference/tasks/stopwatch_task.md) |
-| `symfony/var-dumper` | the dumps of the [DebugTask](reference/tasks/debug_task.md), of the `debug` transformer and of `cleverage:process:execute --output-format=dump` (nothing is dumped without it) |
+| `symfony/var-dumper` | the dumps of the [DebugTask](reference/tasks/debug_task.md), of the `debug` transformer and of `cleverage:process:execute --output-format=dump` (required by this format: the command fails without it) |
 | `symfony/monolog-bundle` | the `cleverage_process`, `cleverage_process_task` and `cleverage_process_transformer` log channels, with the process and task data in the `extra` of the records (see [logging](03-custom_tasks.md#logging)); without it, the default Symfony logger is used |
 
 Without `symfony/process`, `symfony/stopwatch` or `ext-intl`, the container still compiles, and a process using one of
@@ -267,7 +267,7 @@ Process 'project_prefix.process_name' executed successfully
 | `--input-from-stdin` | | Read the input value from STDIN instead (e.g. `cat file.json \| bin/console cleverage:process:execute ...`) |
 | `--context=<key>:<value>` | `-c` | Contextual value, can be repeated. The key must only contain word characters (`\w+`: letters, digits, `_`). The value is parsed as YAML, so `-c limit:10` gives an integer and `-c name:"'foo'"` forces a string (also needed for dates: `-c date:2024-01-01` gives an integer timestamp) |
 | `--output=<path>` | `-o` | Where to dump the value returned by the task defined by the process `end_point`: `-` (default) for STDOUT, or a file path |
-| `--output-format=<format>` | `-t` | Format of the dumped output: `dump` (Symfony VarDumper, STDOUT only) or `json-stream` (written to STDOUT, or into the `--output` file if the value is an array: otherwise a warning is written on the error output). Nothing is dumped when this option is omitted. Without `end_point`, the output is `null`. The format and the process codes are checked before any process is executed |
+| `--output-format=<format>` | `-t` | Format of the dumped output: `dump` (Symfony VarDumper, STDOUT only) or `json-stream` (written to STDOUT, invalid UTF-8 sequences replaced, or into the `--output` file if the value is an array: otherwise, or when the value cannot be encoded as JSON for STDOUT, a warning is written on the error output). Nothing is dumped when this option is omitted. Without `end_point`, the output is `null`. The format and the process codes are checked before any process is executed |
 
 Example:
 

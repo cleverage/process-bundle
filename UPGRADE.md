@@ -71,6 +71,8 @@ process because of an error, let the error fail it (error strategy `stop`).
 - With `--output-format`, the output is printed to STDOUT whatever the verbosity (it required `-vv`): a script reading
   STDOUT now receives it.
 - A non-array output that cannot be stored as JSON stream is reported on the error output.
+- `--output-format=dump` without `symfony/var-dumper`, or an unknown format, makes the command fail before any process
+  is executed: it was ignored for STDOUT without `-vv`. Install `symfony/var-dumper` or fix the option.
 
 ### Tasks and transformers
 
