@@ -28,7 +28,8 @@ Nothing is output when an input is received (the task is skipped). When `json_bu
 end point output (only if it is an array) is written to a JSON stream file of the system temporary directory (`<sys_get_temp_dir()>/cdm_buffer_*.json-stream`, in `var/` of the project before 5.4) and, once the sub-process is
 finished, the task outputs the path of this file (`string`), during the next iterations or when flushed. If nothing
 was written (no `end_point`, or an output that is not an array), the empty file is removed and the task outputs
-nothing for this sub-process. Without `json_buffering`, the task outputs nothing.
+nothing for this sub-process. The file has a random name and is readable by its owner only (`0600`): the task reading
+it must run with the same user. Without `json_buffering`, the task outputs nothing.
 
 If a sub-process exits with a non-zero code, its error output is logged as critical, all running sub-processes are
 stopped and a `RuntimeException` is thrown.

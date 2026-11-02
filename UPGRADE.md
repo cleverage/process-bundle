@@ -88,6 +88,12 @@ process because of an error, let the error fail it (error strategy `stop`).
 - `file_splitter`, `csv_splitter` and the `json_buffering` of `process_launcher` create their temporary files readable
   by their owner only (`0600`): a process reading them must run with the same user.
 
+### `ProcessManager` subclasses
+
+- `$taskRegistry` is typed `TaskRegistryInterface` (it was `TaskRegistry`), as the constructor argument.
+- The keys of `$processedIterables` and `$processedBlockings` are the `spl_object_id()` of the task configurations (they
+  were the task codes): a task of a sub-process may have the same code as a task of its parent.
+
 ### Long-running workers
 
 `ProcessConfigurationRegistry` is reset between two messages of a worker (`kernel.reset`): the task instances and their

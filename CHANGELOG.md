@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#392](https://github.com/cleverage/process-bundle/issues/392) Documentation: reset of the process configurations between two messages of a worker (`kernel.reset`, #355), permissions of the JSON buffer of `process_launcher`, `ProcessManager` subclasses in `UPGRADE.md` (v5.5), broken link in the CHANGELOG.
+
 ## Fixes
 * [#388](https://github.com/cleverage/process-bundle/issues/388) The temporary files of `file_splitter`, `csv_splitter` and of the JSON buffer of `process_launcher` (#343) are created with the `0077` umask: they are no longer readable by other users before their permissions are set to `0600`. Add tests.
 * [#390](https://github.com/cleverage/process-bundle/issues/390) `cleverage:process:execute` with `--output-format=json-stream` and STDOUT (#353): the invalid UTF-8 sequences of the output are replaced, and an output that still cannot be encoded as JSON (e.g. `NAN`) is reported on the error output instead of throwing a `JsonException` that made the command fail after the execution and skipped the next processes. `UPGRADE.md` (v5.5): the `dump` format without `symfony/var-dumper` and the unknown formats make the command fail before any execution. Update documentation, add tests.
@@ -425,7 +428,7 @@ v3.1.0
 
 ### Features
 
-* [GITHUB-83](https://github.com/cleverage/process-bundle/issues/83): added [events](../04-advanced_workflow.md#events)
+* [GITHUB-83](https://github.com/cleverage/process-bundle/issues/83): added [events](docs/04-advanced_workflow.md#events)
   around process execution
 * [GITHUB-86](https://github.com/cleverage/process-bundle/issues/86): added XML manipulation tools
 * [GITHUB-109](https://github.com/cleverage/process-bundle/issues/109): added an event during CLI process execution

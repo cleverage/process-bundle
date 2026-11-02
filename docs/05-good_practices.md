@@ -22,6 +22,10 @@ open file, a buffer, a counter...). A shared service would share this state betw
 in a process (deprecated, rejected in v6.0), or between two executions of a process in the same PHP
 process (sub-processes, workers, tests). See [service declaration](03-custom_tasks.md#service-declaration).
 
+In a long-running worker (Messenger, UI bundle), the resolved process configurations are released between two messages
+(`ProcessConfigurationRegistry::reset()`, tagged `kernel.reset`), with their task instances and states (inputs,
+outputs, aggregated data): a task must not rely on data kept from a previous message.
+
 ## Split big workflows into small processes
 
 A process with dozens of tasks is hard to read, to debug and to test. Split it into small processes that do one thing
