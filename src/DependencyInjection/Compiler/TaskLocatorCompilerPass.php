@@ -71,7 +71,7 @@ final class TaskLocatorCompilerPass implements CompilerPassInterface
             if (\count($taskCodes) > 1 && $container->findDefinition($id)->isShared()) {
                 trigger_deprecation(
                     'cleverage/process-bundle',
-                    '5.5.1',
+                    '5.6',
                     'The service "%s" is used by the tasks "%s" of the process "%s", but it is shared: all these tasks run with the same instance (and the options of one of them). Declare the service with "shared: false". Shared services used by several tasks of a process are deprecated, they will be rejected in v6.0.',
                     $id,
                     implode('", "', $taskCodes),
