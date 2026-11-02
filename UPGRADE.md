@@ -1,6 +1,14 @@
 Upgrade Guide
 =============
 
+## v5.5.1
+
+### Shared task services
+
+A shared service referenced by several tasks of the same process is no longer rejected when the container is compiled
+(5.5): it is deprecated, and will be rejected in v6.0. The deprecation names the service, the tasks and the process:
+declare the service with `shared: false`, as below.
+
 ## v5.5
 
 No deprecation in this version. Some behaviours change: check the points below.
@@ -8,9 +16,9 @@ No deprecation in this version. Some behaviours change: check the points below.
 ### Shared task services
 
 A shared service referenced by several tasks of the same process is rejected when the container is compiled
-(`InvalidArgumentException` naming the service, the tasks and the process): all these tasks ran with the same instance,
-initialized with the options of each task in turn. Declare your task services with `shared: false`, as the
-autoconfiguration of `TaskInterface` does since 5.4:
+(`InvalidArgumentException` naming the service, the tasks and the process; deprecated instead since 5.5.1, see above):
+all these tasks ran with the same instance, initialized with the options of each task in turn. Declare your task
+services with `shared: false`, as the autoconfiguration of `TaskInterface` does since 5.4:
 
 ```yaml
 # config/services.yaml

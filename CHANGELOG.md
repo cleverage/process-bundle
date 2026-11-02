@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#382](https://github.com/cleverage/process-bundle/issues/382) A shared service referenced by several tasks of the same process is deprecated instead of being rejected when the container is compiled (5.5, #339): this configuration worked before 5.5, all these tasks running with the same instance. The deprecation names the service, the tasks and the process; it will be rejected in 6.0. Declare the task services with `shared: false`. Update documentation, update tests.
+
 v5.5
 -----
 
