@@ -134,15 +134,32 @@ class TaskLocatorCompilerPassTest extends TestCase
         (new TaskLocatorCompilerPass())->process($container);
     }
 
-    public function testSharedServiceUsedBySeveralTasksOfAProcessThrows(): void
+    public function testSharedServiceUsedBySeveralTasksOfAProcessIsDeprecated(): void
     {
         $container = $this->createContainerWithTasks(['test.process' => ['first' => 'app_task', 'second' => 'app_task']]);
         $container->setDefinition('app.task', (new Definition(DummyTask::class))->addTag('cleverage.task', ['code' => 'app_task']));
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The service "app.task" is used by the tasks "first", "second" of the process "test.process", but it is shared: all these tasks would run with the same instance (and the options of one of them). Declare the service with "shared: false".');
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
 
-        (new TaskLocatorCompilerPass())->process($container);
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            (new TaskLocatorCompilerPass())->process($container);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame([
+            'Since cleverage/process-bundle 5.6: The service "app.task" is used by the tasks "first", "second" of the process "test.process", but it is shared: all these tasks run with the same instance (and the options of one of them). Declare the service with "shared: false". Shared services used by several tasks of a process are deprecated, they will be rejected in v6.0.',
+        ], $deprecations);
+        // The service is still available to the tasks, as before 5.5
+        $locatorReference = $container->getDefinition('cleverage_process.registry.task')->getArgument(0);
+        self::assertInstanceOf(Reference::class, $locatorReference);
+        $services = $container->getDefinition((string) $locatorReference)->getArgument(0);
+        self::assertIsArray($services);
+        self::assertSame(['app.task'], array_keys($services));
     }
 
     public function testNonSharedServiceCanBeUsedBySeveralTasksOfAProcess(): void
