@@ -252,6 +252,7 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
 
         // Check the task references, the links below would fail with a message naming neither the process nor the task
         $this->checkTaskReferences($processCode, $rawProcessConfiguration, $taskConfigurations, $errorOutputsKeys);
+        $this->checkDuplicateTaskReferences($processCode, $taskConfigurations, $errorOutputsKeys);
 
         // Set links between tasks
         foreach ($taskConfigurations as $taskConfig) {
@@ -318,6 +319,36 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
             $referencedTaskCode = $rawProcessConfiguration[$key] ?? null;
             if (\is_string($referencedTaskCode) && !\array_key_exists($referencedTaskCode, $taskConfigurations)) {
                 throw InvalidProcessConfigurationException::createUnknownTaskReference($processCode, $key, $referencedTaskCode);
+            }
+        }
+    }
+
+    /**
+     * A task listed several times in the outputs of a task is executed once per occurrence (deprecated).
+     *
+     * @param TaskConfiguration[]   $taskConfigurations indexed by task code
+     * @param array<string, string> $errorOutputsKeys   "errors" for the tasks using this deprecated key
+     */
+    private function checkDuplicateTaskReferences(string $processCode, array $taskConfigurations, array $errorOutputsKeys): void
+    {
+        foreach ($taskConfigurations as $taskCode => $taskConfig) {
+            $references = [
+                'outputs' => $taskConfig->getOutputs(),
+                $errorOutputsKeys[$taskCode] ?? 'error_outputs' => $taskConfig->getErrorOutputs(),
+            ];
+            foreach ($references as $key => $codes) {
+                foreach (array_unique(array_diff_assoc($codes, array_unique($codes))) as $duplicateCode) {
+                    // @deprecated since 5.7, an exception will be thrown in v6.0
+                    trigger_deprecation(
+                        'cleverage/process-bundle',
+                        '5.7',
+                        'Listing the task "%s" several times in the "%s" of the task "%s" of the process "%s" is deprecated: it is executed once per occurrence. In v6.0, an exception will be thrown.',
+                        $duplicateCode,
+                        $key,
+                        $taskCode,
+                        $processCode,
+                    );
+                }
             }
         }
     }
