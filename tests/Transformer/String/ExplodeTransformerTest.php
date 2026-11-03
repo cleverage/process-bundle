@@ -15,6 +15,7 @@ namespace CleverAge\ProcessBundle\Tests\Transformer\String;
 
 use CleverAge\ProcessBundle\Transformer\String\ExplodeTransformer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ExplodeTransformer::class)]
@@ -71,5 +72,14 @@ class ExplodeTransformerTest extends TestCase
 
         $resolvedOptions = $resolver->resolve();
         $this->assertEquals(['delimiter'], array_keys($resolvedOptions));
+    }
+
+    public function testAnEmptyDelimiterIsRejected(): void
+    {
+        $resolver = new OptionsResolver();
+        (new ExplodeTransformer())->configureOptions($resolver);
+
+        $this->expectException(InvalidOptionsException::class);
+        $resolver->resolve(['delimiter' => '']);
     }
 }

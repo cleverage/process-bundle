@@ -179,4 +179,25 @@ class FilterTaskTest extends TestCase
 
         return $state;
     }
+
+    /**
+     * A numeric property path (e.g. a list input) is an int key: a TypeError was thrown.
+     */
+    public function testNumericPropertyPaths(): void
+    {
+        // The path "1" is not readable on an array (unlike "[1]"): null
+        $this->assertFalse($this->execute(['match' => [1 => null, '[1]' => 'b']], ['a', 'b'])->isSkipped());
+        $this->assertTrue($this->execute(['match' => [0 => 'x']], ['a', 'b'])->isSkipped());
+        $this->assertTrue($this->execute(['not_empty' => [0 => null]], ['a'])->isSkipped());
+    }
+
+    /**
+     * The list form of empty / not_empty: the values are the property paths (a TypeError was thrown).
+     */
+    public function testListFormOfEmptyAndNotEmpty(): void
+    {
+        $this->assertFalse($this->execute(['not_empty' => ['[email]'], 'empty' => ['[deleted_at]']], ['email' => 'a@b.c'])->isSkipped());
+        $this->assertTrue($this->execute(['not_empty' => ['[email]']], ['email' => ''])->isSkipped());
+        $this->assertTrue($this->execute(['empty' => ['[deleted_at]']], ['deleted_at' => 'yesterday'])->isSkipped());
+    }
 }

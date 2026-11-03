@@ -12,7 +12,8 @@ Transformer reference
 Accepted inputs
 ---------------
 
-Any value that can be cast to `string`.
+Any value that can be cast to `string` (`null` gives the hash of an empty string). An array or an object that is not
+`\Stringable` throws an `UnexpectedValueException` (an array was hashed as the string `Array`).
 
 Possible outputs
 ----------------

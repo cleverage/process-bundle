@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer\String;
 
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -40,12 +41,22 @@ class SprintfTransformer implements ConfigurableTransformerInterface
         return 'sprintf';
     }
 
-    /**
-     * @codeCoverageIgnore
-     */
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefault('format', '%s');
         $resolver->setAllowedTypes('format', 'string');
+        // An invalid format (e.g. a "%" alone) is rejected with the configuration, not with the first value
+        $resolver->setAllowedValues('format', static function (string $format): bool {
+            // Enough arguments for every conversion specification, positional ones included
+            preg_match_all('/%(\d+)\$/', $format, $positions);
+            $count = max([substr_count($format, '%'), ...array_map(intval(...), $positions[1])]) + 1;
+            try {
+                vsprintf($format, array_fill(0, $count, ''));
+            } catch (\ValueError $error) {
+                throw new InvalidOptionsException(\sprintf('Invalid "format" option "%s": %s', $format, $error->getMessage()), 0, $error);
+            }
+
+            return true;
+        });
     }
 }

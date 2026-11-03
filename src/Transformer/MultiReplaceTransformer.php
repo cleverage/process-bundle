@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -32,7 +33,8 @@ class MultiReplaceTransformer implements ConfigurableTransformerInterface
     public function transform(mixed $value, array $options = []): mixed
     {
         foreach ($options['replace_mapping'] as $pattern => $replacement) {
-            $value = str_replace($pattern, $replacement, (string) $value);
+            // A numeric key of the mapping is an int
+            $value = str_replace((string) $pattern, (string) $replacement, (string) $value);
         }
 
         return $value;
@@ -42,6 +44,18 @@ class MultiReplaceTransformer implements ConfigurableTransformerInterface
     {
         $resolver->setRequired('replace_mapping');
         $resolver->setAllowedTypes('replace_mapping', 'array');
+        $resolver->setAllowedValues(
+            'replace_mapping',
+            static function (array $mapping): bool {
+                foreach ($mapping as $replacement) {
+                    if (null !== $replacement && !\is_scalar($replacement)) {
+                        throw new InvalidOptionsException(\sprintf('The replacements of the "replace_mapping" option must be strings, %s given.', get_debug_type($replacement)));
+                    }
+                }
+
+                return true;
+            }
+        );
     }
 
     public function getCode(): string

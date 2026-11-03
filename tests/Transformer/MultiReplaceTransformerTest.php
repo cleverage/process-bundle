@@ -15,6 +15,7 @@ namespace CleverAge\ProcessBundle\Tests\Transformer;
 
 use CleverAge\ProcessBundle\Transformer\MultiReplaceTransformer;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(MultiReplaceTransformer::class)]
@@ -89,5 +90,26 @@ class MultiReplaceTransformerTest extends TestCase
         $code = $transformer->getCode();
 
         $this->assertEquals('multi_replace', $code);
+    }
+
+    /**
+     * A numeric key of the mapping is an int: str_replace() threw a TypeError.
+     */
+    public function testTransformWithNumericKeys(): void
+    {
+        $transformer = new MultiReplaceTransformer();
+
+        $this->assertSame('one ten', $transformer->transform('1 10', ['replace_mapping' => ['10' => 'ten', '1' => 'one', 2 => 3]]));
+    }
+
+    public function testAReplacementMustBeAString(): void
+    {
+        $resolver = new OptionsResolver();
+        (new MultiReplaceTransformer())->configureOptions($resolver);
+
+        $this->assertSame(['a' => 1, 'b' => null], $resolver->resolve(['replace_mapping' => ['a' => 1, 'b' => null]])['replace_mapping']);
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('The replacements of the "replace_mapping" option must be strings, array given.');
+        $resolver->resolve(['replace_mapping' => ['a' => ['b']]]);
     }
 }

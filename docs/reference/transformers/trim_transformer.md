@@ -26,7 +26,7 @@ Options
 
 | Code       | Type     | Required | Default             | Description                                                    |
 |------------|----------|:--------:|---------------------|----------------------------------------------------------------|
-| `charlist` | `string` |          | `" \t\n\r\0\x0B"`   | Characters to strip (ranges like `a..z` are supported)         |
+| `charlist` | `string` |          | `" \t\n\r\0\x0B"`   | Characters to strip (ranges like `a..z` are supported, for single-byte characters only); multibyte characters (e.g. `é`, `«`) are supported, with `mb_trim()` |
 
 Examples
 --------

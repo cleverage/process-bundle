@@ -79,14 +79,14 @@ class InstantiateTransformerTest extends TestCase
         $transformer->transform('foo', $options);
     }
 
+    /**
+     * Rejected with the configuration: it was only detected with the first value.
+     */
     public function testUnknownClassThrows(): void
     {
-        $transformer = new InstantiateTransformer();
-        $options = $this->resolveOptions($transformer, ['class' => 'App\Unknown\Foo']);
+        $this->expectException(InvalidOptionsException::class);
 
-        $this->expectException(\ReflectionException::class);
-
-        $transformer->transform([], $options);
+        $this->resolveOptions(new InstantiateTransformer(), ['class' => 'App\Unknown\Foo']);
     }
 
     public function testClassIsRequired(): void

@@ -66,4 +66,5 @@ Notes
 -----
 
 In Symfony YAML configuration files, `%` is used for container parameters: escape it as `%%` (`'%%s'` is resolved as
-`'%s'`). A format with more placeholders than arguments throws a `\ValueError`.
+`'%s'`). An invalid format (e.g. a `%` alone, not escaped as `%%`) is rejected with the configuration. A format with
+more placeholders than arguments throws an `\ArgumentCountError`, with the value.
