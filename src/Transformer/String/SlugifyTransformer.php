@@ -31,6 +31,11 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
      */
     public function transform(mixed $value, array $options = []): string
     {
+        if (\is_int($value) || \is_float($value) || \is_bool($value) || $value instanceof \Stringable) {
+            $value = (string) $value;
+        } elseif (!\is_string($value)) {
+            throw new UnexpectedValueException(\sprintf('The slugify transformer expects a string, %s given.', get_debug_type($value)));
+        }
         /** @var \Transliterator $transliterator */
         $transliterator = $options['transliterator'];
         $string = $transliterator->transliterate($value);
@@ -38,11 +43,16 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
             throw new UnexpectedValueException("Unable to transliterate the value: {$transliterator->getErrorMessage()}");
         }
 
+        if ($options['strip_tags']) {
+            $string = strip_tags($string);
+        }
+
         return trim(
             (string) preg_replace(
                 $options['replace'],
                 (string) $options['separator'],
-                strtolower(trim(strip_tags($string)))
+                // The characters left by the transliterator may be multibyte
+                mb_strtolower(trim($string))
             ),
             $options['separator']
         );
@@ -63,8 +73,11 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
                 'transliterator' => 'NFD; [:Nonspacing Mark:] Remove; NFC',
                 'replace' => '/[^a-z0-9]+/',
                 'separator' => '_',
+                // strip_tags() removes everything after a "<" (e.g. "Tom<Jerry" gives "tom")
+                'strip_tags' => true,
             ]
         );
+        $resolver->setAllowedTypes('strip_tags', ['bool']);
         $resolver->setAllowedTypes('transliterator', ['string']);
         $resolver->setAllowedTypes('replace', ['string']);
         $resolver->setAllowedTypes('separator', ['string']);
