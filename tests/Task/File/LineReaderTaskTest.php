@@ -23,6 +23,7 @@ use CleverAge\ProcessBundle\Task\File\InputLineReaderTask;
 use CleverAge\ProcessBundle\Task\File\LineReaderTask;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(LineReaderTask::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(InputLineReaderTask::class)]
@@ -91,6 +92,13 @@ class LineReaderTaskTest extends TestCase
 
         self::assertSame(["a1\n", "a2\n"], $this->iterate($task, $state, $this->tmpDir.'/a.txt'));
         self::assertSame(["b1\n"], $this->iterate($task, $state, $this->tmpDir.'/b.txt'));
+    }
+
+    public function testFilenameMustBeAString(): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+
+        $this->iterate(new LineReaderTask(), $this->createState(['filename' => ['a.txt']]));
     }
 
     /**
