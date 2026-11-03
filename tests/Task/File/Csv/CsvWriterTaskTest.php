@@ -127,6 +127,53 @@ class CsvWriterTaskTest extends TestCase
         self::assertSame("tags\na|b|c\n", file_get_contents($filePath));
     }
 
+    public function testFormulasAreWrittenAsTheyAreByDefault(): void
+    {
+        $filePath = $this->tmpDir.'/out.csv';
+        $task = new CsvWriterTask();
+        $state = $this->createState(['file_path' => $filePath, 'headers' => ['=id', 'value']]);
+
+        $this->write($task, $state, [['=id' => 1, 'value' => '=HYPERLINK("https://example.com")']]);
+
+        self::assertSame("=id;value\n1;\"=HYPERLINK(\"\"https://example.com\"\")\"\n", file_get_contents($filePath));
+    }
+
+    /**
+     * As the CsvEncoder of the Symfony Serializer: the values and the headers starting with a character of a formula
+     * are prefixed with a single quote.
+     */
+    public function testEscapeFormulas(): void
+    {
+        $filePath = $this->tmpDir.'/out.csv';
+        $task = new CsvWriterTask();
+        $state = $this->createState(['file_path' => $filePath, 'escape_formulas' => true]);
+        $stringable = new class implements \Stringable {
+            public function __toString(): string
+            {
+                return '@SUM(A1)';
+            }
+        };
+
+        $this->write($task, $state, [
+            ['=key' => '=1+1', 'plus' => '+33600000000', 'minus' => -5, 'float' => -1.5, 'at' => $stringable, 'tab' => "\tx", 'array' => ['=a', 'b'], 'text' => 'a=b', 'null' => null, 'bool' => true],
+            ['=key' => "\rx", 'plus' => "\nx", 'minus' => 5, 'float' => 1.5, 'at' => '', 'tab' => 'x', 'array' => ['a', '=b'], 'text' => '', 'null' => null, 'bool' => false],
+        ]);
+
+        self::assertSame(
+            "'=key;plus;minus;float;at;tab;array;text;null;bool\n"
+            ."'=1+1;'+33600000000;'-5;'-1.5;'@SUM(A1);\"'\tx\";'=a|b;a=b;;1\n"
+            ."\"'\rx\";\"'\nx\";5;1.5;;x;a|=b;;;\n",
+            file_get_contents($filePath)
+        );
+    }
+
+    public function testEscapeFormulasMustBeABoolean(): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+
+        $this->write(new CsvWriterTask(), $this->createState(['file_path' => $this->tmpDir.'/out.csv', 'escape_formulas' => 'yes']), [['a' => 1]]);
+    }
+
     public function testDefaultModeOverwritesExistingFile(): void
     {
         $filePath = $this->tmpDir.'/out.csv';
