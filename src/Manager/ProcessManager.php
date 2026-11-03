@@ -517,6 +517,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 $task->proceed($state);
                 $this->removeProcessedBlocking($taskConfiguration);
             } elseif (self::EXECUTE_FLUSH === $executionFlag) {
+                $previousOutput = $state->getOutput();
                 $state->reset(true);
                 if (!$task instanceof FlushableTaskInterface) {
                     // This exception should never be thrown
@@ -524,6 +525,11 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 }
                 $this->processLogger->debug("Flushing task {$taskConfiguration->getCode()}");
                 $task->flush($state);
+                if ($state->isSkipped() && !$state->getException() instanceof \Throwable) {
+                    // Nothing to flush (a task is flushed several times): the last output is kept, e.g. the output of
+                    // the end point returned by the process
+                    $state->setOutput($previousOutput);
+                }
             } else {
                 throw new UnexpectedValueException("Unknown execution flag: {$executionFlag}");
             }

@@ -96,7 +96,8 @@ tasks as a normal output (call `ProcessState::setSkipped(true)` when there is no
 
 Since every resolved ancestor triggers this walk, `flush` may be called several times on the same task, including when
 its buffer is already empty: implementations must be idempotent (output nothing, and skip, when there is nothing new to
-flush).
+flush). A skipped flush keeps the last output of the task: a flushable task used as `end_point` returns its last output
+(e.g. the last batch of a `SimpleBatchTask`).
 
 Examples:
 - [SimpleBatchTask](reference/tasks/simple_batch_task.md) groups inputs by batches of `batch_count` elements: each

@@ -251,6 +251,21 @@ class ProcessManagerFlowTest extends TestCase
     }
 
     /**
+     * A flushable end point: its flushes with nothing to output keep its last output, returned by the process (it
+     * returned null).
+     */
+    public function testFlushableEndPoint(): void
+    {
+        $result = $this->execute([
+            'items' => ['type' => 'iterable', 'items' => [1, 2], 'outputs' => ['last']],
+            'last' => ['type' => 'flushable'],
+        ], ['end_point' => 'last']);
+
+        self::assertSame(['last:execute:1', 'last:execute:2', 'last:flush'], \array_slice($this->events, 0, 3));
+        self::assertSame(2, $result);
+    }
+
+    /**
      * A task which is not iterable nor blocking is flushed once resolved.
      */
     public function testRootTaskIsFlushed(): void
