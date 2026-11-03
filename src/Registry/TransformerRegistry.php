@@ -38,9 +38,12 @@ class TransformerRegistry implements TransformerRegistryInterface
 
     /**
      * @param ServiceProviderInterface<TransformerInterface>|null $locator
+     * @param array<string, string>                               $deprecatedCodes former name of the generic transformers
+     *                                                                             whose code has a dash => code (internal)
      */
     public function __construct(
         protected ?ServiceProviderInterface $locator = null,
+        private readonly array $deprecatedCodes = [],
     ) {
     }
 
@@ -80,6 +83,18 @@ class TransformerRegistry implements TransformerRegistryInterface
 
     public function getTransformer(string $code): TransformerInterface
     {
+        if (!$this->hasRegisteredTransformer($code) && isset($this->deprecatedCodes[$code])) {
+            // @deprecated since 5.7, the former name will not be found in v6.0
+            trigger_deprecation(
+                'cleverage/process-bundle',
+                '5.7',
+                'Using the generic transformer "%s" by the name "%s", with underscores instead of dashes, is deprecated: use its code "%s". The dashes of the codes were replaced by underscores before 5.7, the former name will not be found in v6.0.',
+                $this->deprecatedCodes[$code],
+                $code,
+                $this->deprecatedCodes[$code],
+            );
+            $code = $this->deprecatedCodes[$code];
+        }
         if (isset($this->transformers[$code])) {
             return $this->transformers[$code];
         }
@@ -101,6 +116,11 @@ class TransformerRegistry implements TransformerRegistryInterface
     }
 
     public function hasTransformer(string $code): bool
+    {
+        return $this->hasRegisteredTransformer($code) || isset($this->deprecatedCodes[$code]);
+    }
+
+    private function hasRegisteredTransformer(string $code): bool
     {
         return isset($this->transformers[$code]) || ($this->locator?->has($code) ?? false);
     }

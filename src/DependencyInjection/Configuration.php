@@ -81,6 +81,8 @@ class Configuration implements ConfigurationInterface
     {
         $transformersArrayDefinition = $definition->arrayNode('generic_transformers')
             ->useAttributeAsKey('code')
+            // Keep the dashes of the codes (replaced by underscores before 5.7, see DeprecatedCodeAliases)
+            ->normalizeKeys(false)
             ->arrayPrototype();
 
         // Process list
@@ -120,6 +122,8 @@ class Configuration implements ConfigurationInterface
     {
         $configurationsArrayDefinition = $definition->arrayNode('configurations')
             ->useAttributeAsKey('code')
+            // Keep the dashes of the codes (replaced by underscores before 5.7, see DeprecatedCodeAliases)
+            ->normalizeKeys(false)
             ->arrayPrototype();
 
         // Process list
@@ -178,6 +182,8 @@ class Configuration implements ConfigurationInterface
         $tasksArrayDefinition = $definition
             ->arrayNode('tasks')
             ->useAttributeAsKey('code')
+            // Keep the dashes of the codes (replaced by underscores before 5.7, see DeprecatedCodeAliases)
+            ->normalizeKeys(false)
             ->arrayPrototype();
 
         // Process list

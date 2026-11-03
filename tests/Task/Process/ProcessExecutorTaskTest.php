@@ -38,6 +38,7 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessHistory::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessConfigurationRegistry::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases::class)]
 class ProcessExecutorTaskTest extends TestCase
 {
     public function testInputIsPassedToTheSubProcessAndItsOutputIsForwarded(): void

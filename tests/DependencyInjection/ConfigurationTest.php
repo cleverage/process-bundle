@@ -210,4 +210,27 @@ class ConfigurationTest extends TestCase
     {
         return (new Processor())->processConfiguration(new Configuration(), [$config]);
     }
+
+    /**
+     * The dashes of the codes were replaced by underscores (key normalization), not those of the references to them.
+     */
+    public function testTheDashesOfTheCodesAreKept(): void
+    {
+        $config = $this->process([
+            'generic_transformers' => ['to-upper' => ['transformers' => ['callback' => ['callback' => 'mb_strtoupper']]]],
+            'configurations' => ['demo.x-y' => ['tasks' => [
+                'first-task' => ['task' => 'transformer', 'outputs' => ['next-task']],
+                'next-task' => ['task' => 'transformer'],
+            ]]],
+        ]);
+
+        self::assertSame(['to-upper'], array_keys($config['generic_transformers']));
+        self::assertSame(['demo.x-y'], array_keys($config['configurations']));
+        self::assertSame(['first-task', 'next-task'], array_keys($config['configurations']['demo.x-y']['tasks']));
+        // The keys of the options are still normalized
+        self::assertArrayHasKey('error_outputs', $this->process(['configurations' => ['p' => ['tasks' => [
+            't' => ['task' => 'transformer', 'error-outputs' => ['u']],
+            'u' => ['task' => 'transformer'],
+        ]]]])['configurations']['p']['tasks']['t']);
+    }
 }

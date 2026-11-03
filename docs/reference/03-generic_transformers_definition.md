@@ -74,4 +74,5 @@ clever_age_process:
                                                 prefix: product
 ```
 
-As any transformer code, generic transformer codes must be unique: use a prefix to avoid conflicts.
+As any transformer code, generic transformer codes must be unique: use a prefix to avoid conflicts. A dash is kept in
+the code (it was replaced by an underscore before 5.7, the former name is deprecated).

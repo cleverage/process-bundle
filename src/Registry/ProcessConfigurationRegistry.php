@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Registry;
 
+use CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
@@ -34,6 +35,11 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
     protected array $processConfigurations = [];
 
     /**
+     * @var array<string, string>|null
+     */
+    private ?array $deprecatedProcessCodes = null;
+
+    /**
      * @param array<string, array<string, mixed>>                  $rawConfiguration
      * @param array{success_level?: string, failed_level?: string} $defaultLogLevels
      */
@@ -50,6 +56,7 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
         if (!$this->hasProcessConfiguration($processCode)) {
             throw MissingProcessException::create($processCode);
         }
+        $processCode = $this->resolveDeprecatedProcessCode($processCode);
         $this->resolveConfiguration($processCode);
 
         return $this->processConfigurations[$processCode];
@@ -92,7 +99,103 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
 
     public function hasProcessConfiguration(string $processCode): bool
     {
-        return \array_key_exists($processCode, $this->rawConfiguration);
+        return \array_key_exists($processCode, $this->rawConfiguration)
+            || \array_key_exists($processCode, $this->getDeprecatedProcessCodes());
+    }
+
+    /**
+     * @return array<string, string> former name of the processes whose code has a dash => code
+     */
+    private function getDeprecatedProcessCodes(): array
+    {
+        return $this->deprecatedProcessCodes ??= DeprecatedCodeAliases::create(array_keys($this->rawConfiguration));
+    }
+
+    private function resolveDeprecatedProcessCode(string $processCode): string
+    {
+        if (\array_key_exists($processCode, $this->rawConfiguration)) {
+            return $processCode;
+        }
+        $code = $this->getDeprecatedProcessCodes()[$processCode];
+        // @deprecated since 5.7, the former name will not be found in v6.0
+        trigger_deprecation(
+            'cleverage/process-bundle',
+            '5.7',
+            'Using the process "%s" by the name "%s", with underscores instead of dashes, is deprecated: use its code "%s". The dashes of the codes were replaced by underscores before 5.7, the former name will not be found in v6.0.',
+            $code,
+            $processCode,
+            $code,
+        );
+
+        return $code;
+    }
+
+    /**
+     * Task references using the former name of a task whose code has a dash (deprecated).
+     *
+     * @param array<string, mixed> $rawProcessConfiguration
+     *
+     * @return array<string, mixed>
+     */
+    private function resolveDeprecatedTaskReferences(string $processCode, array $rawProcessConfiguration): array
+    {
+        /** @var array<string, mixed> $tasks */
+        $tasks = $rawProcessConfiguration['tasks'];
+        // Only when a reference is unknown (an unknown reference is reported by checkTaskReferences())
+        $references = [$rawProcessConfiguration['entry_point'] ?? null, $rawProcessConfiguration['end_point'] ?? null];
+        foreach ($tasks as $rawTaskConfiguration) {
+            foreach (['outputs', 'error_outputs', 'errors'] as $key) {
+                $references = [...$references, ...(\is_array($rawTaskConfiguration[$key] ?? null) ? $rawTaskConfiguration[$key] : [])];
+            }
+        }
+        $unknownReferences = array_filter(
+            $references,
+            static fn (mixed $reference): bool => \is_string($reference) && !\array_key_exists($reference, $tasks)
+        );
+        if ([] === $unknownReferences) {
+            return $rawProcessConfiguration;
+        }
+        $aliases = DeprecatedCodeAliases::create(array_keys($tasks));
+        $resolve = static function (string $reference, string $key) use ($aliases, $processCode): string {
+            if (!\array_key_exists($reference, $aliases)) {
+                return $reference;
+            }
+            // @deprecated since 5.7, the former name will not be found in v6.0
+            trigger_deprecation(
+                'cleverage/process-bundle',
+                '5.7',
+                'Referencing the task "%s" of the process "%s" by the name "%s" in "%s", with underscores instead of dashes, is deprecated: use its code "%s". The dashes of the codes were replaced by underscores before 5.7, the former name will not be found in v6.0.',
+                $aliases[$reference],
+                $processCode,
+                $reference,
+                $key,
+                $aliases[$reference],
+            );
+
+            return $aliases[$reference];
+        };
+        foreach (['entry_point', 'end_point'] as $key) {
+            if (\is_string($rawProcessConfiguration[$key] ?? null)) {
+                $rawProcessConfiguration[$key] = $resolve($rawProcessConfiguration[$key], $key);
+            }
+        }
+        foreach ($tasks as $taskCode => $rawTaskConfiguration) {
+            if (!\is_array($rawTaskConfiguration)) {
+                continue;
+            }
+            foreach (['outputs', 'error_outputs', 'errors'] as $key) {
+                if (\is_array($rawTaskConfiguration[$key] ?? null)) {
+                    $rawTaskConfiguration[$key] = array_map(
+                        static fn (mixed $reference): mixed => \is_string($reference) ? $resolve($reference, $key) : $reference,
+                        $rawTaskConfiguration[$key]
+                    );
+                }
+            }
+            $tasks[$taskCode] = $rawTaskConfiguration;
+        }
+        $rawProcessConfiguration['tasks'] = $tasks;
+
+        return $rawProcessConfiguration;
     }
 
     protected function resolveConfiguration(string $processCode): void
@@ -100,7 +203,7 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
         if (\array_key_exists($processCode, $this->processConfigurations)) {
             return;
         }
-        $rawProcessConfiguration = $this->rawConfiguration[$processCode];
+        $rawProcessConfiguration = $this->resolveDeprecatedTaskReferences($processCode, $this->rawConfiguration[$processCode]);
         /** @var TaskConfiguration[] $taskConfigurations */
         $taskConfigurations = [];
         /** @var array<string, string> $errorOutputsKeys */

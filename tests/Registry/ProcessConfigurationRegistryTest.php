@@ -27,6 +27,7 @@ use Psr\Log\AbstractLogger;
 #[CoversClass(InvalidProcessConfigurationException::class)]
 #[UsesClass(ProcessConfiguration::class)]
 #[UsesClass(TaskConfiguration::class)]
+#[UsesClass(\CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases::class)]
 class ProcessConfigurationRegistryTest extends TestCase
 {
     public function testTaskCodeNotResolvedAtCompileTimeThrows(): void
@@ -222,5 +223,63 @@ class ProcessConfigurationRegistryTest extends TestCase
                 'log_level' => null,
             ], $tasks),
         ];
+    }
+
+    public function testTheCodesWithDashesAreKept(): void
+    {
+        $registry = new ProcessConfigurationRegistry([
+            'demo.x-y' => $this->rawProcess(
+                ['first-task' => ['outputs' => ['next-task']], 'next-task' => []],
+                ['entry_point' => 'first-task', 'end_point' => 'next-task']
+            ),
+        ], 'stop');
+
+        $processConfiguration = $registry->getProcessConfiguration('demo.x-y');
+
+        self::assertSame('demo.x-y', $processConfiguration->getCode());
+        self::assertSame('first-task', $processConfiguration->getEntryPoint()?->getCode());
+        self::assertSame(['next-task'], array_map(
+            static fn (TaskConfiguration $task): string => $task->getCode(),
+            $processConfiguration->getTaskConfiguration('first-task')->getNextTasksConfigurations()
+        ));
+    }
+
+    /**
+     * The former names (dashes replaced by underscores before 5.7) still work, with a deprecation.
+     */
+    public function testTheFormerNamesAreDeprecated(): void
+    {
+        $registry = new ProcessConfigurationRegistry([
+            'demo.x-y' => $this->rawProcess(
+                ['first-task' => ['outputs' => ['next_task'], 'error_outputs' => ['error-task']], 'next-task' => [], 'error-task' => []],
+                ['entry_point' => 'first_task']
+            ),
+        ], 'stop');
+
+        self::assertTrue($registry->hasProcessConfiguration('demo.x_y'));
+        self::assertFalse($registry->hasProcessConfiguration('demo.x.y'));
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            $processConfiguration = $registry->getProcessConfiguration('demo.x_y');
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame('demo.x-y', $processConfiguration->getCode());
+        self::assertSame('first-task', $processConfiguration->getEntryPoint()?->getCode());
+        self::assertSame(['next-task'], array_map(
+            static fn (TaskConfiguration $task): string => $task->getCode(),
+            $processConfiguration->getTaskConfiguration('first-task')->getNextTasksConfigurations()
+        ));
+        self::assertSame([
+            'Since cleverage/process-bundle 5.7: Using the process "demo.x-y" by the name "demo.x_y", with underscores instead of dashes, is deprecated: use its code "demo.x-y". The dashes of the codes were replaced by underscores before 5.7, the former name will not be found in v6.0.',
+            'Since cleverage/process-bundle 5.7: Referencing the task "first-task" of the process "demo.x-y" by the name "first_task" in "entry_point", with underscores instead of dashes, is deprecated: use its code "first-task". The dashes of the codes were replaced by underscores before 5.7, the former name will not be found in v6.0.',
+            'Since cleverage/process-bundle 5.7: Referencing the task "next-task" of the process "demo.x-y" by the name "next_task" in "outputs", with underscores instead of dashes, is deprecated: use its code "next-task". The dashes of the codes were replaced by underscores before 5.7, the former name will not be found in v6.0.',
+        ], $deprecations);
     }
 }
