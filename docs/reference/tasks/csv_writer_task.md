@@ -36,6 +36,7 @@ Options
 | `mode`            | `string`      |          | `wb`    | File open mode (see [fopen mode parameter](https://www.php.net/manual/en/function.fopen.php))                                                                                               |
 | `split_character` | `string`      |          | `\|`    | Used to implode array values                                                                                                                                                                |
 | `write_headers`   | `bool`        |          | `true`  | Write the headers as first line, only if the file is empty (useful with an append `mode`); cast to `bool`                                                                                   |
+| `escape_formulas` | `bool`        |          | `false` | Prefix with a single quote the values and the headers starting with `=`, `-`, `+`, `@`, a tabulation, a carriage return or a line feed, so that a spreadsheet application does not interpret them as formulas (see [notes](#notes)) |
 
 Examples
 --------
@@ -59,6 +60,17 @@ write:
     file_path: '%kernel.project_dir%/var/data/csv_writer_{date_time}.csv'
 ```
 
+* Write a file opened by users in a spreadsheet application, with values coming from outside (CSV injection)
+
+```yaml
+# Task configuration level
+write:
+  task: csv_writer
+  options:
+    file_path: '%kernel.project_dir%/var/data/customers.csv'
+    escape_formulas: true
+```
+
 * Append lines to an existing file, with fixed headers
 
 ```yaml
@@ -80,3 +92,10 @@ Notes
 * An input that is not an `array` throws an `UnexpectedValueException`.
 * Each input must contain every header key (extra keys are not allowed: the number of columns must match the number of
   headers), otherwise an `UnexpectedValueException` is thrown. Columns are written in the headers order.
+* A value starting with `=`, `+`, `-` or `@` is interpreted as a formula when the file is opened in a spreadsheet
+  application (CSV injection, see [OWASP](https://owasp.org/www-community/attacks/CSV_Injection)): it can display
+  misleading data or exfiltrate data of the sheet through a link. When the values come from outside (user inputs, an
+  API...) and the file is opened by users, enable `escape_formulas` (same characters as the `csv_escape_formulas`
+  context of the Symfony Serializer `CsvEncoder`): the value is prefixed with a single quote, displayed as text (the quote
+  is hidden by most spreadsheet applications, but kept by other readers of the file). Strings, numbers and `Stringable`
+  objects are escaped, after the implode of the arrays: a negative number (`-5`) is then written as text (`'-5`).
