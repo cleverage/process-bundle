@@ -15,6 +15,7 @@ namespace CleverAge\ProcessBundle\Transformer\Object;
 
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
 /**
@@ -38,6 +39,14 @@ class PropertyAccessorTransformer implements ConfigurableTransformerInterface
             return null;
         }
 
+        // A property of a value that is neither an array nor an object is not readable, instead of the TypeError of
+        // the PropertyAccessor
+        if (!\is_array($value) && !\is_object($value)) {
+            if ($options['ignore_missing']) {
+                return null;
+            }
+            throw new NoSuchPropertyException(\sprintf('Cannot read the property "%s" of a value of type "%s": the input must be an array or an object.', $options['property_path'], get_debug_type($value)));
+        }
         if ($options['ignore_missing'] && !$this->accessor->isReadable($value, $options['property_path'])) {
             return null;
         }

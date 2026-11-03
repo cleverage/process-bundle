@@ -92,6 +92,52 @@ class MappingTransformerTest extends TestCase
         $transformer->transform((object) ['field' => 'value'], $options);
     }
 
+    /**
+     * @return iterable<string, array{mixed, string}>
+     */
+    public static function nonArrayInputProvider(): iterable
+    {
+        yield 'null' => [null, 'null'];
+        yield 'string' => ['abc', 'string'];
+        yield 'int' => [42, 'int'];
+        yield 'bool' => [false, 'bool'];
+    }
+
+    #[DataProvider('nonArrayInputProvider')]
+    public function testNonArrayInputThrowsWhenNotIgnored(mixed $value, string $type): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, [
+            'mapping' => [
+                'name' => ['code' => '[name]'],
+            ],
+        ]);
+
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot read the property "[name]" of a value of type "%s": the input must be an array or an object.', $type));
+
+        $transformer->transform($value, $options);
+    }
+
+    #[DataProvider('nonArrayInputProvider')]
+    public function testNonArrayInputIsMissingWithIgnoreMissing(mixed $value, string $type): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, [
+            'ignore_missing' => true,
+            'mapping' => [
+                'index' => ['code' => '[name]'],
+                'property' => ['code' => 'name'],
+                'several' => ['code' => ['[a]', 'b']],
+                // Not read from the input
+                'whole' => ['code' => '.'],
+                'constant' => ['constant' => 'c'],
+            ],
+        ]);
+
+        self::assertSame(['several' => [], 'whole' => $value, 'constant' => 'c'], $transformer->transform($value, $options));
+    }
+
     public function testMissingPropertyIsLogged(): void
     {
         $logger = $this->createCollectingLogger();

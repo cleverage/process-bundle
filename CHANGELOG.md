@@ -4,6 +4,9 @@ Latest
 ## Changes
 * [#426](https://github.com/cleverage/process-bundle/issues/426) A task code referenced by the `outputs`, the `error_outputs` (or the deprecated `errors`) of a task or by the `entry_point` / `end_point` of a process, and that is not a task of this process, is deprecated when the container is compiled: the deprecation names the process, the task and the key holding the reference. It will be rejected when the container is compiled in v6.0; the process already fails when it is executed (#372). Update documentation, add tests.
 
+## Fixes
+* [#430](https://github.com/cleverage/process-bundle/issues/430) `mapping` / `property_accessor`: an input that is neither an array nor an object (`null`, a scalar) has no readable property. With `ignore_missing`, its properties are missing (skipped by `mapping`, `null` for `property_accessor`); otherwise a `NoSuchPropertyException` naming the property and the type of the input is thrown, instead of the `TypeError` of the PropertyAccessor (`must be of type object|array, null given`) thrown in both cases. Update documentation, add tests.
+
 v5.7
 -----
 

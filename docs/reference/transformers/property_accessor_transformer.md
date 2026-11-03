@@ -13,14 +13,17 @@ Transformer reference
 Accepted inputs
 ---------------
 
-`array` or `object` readable by the PropertyAccessor. `null` is accepted only when `ignore_null` is `true`.
+`array` or `object` readable by the PropertyAccessor. Any other input (`null`, a scalar) has no readable property: it
+gives `null` with `ignore_missing` (or, for `null`, with `ignore_null`), and otherwise throws a
+`NoSuchPropertyException` (`Cannot read the property "[name]" of a value of type "null": the input must be an array or
+an object.`).
 
 Possible outputs
 ----------------
 
 * `any`: the value found at the property path
-* `null` if the input is `null` and `ignore_null` is `true`, or if the path is not readable and `ignore_missing` is
-  `true`
+* `null` if the input is `null` and `ignore_null` is `true`, or if the path is not readable (including an input that is
+  neither an array nor an object) and `ignore_missing` is `true`
 
 Options
 -------
