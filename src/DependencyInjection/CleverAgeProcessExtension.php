@@ -72,6 +72,7 @@ class CleverAgeProcessExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
         $this->checkErrorStrategies($container, $config['configurations']);
+        $this->checkTaskReferences($container, $config['configurations']);
 
         $processConfigurationRegistry = $container->getDefinition('cleverage_process.registry.process_configuration');
         $processConfigurationRegistry->replaceArgument(0, $config['configurations']);
@@ -127,6 +128,58 @@ class CleverAgeProcessExtension extends Extension
                     $taskCode,
                     $processCode
                 );
+            }
+        }
+    }
+
+    /**
+     * A task reference (outputs, error outputs, entry point, end point) that is not a task of its process only fails
+     * when the process configuration is resolved (InvalidProcessConfigurationException).
+     *
+     * @param array<string, array{tasks: array<string, array<string, mixed>>, entry_point?: mixed, end_point?: mixed}> $configurations
+     */
+    protected function checkTaskReferences(ContainerBuilder $container, array $configurations): void
+    {
+        foreach ($configurations as $processCode => $processConfiguration) {
+            $tasks = $processConfiguration['tasks'];
+            // Former names of the tasks whose code has a dash: deprecated on their own when the process is resolved
+            $aliases = DeprecatedCodeAliases::create(array_keys($tasks));
+            $isUnknown = static fn (mixed $reference): bool => \is_string($reference)
+                && !\array_key_exists($reference, $tasks)
+                && !\array_key_exists($reference, $aliases)
+                // An environment variable is only known at runtime
+                && !str_contains((string) $container->resolveEnvPlaceholders($reference), '%env(');
+
+            foreach ($tasks as $taskCode => $taskConfiguration) {
+                foreach (['outputs', 'error_outputs', 'errors'] as $key) {
+                    $references = \is_array($taskConfiguration[$key] ?? null) ? $taskConfiguration[$key] : [];
+                    foreach (array_unique(array_filter($references, $isUnknown)) as $reference) {
+                        // @deprecated since 5.8, an exception will be thrown in v6.0
+                        trigger_deprecation(
+                            'cleverage/process-bundle',
+                            '5.8',
+                            'The task "%s" in the "%s" of the task "%s" of the process "%s" is not a task of this process. Unknown task references are deprecated, they will be rejected when the container is compiled in v6.0 (the process already fails when it is executed).',
+                            $reference,
+                            $key,
+                            $taskCode,
+                            $processCode
+                        );
+                    }
+                }
+            }
+            foreach (['entry_point', 'end_point'] as $key) {
+                $reference = $processConfiguration[$key] ?? null;
+                if ($isUnknown($reference)) {
+                    // @deprecated since 5.8, an exception will be thrown in v6.0
+                    trigger_deprecation(
+                        'cleverage/process-bundle',
+                        '5.8',
+                        'The task "%s" in the "%s" of the process "%s" is not a task of this process. Unknown task references are deprecated, they will be rejected when the container is compiled in v6.0 (the process already fails when it is executed).',
+                        $reference,
+                        $key,
+                        $processCode
+                    );
+                }
             }
         }
     }

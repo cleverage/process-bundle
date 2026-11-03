@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Tests\DependencyInjection;
 
+use CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases;
 use CleverAge\ProcessBundle\DependencyInjection\CleverAgeProcessExtension;
 use CleverAge\ProcessBundle\DependencyInjection\Configuration;
 use CleverAge\ProcessBundle\Tests\IgnoreDeprecationsTrait;
@@ -23,6 +24,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(Configuration::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(CleverAgeProcessExtension::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(DeprecatedCodeAliases::class)]
 class ConfigurationTest extends TestCase
 {
     use IgnoreDeprecationsTrait;
@@ -190,6 +192,55 @@ class ConfigurationTest extends TestCase
         self::assertSame(
             ['Since cleverage/process-bundle 5.4: The error strategy "skp" of the task "typo" of the process "test.process" is unknown, use "skip" or "stop" (or remove it to use the "default_error_strategy"). Unknown error strategies are deprecated, they will be rejected in v6.0.'],
             $deprecations
+        );
+    }
+
+    public function testUnknownTaskReferenceIsDeprecated(): void
+    {
+        $container = new ContainerBuilder();
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            (new CleverAgeProcessExtension())->load([['configurations' => [
+                'test.valid' => [
+                    'entry_point' => 'first-task',
+                    'end_point' => 'last',
+                    'tasks' => [
+                        // Former name of "next-task": deprecated on its own when the process is resolved
+                        'first-task' => ['task' => 'transformer', 'outputs' => ['next_task'], 'error_outputs' => ['last']],
+                        'next-task' => ['task' => 'transformer', 'outputs' => ['last']],
+                        // Placeholder of the environment variable, as given to the extension
+                        'env' => ['task' => 'transformer', 'outputs' => [$container->getParameterBag()->resolveValue('%env(APP_NEXT_TASK)%')]],
+                        'last' => ['task' => 'transformer'],
+                    ],
+                ],
+                'test.invalid' => [
+                    'entry_point' => 'missing_entry',
+                    'end_point' => 'missing_end',
+                    'tasks' => [
+                        'read' => ['task' => 'transformer', 'outputs' => ['missing', 'write', 'missing'], 'error_outputs' => ['missing_error']],
+                        'write' => ['task' => 'transformer', 'errors' => ['missing_deprecated_error']],
+                    ],
+                ],
+            ]]], $container);
+        } finally {
+            restore_error_handler();
+        }
+
+        $suffix = ' is not a task of this process. Unknown task references are deprecated, they will be rejected when the container is compiled in v6.0 (the process already fails when it is executed).';
+        self::assertSame(
+            [
+                'Since cleverage/process-bundle 5.8: The task "missing" in the "outputs" of the task "read" of the process "test.invalid"'.$suffix,
+                'Since cleverage/process-bundle 5.8: The task "missing_error" in the "error_outputs" of the task "read" of the process "test.invalid"'.$suffix,
+                'Since cleverage/process-bundle 5.8: The task "missing_deprecated_error" in the "errors" of the task "write" of the process "test.invalid"'.$suffix,
+                'Since cleverage/process-bundle 5.8: The task "missing_entry" in the "entry_point" of the process "test.invalid"'.$suffix,
+                'Since cleverage/process-bundle 5.8: The task "missing_end" in the "end_point" of the process "test.invalid"'.$suffix,
+            ],
+            array_values(array_filter($deprecations, static fn (string $message): bool => str_contains($message, 'Unknown task references')))
         );
     }
 

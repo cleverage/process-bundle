@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Tests\DependencyInjection\Compiler;
 
+use CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases;
 use CleverAge\ProcessBundle\DependencyInjection\CleverAgeProcessExtension;
 use CleverAge\ProcessBundle\DependencyInjection\Compiler\TaskLocatorCompilerPass;
 use CleverAge\ProcessBundle\DependencyInjection\Configuration;
@@ -31,6 +32,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 #[CoversClass(TaskLocatorCompilerPass::class)]
 #[UsesClass(CleverAgeProcessExtension::class)]
 #[UsesClass(Configuration::class)]
+#[UsesClass(DeprecatedCodeAliases::class)]
 class TaskLocatorCompilerPassTest extends TestCase
 {
     use IgnoreDeprecationsTrait;
