@@ -249,10 +249,27 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             }
 
             // Finalize the process in a linear way
+            $finalizationError = null;
             foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
                 // Never finalized twice, even if the process fails after this point
                 unset($tasksToFinalize[spl_object_id($taskConfiguration)]);
+                $state = $taskConfiguration->getState();
+                // Already failed (initialization failure of a task never reached): not a finalization failure
+                $failedBefore = $state->isStopped() && $state->getException() instanceof \Throwable;
                 $this->finalize($taskConfiguration);
+                if (!$failedBefore && !$finalizationError instanceof \Throwable
+                    && $state->isStopped() && $state->getException() instanceof \Throwable) {
+                    $finalizationError = ProcessFailedException::create(
+                        $processCode,
+                        $taskConfiguration->getCode(),
+                        $state->getException()
+                    );
+                }
+            }
+            // After the finalization of every task: a finalization failure makes the process fail (it ended as
+            // succeeded, while flagged and logged as failed)
+            if ($finalizationError instanceof \Throwable) {
+                throw $finalizationError;
             }
 
             $this->endProcess($processHistory);

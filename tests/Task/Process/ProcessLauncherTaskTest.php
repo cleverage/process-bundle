@@ -176,6 +176,39 @@ class ProcessLauncherTaskTest extends TestCase
         unlink($bufferPath);
     }
 
+    /**
+     * The process has failed or has been stopped: the sub-processes still running are stopped (they went on with their
+     * side effects), and the buffers that will never be output are removed.
+     */
+    public function testTheSubprocessesAreStoppedWhenTheTaskIsFinalized(): void
+    {
+        [$task, $state, $runningBufferPath] = $this->launch('sleep', wait: false);
+        [, , $terminatedBufferPath] = $this->launch('write', $task, $state);
+        $launchedProcesses = (new \ReflectionProperty($task, 'launchedProcesses'))->getValue($task);
+        $this->assertIsArray($launchedProcesses);
+        $runningSubprocess = reset($launchedProcesses);
+        $this->assertInstanceOf(SubprocessInstance::class, $runningSubprocess);
+        $this->assertTrue($runningSubprocess->getProcess()->isRunning());
+
+        $task->finalize($state);
+
+        $this->assertFalse($runningSubprocess->getProcess()->isRunning());
+        $this->assertFileDoesNotExist($runningBufferPath);
+        $this->assertFileDoesNotExist($terminatedBufferPath);
+        $this->assertSame([], (new \ReflectionProperty($task, 'launchedProcesses'))->getValue($task));
+        // Nothing left to output
+        $this->assertFalse($task->next($state));
+    }
+
+    public function testFinalizeWithoutSubprocess(): void
+    {
+        $task = $this->createTask();
+
+        $task->finalize($this->createState(['process' => 'child']));
+
+        $this->assertSame([], (new \ReflectionProperty($task, 'launchedProcesses'))->getValue($task));
+    }
+
     protected function tearDown(): void
     {
         if (isset($this->consoleDir)) {

@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle\Task\Process;
 use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
 use CleverAge\ProcessBundle\Exception\RuntimeException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
+use CleverAge\ProcessBundle\Model\FinalizableTaskInterface;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -32,7 +33,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  *
  * @final since 5.4
  */
-class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface
+class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface, FinalizableTaskInterface
 {
     /**
      * @var SubprocessInstance[]
@@ -136,6 +137,29 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         usleep($this->getOption($state, 'sleep_on_finalize_interval'));
 
         return false;
+    }
+
+    /**
+     * Stop the sub-processes still running at the end of the process, and remove the buffers that will never be
+     * output. Only when the process has failed or has been stopped: otherwise, the task has waited for every
+     * sub-process. The sub-processes went on with their side effects, their error output no longer read.
+     */
+    public function finalize(ProcessState $state): void
+    {
+        $running = 0;
+        foreach ($this->launchedProcesses as $process) {
+            if (!$process->getProcess()->isTerminated()) {
+                ++$running;
+            }
+            $process->stop(5);
+            $process->removeBuffer();
+        }
+        if ($running > 0) {
+            $this->logger->warning("{$running} sub-process(es) still running at the end of the process have been stopped");
+        }
+        $this->launchedProcesses = [];
+        $this->finishedBuffers = new \SplQueue();
+        $this->flushMode = false;
     }
 
     protected function handleInput(ProcessState $state): void

@@ -34,6 +34,10 @@ it must run with the same user. Without `json_buffering`, the task outputs nothi
 If a sub-process exits with a non-zero code, its error output is logged as critical, all running sub-processes are
 stopped and a `RuntimeException` is thrown.
 
+When the process fails or is stopped (stop request, [StopTask](stop_task.md)) while sub-processes are still running,
+they are stopped when the task is finalized (a warning is logged), and the JSON stream files not output yet are removed:
+the sub-processes no longer go on with their side effects after the end of the process.
+
 Options
 -------
 
@@ -73,5 +77,6 @@ Notes
   environment as the current one (`--env`), the arguments of the service.
 * The JSON stream files output by the task are not removed by it: remove them once read (e.g. with a
   [file remover](file_remover_task.md) task). The task only removes the files it does not output: empty ones, and
-  those of a failed sub-process and of the still running sub-processes stopped because of it.
+  those of a failed sub-process and of the still running sub-processes stopped because of it or at the end of the
+  process.
 * The incremental error output (stderr) of the running sub-processes is echoed directly.
