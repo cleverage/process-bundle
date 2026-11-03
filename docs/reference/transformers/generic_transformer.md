@@ -67,7 +67,7 @@ clever_age_process:
     uppercase:
       transformers:
         callback:
-          callback: strtoupper
+          callback: mb_strtoupper
 ```
 
 ```yaml
@@ -75,7 +75,7 @@ clever_age_process:
 uppercase: ~
 ```
 
-* Definition with contextual options, and usage: `substr($value, 2, null)`
+* Definition with contextual options, and usage: `mb_substr($value, 2, null)`
 
 ```yaml
 # Bundle configuration level (config/packages/*.yaml)
@@ -89,7 +89,7 @@ clever_age_process:
           default_is_null: true
       transformers:
         callback:
-          callback: substr
+          callback: mb_substr
           right_parameters: ['{{ offset }}', '{{ length }}']
 ```
 

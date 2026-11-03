@@ -14,13 +14,18 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests\Transformer\Xml;
 
 use CleverAge\ProcessBundle\Transformer\Xml\XpathEvaluatorTransformer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(XpathEvaluatorTransformer::class)]
 #[\PHPUnit\Framework\Attributes\CoversMethod(XpathEvaluatorTransformer::class, 'buildXpath')]
 #[\PHPUnit\Framework\Attributes\CoversMethod(XpathEvaluatorTransformer::class, 'query')]
 #[\PHPUnit\Framework\Attributes\CoversMethod(XpathEvaluatorTransformer::class, 'transform')]
 #[\PHPUnit\Framework\Attributes\CoversMethod(XpathEvaluatorTransformer::class, 'getCode')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(XpathEvaluatorTransformer::class, 'configureOptions')]
+#[\PHPUnit\Framework\Attributes\CoversMethod(XpathEvaluatorTransformer::class, 'configureQueryOptions')]
 class XpathEvaluatorTransformerTest extends TestCase
 {
     public function testSimpleQuery(): void
@@ -143,5 +148,90 @@ class XpathEvaluatorTransformerTest extends TestCase
         $this->expectExceptionMessage('The node does not belong to a document');
 
         (new XpathEvaluatorTransformer())->buildXpath(new \DOMElement('a'));
+    }
+
+    /**
+     * @return iterable<string, array{string, mixed}>
+     */
+    public static function provideScalarExpressions(): iterable
+    {
+        yield 'number' => ['count(//item)', 2.0];
+        yield 'string' => ['string(//item[2]/@id)', 'b'];
+        yield 'boolean' => ['//item = "2"', true];
+        yield 'sum' => ['sum(//item)', 3.0];
+    }
+
+    /**
+     * An expression returning a number, a string or a boolean gave null: query() returned an empty node list.
+     */
+    #[DataProvider('provideScalarExpressions')]
+    public function testScalarExpression(string $query, mixed $expected): void
+    {
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML('<items><item id="a">1</item><item id="b">2</item></items>');
+        $transformer = new XpathEvaluatorTransformer();
+
+        $this->assertSame($expected, $transformer->transform($domDocument, $this->resolve(['query' => $query])));
+    }
+
+    public function testScalarExpressionInASubquery(): void
+    {
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML('<items><item id="a">1</item><item id="b">2</item></items>');
+        $transformer = new XpathEvaluatorTransformer();
+
+        $this->assertSame(
+            ['count' => 2.0, 'first' => '1'],
+            $transformer->transform($domDocument, $this->resolve(['query' => ['count' => 'count(//item)', 'first' => '//item[1]/text()']]))
+        );
+    }
+
+    /**
+     * A document with a default namespace: its elements must be queried with a registered prefix (an unprefixed query
+     * gives no result, without error).
+     */
+    public function testNamespaces(): void
+    {
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML('<feed xmlns="http://www.w3.org/2005/Atom"><title>News</title></feed>');
+        $transformer = new XpathEvaluatorTransformer();
+
+        $this->assertNull($transformer->transform($domDocument, $this->resolve(['query' => '/feed/title/text()'])));
+        $this->assertSame('News', $transformer->transform($domDocument, $this->resolve([
+            'query' => '/atom:feed/atom:title/text()',
+            'namespaces' => ['atom' => 'http://www.w3.org/2005/Atom'],
+        ])));
+    }
+
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function provideInvalidNamespaces(): iterable
+    {
+        yield 'list' => [['http://www.w3.org/2005/Atom']];
+        yield 'empty prefix' => [['' => 'http://www.w3.org/2005/Atom']];
+        yield 'not a string' => [['atom' => 1]];
+        yield 'not an array' => ['atom'];
+    }
+
+    #[DataProvider('provideInvalidNamespaces')]
+    public function testInvalidNamespaces(mixed $namespaces): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+
+        $this->resolve(['query' => '/a', 'namespaces' => $namespaces]);
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return array<string, mixed>
+     */
+    private function resolve(array $options): array
+    {
+        $resolver = new OptionsResolver();
+        (new XpathEvaluatorTransformer())->configureOptions($resolver);
+
+        return $resolver->resolve($options);
     }
 }
