@@ -73,4 +73,18 @@ class TrimTransformerTest extends TestCase
 
         $this->assertEquals(['charlist' => " \t\n\r\0\x0B"], $resolvedOptions);
     }
+
+    /**
+     * trim() removes bytes: a multibyte character of the list cut the characters sharing its bytes ("Été" gave "\x89t").
+     */
+    public function testTransformWithAMultibyteCharlist(): void
+    {
+        $transformer = new TrimTransformer();
+
+        $this->assertSame('Ét', $transformer->transform('Été', ['charlist' => 'é']));
+        $this->assertSame('t', $transformer->transform('ÉtéÉ', ['charlist' => 'éÉ']));
+        $this->assertSame('t', $transformer->transform('« t »', ['charlist' => '« »']));
+        // A single-byte charlist keeps the ranges of trim()
+        $this->assertSame('123', $transformer->transform('abc123cba', ['charlist' => 'a..c']));
+    }
 }

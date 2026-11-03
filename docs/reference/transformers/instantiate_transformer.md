@@ -26,7 +26,7 @@ Options
 
 | Code    | Type     | Required | Default | Description                                |
 |---------|----------|:--------:|---------|--------------------------------------------|
-| `class` | `string` |  **X**   |         | Fully qualified class name to instantiate  |
+| `class` | `string` |  **X**   |         | Fully qualified class name to instantiate, must exist (checked with the configuration) |
 
 Examples
 --------

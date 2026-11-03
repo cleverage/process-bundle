@@ -40,6 +40,8 @@ class InstantiateTransformer implements ConfigurableTransformerInterface
     {
         $resolver->setRequired(['class']);
         $resolver->setAllowedTypes('class', ['string']);
+        // Rejected with the configuration, not with the first value
+        $resolver->setAllowedValues('class', static fn (string $class): bool => class_exists($class));
     }
 
     public function getCode(): string

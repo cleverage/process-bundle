@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -33,37 +34,37 @@ trait ConditionTrait
     protected function checkCondition(mixed $input, array $conditions): bool
     {
         foreach ($conditions['match'] as $key => $value) {
-            if (!$this->checkValue($input, $key, $value)) {
+            if (!$this->checkValue($input, (string) $key, $value)) {
                 return false;
             }
         }
 
         foreach ($conditions['empty'] as $key => $value) {
-            if (!$this->checkEmpty($input, $key)) {
+            if (!$this->checkEmpty($input, (string) $key)) {
                 return false;
             }
         }
 
         foreach ($conditions['match_regexp'] as $key => $value) {
-            if (!$this->checkValue($input, $key, $value, true, true)) {
+            if (!$this->checkValue($input, (string) $key, $value, true, true)) {
                 return false;
             }
         }
 
         foreach ($conditions['not_match'] as $key => $value) {
-            if (!$this->checkValue($input, $key, $value, false)) {
+            if (!$this->checkValue($input, (string) $key, $value, false)) {
                 return false;
             }
         }
 
         foreach ($conditions['not_empty'] as $key => $value) {
-            if ($this->checkEmpty($input, $key)) {
+            if ($this->checkEmpty($input, (string) $key)) {
                 return false;
             }
         }
 
         foreach ($conditions['not_match_regexp'] as $key => $value) {
-            if (!$this->checkValue($input, $key, $value, false, true)) {
+            if (!$this->checkValue($input, (string) $key, $value, false, true)) {
                 return false;
             }
         }
@@ -106,6 +107,21 @@ trait ConditionTrait
         $resolver->setAllowedTypes('empty', 'array');
         $resolver->setAllowedTypes('not_match_regexp', 'array');
         $resolver->setAllowedTypes('match_regexp', 'array');
+        // The list form of empty / not_empty (e.g. not_empty: ['[email]']): the values are the property paths
+        foreach (['empty', 'not_empty'] as $option) {
+            $resolver->setNormalizer($option, static function (Options $options, array $value): array {
+                $conditions = [];
+                foreach ($value as $key => $path) {
+                    if (\is_int($key) && \is_string($path)) {
+                        $conditions[$path] = null;
+                    } else {
+                        $conditions[$key] = $path;
+                    }
+                }
+
+                return $conditions;
+            });
+        }
     }
 
     /**

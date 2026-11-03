@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer\String;
 
+use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -39,6 +40,11 @@ class HashTransformer implements ConfigurableTransformerInterface
      */
     public function transform(mixed $value, array $options = []): string
     {
+        if (\is_array($value) || (\is_object($value) && !$value instanceof \Stringable)) {
+            // An array was hashed as the string "Array": the same hash for every array
+            throw new UnexpectedValueException(\sprintf('The hash transformer expects a string, %s given.', get_debug_type($value)));
+        }
+
         return hash((string) $options['algo'], (string) $value, $options['raw_output']);
     }
 
