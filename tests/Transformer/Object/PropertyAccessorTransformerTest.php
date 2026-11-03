@@ -59,9 +59,44 @@ class PropertyAccessorTransformerTest extends TestCase
         $transformer = $this->createTransformer();
         $options = $this->resolveOptions($transformer, ['property_path' => 'name']);
 
-        $this->expectException(\TypeError::class);
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage('Cannot read the property "name" of a value of type "null": the input must be an array or an object.');
 
         $transformer->transform(null, $options);
+    }
+
+    /**
+     * @return iterable<string, array{mixed, string}>
+     */
+    public static function nonArrayInputProvider(): iterable
+    {
+        yield 'null' => [null, 'null'];
+        yield 'string' => ['abc', 'string'];
+        yield 'int' => [42, 'int'];
+        yield 'bool' => [true, 'bool'];
+    }
+
+    #[DataProvider('nonArrayInputProvider')]
+    public function testNonArrayInputThrowsByDefault(mixed $value, string $type): void
+    {
+        $transformer = $this->createTransformer();
+        $options = $this->resolveOptions($transformer, ['property_path' => '[name]']);
+
+        $this->expectException(NoSuchPropertyException::class);
+        $this->expectExceptionMessage(\sprintf('Cannot read the property "[name]" of a value of type "%s"', $type));
+
+        $transformer->transform($value, $options);
+    }
+
+    #[DataProvider('nonArrayInputProvider')]
+    public function testNonArrayInputReturnsNullWithIgnoreMissing(mixed $value, string $type): void
+    {
+        $transformer = $this->createTransformer();
+
+        foreach (['[name]', 'name'] as $propertyPath) {
+            $options = $this->resolveOptions($transformer, ['property_path' => $propertyPath, 'ignore_missing' => true]);
+            self::assertNull($transformer->transform($value, $options));
+        }
     }
 
     public function testNullInputReturnsNullWithIgnoreNull(): void

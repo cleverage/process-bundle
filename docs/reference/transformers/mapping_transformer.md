@@ -136,6 +136,10 @@ Notes
 * Array values must be read with the index notation (`[key]`). By default, the Symfony PropertyAccessor returns `null`
   instead of throwing for a missing array index (`framework.property_access.throw_exception_on_invalid_index`), so
   `ignore_missing` mostly matters for objects.
+* An input that is neither an array nor an object (`null`, a scalar) has no readable property: with `ignore_missing`,
+  the properties read from it are skipped (`code: .`, `constant` and `set_null` still apply); otherwise a
+  `NoSuchPropertyException` is thrown (`Cannot read the property "[name]" of a value of type "null": the input must be
+  an array or an object.`).
 * When a sub-transformer fails, the thrown `TransformerException` reports the target property.
 * On an array destination, a target property that is not an index notation is added as a literal key: a simple
   property name (e.g. `name`) gives the `name` key. Doing so with a nested path (e.g. `address.city`, `address[city]`)

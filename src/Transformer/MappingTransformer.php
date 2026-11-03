@@ -20,6 +20,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
@@ -202,6 +203,11 @@ class MappingTransformer implements ConfigurableTransformerInterface
     {
         if ('.' === $sourceProperty) {
             return $input;
+        }
+        // A property of a value that is neither an array nor an object is missing (ignore_missing), instead of the
+        // TypeError of the PropertyAccessor
+        if (!\is_array($input) && !\is_object($input)) {
+            throw new NoSuchPropertyException(\sprintf('Cannot read the property "%s" of a value of type "%s": the input must be an array or an object.', $sourceProperty, get_debug_type($input)));
         }
 
         return $this->accessor->getValue($input, $sourceProperty);
