@@ -218,22 +218,7 @@ class TaskConfiguration
      */
     public function hasAncestor(self $taskConfig): bool
     {
-        foreach ($this->getPreviousTasksConfigurations() as $previousTaskConfig) {
-            // Avoid errors for direct ancestors
-            if ($this->getCode() === $previousTaskConfig->getCode()) {
-                continue;
-            }
-
-            if ($previousTaskConfig->getCode() === $taskConfig->getCode()) {
-                return true;
-            }
-
-            if ($previousTaskConfig->hasAncestor($taskConfig)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->hasRelative($taskConfig, static fn (self $task): array => $task->getPreviousTasksConfigurations());
     }
 
     /**
@@ -241,34 +226,35 @@ class TaskConfiguration
      */
     public function hasDescendant(self $taskConfig, bool $checkErrors = true): bool
     {
-        foreach ($this->getNextTasksConfigurations() as $nextTaskConfig) {
-            // Avoid errors for direct descendant
-            if ($this->getCode() === $nextTaskConfig->getCode()) {
-                continue;
-            }
+        return $this->hasRelative(
+            $taskConfig,
+            static fn (self $task): array => $checkErrors
+                ? [...$task->getNextTasksConfigurations(), ...$task->getErrorTasksConfigurations()]
+                : $task->getNextTasksConfigurations()
+        );
+    }
 
-            if ($nextTaskConfig->getCode() === $taskConfig->getCode()) {
-                return true;
-            }
-
-            if ($nextTaskConfig->hasDescendant($taskConfig, $checkErrors)) {
-                return true;
-            }
-        }
-
-        if ($checkErrors) {
-            foreach ($this->getErrorTasksConfigurations() as $errorTasksConfig) {
-                // Avoid errors for direct error descendant
-                if ($this->getCode() === $errorTasksConfig->getCode()) {
+    /**
+     * Each task is visited once (it was visited once per path, exponential with "diamonds"), and the search ends on a
+     * cycle. A direct reference of a task to itself is ignored, as before.
+     *
+     * @param \Closure(self): array<self> $relatives
+     */
+    private function hasRelative(self $taskConfig, \Closure $relatives): bool
+    {
+        $visited = [];
+        $stack = [$this];
+        while (null !== ($task = array_pop($stack))) {
+            foreach ($relatives($task) as $relative) {
+                if ($relative->getCode() === $task->getCode()) {
                     continue;
                 }
-
-                if ($errorTasksConfig->getCode() === $taskConfig->getCode()) {
+                if ($relative->getCode() === $taskConfig->getCode()) {
                     return true;
                 }
-
-                if ($errorTasksConfig->hasDescendant($taskConfig, $checkErrors)) {
-                    return true;
+                if (!isset($visited[$relative->getCode()])) {
+                    $visited[$relative->getCode()] = true;
+                    $stack[] = $relative;
                 }
             }
         }

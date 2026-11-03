@@ -276,11 +276,13 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
             }
         }
 
-        // Un-mark non-error branch (may be important for task that are in both branches)
+        // Un-mark non-error branch (may be important for task that are in both branches): the tasks reached from a root
+        // through outputs (markErrorBranch($root, false) stopped at the root, which is never marked)
+        $visited = [];
         foreach ($processConfig->getMainTaskGroup() as $taskCode) {
             $task = $taskConfigurations[$taskCode];
             if ($task->isRoot()) {
-                $this->markErrorBranch($task, false);
+                $this->unmarkMainBranch($task, $visited);
             }
         }
 
@@ -350,6 +352,21 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
                     );
                 }
             }
+        }
+    }
+
+    /**
+     * @param array<string, true> $visited
+     */
+    private function unmarkMainBranch(TaskConfiguration $taskConfig, array &$visited): void
+    {
+        if (isset($visited[$taskConfig->getCode()])) {
+            return;
+        }
+        $visited[$taskConfig->getCode()] = true;
+        $taskConfig->setInErrorBranch(false);
+        foreach ($taskConfig->getNextTasksConfigurations() as $nextTaskConfig) {
+            $this->unmarkMainBranch($nextTaskConfig, $visited);
         }
     }
 
