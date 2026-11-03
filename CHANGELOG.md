@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#426](https://github.com/cleverage/process-bundle/issues/426) A task code referenced by the `outputs`, the `error_outputs` (or the deprecated `errors`) of a task or by the `entry_point` / `end_point` of a process, and that is not a task of this process, is deprecated when the container is compiled: the deprecation names the process, the task and the key holding the reference. It will be rejected when the container is compiled in v6.0; the process already fails when it is executed (#372). Update documentation, add tests.
+
 v5.7
 -----
 

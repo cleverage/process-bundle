@@ -1,6 +1,16 @@
 Upgrade Guide
 =============
 
+## v5.8
+
+### Unknown task references
+
+A task code referenced by the `outputs` or the `error_outputs` of a task, or by the `entry_point` or the `end_point` of
+a process, and that is not a task of this process, is deprecated since 5.8 when the container is compiled (`Since
+cleverage/process-bundle 5.8: The task "missing" in the "outputs" of the task "read" of the process "app.import" is not
+a task of this process...`). Such a process already failed when executed, and is left out of the process lists since
+5.6. In 6.0, the container will not compile: fix the reference, or remove the process.
+
 ## v5.7
 
 ### Dashes in the codes

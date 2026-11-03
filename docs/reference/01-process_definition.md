@@ -81,10 +81,14 @@ reads its `ui` key to configure the launch form.
 ### Invalid task references
 
 The task codes referenced by the `entry_point` and the `end_point` of the process, and by the `outputs` and the
-`error_outputs` of its tasks, must be tasks of the process. They are not checked when the container is compiled, but
-when the process configuration is resolved: getting or executing the process throws an
-`InvalidProcessConfigurationException` naming the process, the unknown task and where it is referenced (e.g.
-`Unknown task 'missing' in the 'outputs' of the task 'read' (from process: app.import)`).
+`error_outputs` of its tasks, must be tasks of the process. Getting or executing a process with an unknown task
+reference throws an `InvalidProcessConfigurationException` naming the process, the unknown task and where it is
+referenced (e.g. `Unknown task 'missing' in the 'outputs' of the task 'read' (from process: app.import)`).
+
+Since 5.8, an unknown task reference is also deprecated when the container is compiled, so that it shows before the
+process is executed (`Since cleverage/process-bundle 5.8: The task "missing" in the "outputs" of the task "read" of
+the process "app.import" is not a task of this process...`): the container will not compile in v6.0. A reference given
+by an environment variable is only checked when the process is resolved.
 
 Such a process, as any process whose configuration is not valid, is left out of the lists of processes
 (`cleverage:process:list`, `ProcessConfigurationRegistryInterface::getProcessConfigurations()` used e.g. by the UI),
