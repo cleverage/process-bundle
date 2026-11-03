@@ -107,6 +107,23 @@ exception is rethrown; but a task error handled by the `stop` error strategy is 
 `getPrevious()`. Test it with `expectException(ProcessFailedException::class)`, and check the original exception with
 `getPrevious()` if needed.
 
+The test kernel must be known to `KernelTestCase`: the `KERNEL_CLASS` environment variable (e.g. `App\Kernel`) is set by
+the PHPUnit recipe of Symfony Flex (`symfony/test-pack`, in `phpunit.dist.xml` or `.env.test`). Without it, the test
+fails with "You must set the KERNEL_CLASS environment variable to the fully-qualified class name of your Kernel":
+
+```xml
+<!-- phpunit.dist.xml -->
+<php>
+    <server name="KERNEL_CLASS" value="App\Kernel" />
+</php>
+```
+
+With [cleverage/ui-process-bundle](https://github.com/cleverage/ui-process-bundle) installed, every execution is
+stored in database, also in the `test` environment: create the test database and its schema first (e.g.
+`bin/console doctrine:database:create --env=test` and `bin/console doctrine:migrations:migrate --env=test -n`), or
+the process fails as soon as it starts. Its `logs.store_in_database: false` option only disables the storage of the
+logs, not of the executions.
+
 ```yaml
 # config/packages/test/clever_age_process.yaml
 clever_age_process:

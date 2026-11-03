@@ -37,6 +37,15 @@ With [Symfony Flex](https://symfony.com/doc/current/setup/flex.html), the
 - `config/packages/process/`: the directory of your processes, one file per process (see
   [process definition](reference/01-process_definition.md)).
 
+The recipe comes from the `recipes-contrib` repository: Flex asks before applying it. In a non-interactive install (CI,
+Docker, `composer require -n`), it is skipped unless the contrib recipes are allowed, and the bundle is then not
+registered (`There are no commands defined in the "cleverage:process" namespace`). Allow them and install the recipe:
+
+```bash
+composer config extra.symfony.allow-contrib true
+composer recipes:install cleverage/process-bundle --force -v
+```
+
 Without Flex, add the following line to `config/bundles.php`:
 
 ```php

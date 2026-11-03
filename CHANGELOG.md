@@ -2,6 +2,7 @@ Latest
 ------
 
 ## Changes
+* [#406](https://github.com/cleverage/process-bundle/issues/406) Documentation: non-interactive install with Symfony Flex (`allow-contrib`, the recipe being in `recipes-contrib`), `$kernel` constructor parameter renamed in 5.4 in `UPGRADE.md` (breaks the named arguments), prerequisites of the functional test of `06-testing.md` (`KERNEL_CLASS`, test database with the UI bundle).
 * [#392](https://github.com/cleverage/process-bundle/issues/392) Documentation: reset of the process configurations between two messages of a worker (`kernel.reset`, #355), permissions of the JSON buffer of `process_launcher`, `ProcessManager` subclasses in `UPGRADE.md` (v5.5), broken link in the CHANGELOG.
 
 ## Fixes

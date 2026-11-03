@@ -18,6 +18,9 @@ Demo project can be found on [there](https://github.com/cleverage/process-bundle
 composer require cleverage/process-bundle
 ```
 
+In a non-interactive install (CI, Docker, `-n`), Symfony Flex skips the recipe (from `recipes-contrib`) unless
+`extra.symfony.allow-contrib` is `true`: see the [quick start](docs/01-quick_start.md).
+
 Without Symfony Flex, register the bundle in `config/bundles.php`:
 
 ```php
