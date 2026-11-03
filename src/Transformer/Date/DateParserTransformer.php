@@ -42,10 +42,22 @@ class DateParserTransformer implements ConfigurableTransformerInterface
             return \DateTime::createFromImmutable($value);
         }
 
+        if (\is_int($value) || \is_float($value) || \is_bool($value) || $value instanceof \Stringable) {
+            $value = (string) $value;
+        } elseif (!\is_string($value)) {
+            throw new UnexpectedValueException(\sprintf('The date_parser transformer expects a string, %s given.', get_debug_type($value)));
+        }
+
         $date = \DateTime::createFromFormat($options['format'], $value);
 
         if (!$date) {
             throw new UnexpectedValueException('Given value cannot be parsed into a date');
+        }
+        // An out-of-range value (e.g. "2024-02-31", "25:61") is parsed with a warning, the date overflowing to the next
+        // month or day
+        $errors = \DateTime::getLastErrors();
+        if (\is_array($errors) && [] !== $errors['warnings']) {
+            throw new UnexpectedValueException(\sprintf('Given value "%s" is not a valid date: %s', $value, implode(', ', $errors['warnings'])));
         }
 
         return $date;
