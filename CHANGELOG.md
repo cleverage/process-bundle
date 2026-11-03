@@ -1,6 +1,9 @@
 Latest
 ------
 
+v5.8
+-----
+
 ## Changes
 * [#432](https://github.com/cleverage/process-bundle/issues/432) Documentation: the `%f` conversion of the `sprintf` transformer depends on the locale set with `setlocale()` (`1,50` with `fr_FR.UTF-8`), `%F` is recommended for a number written to a file or sent to an API.
 * [#426](https://github.com/cleverage/process-bundle/issues/426) A task code referenced by the `outputs`, the `error_outputs` (or the deprecated `errors`) of a task or by the `entry_point` / `end_point` of a process, and that is not a task of this process, is deprecated when the container is compiled: the deprecation names the process, the task and the key holding the reference. It will be rejected when the container is compiled in v6.0; the process already fails when it is executed (#372). Update documentation, add tests.
