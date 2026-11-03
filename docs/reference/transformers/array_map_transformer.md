@@ -47,7 +47,7 @@ array_map:
         cast:
           type: 'string'
         callback:
-          callback: strtoupper
+          callback: mb_strtoupper
 ```
 
 * Convert each `stdClass` item into an array and remap it

@@ -25,7 +25,7 @@ Options
 
 | Code                    | Type            | Required | Default | Description                                                                                               |
 |-------------------------|-----------------|:--------:|---------|-----------------------------------------------------------------------------------------------------------|
-| `callback`              | `string\|array` |  **X**   |         | A valid PHP callable (e.g. `strtoupper`, `['App\MyClass', 'myStaticMethod']`), checked with `is_callable` |
+| `callback`              | `string\|array` |  **X**   |         | A valid PHP callable (e.g. `mb_strtoupper`, `['App\MyClass', 'myStaticMethod']`), checked with `is_callable` |
 | `left_parameters`       | `array`         |          | `[]`    | Parameters passed before the value                                                                        |
 | `right_parameters`      | `array`         |          | `[]`    | Parameters passed after the value                                                                         |
 | `additional_parameters` | `array`         |          | `[]`    | **Deprecated**: use `right_parameters` instead. Only used when `right_parameters` is empty                |
@@ -33,12 +33,13 @@ Options
 Examples
 --------
 
-* Simple PHP function
+* Simple PHP function (prefer the multibyte `mb_*` functions for texts: `strtoupper`, `strtolower` or `substr` work on
+  bytes, and break or leave the non-ASCII characters, e.g. `substr('été', 0, 1)` gives an invalid `"\xC3"`)
 
 ```yaml
 # Transformer options level
 callback:
-  callback: strtoupper
+  callback: mb_strtoupper
 ```
 
 * Function with extra parameters: `json_decode($value, true)`

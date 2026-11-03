@@ -4,7 +4,7 @@ XpathEvaluatorTransformer
 Evaluate one or several XPath queries on a `\DOMNode` and return the matching values or nodes. Requires the `dom` PHP
 extension.
 
-Queries are evaluated with [\DOMXPath::query](https://www.php.net/manual/en/domxpath.query.php), using the input node
+Queries are evaluated with [\DOMXPath::evaluate](https://www.php.net/manual/en/domxpath.evaluate.php), using the input node
 as context node: to query relatively to a sub element of the document, start the query with `.` (e.g. `./c/text()`);
 an absolute query (starting with `/`) always searches the whole document.
 
@@ -29,6 +29,8 @@ For a single query, depending on the options:
 * `\DOMNode`: the matching node (`single_result` is `true`, `unwrap_value` is `false`)
 * `null`: nothing matched (`single_result` and `ignore_missing` are `true`)
 * `array` of the above when `single_result` is `false`
+* `float`, `string` or `bool`: the value of an expression that does not return nodes (e.g. `count(...)`, `string(...)`,
+  `sum(...)`, a comparison), whatever the other options (before, `null`)
 
 When `query` is an array, the output is an `array` with the same keys, each value being the result of the matching
 subquery.
@@ -42,6 +44,7 @@ Options
 | `single_result`  | `bool`          |          | `true`  | Return a single value instead of a list; more than one result throws an `UnexpectedValueException`                                      |
 | `ignore_missing` | `bool`          |          | `true`  | Only used with `single_result`: return `null` when nothing matches, instead of throwing an `UnexpectedValueException`                   |
 | `unwrap_value`   | `bool`          |          | `true`  | Return the text value of each result; only `\DOMText` (use the `text()` selector) and `\DOMAttr` results are supported, others throw     |
+| `namespaces`     | `array`         |          | `[]`    | Prefix => namespace URI, registered for the queries (root level only). Needed to query the elements of a namespace, including the default namespace of a document (see below) |
 
 Each element of an array `query` is either a string (the subquery itself, using the root level options), or an array
 with the following options:
@@ -118,6 +121,14 @@ xpath_evaluator:
   unwrap_value: false
 ```
 
+* Count elements: `3.0` (an XPath number is a `float`)
+
+```yaml
+# Transformer options level
+xpath_evaluator:
+  query: 'count(/a/b/c)'
+```
+
 * Named subqueries, partially overriding root level options:
   `{all_c_values: ['ok1', 'ok2', 'ok3'], e_value: 'ok4', f_value: 'ok5'}`
 
@@ -131,4 +142,15 @@ xpath_evaluator:
     e_value: '/a/d/e/text()'
     f_value:
       subquery: '/a/d/f/text()'
+```
+
+* A document with a default namespace (e.g. an Atom feed, `<feed xmlns="http://www.w3.org/2005/Atom">`): XPath has no
+  default namespace, an unprefixed query (`/feed/title`) matches nothing, without error. Register a prefix for it:
+
+```yaml
+# Transformer options level
+xpath_evaluator:
+  query: '/atom:feed/atom:title/text()'
+  namespaces:
+    atom: 'http://www.w3.org/2005/Atom'
 ```
