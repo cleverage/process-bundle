@@ -13,7 +13,7 @@ RUN apk update && apk add \
     bash \
     icu-dev \
     && docker-php-ext-configure intl \
-    && docker-php-ext-install intl
+    && docker-php-ext-install intl pcntl
 
 RUN ln -s /usr/share/zoneinfo/Europe/Paris /etc/localtime \
     && sed -i "s/^;date.timezone =.*/date.timezone = Europe\/Paris/" $PHP_INI_DIR/php.ini
