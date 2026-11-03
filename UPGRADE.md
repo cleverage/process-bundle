@@ -196,6 +196,11 @@ Only relevant if you instantiate or decorate these services yourself:
 | `CommandRunnerTask`                         | `KernelInterface`                 | `%kernel.project_dir%`                            |
 | `ProcessLauncherTask`, `SubprocessInstance` | `KernelInterface`                 | console path and `%kernel.environment%`           |
 
+The `$kernel` parameter of these three constructors is renamed: `$projectDir` (`CommandRunnerTask`) and `$consolePath`
+(`ProcessLauncherTask`, `SubprocessInstance`). Passing the kernel is deprecated, but passing the argument by its name
+breaks: a service definition (`arguments: { $kernel: '@kernel' }`) or a call (`new CommandRunnerTask(kernel: $kernel)`)
+using the old name must use the new one.
+
 ### Exceptions
 
 The bundle throws its own exceptions implementing `ProcessExceptionInterface` (`InvalidArgumentException`,
