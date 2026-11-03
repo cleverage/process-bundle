@@ -1,6 +1,22 @@
 Upgrade Guide
 =============
 
+## v5.7
+
+### Dashes in the codes
+
+The codes of the processes, of their tasks and of the generic transformers keep their dashes. Before 5.7, the Symfony
+configuration replaced them by underscores (unless the code also had an underscore): `demo.x-y` was registered as
+`demo.x_y`, while the references to it kept the dash and failed (`Unknown process demo.x-y`, `No task configuration
+with code : next-task`, `No transformer with code : to-upper`). Such codes now work as written, and `cleverage:process:list`
+shows them with their dashes.
+
+If you used the former name (with underscores) of such a code, it still works but is deprecated since 5.7
+(`Since cleverage/process-bundle 5.7: Using the process "demo.x-y" by the name "demo.x_y"...`), and will not be found in
+6.0: use the code as written in the configuration, in the commands (`cleverage:process:execute demo.x-y`), the
+`process_executor` tasks, the task references (`outputs`, `error_outputs`, `entry_point`, `end_point`), the transformer
+references and the applications storing process codes (e.g. the schedules of the UI bundle).
+
 ## v5.6
 
 Two deprecations, and some behaviours change: check the points below.

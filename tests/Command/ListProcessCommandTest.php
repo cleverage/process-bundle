@@ -28,6 +28,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 #[UsesClass(TaskConfiguration::class)]
 #[UsesClass(ProcessConfigurationRegistry::class)]
 #[UsesClass(InvalidProcessConfigurationException::class)]
+#[UsesClass(\CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases::class)]
 class ListProcessCommandTest extends TestCase
 {
     public function testThePublicProcessesAreListedSortedByCode(): void

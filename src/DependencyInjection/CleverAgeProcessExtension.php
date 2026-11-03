@@ -15,6 +15,7 @@ namespace CleverAge\ProcessBundle\DependencyInjection;
 
 use CleverAge\ProcessBundle\Attribute\AsTask;
 use CleverAge\ProcessBundle\Attribute\AsTransformer;
+use CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Model\ProcessStopCheckerInterface;
 use CleverAge\ProcessBundle\Model\TaskInterface;
@@ -76,6 +77,13 @@ class CleverAgeProcessExtension extends Extension
         $processConfigurationRegistry->replaceArgument(0, $config['configurations']);
         $processConfigurationRegistry->replaceArgument(1, $config['default_error_strategy']);
         $processConfigurationRegistry->replaceArgument(2, $config['logs']);
+
+        // Former names of the generic transformers whose code has a dash (deprecated, see DeprecatedCodeAliases)
+        $genericTransformerCodes = array_keys($config['generic_transformers']);
+        if ([] !== array_filter($genericTransformerCodes, static fn (int|string $code): bool => str_contains((string) $code, '-'))) {
+            $container->getDefinition('cleverage_process.registry.transformer')
+                ->replaceArgument(1, DeprecatedCodeAliases::create($genericTransformerCodes));
+        }
 
         // Automatic transformer creation from config
         foreach ($config['generic_transformers'] as $transformerCode => $transformerConfig) {

@@ -29,6 +29,7 @@ use CleverAge\ProcessBundle\Registry\TransformerRegistryInterface;
 use CleverAge\ProcessBundle\Task\DummyTask;
 use CleverAge\ProcessBundle\Tests\Fixtures\AttributedTask;
 use CleverAge\ProcessBundle\Tests\Fixtures\AttributedTransformer;
+use CleverAge\ProcessBundle\Transformer\GenericTransformer;
 use CleverAge\ProcessBundle\Transformer\String\TrimTransformer;
 use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -45,6 +46,7 @@ use Symfony\Component\Yaml\Yaml;
 
 #[CoversClass(CleverAgeProcessExtension::class)]
 #[UsesClass(Configuration::class)]
+#[UsesClass(\CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases::class)]
 #[UsesClass(AsTransformer::class)]
 #[UsesClass(AsTask::class)]
 class CleverAgeProcessExtensionTest extends TestCase
@@ -217,6 +219,24 @@ class CleverAgeProcessExtensionTest extends TestCase
             [['method' => 'reset']],
             $container->getDefinition('cleverage_process.registry.process_configuration')->getTag('kernel.reset')
         );
+    }
+
+    /**
+     * The former names of the generic transformers whose code has a dash (dashes replaced by underscores before 5.7) are
+     * given to the transformer registry, as deprecated aliases.
+     */
+    public function testTheFormerNamesOfTheGenericTransformersAreGivenToTheRegistry(): void
+    {
+        $transformer = ['transformers' => ['callback' => ['callback' => 'mb_strtoupper']]];
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([], $container);
+        self::assertSame([], $container->getDefinition('cleverage_process.registry.transformer')->getArgument(1));
+
+        $container = new ContainerBuilder();
+        (new CleverAgeProcessExtension())->load([['generic_transformers' => ['to-upper' => $transformer, 'plain' => $transformer]]], $container);
+
+        self::assertSame(['to_upper' => 'to-upper'], $container->getDefinition('cleverage_process.registry.transformer')->getArgument(1));
+        self::assertTrue($container->hasDefinition(GenericTransformer::class.'\\to-upper'));
     }
 
     public function testTheDataQueueListenerIsDeprecated(): void

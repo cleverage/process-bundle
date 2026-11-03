@@ -33,6 +33,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[UsesClass(ProcessConfigurationRegistry::class)]
 #[UsesClass(ConsoleProcessEvent::class)]
 #[UsesClass(JsonStreamFile::class)]
+#[UsesClass(\CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases::class)]
 class ExecuteProcessCommandTest extends TestCase
 {
     private string $outputFile;

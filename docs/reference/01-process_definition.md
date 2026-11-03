@@ -47,6 +47,10 @@ Process attributes
 The process code (key of the `configurations` array) must be unique in the whole application: a process cannot be
 defined twice, even in different files.
 
+The codes of the processes, of their tasks and of the generic transformers are kept as written, dashes included
+(`demo.x-y`). Before 5.7, their dashes were replaced by underscores (`demo.x_y`), but not those of the references to
+them: the former name still works, with a deprecation, until v6.0.
+
 **description**: optional string to describe a process. Displayed in process list and help. Should not be too long
 (~ one line). Default is empty.
 

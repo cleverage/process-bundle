@@ -17,6 +17,7 @@ use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use CleverAge\ProcessBundle\Registry\TransformerRegistry;
 use CleverAge\ProcessBundle\Transformer\CastTransformer;
 use CleverAge\ProcessBundle\Transformer\String\TrimTransformer;
+use CleverAge\ProcessBundle\Transformer\TransformerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
@@ -134,5 +135,33 @@ class TransformerRegistryTest extends TestCase
         }
 
         return $deprecations;
+    }
+
+    /**
+     * The former name of a generic transformer whose code has a dash (dashes replaced by underscores before 5.7) still
+     * works, with a deprecation.
+     */
+    public function testTheFormerNamesOfTheGenericTransformersAreDeprecated(): void
+    {
+        $transformer = new class implements TransformerInterface {
+            public function transform(mixed $value, array $options = []): mixed
+            {
+                return $value;
+            }
+
+            public function getCode(): string
+            {
+                return 'to-upper';
+            }
+        };
+        $registry = new TransformerRegistry(new ServiceLocator(['to-upper' => static fn (): TransformerInterface => $transformer]), ['to_upper' => 'to-upper']);
+
+        self::assertTrue($registry->hasTransformer('to-upper'));
+        self::assertTrue($registry->hasTransformer('to_upper'));
+        self::assertSame([], $this->collectDeprecations(static fn () => self::assertSame($transformer, $registry->getTransformer('to-upper'))));
+        self::assertSame(
+            ['Since cleverage/process-bundle 5.7: Using the generic transformer "to-upper" by the name "to_upper", with underscores instead of dashes, is deprecated: use its code "to-upper". The dashes of the codes were replaced by underscores before 5.7, the former name will not be found in v6.0.'],
+            $this->collectDeprecations(static fn () => self::assertSame($transformer, $registry->getTransformer('to_upper')))
+        );
     }
 }
