@@ -64,6 +64,13 @@ empty:
   '[deleted_at]': ~
 ```
 
+Or, with the list form of `empty` and `not_empty`:
+
+```yaml
+not_empty: ['[email]']
+empty: ['[deleted_at]']
+```
+
 * Regular expressions, on an object input
 
 ```yaml

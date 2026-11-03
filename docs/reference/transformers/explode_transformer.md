@@ -24,7 +24,7 @@ Options
 
 | Code        | Type     | Required | Default | Description                                 |
 |-------------|----------|:--------:|---------|---------------------------------------------|
-| `delimiter` | `string` |  **X**   |         | The boundary string, must not be empty      |
+| `delimiter` | `string` |  **X**   |         | The boundary string, must not be empty (checked with the configuration) |
 
 Examples
 --------

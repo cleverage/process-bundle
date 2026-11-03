@@ -49,5 +49,7 @@ class ExplodeTransformer implements ConfigurableTransformerInterface
     {
         $resolver->setRequired(['delimiter']);
         $resolver->setAllowedTypes('delimiter', ['string']);
+        // explode() fails on an empty delimiter: rejected with the configuration, not with the first value
+        $resolver->setAllowedValues('delimiter', static fn (string $delimiter): bool => '' !== $delimiter);
     }
 }

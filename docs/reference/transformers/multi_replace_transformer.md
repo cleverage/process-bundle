@@ -26,7 +26,7 @@ Options
 
 | Code              | Type    | Required | Default | Description                                                                              |
 |-------------------|---------|:--------:|---------|------------------------------------------------------------------------------------------|
-| `replace_mapping` | `array` |  **X**   |         | Searched string as key, replacement as value. Entries are applied sequentially, in order |
+| `replace_mapping` | `array` |  **X**   |         | Searched string as key, replacement as value (a string or a scalar, cast to string; checked with the configuration). Entries are applied sequentially, in order |
 
 Examples
 --------

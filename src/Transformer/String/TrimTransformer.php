@@ -38,7 +38,14 @@ class TrimTransformer implements ConfigurableTransformerInterface
             return null;
         }
 
-        return trim((string) $value, $options['charlist']);
+        $charlist = $options['charlist'];
+        // trim() removes bytes: a multibyte character of the list would cut the characters sharing its bytes (ranges
+        // with ".." are only supported for single-byte characters)
+        if (1 === preg_match('/[\x80-\xff]/', $charlist)) {
+            return mb_trim((string) $value, $charlist);
+        }
+
+        return trim((string) $value, $charlist);
     }
 
     /**

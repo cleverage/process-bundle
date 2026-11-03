@@ -122,9 +122,12 @@ class ConvertValueTransformerTest extends TestCase
         self::assertSame($expected, $this->transform($value, ['auto_cast' => true]));
     }
 
-    public function testAutoCastKeepsCastValueWhenMissing(): void
+    /**
+     * The input itself, as documented, not its value cast by auto_cast.
+     */
+    public function testAutoCastKeepsTheInputWhenMissing(): void
     {
-        self::assertSame('2.5', $this->transform(2.5, ['auto_cast' => true, 'keep_missing' => true]));
+        self::assertSame(2.5, $this->transform(2.5, ['auto_cast' => true, 'keep_missing' => true]));
     }
 
     public function testArrayIsRejectedEvenWithAutoCast(): void

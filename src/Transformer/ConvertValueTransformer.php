@@ -34,6 +34,7 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
             return null;
         }
 
+        $input = $value;
         if (!\is_string($value) && !\is_int($value)) { // If not a valid array index
             if (!$options['auto_cast']) {
                 $type = \gettype($value);
@@ -47,7 +48,8 @@ class ConvertValueTransformer implements ConfigurableTransformerInterface
 
         if (!\array_key_exists($value, $options['map'])) {
             if ($options['keep_missing']) {
-                return $value;
+                // The input itself, not its value cast by auto_cast
+                return $input;
             }
             if (!$options['ignore_missing']) {
                 throw new UnexpectedValueException("Missing value in map '{$value}'");
