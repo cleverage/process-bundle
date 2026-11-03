@@ -30,12 +30,23 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
 {
+    /**
+     * First characters of a value interpreted as a formula by a spreadsheet application (as the CsvEncoder of the
+     * Symfony Serializer).
+     */
+    private const FORMULAS_START_CHARACTERS = ['=', '-', '+', '@', "\t", "\r", "\n"];
+
     public function execute(ProcessState $state): void
     {
         if (!$this->csv instanceof CsvFile) {
             $this->initFile($state);
             if ($this->getOption($state, 'write_headers') && 0 === filesize($this->csv->getFilePath())) {
-                $this->csv->writeHeaders();
+                if ($this->getOption($state, 'escape_formulas')) {
+                    // The headers of the file stay the keys of the inputs
+                    $this->csv->writeRaw(array_map($this->escapeFormula(...), $this->csv->getHeaders()));
+                } else {
+                    $this->csv->writeHeaders();
+                }
             }
         }
         $this->csv->writeLine($this->getInput($state));
@@ -54,8 +65,10 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
             'mode' => 'wb',
             'split_character' => '|',
             'write_headers' => true,
+            'escape_formulas' => false,
         ]);
         $resolver->setAllowedTypes('split_character', ['string']);
+        $resolver->setAllowedTypes('escape_formulas', ['bool']);
         // Any value used to be evaluated as a boolean: cast it instead of rejecting it
         $resolver->setNormalizer('write_headers', static fn (Options $options, mixed $value): bool => (bool) $value);
 
@@ -84,13 +97,31 @@ class CsvWriterTask extends AbstractCsvTask implements BlockingTaskInterface
         }
         $splitCharacter = $this->getOption($state, 'split_character');
 
+        $escapeFormulas = $this->getOption($state, 'escape_formulas');
         foreach ($input as &$item) {
             if (\is_array($item)) {
                 $item = implode($splitCharacter, $item);
             }
+            if ($escapeFormulas) {
+                $item = $this->escapeFormula($item);
+            }
         }
 
         return $input;
+    }
+
+    /**
+     * A value starting with a character of a formula, prefixed with a single quote: written as text by a spreadsheet
+     * application (CSV injection).
+     */
+    private function escapeFormula(mixed $value): mixed
+    {
+        if (!\is_string($value) && !\is_int($value) && !\is_float($value) && !$value instanceof \Stringable) {
+            return $value;
+        }
+        $value = (string) $value;
+
+        return \in_array(substr($value, 0, 1), self::FORMULAS_START_CHARACTERS, true) ? "'".$value : $value;
     }
 
     /**
