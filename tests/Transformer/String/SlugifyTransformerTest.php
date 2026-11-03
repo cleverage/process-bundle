@@ -60,6 +60,7 @@ class SlugifyTransformerTest extends TestCase
         yield 'transliterator' => [['transliterator' => 123]];
         yield 'replace' => [['replace' => ['/a/']]];
         yield 'separator' => [['separator' => []]];
+        yield 'strip_tags' => [['strip_tags' => 'yes']];
     }
 
     /**
@@ -86,6 +87,83 @@ class SlugifyTransformerTest extends TestCase
         $this->expectExceptionMessage('Unable to transliterate the value');
 
         $transformer->transform("a\xff", $this->resolveOptions($transformer));
+    }
+
+    /**
+     * The default transliterator only removes the accents: the letters that are not decomposed are removed with the
+     * replace pattern. Any-Latin; Latin-ASCII keeps them.
+     */
+    public function testLettersWithoutDecomposition(): void
+    {
+        $transformer = new SlugifyTransformer();
+
+        $this->assertSame('c_ur_stra_e_odz', $transformer->transform('Cœur Straße Łódź', $this->resolveOptions($transformer)));
+        $this->assertSame('coeur_strasse_lodz', $transformer->transform('Cœur Straße Łódź', $this->resolveOptions($transformer, [
+            'transliterator' => 'Any-Latin; Latin-ASCII',
+        ])));
+    }
+
+    /**
+     * strip_tags() removes everything after a "<".
+     */
+    public function testStripTags(): void
+    {
+        $transformer = new SlugifyTransformer();
+
+        $this->assertSame('tom', $transformer->transform('Tom<Jerry', $this->resolveOptions($transformer)));
+        $this->assertSame('tom_jerry', $transformer->transform('Tom<Jerry', $this->resolveOptions($transformer, ['strip_tags' => false])));
+        $this->assertSame('3_love', $transformer->transform('<3 love', $this->resolveOptions($transformer, ['strip_tags' => false])));
+    }
+
+    /**
+     * The characters left by the transliterator are lowercased too (strtolower() only lowercased ASCII letters).
+     */
+    public function testMultibyteLowercase(): void
+    {
+        $transformer = new SlugifyTransformer();
+        $options = $this->resolveOptions($transformer, ['transliterator' => 'NFC', 'replace' => '/[^\p{L}0-9]+/u']);
+
+        $this->assertSame('élan_ça', $transformer->transform('ÉLAN ÇA', $options));
+    }
+
+    public function testScalarAndStringableValues(): void
+    {
+        $transformer = new SlugifyTransformer();
+        $options = $this->resolveOptions($transformer);
+        $stringable = new class implements \Stringable {
+            public function __toString(): string
+            {
+                return 'Hélène';
+            }
+        };
+
+        $this->assertSame('123', $transformer->transform(123, $options));
+        $this->assertSame('1_5', $transformer->transform(1.5, $options));
+        $this->assertSame('helene', $transformer->transform($stringable, $options));
+    }
+
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function provideInvalidValues(): iterable
+    {
+        yield 'null' => [null];
+        yield 'array' => [['a']];
+        yield 'object' => [new \stdClass()];
+    }
+
+    /**
+     * A raw TypeError was thrown.
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidValues')]
+    public function testInvalidValues(mixed $value): void
+    {
+        $transformer = new SlugifyTransformer();
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('The slugify transformer expects a string, '.get_debug_type($value).' given.');
+
+        $transformer->transform($value, $this->resolveOptions($transformer));
     }
 
     /**
