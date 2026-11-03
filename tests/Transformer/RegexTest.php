@@ -30,7 +30,8 @@ class RegexTest extends TestCase
     public function testInvalidPattern(): void
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('Invalid regular expression "a" in the "match" option: Delimiter must not be alphanumeric, backslash, or NUL byte');
+        // The end of the PHP message depends on the version ("or NUL byte" since PHP 8.4)
+        $this->expectExceptionMessage('Invalid regular expression "a" in the "match" option: Delimiter must not be alphanumeric');
 
         Regex::validate('a', 'match');
     }
