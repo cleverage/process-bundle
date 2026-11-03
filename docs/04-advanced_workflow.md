@@ -313,6 +313,22 @@ Keep in mind that:
   parent process has failed. To recognize a stopped process, look for a `ProcessStoppedException` in the chain of the
   previous exceptions of the process error.
 
+### SIGTERM and SIGINT
+
+When a console command executing a process (`cleverage:process:execute`, `messenger:consume`...) receives SIGTERM
+(`docker stop`, Kubernetes, systemd, supervisord...) or SIGINT (Ctrl+C) during the process, the bundle stops the process
+before its next task, as a stop checker, instead of exiting right away: the initialized tasks are finalized, the
+`cleverage_process.fail` event is dispatched (e.g. the UI records the execution as `stopped`), a warning is logged on the
+`cleverage_process` channel, and `cleverage:process:execute` exits with `1` without executing the next processes of
+its arguments. A Messenger worker stops after the message (the message fails with the process). A second signal exits
+right away, as a signal received when no process is running.
+
+This requires the `pcntl` extension (the Symfony console application dispatches the signals only with it): without it,
+the command is killed right away, the tasks are not finalized and the end of the process is never recorded. As for any
+stop, a task blocked in a single long call stops only when the call returns: give the process enough time to stop
+before killing it (e.g. `docker stop --time`, `terminationGracePeriodSeconds` of Kubernetes, `stopwaitsecs` of
+supervisord).
+
 ## Parallelization
 
 PHP executes a process in a single thread. To use several CPU cores, the
