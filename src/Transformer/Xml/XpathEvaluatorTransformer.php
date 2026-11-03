@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle\Transformer\Xml;
 use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
 use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -61,6 +62,19 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
             throw new InvalidArgumentException('Unhandled query');
         });
 
+        // Prefixes of the namespaces used by the queries (e.g. for a document with a default namespace)
+        $resolver->setDefault('namespaces', []);
+        $resolver->setAllowedTypes('namespaces', 'string[]');
+        $resolver->setAllowedValues('namespaces', static function (array $namespaces): bool {
+            foreach (array_keys($namespaces) as $prefix) {
+                if (!\is_string($prefix) || '' === $prefix) {
+                    throw new InvalidOptionsException('The keys of the "namespaces" option must be the prefixes of the namespaces.');
+                }
+            }
+
+            return true;
+        });
+
         // Use same options & defaults for root option level and subquery options
         $this->configureQueryOptions($resolver);
     }
@@ -93,6 +107,9 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         }
 
         $xpath = $this->buildXpath($value);
+        foreach ($options['namespaces'] ?? [] as $prefix => $namespace) {
+            $xpath->registerNamespace($prefix, $namespace);
+        }
 
         $query = $options['query'];
         if (\is_array($query)) {
@@ -128,7 +145,9 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
         $previousUseErrors = libxml_use_internal_errors(true);
         libxml_clear_errors();
         try {
-            $nodeList = $xpath->query($query, $node);
+            // evaluate(), not query(): an expression returning a number, a string or a boolean (e.g. count(), string())
+            // gave an empty node list
+            $nodeList = $xpath->evaluate($query, $node);
             $errors = libxml_get_errors();
         } finally {
             libxml_clear_errors();
@@ -138,6 +157,9 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
             $messages = array_map(static fn (\LibXMLError $error): string => trim($error->message), $errors);
 
             throw new UnexpectedValueException(\sprintf("Invalid xpath query '%s': %s", $query, [] !== $messages ? implode('; ', $messages) : 'unknown error'));
+        }
+        if (!$nodeList instanceof \DOMNodeList) {
+            return $nodeList;
         }
         $results = iterator_to_array($nodeList);
 
