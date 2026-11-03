@@ -49,7 +49,9 @@ added at runtime) is fetched from the service container, which requires a public
 **options**: optional list of parameters to pass to the task. String values can contain `{{ key }}` placeholders that
 are replaced by the process [contextual values](../01-quick_start.md#contextual-values).
 
-**outputs**: optional list of following tasks, receiving the output of this task. It can be a simple string.
+**outputs**: optional list of following tasks, receiving the output of this task. It can be a simple string. A task
+listed several times is executed once per occurrence: this is deprecated since 5.7, and will throw an exception in 6.0
+(also for `error_outputs`).
 
 **error_outputs**: optional list of following tasks, receiving the error output of this task (by default its input when
 an error occurs). It can be a simple string. See [errors and skips](../04-advanced_workflow.md#errors-and-skips).

@@ -17,6 +17,12 @@ If you used the former name (with underscores) of such a code, it still works bu
 `process_executor` tasks, the task references (`outputs`, `error_outputs`, `entry_point`, `end_point`), the transformer
 references and the applications storing process codes (e.g. the schedules of the UI bundle).
 
+### Duplicate task references
+
+Listing a task several times in the `outputs` or the `error_outputs` of a task (e.g. `outputs: [next, next]`) is
+deprecated since 5.7 (`Since cleverage/process-bundle 5.7: Listing the task "next" several times in the "outputs"...`):
+the task is executed once per occurrence, and an exception will be thrown in 6.0. List it once.
+
 ## v5.6
 
 Two deprecations, and some behaviours change: check the points below.

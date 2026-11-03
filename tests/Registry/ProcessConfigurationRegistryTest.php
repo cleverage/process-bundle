@@ -282,4 +282,38 @@ class ProcessConfigurationRegistryTest extends TestCase
             'Since cleverage/process-bundle 5.7: Referencing the task "next-task" of the process "demo.x-y" by the name "next_task" in "outputs", with underscores instead of dashes, is deprecated: use its code "next-task". The dashes of the codes were replaced by underscores before 5.7, the former name will not be found in v6.0.',
         ], $deprecations);
     }
+
+    /**
+     * A task listed several times in the outputs is executed once per occurrence: deprecated, it will throw in v6.0.
+     */
+    public function testDuplicateTaskReferencesAreDeprecated(): void
+    {
+        $registry = new ProcessConfigurationRegistry([
+            'test.process' => $this->rawProcess([
+                'first' => ['outputs' => ['next', 'other', 'next', 'next'], 'error_outputs' => ['error', 'error']],
+                'next' => [],
+                'other' => [],
+                'error' => [],
+            ]),
+        ], 'stop');
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            $processConfiguration = $registry->getProcessConfiguration('test.process');
+        } finally {
+            restore_error_handler();
+        }
+
+        // Unchanged behaviour until v6.0
+        self::assertCount(4, $processConfiguration->getTaskConfiguration('first')->getNextTasksConfigurations());
+        self::assertCount(2, $processConfiguration->getTaskConfiguration('first')->getErrorTasksConfigurations());
+        self::assertSame([
+            'Since cleverage/process-bundle 5.7: Listing the task "next" several times in the "outputs" of the task "first" of the process "test.process" is deprecated: it is executed once per occurrence. In v6.0, an exception will be thrown.',
+            'Since cleverage/process-bundle 5.7: Listing the task "error" several times in the "error_outputs" of the task "first" of the process "test.process" is deprecated: it is executed once per occurrence. In v6.0, an exception will be thrown.',
+        ], $deprecations);
+    }
 }
