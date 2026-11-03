@@ -19,7 +19,11 @@ Any value that can be cast to string.
 Possible outputs
 ----------------
 
-`string|null`: the replaced string, or `null` if no pattern matches (or on regex error).
+`string|null`: the replaced string, or `null` if no pattern matches.
+
+An invalid regular expression is rejected with an `InvalidOptionsException` when the options are resolved. A PCRE
+error while matching (e.g. invalid UTF-8 with the `u` modifier, backtracking limit reached) throws an
+`UnexpectedValueException` with the PCRE error message, instead of being taken for "no match".
 
 Options
 -------

@@ -25,6 +25,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(UnsetTransformer::class)]
 #[\PHPUnit\Framework\Attributes\UsesTrait(ConditionTrait::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\CleverAge\ProcessBundle\Transformer\Regex::class)]
 class UnsetTransformerTest extends TestCase
 {
     private const INPUT = [

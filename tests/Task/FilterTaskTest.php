@@ -34,6 +34,7 @@ use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 #[\PHPUnit\Framework\Attributes\UsesClass(ContextualOptionResolver::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessHistory::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\CleverAge\ProcessBundle\Transformer\Regex::class)]
 class FilterTaskTest extends TestCase
 {
     /**
@@ -199,5 +200,49 @@ class FilterTaskTest extends TestCase
         $this->assertFalse($this->execute(['not_empty' => ['[email]'], 'empty' => ['[deleted_at]']], ['email' => 'a@b.c'])->isSkipped());
         $this->assertTrue($this->execute(['not_empty' => ['[email]']], ['email' => ''])->isSkipped());
         $this->assertTrue($this->execute(['empty' => ['[deleted_at]']], ['deleted_at' => 'yesterday'])->isSkipped());
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function provideInvalidRegexpOptions(): iterable
+    {
+        yield 'match_regexp' => [['match_regexp' => ['[name]' => '/(a/']]];
+        yield 'not_match_regexp' => [['not_match_regexp' => ['[name]' => '/(a/']]];
+        yield 'not a string' => [['match_regexp' => ['[name]' => 1]]];
+    }
+
+    /**
+     * An invalid pattern made both match_regexp and not_match_regexp fail: every input was filtered out.
+     *
+     * @param array<string, mixed> $options
+     */
+    #[DataProvider('provideInvalidRegexpOptions')]
+    public function testInvalidRegexpIsRejected(array $options): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+
+        $this->execute($options, ['name' => 'a']);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function provideRegexpOptions(): iterable
+    {
+        yield 'match_regexp' => ['match_regexp'];
+        yield 'not_match_regexp' => ['not_match_regexp'];
+    }
+
+    /**
+     * A PCRE error made both match_regexp and not_match_regexp fail: the input was filtered out.
+     */
+    #[DataProvider('provideRegexpOptions')]
+    public function testPcreErrorThrows(string $option): void
+    {
+        $this->expectException(\CleverAge\ProcessBundle\Exception\UnexpectedValueException::class);
+        $this->expectExceptionMessage('The regular expression "/a/u" has failed: Malformed UTF-8 characters');
+
+        $this->execute([$option => ['[name]' => '/a/u']], ['name' => "a\xff"]);
     }
 }

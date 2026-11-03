@@ -31,7 +31,7 @@ Options
 | Code             | Type     | Required | Default                                  | Description                                                                             |
 |------------------|----------|:--------:|------------------------------------------|-----------------------------------------------------------------------------------------|
 | `transliterator` | `string` |          | `'NFD; [:Nonspacing Mark:] Remove; NFC'` | Transliterator identifier, passed to `\Transliterator::create()` (see Notes)            |
-| `replace`        | `string` |          | `'/[^a-z0-9]+/'`                         | Regular expression of the characters to replace (applied on the lowercased string)      |
+| `replace`        | `string` |          | `'/[^a-z0-9]+/'`                         | Regular expression of the characters to replace (applied on the lowercased string), checked with the configuration |
 | `separator`      | `string` |          | `'_'`                                    | Replacement string, also trimmed from both ends of the result                           |
 | `strip_tags`     | `bool`   |          | `true`                                   | Strip the HTML tags with `strip_tags()`, which removes everything after a `<` that does not open a tag (`'Tom<Jerry'` becomes `'tom'`, `'<3 love'` becomes `''`): set it to `false` for a text that is not HTML |
 

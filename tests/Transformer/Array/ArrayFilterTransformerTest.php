@@ -19,6 +19,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ArrayFilterTransformer::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\CleverAge\ProcessBundle\Transformer\Regex::class)]
 class ArrayFilterTransformerTest extends TestCase
 {
     public function testWholeValueConditionOnScalars(): void

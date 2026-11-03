@@ -33,7 +33,13 @@ class PregFilterTransformer implements ConfigurableTransformerInterface
         $pattern = $options['pattern'];
         $replacement = $options['replacement'];
 
-        return preg_filter($pattern, $replacement, (string) $value);
+        $result = preg_filter($pattern, $replacement, (string) $value);
+        // null is also "no match": a PCRE error (e.g. invalid UTF-8 with the "u" modifier) is not
+        if (null === $result) {
+            Regex::checkLastError(\is_array($pattern) ? implode('", "', $pattern) : $pattern);
+        }
+
+        return $result;
     }
 
     /**
@@ -49,6 +55,19 @@ class PregFilterTransformer implements ConfigurableTransformerInterface
         $resolver->setRequired(['pattern', 'replacement']);
         $resolver->setAllowedTypes('pattern', ['string', 'array']);
         $resolver->setAllowedTypes('replacement', ['string', 'array']);
+        $resolver->setNormalizer(
+            'pattern',
+            static function (Options $options, string|array $value): string|array {
+                foreach ((array) $value as $pattern) {
+                    if (!\is_string($pattern)) {
+                        throw new InvalidOptionsException(\sprintf('The patterns of the "pattern" option must be strings, %s given.', get_debug_type($pattern)));
+                    }
+                    Regex::validate($pattern);
+                }
+
+                return $value;
+            }
+        );
         $resolver->setNormalizer(
             'replacement',
             static function (Options $options, string|array $value): string|array {

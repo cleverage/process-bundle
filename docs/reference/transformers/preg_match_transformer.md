@@ -22,6 +22,10 @@ Possible outputs
   `preg_match`)
 * `null` if the input is `null` or an empty string
 
+An invalid regular expression is rejected with an `InvalidOptionsException` when the options are resolved. A PCRE
+error while matching (e.g. invalid UTF-8 with the `u` modifier, backtracking limit reached) throws an
+`UnexpectedValueException` with the PCRE error message, instead of being taken for "no match".
+
 Options
 -------
 
