@@ -206,6 +206,58 @@ class ProcessManagerFinalizationTest extends TestCase
         self::assertContains(['critical', 'Finalization failed', 'throwing'], $this->taskLogs);
     }
 
+    /**
+     * A finalization failure makes the process fail: it was flagged and logged as failed, but ended as succeeded (end
+     * event, the command exiting with 0, a parent process going on).
+     */
+    public function testAFinalizationFailureMakesTheProcessFail(): void
+    {
+        $events = [];
+        $this->eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_ENDED, static function () use (&$events): void {
+            $events[] = 'end';
+        });
+        $this->eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_FAILED, static function () use (&$events): void {
+            $events[] = 'fail';
+        });
+
+        $error = $this->executeFailing([
+            'throwing' => $this->createTaskConfiguration('@test.finalizable_throwing', ['second']),
+            'second' => $this->createTaskConfiguration('@test.finalizable_second'),
+        ]);
+
+        self::assertInstanceOf(ProcessFailedException::class, $error);
+        self::assertSame("Process test.process has failed during process throwing with message: 'Finalization failed'.\n", $error->getMessage());
+        // Every task is finalized, once
+        self::assertSame(['throwing (throwing)', 'second (second)'], $this->finalized);
+        self::assertSame(['fail'], $events);
+        self::assertNull($this->processManager->getTaskConfiguration());
+    }
+
+    public function testAFinalizationFailureOfASubProcessMakesItsParentTaskFail(): void
+    {
+        $this->createProcessManager([
+            'test.process' => [
+                'sub_process' => $this->createTaskConfiguration('@test.sub_process', ['second'], ['process' => 'test.child']),
+                'second' => $this->createTaskConfiguration('@test.finalizable_second'),
+            ],
+            'test.child' => [
+                'throwing' => $this->createTaskConfiguration('@test.finalizable_throwing'),
+            ],
+        ]);
+
+        try {
+            $this->processManager->execute('test.process');
+            self::fail('The process should have failed');
+        } catch (ProcessFailedException $error) {
+            self::assertInstanceOf(ProcessFailedException::class, $error->getPrevious());
+            self::assertSame('Finalization failed', $error->getPrevious()->getPrevious()?->getMessage());
+        }
+
+        // The parent process does not go on with the next task
+        self::assertSame(['throwing (throwing)', 'second (second)'], $this->finalized);
+        self::assertSame([false, true], $this->failedAtFinalization);
+    }
+
     public function testTheTasksAreNotFinalizedTwiceWhenTheProcessFailsAfterTheirFinalization(): void
     {
         $this->failingProcessLog = 'Process test.process succeed';

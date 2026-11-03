@@ -160,7 +160,9 @@ On the opposite, some tasks may require cleanup work at the very end of the proc
 temporary folder, log some statistics).
 
 Finalizable tasks implement `CleverAge\ProcessBundle\Model\FinalizableTaskInterface`. Their `finalize` method is
-called once all tasks are resolved, for every task of the process, in the order they are configured.
+called once all tasks are resolved, for every task of the process, in the order they are configured. An exception
+thrown by `finalize` is logged as critical, the next tasks are still finalized, then the process fails with a
+`ProcessFailedException`.
 
 A process stopped without exception (e.g. by the [StopTask](reference/tasks/stop_task.md)) is finalized the same way.
 
