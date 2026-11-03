@@ -226,6 +226,72 @@ class XmlStreamReaderTaskTest extends TestCase
     }
 
     /**
+     * The root element can be iterated.
+     */
+    public function testRootElement(): void
+    {
+        $outputs = $this->iterate(['file_path' => $this->tmpDir.'/catalog.xml', 'node_name' => 'catalog']);
+
+        self::assertCount(1, $outputs);
+        self::assertSame('catalog', $outputs[0]->nodeName);
+    }
+
+    public function testDirectoryThrows(): void
+    {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage(\sprintf('XML file "%s" does not exist or is not readable', $this->tmpDir));
+
+        $this->iterate(['file_path' => $this->tmpDir, 'node_name' => 'product']);
+    }
+
+    /**
+     * A warning (e.g. a relative namespace URI) does not prevent the reading.
+     */
+    public function testWarningsAreTolerated(): void
+    {
+        file_put_contents($this->tmpDir.'/warning.xml', '<catalog><product xmlns:a="relative"><a:name>Foo</a:name></product></catalog>');
+
+        $outputs = $this->iterate(['file_path' => $this->tmpDir.'/warning.xml', 'node_name' => 'product']);
+
+        self::assertCount(1, $outputs);
+        self::assertSame('Foo', $outputs[0]->textContent);
+    }
+
+    /**
+     * The errors left by another code (libxml_use_internal_errors(true)) are not reported, none is left by an invalid
+     * file, and the setting is restored.
+     */
+    public function testLibxmlStateIsRestored(): void
+    {
+        file_put_contents($this->tmpDir.'/invalid.xml', '<catalog><product id="1"></catalog>');
+        $previous = libxml_use_internal_errors(true);
+        try {
+            (new \DOMDocument())->loadXML('<other>');
+
+            self::assertCount(2, $this->iterate(['file_path' => $this->tmpDir.'/catalog.xml', 'node_name' => 'product']));
+
+            try {
+                $this->iterate(['file_path' => $this->tmpDir.'/invalid.xml', 'node_name' => 'product']);
+                self::fail('An exception should have been thrown');
+            } catch (\UnexpectedValueException $exception) {
+                // Trimmed messages, with their position
+                self::assertStringStartsWith(
+                    \sprintf('Invalid XML in file "%s": Opening and ending tag mismatch: product line 1 and catalog (line 1, column ', $this->tmpDir.'/invalid.xml'),
+                    $exception->getMessage()
+                );
+            }
+            self::assertSame([], libxml_get_errors());
+            self::assertTrue(libxml_use_internal_errors(false), 'Restored');
+
+            self::assertCount(2, $this->iterate(['file_path' => $this->tmpDir.'/catalog.xml', 'node_name' => 'product']));
+            self::assertFalse(libxml_use_internal_errors(false), 'Restored');
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
+    }
+
+    /**
      * @param array<string, mixed> $options
      *
      * @return list<\DOMElement>

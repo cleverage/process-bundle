@@ -29,6 +29,7 @@ use CleverAge\ProcessBundle\Task\File\Csv\InputCsvReaderTask;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CsvReaderTask::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(InputCsvReaderTask::class)]
@@ -109,6 +110,26 @@ class CsvReaderTaskTest extends TestCase
         $this->expectExceptionMessage('The input of the input_csv_reader task must be the path of the file to read, "null" given.');
 
         $task->execute($state);
+    }
+
+    /**
+     * The input is a path relative to base_path, with or without its trailing slash.
+     */
+    public function testInputCsvReaderBasePath(): void
+    {
+        $expected = [['id' => '3', 'name' => 'baz']];
+        foreach ([$this->tmpDir, $this->tmpDir.'/'] as $basePath) {
+            $task = new InputCsvReaderTask(new NullLogger());
+            self::assertSame($expected, $this->iterate($task, $this->createState(['base_path' => $basePath]), 'b.csv'), $basePath);
+            $task->finalize($this->createState([]));
+        }
+    }
+
+    public function testInputCsvReaderBasePathMustBeAString(): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+
+        $this->iterate(new InputCsvReaderTask(new NullLogger()), $this->createState(['base_path' => ['a']]), 'b.csv');
     }
 
     /**

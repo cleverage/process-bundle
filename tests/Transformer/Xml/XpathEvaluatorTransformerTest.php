@@ -222,6 +222,114 @@ class XpathEvaluatorTransformerTest extends TestCase
         $this->resolve(['query' => '/a', 'namespaces' => $namespaces]);
     }
 
+    public function testMissingResult(): void
+    {
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML('<items><item>1</item></items>');
+        $transformer = new XpathEvaluatorTransformer();
+
+        // ignore_missing (default): null, or an empty list without single_result
+        $this->assertNull($transformer->transform($domDocument, $this->resolve(['query' => '//missing/text()'])));
+        $this->assertSame([], $transformer->transform($domDocument, $this->resolve(['query' => '//missing/text()', 'single_result' => false])));
+        // A result is still returned without ignore_missing
+        $this->assertSame('1', $transformer->transform($domDocument, $this->resolve(['query' => '//item/text()', 'ignore_missing' => false])));
+        $this->assertSame([], $transformer->transform($domDocument, $this->resolve(['query' => '//missing/text()', 'single_result' => false, 'ignore_missing' => false])));
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage("There is not enough results for query '//missing/text()'");
+
+        $transformer->transform($domDocument, $this->resolve(['query' => '//missing/text()', 'ignore_missing' => false]));
+    }
+
+    public function testTooManyResults(): void
+    {
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML('<items><item>1</item><item>2</item></items>');
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage("There is too much results for query '//item/text()'");
+
+        (new XpathEvaluatorTransformer())->transform($domDocument, $this->resolve(['query' => '//item/text()']));
+    }
+
+    /**
+     * The options of a subquery override the ones of the root level.
+     */
+    public function testSubqueryOptions(): void
+    {
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML('<items><item>1</item><item>2</item></items>');
+
+        $this->assertSame(
+            ['all' => ['1', '2'], 'first' => '1', 'missing' => []],
+            (new XpathEvaluatorTransformer())->transform($domDocument, $this->resolve([
+                'query' => [
+                    'all' => '//item/text()',
+                    'first' => ['subquery' => '//item[1]/text()', 'single_result' => true],
+                    'missing' => '//missing/text()',
+                ],
+                'single_result' => false,
+            ]))
+        );
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function provideInvalidOptions(): iterable
+    {
+        yield 'query not a string nor an array' => [['query' => 1]];
+        yield 'subquery not a string' => [['query' => ['a' => ['subquery' => 1]]]];
+        yield 'single_result not a boolean' => [['query' => '/a', 'single_result' => 'yes']];
+        yield 'ignore_missing not a boolean' => [['query' => '/a', 'ignore_missing' => 1]];
+        yield 'unwrap_value not a boolean' => [['query' => '/a', 'unwrap_value' => 'no']];
+        yield 'subquery option not a boolean' => [['query' => ['a' => ['subquery' => '/a', 'single_result' => 'yes']]]];
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     */
+    #[DataProvider('provideInvalidOptions')]
+    public function testInvalidOptions(array $options): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+
+        $this->resolve($options);
+    }
+
+    /**
+     * The libxml errors are collected for the query only: the previous ones are not reported, none is left, and the
+     * previous libxml_use_internal_errors() setting is restored.
+     */
+    public function testLibxmlStateIsRestored(): void
+    {
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML('<a>ok</a>');
+        $transformer = new XpathEvaluatorTransformer();
+        $previousUseErrors = libxml_use_internal_errors(true);
+        try {
+            // An error left by another code
+            (new \DOMDocument())->loadXML('<a>');
+            self::assertNotSame([], libxml_get_errors());
+
+            try {
+                $transformer->transform($domDocument, $this->resolve(['query' => '//[']));
+                self::fail('The query is invalid');
+            } catch (\UnexpectedValueException $exception) {
+                // Only the error of the query, trimmed
+                self::assertSame("Invalid xpath query '//[': Invalid expression", $exception->getMessage());
+            }
+            self::assertSame([], libxml_get_errors());
+            self::assertTrue(libxml_use_internal_errors(false), 'Restored');
+
+            $this->assertSame('ok', $transformer->transform($domDocument, $this->resolve(['query' => '/a/text()'])));
+            self::assertFalse(libxml_use_internal_errors(false), 'Restored');
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousUseErrors);
+        }
+    }
+
     /**
      * @param array<string, mixed> $options
      *

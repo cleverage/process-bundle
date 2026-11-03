@@ -105,6 +105,62 @@ class XmlFileTest extends TestCase
         }
     }
 
+    /**
+     * The errors left by another code (libxml_use_internal_errors(true)) are neither reported nor cleared by a valid
+     * file, and none is left by an invalid one.
+     */
+    public function testReadWithPreviousLibxmlErrors(): void
+    {
+        $previous = libxml_use_internal_errors(true);
+        try {
+            (new \DOMDocument())->loadXML('<other>');
+            file_put_contents($this->path, '<root/>');
+            (new XmlFile($this->path))->read();
+
+            file_put_contents($this->path, '<root>');
+            try {
+                (new XmlFile($this->path))->read();
+                self::fail('An exception should have been thrown');
+            } catch (\UnexpectedValueException $e) {
+                // Only the error of the file, trimmed, with its position
+                self::assertSame(
+                    \sprintf('Invalid XML in file "%s": Premature end of data in tag root line 1 (line 1, column 7)', $this->path),
+                    $e->getMessage()
+                );
+            }
+            self::assertSame([], libxml_get_errors());
+            self::assertTrue(libxml_use_internal_errors(), 'Restored');
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previous);
+        }
+    }
+
+    /**
+     * A warning (e.g. a relative namespace URI) does not prevent the reading.
+     */
+    public function testReadToleratesWarnings(): void
+    {
+        file_put_contents($this->path, '<root xmlns:a="relative"><a:b>ok</a:b></root>');
+
+        $dom = (new XmlFile($this->path))->read();
+
+        self::assertSame('ok', $dom->documentElement?->textContent);
+    }
+
+    public function testReadTwice(): void
+    {
+        file_put_contents($this->path, '<root>ok</root>');
+        $file = new XmlFile($this->path);
+
+        $first = $file->read();
+        $second = $file->read();
+
+        self::assertNotSame($first, $second);
+        self::assertSame('ok', $first->documentElement?->textContent);
+        self::assertSame('ok', $second->documentElement?->textContent);
+    }
+
     public function testWriteThrowsWhenTheXmlCannotBeGenerated(): void
     {
         $dom = new class extends \DOMDocument {

@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle\Tests\Task\File;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -24,6 +25,7 @@ use CleverAge\ProcessBundle\Task\File\InputFolderBrowserTask;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(FolderBrowserTask::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(InputFolderBrowserTask::class)]
@@ -107,6 +109,50 @@ class FolderBrowserTaskTest extends TestCase
         $this->expectExceptionMessage('No folder path given as input');
 
         $this->iterate($task, $state);
+    }
+
+    /**
+     * The input is concatenated to base_folder_path (without separator).
+     */
+    public function testInputFolderBrowserBaseFolderPath(): void
+    {
+        $task = new InputFolderBrowserTask(new NullLogger());
+        $state = $this->createState(['base_folder_path' => $this->tmpDir.'/']);
+
+        self::assertSame([$this->tmpDir.'/dirB/b1.txt'], $this->iterate($task, $state, 'dirB'));
+    }
+
+    /**
+     * The options are validated when the task is initialized, before any input.
+     */
+    public function testInputFolderBrowserOptionsAreValidatedOnInitialization(): void
+    {
+        $task = new InputFolderBrowserTask(new NullLogger());
+
+        $this->expectException(InvalidOptionsException::class);
+
+        $task->initialize($this->createState(['base_folder_path' => ['a']]));
+    }
+
+    /**
+     * Another folder cannot be given while a folder is browsed.
+     */
+    public function testInputFolderBrowserRejectsAnotherFolderWhileBrowsing(): void
+    {
+        $task = new InputFolderBrowserTask(new NullLogger());
+        $state = $this->createState([]);
+        $state->setInput($this->tmpDir.'/dirA');
+        $task->execute($state);
+        self::assertTrue($task->next($state));
+
+        // The same folder is accepted
+        $task->execute($state);
+
+        $state->setInput($this->tmpDir.'/dirB');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage("Folder path '{$this->tmpDir}/dirB' already initialized with a different value {$this->tmpDir}/dirA");
+
+        $task->execute($state);
     }
 
     /**
