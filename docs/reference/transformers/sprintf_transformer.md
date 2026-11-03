@@ -68,3 +68,8 @@ Notes
 In Symfony YAML configuration files, `%` is used for container parameters: escape it as `%%` (`'%%s'` is resolved as
 `'%s'`). An invalid format (e.g. a `%` alone, not escaped as `%%`) is rejected with the configuration. A format with
 more placeholders than arguments throws an `\ArgumentCountError`, with the value.
+
+The `%f` conversion depends on the locale: once the application has called `setlocale()` (e.g. with `fr_FR.UTF-8`),
+`%.2f` formats `1.5` as `1,50`. Use `%F`, which always uses a dot (`1.50`), for a number written to a file or sent to an
+API. PHP does not inherit the locale from the environment (`LANG`, `LC_ALL`): without a call to `setlocale()`, both
+give `1.50`.
