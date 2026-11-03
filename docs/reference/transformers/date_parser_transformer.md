@@ -13,11 +13,14 @@ Accepted inputs
 ---------------
 
 * `string`: a date matching the configured `format`
+* another scalar (e.g. an `int` timestamp with the `U` format) or a `\Stringable`, cast to string
 * `\DateTime`, returned unchanged
 * `\DateTimeImmutable`, converted to a `\DateTime` (same date, time and timezone)
 * Any falsy value (`null`, `''`, `false`…), returned unchanged
 
-A string that cannot be parsed with the given format throws an `UnexpectedValueException`.
+A string that cannot be parsed with the given format throws an `UnexpectedValueException`, and so does a date or a
+time out of range (e.g. `2024-02-31` or `25:61`, that `\DateTime::createFromFormat()` parses with a warning, the date
+overflowing to `2024-03-02`). An array or another object throws an `UnexpectedValueException`.
 
 Possible outputs
 ----------------
