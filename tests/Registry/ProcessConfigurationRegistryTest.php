@@ -25,6 +25,7 @@ use Psr\Log\AbstractLogger;
 
 #[CoversClass(ProcessConfigurationRegistry::class)]
 #[CoversClass(InvalidProcessConfigurationException::class)]
+#[UsesClass(\CleverAge\ProcessBundle\Exception\CircularProcessException::class)]
 #[UsesClass(ProcessConfiguration::class)]
 #[UsesClass(TaskConfiguration::class)]
 #[UsesClass(\CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases::class)]
@@ -315,5 +316,49 @@ class ProcessConfigurationRegistryTest extends TestCase
             'Since cleverage/process-bundle 5.7: Listing the task "next" several times in the "outputs" of the task "first" of the process "test.process" is deprecated: it is executed once per occurrence. In v6.0, an exception will be thrown.',
             'Since cleverage/process-bundle 5.7: Listing the task "error" several times in the "error_outputs" of the task "first" of the process "test.process" is deprecated: it is executed once per occurrence. In v6.0, an exception will be thrown.',
         ], $deprecations);
+    }
+
+    /**
+     * A task reached from the root through outputs is in the main branch, even if it is also in an error branch: it
+     * stayed marked as in the error branch (process:help).
+     */
+    public function testATaskInBothBranchesIsInTheMainBranch(): void
+    {
+        // root -> main, root -(error)-> error -> main, error -> error_only
+        $registry = new ProcessConfigurationRegistry([
+            'test.process' => $this->rawProcess([
+                'root' => ['outputs' => ['main'], 'error_outputs' => ['error']],
+                'error' => ['outputs' => ['main', 'error_only']],
+                'main' => [],
+                'error_only' => [],
+            ]),
+        ], 'stop');
+
+        $processConfiguration = $registry->getProcessConfiguration('test.process');
+
+        $inErrorBranch = array_map(
+            static fn (TaskConfiguration $task): bool => $task->isInErrorBranch(),
+            $processConfiguration->getTaskConfigurations()
+        );
+        self::assertSame(['root' => false, 'error' => true, 'main' => false, 'error_only' => true], $inErrorBranch);
+    }
+
+    /**
+     * A cycle that does not contain the first task checked: the search of the ancestors recursed endlessly.
+     */
+    public function testACycleIsDetected(): void
+    {
+        $registry = new ProcessConfigurationRegistry([
+            'test.process' => $this->rawProcess([
+                'last' => [],
+                'first' => ['outputs' => ['second']],
+                'second' => ['outputs' => ['first', 'last']],
+            ]),
+        ], 'stop');
+        $processConfiguration = $registry->getProcessConfiguration('test.process');
+
+        $this->expectException(\CleverAge\ProcessBundle\Exception\CircularProcessException::class);
+
+        $processConfiguration->checkCircularDependencies();
     }
 }

@@ -35,6 +35,11 @@ class ProcessConfiguration
     protected ?array $mainTaskGroup = null;
 
     /**
+     * Result of checkCircularDependencies() for the sort of the dependencies.
+     */
+    private ?bool $hasCircularDependencies = null;
+
+    /**
      * @param array<string, TaskConfiguration> $taskConfigurations
      * @param array<string, mixed>             $options
      */
@@ -271,9 +276,16 @@ class ProcessConfiguration
             return $dependencies;
         }
 
-        try {
-            $this->checkCircularDependencies();
-        } catch (CircularProcessException) {
+        // Checked once (it was checked again at each level of the sort)
+        if (null === $this->hasCircularDependencies) {
+            try {
+                $this->checkCircularDependencies();
+                $this->hasCircularDependencies = false;
+            } catch (CircularProcessException) {
+                $this->hasCircularDependencies = true;
+            }
+        }
+        if ($this->hasCircularDependencies) {
             // Skipping the sort phase, it will throw later, on runtime
             return $dependencies;
         }
