@@ -222,6 +222,10 @@ to the process code, input, context and, depending on the event, output or error
 
 Those events are also dispatched for sub-processes executed with the `ProcessExecutorTask`.
 
+An exception thrown by a listener of `cleverage_process.fail` is logged as an error (`A listener of the process
+failure has failed`) and does not replace the error of the process, which is rethrown (the following listeners of the
+event are not called).
+
 Another event is dispatched once by the `cleverage:process:execute` command, before executing any process:
 `CleverAge\ProcessBundle\Event\ConsoleProcessEvent`. It is dispatched without a specific name, so listeners must use
 the class name as event name. It gives access to the console input/output objects, and to the process input and

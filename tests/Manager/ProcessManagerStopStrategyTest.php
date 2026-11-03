@@ -30,7 +30,8 @@ use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use CleverAge\ProcessBundle\Task\ConstantOutputTask;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
+use Psr\Log\AbstractLogger as PsrAbstractLogger;
+use Psr\Log\LogLevel;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -49,6 +50,16 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[\PHPUnit\Framework\Attributes\UsesClass(ConstantOutputTask::class)]
 class ProcessManagerStopStrategyTest extends TestCase
 {
+    /**
+     * @var list<array{string, string, array<string, mixed>}>
+     */
+    private array $records = [];
+
+    /**
+     * @var list<mixed>
+     */
+    private array $errorBranchInputs = [];
+
     public function testStopStrategyThrowsAProcessFailedExceptionWithTheOriginalException(): void
     {
         $originalException = new \LogicException('Something went wrong', 42);
@@ -74,8 +85,96 @@ class ProcessManagerStopStrategyTest extends TestCase
         self::assertNull($processManager->execute('test.process'));
     }
 
-    private function createProcessManager(\Throwable $exception, string $errorStrategy = 'stop'): ProcessManager
+    /**
+     * The error branch of a task with the stop strategy is executed before the process stops (a debug message said it
+     * would never be reached).
+     */
+    public function testStopStrategyExecutesTheErrorBranchBeforeStopping(): void
     {
+        $processManager = $this->createProcessManager(new \LogicException('Something went wrong'), errorOutputs: ['error_branch']);
+
+        try {
+            $processManager->execute('test.process');
+            self::fail('The process should have failed');
+        } catch (ProcessFailedException) {
+        }
+
+        self::assertSame(['value'], $this->errorBranchInputs);
+        foreach ($this->records as [, $message]) {
+            self::assertStringNotContainsString('never be reached', $message);
+        }
+    }
+
+    /**
+     * An error thrown by a listener of the process failure is logged, the error of the process is still thrown (it was
+     * replaced by the error of the listener).
+     */
+    public function testAFailureListenerErrorDoesNotReplaceTheErrorOfTheProcess(): void
+    {
+        $originalException = new \LogicException('Something went wrong');
+        $eventDispatcher = new EventDispatcher();
+        $failedEvents = [];
+        $eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_FAILED, static function () use (&$failedEvents): void {
+            $failedEvents[] = 'first';
+
+            throw new \RuntimeException('Listener error');
+        });
+        $processManager = $this->createProcessManager($originalException, eventDispatcher: $eventDispatcher);
+
+        try {
+            $processManager->execute('test.process');
+            self::fail('The process should have failed');
+        } catch (\Throwable $exception) {
+            self::assertInstanceOf(ProcessFailedException::class, $exception);
+            self::assertSame($originalException, $exception->getPrevious());
+        }
+
+        self::assertSame(['first'], $failedEvents);
+        $errors = array_values(array_filter(
+            $this->records,
+            static fn (array $record): bool => LogLevel::ERROR === $record[0]
+        ));
+        self::assertCount(1, $errors);
+        self::assertSame('A listener of the process failure has failed', $errors[0][1]);
+        self::assertSame('Listener error', $errors[0][2]['error']);
+    }
+
+    /**
+     * @param list<string> $errorOutputs
+     */
+    private function createProcessManager(
+        \Throwable $exception,
+        string $errorStrategy = 'stop',
+        array $errorOutputs = [],
+        EventDispatcher $eventDispatcher = new EventDispatcher(),
+    ): ProcessManager {
+        $errorBranchTask = new class(function (mixed $input): void {
+            $this->errorBranchInputs[] = $input;
+        }) implements TaskInterface {
+            public function __construct(
+                private readonly \Closure $onExecute,
+            ) {
+            }
+
+            public function execute(ProcessState $state): void
+            {
+                ($this->onExecute)($state->getInput());
+            }
+        };
+        $logger = new class(function (string $level, string $message, array $context): void {
+            $this->records[] = [$level, $message, $context];
+        }) extends PsrAbstractLogger {
+            public function __construct(
+                private readonly \Closure $onLog,
+            ) {
+            }
+
+            public function log($level, string|\Stringable $message, array $context = []): void
+            {
+                ($this->onLog)((string) $level, (string) $message, $context);
+            }
+        };
+
         $failingTask = new class($exception) implements TaskInterface {
             public function __construct(
                 private readonly \Throwable $exception,
@@ -91,6 +190,7 @@ class ProcessManagerStopStrategyTest extends TestCase
         $container = new Container();
         $container->set('test.constant', new ConstantOutputTask());
         $container->set('test.failing', $failingTask);
+        $container->set('test.error_branch', $errorBranchTask);
 
         $registry = new ProcessConfigurationRegistry(
             [
@@ -103,7 +203,8 @@ class ProcessManagerStopStrategyTest extends TestCase
                     'public' => true,
                     'tasks' => [
                         'entry' => $this->createTaskConfiguration('@test.constant', ['output' => 'value'], ['fail']),
-                        'fail' => $this->createTaskConfiguration('@test.failing', [], [], $errorStrategy),
+                        'fail' => $this->createTaskConfiguration('@test.failing', [], [], $errorStrategy, $errorOutputs),
+                        'error_branch' => $this->createTaskConfiguration('@test.error_branch'),
                     ],
                 ],
             ],
@@ -112,11 +213,11 @@ class ProcessManagerStopStrategyTest extends TestCase
 
         return new ProcessManager(
             $container,
-            new ProcessLogger(new NullLogger()),
-            new TaskLogger(new NullLogger()),
+            new ProcessLogger($logger),
+            new TaskLogger($logger),
             $registry,
             new ContextualOptionResolver(),
-            new EventDispatcher(),
+            $eventDispatcher,
             taskRegistry: new TaskRegistry($container),
         );
     }
@@ -124,6 +225,7 @@ class ProcessManagerStopStrategyTest extends TestCase
     /**
      * @param array<string, mixed> $options
      * @param list<string>         $outputs
+     * @param list<string>         $errorOutputs
      *
      * @return array<string, mixed>
      */
@@ -132,6 +234,7 @@ class ProcessManagerStopStrategyTest extends TestCase
         array $options = [],
         array $outputs = [],
         ?string $errorStrategy = null,
+        array $errorOutputs = [],
     ): array {
         return [
             'service' => $service,
@@ -140,7 +243,7 @@ class ProcessManagerStopStrategyTest extends TestCase
             'help' => '',
             'outputs' => $outputs,
             'errors' => [],
-            'error_outputs' => [],
+            'error_outputs' => $errorOutputs,
             'error_strategy' => $errorStrategy,
             'log_level' => null,
         ];

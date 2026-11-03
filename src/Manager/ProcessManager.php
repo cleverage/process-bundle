@@ -179,10 +179,19 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             $this->processLogger->critical('Critical process failure', [
                 'error' => $error->getMessage(),
             ]);
-            $this->eventDispatcher->dispatch(
-                new ProcessEvent($processCode, $input, $context, null, $error),
-                ProcessEvent::EVENT_PROCESS_FAILED
-            );
+            try {
+                $this->eventDispatcher->dispatch(
+                    new ProcessEvent($processCode, $input, $context, null, $error),
+                    ProcessEvent::EVENT_PROCESS_FAILED
+                );
+            } catch (\Throwable $listenerError) {
+                // The error of a listener must not replace the error of the process (command, parent process,
+                // Messenger): logged, the error of the process is thrown
+                $this->processLogger->error('A listener of the process failure has failed', [
+                    'error' => $listenerError->getMessage(),
+                    'exception' => $listenerError,
+                ]);
+            }
 
             throw $error;
         } finally {
@@ -335,12 +344,6 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
         $previousTaskConfiguration = $this->taskConfiguration;
         $this->taskConfiguration = $taskConfiguration;
 
-        if (TaskConfiguration::STRATEGY_STOP === $taskConfiguration->getErrorStrategy()
-            && [] !== $taskConfiguration->getErrorOutputs()) {
-            $m = "Task configuration {$taskConfiguration->getCode()} has error outputs ";
-            $m .= "but it's error strategy 'stop' implies they will never be reached.";
-            $this->taskLogger->debug($m);
-        }
         $task = $this->taskRegistry->getTask($taskConfiguration);
         $taskConfiguration->setTask($task);
 
