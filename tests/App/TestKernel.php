@@ -94,8 +94,24 @@ final class TestKernel extends Kernel
         foreach (self::getTaskCodes() as $code) {
             $tasks[$code] = ['task' => $code];
         }
+        // A flushable task as end point (#424)
+        $flushableEndPoints = [];
+        foreach ([
+            'simple_batch_flushed' => ['simple_batch', ['batch_count' => 2]],
+            'simple_batch_executed' => ['simple_batch', ['batch_count' => 3]],
+            'iterable_batch' => ['iterable_batch', ['batch_count' => 2]],
+            'counter' => ['counter', ['flush_every' => 2]],
+        ] as $name => [$task, $options]) {
+            $flushableEndPoints['test.flushable_end_point.'.$name] = [
+                'end_point' => 'last',
+                'tasks' => [
+                    'items' => ['task' => 'constant_iterable_output', 'options' => ['output' => [1, 2, 3]], 'outputs' => ['last']],
+                    'last' => ['task' => $task, 'options' => $options],
+                ],
+            ];
+        }
         $container->extension('clever_age_process', [
-            'configurations' => [
+            'configurations' => $flushableEndPoints + [
                 'test.every_task' => ['tasks' => $tasks],
                 'test.run' => [
                     'end_point' => 'format',

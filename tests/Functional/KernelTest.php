@@ -102,6 +102,29 @@ class KernelTest extends KernelTestCase
         self::assertSame($expected, $processManager->execute($processCode));
     }
 
+    /**
+     * @return iterable<string, array{string, mixed}>
+     */
+    public static function provideFlushableEndPoints(): iterable
+    {
+        yield 'last batch outputted by the flush' => ['simple_batch_flushed', [3]];
+        yield 'last batch outputted by the execution' => ['simple_batch_executed', [1, 2, 3]];
+        yield 'iterable batch' => ['iterable_batch', 3];
+        yield 'counter' => ['counter', 3];
+    }
+
+    /**
+     * The output of a flushable end point is kept by its next flushes with nothing to output: the process returned null.
+     */
+    #[DataProvider('provideFlushableEndPoints')]
+    public function testFlushableEndPoint(string $name, mixed $expected): void
+    {
+        $processManager = self::getContainer()->get('test.process_manager');
+        self::assertInstanceOf(ProcessManager::class, $processManager);
+
+        self::assertSame($expected, $processManager->execute('test.flushable_end_point.'.$name));
+    }
+
     private function getExceptionHandler(): mixed
     {
         $handler = set_exception_handler(null);
