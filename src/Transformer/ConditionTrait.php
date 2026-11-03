@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Transformer;
 
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -107,6 +108,19 @@ trait ConditionTrait
         $resolver->setAllowedTypes('empty', 'array');
         $resolver->setAllowedTypes('not_match_regexp', 'array');
         $resolver->setAllowedTypes('match_regexp', 'array');
+        // Rejected with the configuration: an invalid pattern made both match_regexp and not_match_regexp fail
+        foreach (['match_regexp', 'not_match_regexp'] as $option) {
+            $resolver->setNormalizer($option, static function (Options $options, array $value) use ($option): array {
+                foreach ($value as $pattern) {
+                    if (!\is_string($pattern)) {
+                        throw new InvalidOptionsException(\sprintf('The patterns of the "%s" option must be strings, %s given.', $option, get_debug_type($pattern)));
+                    }
+                    Regex::validate($pattern, $option);
+                }
+
+                return $value;
+            });
+        }
         // The list form of empty / not_empty (e.g. not_empty: ['[email]']): the values are the property paths
         foreach (['empty', 'not_empty'] as $option) {
             $resolver->setNormalizer($option, static function (Options $options, array $value): array {
@@ -146,6 +160,10 @@ trait ConditionTrait
 
         if ($regexpMode) {
             $pregMatch = preg_match($value, (string) $currentValue);
+            // A PCRE error (e.g. invalid UTF-8 with the "u" modifier) made both match_regexp and not_match_regexp fail
+            if (false === $pregMatch) {
+                Regex::checkLastError($value);
+            }
 
             if ($shouldMatch && (false === $pregMatch || 0 === $pregMatch)) {
                 return false;

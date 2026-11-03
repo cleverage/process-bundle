@@ -22,6 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 #[\PHPUnit\Framework\Attributes\CoversMethod(PregFilterTransformer::class, 'transform')]
 #[\PHPUnit\Framework\Attributes\CoversMethod(PregFilterTransformer::class, 'configureOptions')]
 #[\PHPUnit\Framework\Attributes\CoversMethod(PregFilterTransformer::class, 'getCode')]
+#[\PHPUnit\Framework\Attributes\UsesClass(\CleverAge\ProcessBundle\Transformer\Regex::class)]
 class PregFilterTransformerTest extends TestCase
 {
     public function testTransformWithStringReplacement(): void
@@ -85,5 +86,42 @@ class PregFilterTransformerTest extends TestCase
         $transformer->configureOptions($resolver);
 
         return $resolver->resolve($options);
+    }
+
+    /**
+     * @return iterable<string, array{string|array<mixed>}>
+     */
+    public static function provideInvalidPatterns(): iterable
+    {
+        yield 'string' => ['/(a/'];
+        yield 'array' => [['/a/', '/(a/']];
+        yield 'not a string' => [['/a/', 1]];
+    }
+
+    /**
+     * Rejected with the configuration (a PHP warning with the first value, then null as for "no match").
+     *
+     * @param string|array<mixed> $pattern
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidPatterns')]
+    public function testInvalidPatternIsRejected(string|array $pattern): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+
+        $this->resolveOptions(new PregFilterTransformer(), ['pattern' => $pattern, 'replacement' => 'b']);
+    }
+
+    /**
+     * A PCRE error was taken for "no match": null.
+     */
+    public function testPcreErrorThrows(): void
+    {
+        $transformer = new PregFilterTransformer();
+        $options = $this->resolveOptions($transformer, ['pattern' => ['/a/u', '/b/u'], 'replacement' => 'c']);
+
+        $this->expectException(\CleverAge\ProcessBundle\Exception\UnexpectedValueException::class);
+        $this->expectExceptionMessage('The regular expression "/a/u", "/b/u" has failed: Malformed UTF-8 characters');
+
+        $transformer->transform("a\xff", $options);
     }
 }

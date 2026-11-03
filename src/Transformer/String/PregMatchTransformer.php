@@ -14,6 +14,8 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Transformer\String;
 
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
+use CleverAge\ProcessBundle\Transformer\Regex;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -35,9 +37,13 @@ class PregMatchTransformer implements ConfigurableTransformerInterface
         }
 
         if ($options['mode_all']) {
-            preg_match_all($options['pattern'], (string) $value, $matches, $options['flags'], $options['offset']);
+            $result = preg_match_all($options['pattern'], (string) $value, $matches, $options['flags'], $options['offset']);
         } else {
-            preg_match($options['pattern'], (string) $value, $matches, $options['flags'], $options['offset']);
+            $result = preg_match($options['pattern'], (string) $value, $matches, $options['flags'], $options['offset']);
+        }
+        // A PCRE error (e.g. invalid UTF-8 with the "u" modifier) is not "no match"
+        if (false === $result) {
+            Regex::checkLastError($options['pattern']);
         }
 
         return $matches;
@@ -55,6 +61,7 @@ class PregMatchTransformer implements ConfigurableTransformerInterface
     {
         $resolver->setRequired(['pattern']);
         $resolver->setAllowedTypes('pattern', ['string']);
+        $resolver->setNormalizer('pattern', static fn (Options $options, string $pattern): string => Regex::validate($pattern));
         $resolver->setDefault('flags', 0);
         $resolver->setAllowedTypes('flags', ['int']);
         $resolver->setDefault('offset', 0);

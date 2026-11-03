@@ -15,6 +15,7 @@ namespace CleverAge\ProcessBundle\Transformer\String;
 
 use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Transformer\ConfigurableTransformerInterface;
+use CleverAge\ProcessBundle\Transformer\Regex;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -47,15 +48,18 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
             $string = strip_tags($string);
         }
 
-        return trim(
-            (string) preg_replace(
-                $options['replace'],
-                (string) $options['separator'],
-                // The characters left by the transliterator may be multibyte
-                mb_strtolower(trim($string))
-            ),
-            $options['separator']
+        $slug = preg_replace(
+            $options['replace'],
+            (string) $options['separator'],
+            // The characters left by the transliterator may be multibyte
+            mb_strtolower(trim($string))
         );
+        if (null === $slug) {
+            // A PCRE error gave an empty slug
+            Regex::checkLastError($options['replace']);
+        }
+
+        return trim((string) $slug, $options['separator']);
     }
 
     /**
@@ -81,6 +85,7 @@ class SlugifyTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('transliterator', ['string']);
         $resolver->setAllowedTypes('replace', ['string']);
         $resolver->setAllowedTypes('separator', ['string']);
+        $resolver->setNormalizer('replace', static fn (Options $options, string $pattern): string => Regex::validate($pattern, 'replace'));
 
         $resolver->setNormalizer(
             'transliterator',

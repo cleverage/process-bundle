@@ -21,6 +21,7 @@ use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(PregMatchTransformer::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\CleverAge\ProcessBundle\Transformer\Regex::class)]
 class PregMatchTransformerTest extends TestCase
 {
     /**
@@ -126,5 +127,40 @@ class PregMatchTransformerTest extends TestCase
         $transformer->configureOptions($resolver);
 
         return $resolver->resolve($options);
+    }
+
+    /**
+     * Rejected with the configuration (a PHP warning with the first value, then no match).
+     */
+    public function testInvalidPatternIsRejected(): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('Invalid regular expression "/(a/" in the "pattern" option: Compilation failed: missing closing parenthesis');
+
+        $this->resolveOptions(new PregMatchTransformer(), ['pattern' => '/(a/']);
+    }
+
+    /**
+     * @return iterable<string, array{bool}>
+     */
+    public static function provideModes(): iterable
+    {
+        yield 'preg_match' => [false];
+        yield 'preg_match_all' => [true];
+    }
+
+    /**
+     * A PCRE error was taken for "no match": an empty array.
+     */
+    #[DataProvider('provideModes')]
+    public function testPcreErrorThrows(bool $modeAll): void
+    {
+        $transformer = new PregMatchTransformer();
+        $options = $this->resolveOptions($transformer, ['pattern' => '/a/u', 'mode_all' => $modeAll]);
+
+        $this->expectException(\CleverAge\ProcessBundle\Exception\UnexpectedValueException::class);
+        $this->expectExceptionMessage('The regular expression "/a/u" has failed: Malformed UTF-8 characters, possibly incorrectly encoded');
+
+        $transformer->transform("a\xff", $options);
     }
 }

@@ -22,6 +22,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 #[\PHPUnit\Framework\Attributes\CoversMethod(SlugifyTransformer::class, 'transform')]
 #[\PHPUnit\Framework\Attributes\CoversMethod(SlugifyTransformer::class, 'configureOptions')]
 #[\PHPUnit\Framework\Attributes\CoversMethod(SlugifyTransformer::class, 'getCode')]
+#[\PHPUnit\Framework\Attributes\UsesClass(\CleverAge\ProcessBundle\Transformer\Regex::class)]
 class SlugifyTransformerTest extends TestCase
 {
     public function testTransformWithDefaultOptions(): void
@@ -177,5 +178,13 @@ class SlugifyTransformerTest extends TestCase
         $transformer->configureOptions($resolver);
 
         return $resolver->resolve($options);
+    }
+
+    public function testInvalidReplaceIsRejected(): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('in the "replace" option');
+
+        $this->resolveOptions(new SlugifyTransformer(), ['replace' => '/[a-z/']);
     }
 }
