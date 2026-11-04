@@ -61,7 +61,7 @@ class CallbackTransformer implements ConfigurableTransformerInterface
             'callback',
             static function (Options $options, $value): callable {
                 if (!\is_callable($value)) {
-                    throw new InvalidOptionsException('Callback option must be callable');
+                    throw new InvalidOptionsException(\sprintf('Callback option must be callable, %s given', self::describe($value)));
                 }
 
                 return $value;
@@ -94,5 +94,18 @@ class CallbackTransformer implements ConfigurableTransformerInterface
                 return $value;
             }
         );
+    }
+
+    private static function describe(mixed $value): string
+    {
+        if (\is_string($value)) {
+            return \sprintf('"%s"', $value);
+        }
+        if (\is_array($value) && array_is_list($value) && 2 === \count($value)
+            && (\is_string($value[0]) || \is_object($value[0])) && \is_string($value[1])) {
+            return \sprintf('"%s::%s"', \is_object($value[0]) ? $value[0]::class : $value[0], $value[1]);
+        }
+
+        return get_debug_type($value);
     }
 }

@@ -54,7 +54,7 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
     public function getProcessConfiguration(string $processCode): ProcessConfiguration
     {
         if (!$this->hasProcessConfiguration($processCode)) {
-            throw MissingProcessException::create($processCode);
+            throw MissingProcessException::create($processCode, $this->getProcessCodes());
         }
         $processCode = $this->resolveDeprecatedProcessCode($processCode);
         $this->resolveConfiguration($processCode);
@@ -95,6 +95,16 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
     public function reset(): void
     {
         $this->processConfigurations = [];
+    }
+
+    /**
+     * The codes of the processes, without resolving their configuration.
+     *
+     * @return list<string>
+     */
+    public function getProcessCodes(): array
+    {
+        return array_map(strval(...), array_keys($this->rawConfiguration));
     }
 
     public function hasProcessConfiguration(string $processCode): bool

@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\DependencyInjection\Compiler;
 
+use CleverAge\ProcessBundle\Configuration\DidYouMean;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\Compiler\ServiceLocatorTagPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -101,7 +102,7 @@ final class TaskLocatorCompilerPass implements CompilerPassInterface
                 if (!\is_string($code) || !isset($codes[$code])) {
                     $known = array_keys($codes);
                     sort($known);
-                    throw new InvalidArgumentException(\sprintf('Unknown task code "%s" for the task "%s" of the process "%s". Known codes: "%s".', \is_string($code) ? $code : get_debug_type($code), $taskCode, $processCode, implode('", "', $known)));
+                    throw new InvalidArgumentException(\sprintf('Unknown task code "%s" for the task "%s" of the process "%s".%s A task of the application is given a code with the #[AsTask(code: \'...\')] attribute or the "code" attribute of its "cleverage.task" tag. Known codes: "%s".', \is_string($code) ? $code : get_debug_type($code), $taskCode, $processCode, \is_string($code) ? DidYouMean::suggest($code, $known) : '', implode('", "', $known)));
                 }
                 $configurations[$processCode]['tasks'][$taskCode]['service'] = '@'.$codes[$code];
             }

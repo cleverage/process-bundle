@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Command;
 
+use CleverAge\ProcessBundle\Configuration\DidYouMean;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Event\ConsoleProcessEvent;
 use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
@@ -94,7 +95,7 @@ class ExecuteProcessCommand extends Command
         // Checked before executing anything: a wrong option must not be detected once the work is done
         foreach ($input->getArgument('processCodes') as $code) {
             if (!$this->processRegistry->hasProcessConfiguration($code)) {
-                throw new InvalidConfigurationException("Unknown process {$code}");
+                throw new InvalidConfigurationException(\sprintf('Unknown process %s.%s The processes are listed by the cleverage:process:list command.', $code, DidYouMean::suggest($code, $this->processRegistry->getProcessCodes())));
             }
         }
         $this->checkOutputFormat($input);
@@ -135,7 +136,7 @@ class ExecuteProcessCommand extends Command
             preg_match($pattern, (string) $contextValue, $parts);
             if (3 !== \count($parts)
                 || $parts[0] !== $contextValue) {
-                throw new InvalidArgumentException(\sprintf('Invalid context %s', $contextValue));
+                throw new InvalidArgumentException(\sprintf('Invalid context %s: expected key:value, e.g. -c date:2024-01-01 (the value is parsed as YAML)', $contextValue));
             }
             $context[$parts[1]] = $parser->parse($parts[2]);
         }
@@ -181,7 +182,9 @@ class ExecuteProcessCommand extends Command
             throw new InvalidArgumentException("The 'dump' output format requires the VarDumper component: run \"composer require symfony/var-dumper\"");
         }
 
-        throw new InvalidArgumentException(\sprintf("Cannot handle data output with format '%s'", $format));
+        $formats = [self::OUTPUT_FORMAT_DUMP, self::OUTPUT_FORMAT_JSON];
+
+        throw new InvalidArgumentException(\sprintf("Cannot handle data output with format '%s': use '%s' (STDOUT only) or '%s'.%s", $format, self::OUTPUT_FORMAT_DUMP, self::OUTPUT_FORMAT_JSON, DidYouMean::suggest((string) $format, $formats)));
     }
 
     protected function handleOutputData(mixed $data, InputInterface $input, OutputInterface $output): void

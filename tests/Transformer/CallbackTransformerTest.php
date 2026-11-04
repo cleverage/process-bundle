@@ -154,9 +154,25 @@ class CallbackTransformerTest extends TestCase
     public function testNonCallableCallbackIsRejected(): void
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('Callback option must be callable');
+        $this->expectExceptionMessage('Callback option must be callable, "not_a_function" given');
 
         $this->resolveOptions(new CallbackTransformer(), ['callback' => 'not_a_function']);
+    }
+
+    public function testNonCallableStaticMethodIsDescribed(): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('Callback option must be callable, "'.self::class.'::unknownMethod" given');
+
+        $this->resolveOptions(new CallbackTransformer(), ['callback' => [self::class, 'unknownMethod']]);
+    }
+
+    public function testNonCallableArrayIsDescribedByItsType(): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('Callback option must be callable, array given');
+
+        $this->resolveOptions(new CallbackTransformer(), ['callback' => [1, 2, 3]]);
     }
 
     public function testClosureCallbackIsRejected(): void

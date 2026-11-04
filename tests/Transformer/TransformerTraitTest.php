@@ -29,6 +29,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 #[\PHPUnit\Framework\Attributes\UsesClass(TrimTransformer::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(MissingTransformerException::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(TransformerException::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\CleverAge\ProcessBundle\Configuration\DidYouMean::class)]
 class TransformerTraitTest extends TestCase
 {
     /**

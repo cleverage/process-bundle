@@ -27,6 +27,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 #[UsesClass(MissingTransformerException::class)]
 #[UsesClass(TrimTransformer::class)]
 #[UsesClass(CastTransformer::class)]
+#[UsesClass(\CleverAge\ProcessBundle\Configuration\DidYouMean::class)]
 class TransformerRegistryTest extends TestCase
 {
     private int $instantiations = 0;

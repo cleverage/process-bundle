@@ -121,22 +121,23 @@ class ConfigurationTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{array<string, mixed>}>
+     * @return iterable<string, array{array<string, mixed>, string}>
      */
     public static function provideInvalidTaskDefinitions(): iterable
     {
-        yield 'neither service nor task' => [['options' => []]];
-        yield 'both service and task' => [['service' => '@app.task', 'task' => 'transformer']];
+        // The message said "not both"
+        yield 'neither service nor task' => [['options' => []], 'A task must define its code ("task: <code>", given on the reference page of each task), it defines neither "task" nor, deprecated, "service"'];
+        yield 'both service and task' => [['service' => '@app.task', 'task' => 'transformer'], 'A task must define either its code ("task: <code>") or, deprecated, its "service", not both'];
     }
 
     /**
      * @param array<string, mixed> $task
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('provideInvalidTaskDefinitions')]
-    public function testTaskMustDefineEitherAServiceOrACode(array $task): void
+    public function testTaskMustDefineEitherAServiceOrACode(array $task, string $message): void
     {
         $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage('A task must define either its code ("task: <code>") or, deprecated, its "service", not both');
+        $this->expectExceptionMessage($message);
 
         // Deprecated "service" option, see testServiceIsDeprecated()
         self::ignoreDeprecations(fn (): array => $this->process(['configurations' => ['test.process' => ['tasks' => ['invalid' => $task]]]]));
@@ -257,6 +258,22 @@ class ConfigurationTest extends TestCase
         $this->expectException(InvalidConfigurationException::class);
         $this->expectExceptionMessage('Invalid type for path "clever_age_process.configurations.test.process.exclusive". Expected "bool"');
         $this->process(['configurations' => ['test.process' => ['exclusive' => 'yes', 'tasks' => []]]]);
+    }
+
+    /**
+     * "outputs: [next]" indented as a task: it was reported as an unknown option "0".
+     */
+    public function testATaskGivenAsAListIsReported(): void
+    {
+        // Thrown by the normalization (beforeNormalization()), before the validation
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A task is defined by a mapping ("task", "options", "outputs"...), not by a list: check the indentation of the "outputs" or "error_outputs" of the previous task.');
+
+        $this->process(['configurations' => ['test.process' => ['tasks' => [
+            'first' => ['task' => 'transformer'],
+            'outputs' => ['next'],
+            'next' => ['task' => 'transformer'],
+        ]]]]);
     }
 
     public function testPublicMustBeABoolean(): void

@@ -13,14 +13,19 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Exception;
 
+use CleverAge\ProcessBundle\Configuration\DidYouMean;
+
 /**
  * Exception thrown when trying to fetch a missing transformer.
  */
 class MissingTransformerException extends \UnexpectedValueException implements ProcessExceptionInterface
 {
-    public static function create(?string $code = ''): self
+    /**
+     * @param iterable<int|string> $knownCodes to suggest the closest one
+     */
+    public static function create(?string $code = '', iterable $knownCodes = []): self
     {
-        $errorStr = "No transformer with code : {$code}";
+        $errorStr = "No transformer with code : {$code}".DidYouMean::suggest((string) $code, $knownCodes);
 
         return new self($errorStr);
     }

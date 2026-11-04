@@ -18,6 +18,9 @@ Latest
 * [#447](https://github.com/cleverage/process-bundle/issues/447) `date_parser`: the trailing data allowed by a `+` in the format (e.g. `!Y-m-d+`) is no longer rejected (`Trailing data` warning, rejected since 5.7 with the other warnings). Update documentation, add tests.
 * [#449](https://github.com/cleverage/process-bundle/issues/449) `sprintf`: a width or a precision given as an argument (`%*d`, `%.*f`, `%1$*2$d`) is accepted by the validation of the `format` option (rejected since 5.7). Add tests.
 
+### Changes
+* [#463](https://github.com/cleverage/process-bundle/issues/463) Error messages give the fix: a "Did you mean" suggestion for an unknown process (with a hint about `cleverage:process:list`), transformer, task code (with a hint about `#[AsTask]` / the `cleverage.task` tag) or output format (with the valid formats); the `key:value` format of an invalid context; the value of a `callback` that is not callable; a task given as a list (e.g. `outputs` badly indented) instead of `Unrecognized option "0"`; "neither" for a task without `task` nor `service`. New `ProcessConfigurationRegistry::getProcessCodes()`. Add tests.
+
 v5.8
 -----
 
