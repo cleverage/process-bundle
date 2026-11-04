@@ -75,4 +75,5 @@ clever_age_process:
 ```
 
 As any transformer code, generic transformer codes must be unique: use a prefix to avoid conflicts. A dash is kept in
-the code (it was replaced by an underscore before 5.7, the former name is deprecated).
+the code (it was replaced by an underscore before 5.7, the former name is deprecated), as in the codes of the
+transformers and of the contextual options of a generic transformer.

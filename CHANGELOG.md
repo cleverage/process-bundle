@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#438](https://github.com/cleverage/process-bundle/issues/438) Generic transformers: the codes of their `transformers` and `contextual_options` keep their dashes, as the codes of the processes, tasks and generic transformers since 5.7. A generic transformer referencing a generic transformer whose code has a dash no longer triggers the deprecation of its former name, and a transformer service whose code has a dash is found. Update documentation, add tests.
+
 v5.8
 -----
 

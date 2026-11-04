@@ -278,6 +278,13 @@ class ConfigurationTest extends TestCase
         self::assertSame(['to-upper'], array_keys($config['generic_transformers']));
         self::assertSame(['demo.x-y'], array_keys($config['configurations']));
         self::assertSame(['first-task', 'next-task'], array_keys($config['configurations']['demo.x-y']['tasks']));
+        // The transformers and the contextual options of a generic transformer, referenced by their code
+        $config = $this->process(['generic_transformers' => ['wrap' => [
+            'contextual_options' => ['wrap-format' => ['default' => '[%s]']],
+            'transformers' => ['to-upper' => null, 'sprintf' => ['format' => '{{ wrap-format }}']],
+        ]]]);
+        self::assertSame(['wrap-format'], array_keys($config['generic_transformers']['wrap']['contextual_options']));
+        self::assertSame(['to-upper', 'sprintf'], array_keys($config['generic_transformers']['wrap']['transformers']));
         // The keys of the options are still normalized
         self::assertArrayHasKey('error_outputs', $this->process(['configurations' => ['p' => ['tasks' => [
             't' => ['task' => 'transformer', 'error-outputs' => ['u']],
