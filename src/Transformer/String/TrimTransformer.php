@@ -42,6 +42,15 @@ class TrimTransformer implements ConfigurableTransformerInterface
         // trim() removes bytes: a multibyte character of the list would cut the characters sharing its bytes (ranges
         // with ".." are only supported for single-byte characters)
         if (1 === preg_match('/[\x80-\xff]/', $charlist)) {
+            // mb_trim() does not support the ranges: expanded before (single-byte characters only, as trim())
+            $charlist = (string) preg_replace_callback(
+                '/([\x00-\x7f])\.\.([\x00-\x7f])/',
+                static fn (array $range): string => \ord($range[1]) <= \ord($range[2])
+                    ? implode('', range($range[1], $range[2]))
+                    : $range[0],
+                $charlist
+            );
+
             return mb_trim((string) $value, $charlist);
         }
 
