@@ -38,6 +38,9 @@ When the process fails or is stopped (stop request, [StopTask](stop_task.md)) wh
 they are stopped when the task is finalized (a warning is logged), and the JSON stream files not output yet are removed:
 the sub-processes no longer go on with their side effects after the end of the process.
 
+The sub-processes are stopped together: `SIGTERM` is sent to all of them, then `SIGKILL` to the ones still running
+after 5 seconds, whatever their number (within the grace period of `docker stop` or Kubernetes).
+
 Options
 -------
 
