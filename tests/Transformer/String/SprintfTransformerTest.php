@@ -51,6 +51,10 @@ class SprintfTransformerTest extends TestCase
         yield 'several' => ['%s-%d-%.2f %%'];
         yield 'positional' => ['%3$s %1$s'];
         yield 'no specification' => ['text'];
+        // Width and precision given as an argument (PHP 8): they were rejected, tested with string arguments
+        yield 'width argument' => ['%*d'];
+        yield 'precision argument' => ['%.*f'];
+        yield 'positional width argument' => ['%1$*2$d'];
     }
 
     #[DataProvider('provideValidFormats')]
@@ -73,5 +77,17 @@ class SprintfTransformerTest extends TestCase
         $this->expectException(InvalidOptionsException::class);
         $this->expectExceptionMessage('Invalid "format" option "50%": Missing format specifier at end of string');
         $resolver->resolve(['format' => '50%']);
+    }
+
+    /**
+     * The transformation of a format with a width given as an argument.
+     */
+    public function testWidthArgument(): void
+    {
+        $resolver = new OptionsResolver();
+        $transformer = new SprintfTransformer();
+        $transformer->configureOptions($resolver);
+
+        $this->assertSame('   42', $transformer->transform([5, 42], $resolver->resolve(['format' => '%*d'])));
     }
 }
