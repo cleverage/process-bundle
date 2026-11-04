@@ -329,6 +329,12 @@ stop, a task blocked in a single long call stops only when the call returns: giv
 before killing it (e.g. `docker stop --time`, `terminationGracePeriodSeconds` of Kubernetes, `stopwaitsecs` of
 supervisord).
 
+Ctrl+C in a terminal sends SIGINT to the whole foreground process group: the system processes started by the
+[CommandRunnerTask](reference/tasks/command_runner_task.md) and the
+[ProcessLauncherTask](reference/tasks/process_launcher_task.md) receive it too, and are interrupted right away: the task
+fails (e.g. a `ProcessSignaledException` for the CommandRunnerTask), instead of the cooperative stop. A signal sent to the PHP process only (`kill
+-TERM <pid>`, `docker stop` for the main process of a container) does not reach them.
+
 ## Parallelization
 
 PHP executes a process in a single thread. To use several CPU cores, the

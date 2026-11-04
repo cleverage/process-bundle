@@ -159,7 +159,8 @@ class ProcessConfigurationRegistryTest extends TestCase
 
         self::assertSame(['test.valid', 'test.other'], array_keys($configurations));
         self::assertSame(['test.valid', 'test.other'], array_keys($registry->getProcessConfigurations()));
-        self::assertCount(4, $logger->records);
+        // Logged once per process: the listing is done on each page of a user interface
+        self::assertCount(2, $logger->records);
         [$level, $message, $context] = $logger->records[0];
         self::assertSame('error', $level);
         self::assertSame("The process test.unknown_output is left out of the process list, its configuration is not valid: Unknown task 'missing' in the 'outputs' of the task 'read' (from process: test.unknown_output)", $message);
