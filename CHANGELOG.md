@@ -7,6 +7,7 @@ Latest
 * [#440](https://github.com/cleverage/process-bundle/issues/440) Documentation: `json_stream_reader` and `file_splitter` open their path with `SplFileObject`, any PHP stream wrapper is accepted (`http://`, `php://filter`...); the path must not be built from untrusted input (SSRF, reading local files), validate it before the task.
 
 ## Fixes
+* [#459](https://github.com/cleverage/process-bundle/issues/459) `process_launcher`: the sub-processes still running are stopped together (`SIGTERM` to all of them, `SIGKILL` after 5 seconds), instead of one after the other with up to 5 seconds each (40 seconds for 8 sub-processes, longer than the grace period of `docker stop` or Kubernetes). Update documentation, add tests.
 * [#455](https://github.com/cleverage/process-bundle/issues/455) `cleverage:process:execute -o <file> -t json-stream`: the invalid UTF-8 sequences of the output are replaced, as on STDOUT (a `JsonException` was thrown, also by the buffer of `process_launcher`); an output that cannot be encoded as JSON is reported on the error output. Update documentation, add tests.
 * [#457](https://github.com/cleverage/process-bundle/issues/457) `mapping` / `callback`: the deprecations of a literal key of an array destination (once per target property) and of `additional_parameters` are triggered once, instead of for each item or each resolution of the options. Add tests.
 * [#453](https://github.com/cleverage/process-bundle/issues/453) `trim`: the ranges of single-byte characters (`a..z`) of a `charlist` with a multibyte character are expanded before `mb_trim()`, which does not support them (the range was lost, its `.` removed). Update documentation, add tests.
@@ -16,9 +17,6 @@ Latest
 * [#438](https://github.com/cleverage/process-bundle/issues/438) Generic transformers: the codes of their `transformers` and `contextual_options` keep their dashes, as the codes of the processes, tasks and generic transformers since 5.7. A generic transformer referencing a generic transformer whose code has a dash no longer triggers the deprecation of its former name, and a transformer service whose code has a dash is found. Update documentation, add tests.
 * [#447](https://github.com/cleverage/process-bundle/issues/447) `date_parser`: the trailing data allowed by a `+` in the format (e.g. `!Y-m-d+`) is no longer rejected (`Trailing data` warning, rejected since 5.7 with the other warnings). Update documentation, add tests.
 * [#449](https://github.com/cleverage/process-bundle/issues/449) `sprintf`: a width or a precision given as an argument (`%*d`, `%.*f`, `%1$*2$d`) is accepted by the validation of the `format` option (rejected since 5.7). Add tests.
-
-### Fixes
-* [#459](https://github.com/cleverage/process-bundle/issues/459) `process_launcher`: the sub-processes still running are stopped together (`SIGTERM` to all of them, `SIGKILL` after 5 seconds), instead of one after the other with up to 5 seconds each (40 seconds for 8 sub-processes, longer than the grace period of `docker stop` or Kubernetes). Update documentation, add tests.
 
 v5.8
 -----
