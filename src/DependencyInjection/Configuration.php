@@ -104,12 +104,16 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('contextual_options')
             ->info('Options of the transformer (code: definition with required, default, default_is_null), injected in the "transformers" with "{{ code }}"')
             ->example(['delimiter' => ['default' => ',']])
+            // Keep the dashes of the option codes, as written in the options given to the transformer and in "{{ code }}"
+            ->normalizeKeys(false)
             ->variablePrototype()
             ->end()
             ->end()
             ->arrayNode('transformers')
             ->info('Transformers applied in sequence, by code, with their options')
             ->example(['explode' => ['delimiter' => '{{ separator }}']])
+            // Keep the dashes of the transformer codes (the former name of a generic transformer is deprecated)
+            ->normalizeKeys(false)
             ->variablePrototype()
             ->end()
             ->end();
