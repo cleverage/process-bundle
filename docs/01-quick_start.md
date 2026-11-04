@@ -272,7 +272,7 @@ Process 'project_prefix.process_name' executed successfully
 
 | Option | Shortcut | Description |
 | ------ | :------: | ----------- |
-| `--input=<value>` | `-i` | Value given as input to the task defined by the process `entry_point` (ignored with a warning if the process has no entry point) |
+| `--input=<value>` | `-i` | Value given as input to the task defined by the process `entry_point` (ignored if the process has no entry point, with a warning on the error output of the command) |
 | `--input-from-stdin` | | Read the input value from STDIN instead (e.g. `cat file.json \| bin/console cleverage:process:execute ...`) |
 | `--context=<key>:<value>` | `-c` | Contextual value, can be repeated. The key must only contain word characters (`\w+`: letters, digits, `_`). The value is parsed as YAML, so `-c limit:10` gives an integer and `-c name:"'foo'"` forces a string (also needed for dates: `-c date:2024-01-01` gives an integer timestamp) |
 | `--output=<path>` | `-o` | Where to dump the value returned by the task defined by the process `end_point`: `-` (default) for STDOUT, or a file path |
