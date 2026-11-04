@@ -20,6 +20,9 @@ Latest
 * [#447](https://github.com/cleverage/process-bundle/issues/447) `date_parser`: the trailing data allowed by a `+` in the format (e.g. `!Y-m-d+`) is no longer rejected (`Trailing data` warning, rejected since 5.7 with the other warnings). Update documentation, add tests.
 * [#449](https://github.com/cleverage/process-bundle/issues/449) `sprintf`: a width or a precision given as an argument (`%*d`, `%.*f`, `%1$*2$d`) is accepted by the validation of the `format` option (rejected since 5.7). Add tests.
 
+### Changes
+* [#465](https://github.com/cleverage/process-bundle/issues/465) Shell completion: `cleverage:process:execute` and `cleverage:process:help` suggest the process codes, and `--output-format` its values. Update documentation, add tests.
+
 v5.8
 -----
 
