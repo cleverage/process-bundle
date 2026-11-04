@@ -56,8 +56,13 @@ class DateParserTransformer implements ConfigurableTransformerInterface
         // An out-of-range value (e.g. "2024-02-31", "25:61") is parsed with a warning, the date overflowing to the next
         // month or day
         $errors = \DateTime::getLastErrors();
-        if (\is_array($errors) && [] !== $errors['warnings']) {
-            throw new UnexpectedValueException(\sprintf('Given value "%s" is not a valid date: %s', $value, implode(', ', $errors['warnings'])));
+        $warnings = \is_array($errors) ? $errors['warnings'] : [];
+        if (str_contains($options['format'], '+')) {
+            // The "+" of the format allows trailing data, reported as a warning
+            $warnings = array_filter($warnings, static fn (string $warning): bool => 'Trailing data' !== $warning);
+        }
+        if ([] !== $warnings) {
+            throw new UnexpectedValueException(\sprintf('Given value "%s" is not a valid date: %s', $value, implode(', ', $warnings)));
         }
 
         return $date;
