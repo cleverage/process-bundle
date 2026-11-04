@@ -33,6 +33,14 @@ class MappingTransformer implements ConfigurableTransformerInterface
 {
     use TransformerTrait;
 
+    /**
+     * The target properties whose deprecation (literal key of an array destination) has been triggered: once per
+     * target property.
+     *
+     * @var array<string, true>
+     */
+    private static array $deprecatedLiteralKeys = [];
+
     public function __construct(
         TransformerRegistry $transformerRegistry,
         protected LoggerInterface $logger,
@@ -118,7 +126,9 @@ class MappingTransformer implements ConfigurableTransformerInterface
             } elseif ($this->accessor->isWritable($result, $targetProperty)) {
                 $this->accessor->setValue($result, $targetProperty, $transformedValue);
             } elseif (\is_array($result)) {
-                if (!$this->isSimplePropertyName($targetProperty)) {
+                // Once per target property: it was triggered for each transformed item
+                if (!$this->isSimplePropertyName($targetProperty) && !isset(self::$deprecatedLiteralKeys[$targetProperty])) {
+                    self::$deprecatedLiteralKeys[$targetProperty] = true;
                     trigger_deprecation(
                         'cleverage/process-bundle',
                         '5.2',

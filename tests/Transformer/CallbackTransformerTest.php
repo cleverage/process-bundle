@@ -31,6 +31,12 @@ class CallbackTransformerTest extends TestCase
         return implode('-', $args);
     }
 
+    protected function setUp(): void
+    {
+        // The deprecation is triggered once per PHP process
+        (new \ReflectionProperty(CallbackTransformer::class, 'additionalParametersDeprecated'))->setValue(null, false);
+    }
+
     public function testGetCode(): void
     {
         self::assertSame('callback', (new CallbackTransformer())->getCode());
@@ -103,6 +109,11 @@ class CallbackTransformerTest extends TestCase
             return true;
         }, \E_USER_DEPRECATED);
         try {
+            $this->resolveOptions($transformer, [
+                'callback' => [self::class, 'doCallback'],
+                'additional_parameters' => [7, 8],
+            ]);
+            // Once: it was triggered each time the options were resolved
             $this->resolveOptions($transformer, [
                 'callback' => [self::class, 'doCallback'],
                 'additional_parameters' => [7, 8],

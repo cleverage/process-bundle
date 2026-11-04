@@ -42,6 +42,12 @@ class MappingTransformerTest extends TestCase
      */
     private array $deprecations = [];
 
+    protected function setUp(): void
+    {
+        // The deprecation is triggered once per PHP process
+        (new \ReflectionProperty(MappingTransformer::class, 'deprecatedLiteralKeys'))->setValue(null, []);
+    }
+
     public function testGetCode(): void
     {
         self::assertSame('mapping', $this->createTransformer()->getCode());
@@ -530,6 +536,8 @@ class MappingTransformerTest extends TestCase
         ]);
 
         $result = $this->transformCollectingDeprecations($transformer, ['field' => 'value'], $options);
+        // Once per target property: it was triggered for each item
+        $this->transformCollectingDeprecations($transformer, ['field' => 'other'], $options);
 
         self::assertSame([$targetProperty => 'value'], $result);
         self::assertSame([

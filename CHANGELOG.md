@@ -7,6 +7,7 @@ Latest
 * [#440](https://github.com/cleverage/process-bundle/issues/440) Documentation: `json_stream_reader` and `file_splitter` open their path with `SplFileObject`, any PHP stream wrapper is accepted (`http://`, `php://filter`...); the path must not be built from untrusted input (SSRF, reading local files), validate it before the task.
 
 ## Fixes
+* [#457](https://github.com/cleverage/process-bundle/issues/457) `mapping` / `callback`: the deprecations of a literal key of an array destination (once per target property) and of `additional_parameters` are triggered once, instead of for each item or each resolution of the options. Add tests.
 * [#453](https://github.com/cleverage/process-bundle/issues/453) `trim`: the ranges of single-byte characters (`a..z`) of a `charlist` with a multibyte character are expanded before `mb_trim()`, which does not support them (the range was lost, its `.` removed). Update documentation, add tests.
 * [#451](https://github.com/cleverage/process-bundle/issues/451) `process_launcher`: when the process fails or is stopped, the JSON buffers of the terminated sub-processes not output yet are removed too, as documented (they were left in the temporary directory). Add tests.
 * [#434](https://github.com/cleverage/process-bundle/issues/434) Signals: when the same SIGINT or SIGTERM is received again while a process is running, the command exits right away, as documented. The console application dispatches the same event at each signal, whose exit stayed aborted by the first signal. Add tests.
