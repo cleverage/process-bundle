@@ -2,6 +2,7 @@ Latest
 ------
 
 ## Changes
+* [#461](https://github.com/cleverage/process-bundle/issues/461) `cleverage:process:execute`: an input (`--input`, `--input-from-stdin`) given to a process without `entry_point` is reported on the error output of the command (only logged as a warning, not displayed without `-v`). Update documentation, add tests.
 * [#444](https://github.com/cleverage/process-bundle/issues/444) New `exclusive` option of the processes (`false` by default): an execution of an exclusive process fails with the new `ProcessAlreadyRunningException` while another execution of it is running (same PHP process, or another one sharing the lock store), dispatched as any process failure. Backed by symfony/lock (new `suggest`, required by an exclusive process when the container is compiled): `ProcessManager` takes an optional `LockFactory` (`lock.factory`), the lock is named `cleverage_process.exclusive.<process_code>`, has a TTL of 300 seconds refreshed before the tasks, and is released at the end of the process or by the reset of the services. New `ProcessConfiguration::isExclusive()`. Update documentation, add tests.
 * [#443](https://github.com/cleverage/process-bundle/issues/443) Documentation: two executions of the same process can run at the same time (cron, user interface, scheduler, Messenger workers); make the outputs unique and the writes idempotent, or lock the execution.
 * [#440](https://github.com/cleverage/process-bundle/issues/440) Documentation: `json_stream_reader` and `file_splitter` open their path with `SplFileObject`, any PHP stream wrapper is accepted (`http://`, `php://filter`...); the path must not be built from untrusted input (SSRF, reading local files), validate it before the task.
@@ -12,9 +13,6 @@ Latest
 * [#438](https://github.com/cleverage/process-bundle/issues/438) Generic transformers: the codes of their `transformers` and `contextual_options` keep their dashes, as the codes of the processes, tasks and generic transformers since 5.7. A generic transformer referencing a generic transformer whose code has a dash no longer triggers the deprecation of its former name, and a transformer service whose code has a dash is found. Update documentation, add tests.
 * [#447](https://github.com/cleverage/process-bundle/issues/447) `date_parser`: the trailing data allowed by a `+` in the format (e.g. `!Y-m-d+`) is no longer rejected (`Trailing data` warning, rejected since 5.7 with the other warnings). Update documentation, add tests.
 * [#449](https://github.com/cleverage/process-bundle/issues/449) `sprintf`: a width or a precision given as an argument (`%*d`, `%.*f`, `%1$*2$d`) is accepted by the validation of the `format` option (rejected since 5.7). Add tests.
-
-### Changes
-* [#461](https://github.com/cleverage/process-bundle/issues/461) `cleverage:process:execute`: an input (`--input`, `--input-from-stdin`) given to a process without `entry_point` is reported on the error output of the command (only logged as a warning, not displayed without `-v`). Update documentation, add tests.
 
 v5.8
 -----
