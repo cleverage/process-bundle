@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#440](https://github.com/cleverage/process-bundle/issues/440) Documentation: `json_stream_reader` and `file_splitter` open their path with `SplFileObject`, any PHP stream wrapper is accepted (`http://`, `php://filter`...); the path must not be built from untrusted input (SSRF, reading local files), validate it before the task.
+
 v5.8
 -----
 
