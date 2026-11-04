@@ -7,14 +7,12 @@ Latest
 * [#440](https://github.com/cleverage/process-bundle/issues/440) Documentation: `json_stream_reader` and `file_splitter` open their path with `SplFileObject`, any PHP stream wrapper is accepted (`http://`, `php://filter`...); the path must not be built from untrusted input (SSRF, reading local files), validate it before the task.
 
 ## Fixes
+* [#457](https://github.com/cleverage/process-bundle/issues/457) `mapping` / `callback`: the deprecations of a literal key of an array destination (once per target property) and of `additional_parameters` are triggered once, instead of for each item or each resolution of the options. Add tests.
 * [#434](https://github.com/cleverage/process-bundle/issues/434) Signals: when the same SIGINT or SIGTERM is received again while a process is running, the command exits right away, as documented. The console application dispatches the same event at each signal, whose exit stayed aborted by the first signal. Add tests.
 * [#436](https://github.com/cleverage/process-bundle/issues/436) `xpath_evaluator`: a boolean expression whose value is `false` (`boolean()`, `not()`, a false comparison) returns `false`, instead of throwing `Invalid xpath query '...': unknown error`. Only an expression reporting libxml errors is invalid. Add tests.
 * [#438](https://github.com/cleverage/process-bundle/issues/438) Generic transformers: the codes of their `transformers` and `contextual_options` keep their dashes, as the codes of the processes, tasks and generic transformers since 5.7. A generic transformer referencing a generic transformer whose code has a dash no longer triggers the deprecation of its former name, and a transformer service whose code has a dash is found. Update documentation, add tests.
 * [#447](https://github.com/cleverage/process-bundle/issues/447) `date_parser`: the trailing data allowed by a `+` in the format (e.g. `!Y-m-d+`) is no longer rejected (`Trailing data` warning, rejected since 5.7 with the other warnings). Update documentation, add tests.
 * [#449](https://github.com/cleverage/process-bundle/issues/449) `sprintf`: a width or a precision given as an argument (`%*d`, `%.*f`, `%1$*2$d`) is accepted by the validation of the `format` option (rejected since 5.7). Add tests.
-
-### Fixes
-* [#457](https://github.com/cleverage/process-bundle/issues/457) `mapping` / `callback`: the deprecations of a literal key of an array destination (once per target property) and of `additional_parameters` are triggered once, instead of for each item or each resolution of the options. Add tests.
 
 v5.8
 -----
