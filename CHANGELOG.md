@@ -11,6 +11,9 @@ Latest
 * [#436](https://github.com/cleverage/process-bundle/issues/436) `xpath_evaluator`: a boolean expression whose value is `false` (`boolean()`, `not()`, a false comparison) returns `false`, instead of throwing `Invalid xpath query '...': unknown error`. Only an expression reporting libxml errors is invalid. Add tests.
 * [#438](https://github.com/cleverage/process-bundle/issues/438) Generic transformers: the codes of their `transformers` and `contextual_options` keep their dashes, as the codes of the processes, tasks and generic transformers since 5.7. A generic transformer referencing a generic transformer whose code has a dash no longer triggers the deprecation of its former name, and a transformer service whose code has a dash is found. Update documentation, add tests.
 
+### Fixes
+* [#447](https://github.com/cleverage/process-bundle/issues/447) `date_parser`: the trailing data allowed by a `+` in the format (e.g. `!Y-m-d+`) is no longer rejected (`Trailing data` warning, rejected since 5.7 with the other warnings). Update documentation, add tests.
+
 v5.8
 -----
 

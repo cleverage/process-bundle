@@ -128,6 +128,22 @@ class DateParserTransformerTest extends TestCase
         (new DateParserTransformer())->transform($value, ['format' => $format]);
     }
 
+    /**
+     * The "+" of the format allows trailing data, reported as a warning: the date was rejected.
+     */
+    public function testTrailingDataIsAllowedByThePlusFormat(): void
+    {
+        $date = (new DateParserTransformer())->transform('2024-02-29T10:00:00.123Z', ['format' => '!Y-m-d+']);
+
+        $this->assertInstanceOf(\DateTime::class, $date);
+        $this->assertSame('2024-02-29 00:00:00', $date->format('Y-m-d H:i:s'));
+
+        // Another warning is still an error
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('Given value "2024-02-31 trailing" is not a valid date: The parsed date was invalid');
+        (new DateParserTransformer())->transform('2024-02-31 trailing', ['format' => 'Y-m-d+']);
+    }
+
     public function testTransformLeapDay(): void
     {
         $date = (new DateParserTransformer())->transform('2024-02-29', ['format' => '!Y-m-d']);
