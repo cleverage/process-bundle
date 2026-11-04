@@ -23,6 +23,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\SubprocessInstance;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Task\Process\ProcessLauncherTask;
+use PHPUnit\Framework\Attributes\RequiresPhpExtension;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
@@ -220,6 +221,33 @@ class ProcessLauncherTaskTest extends TestCase
         $this->assertFalse($task->next($state));
     }
 
+    /**
+     * Stopped one after the other, each one waiting up to the timeout, 3 sub-processes ignoring SIGTERM took 3 times
+     * the timeout.
+     */
+    #[RequiresPhpExtension('pcntl')]
+    public function testTheSubprocessesAreStoppedTogether(): void
+    {
+        [$task, $state] = $this->launch('stubborn', wait: false);
+        $this->launch('stubborn', $task, $state, wait: false);
+        $this->launch('stubborn', $task, $state, wait: false);
+        /** @var array<SubprocessInstance> $launchedProcesses */
+        $launchedProcesses = (new \ReflectionProperty($task, 'launchedProcesses'))->getValue($task);
+        $this->assertCount(3, $launchedProcesses);
+        usleep(300_000); // The sub-processes ignore SIGTERM
+
+        $start = microtime(true);
+        (new \ReflectionMethod($task, 'stopProcesses'))->invoke($task, $launchedProcesses, 1.0);
+        $duration = microtime(true) - $start;
+
+        foreach ($launchedProcesses as $process) {
+            $this->assertFalse($process->getProcess()->isRunning());
+            $process->removeBuffer();
+        }
+        $this->assertGreaterThanOrEqual(1.0, $duration, 'Killed after the timeout');
+        $this->assertLessThan(2.0, $duration, 'A single timeout for all of them');
+    }
+
     public function testFinalizeWithoutSubprocess(): void
     {
         $task = $this->createTask();
@@ -260,6 +288,11 @@ class ProcessLauncherTaskTest extends TestCase
                     usleep(500000);
                     exit(1);
                 } elseif ('sleep' === $input) {
+                    sleep(30);
+                } elseif ('stubborn' === $input) {
+                    // Ignores SIGTERM: killed after the stop timeout
+                    pcntl_async_signals(true);
+                    pcntl_signal(15, SIG_IGN);
                     sleep(30);
                 }
                 PHP);

@@ -36,6 +36,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableTaskInterface, IterableTaskInterface, FinalizableTaskInterface
 {
+    /** Seconds given to the sub-processes to stop after SIGTERM, before SIGKILL */
+    protected const STOP_TIMEOUT = 5;
+
+    /** The value of SIGTERM, whose constant is defined by the pcntl extension */
+    private const SIGTERM = 15;
+
     /**
      * @var SubprocessInstance[]
      */
@@ -147,12 +153,9 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     public function finalize(ProcessState $state): void
     {
-        $running = 0;
+        $running = \count(array_filter($this->launchedProcesses, static fn (SubprocessInstance $process): bool => !$process->getProcess()->isTerminated()));
+        $this->stopProcesses($this->launchedProcesses);
         foreach ($this->launchedProcesses as $process) {
-            if (!$process->getProcess()->isTerminated()) {
-                ++$running;
-            }
-            $process->stop(5);
             $process->removeBuffer();
         }
         if ($running > 0) {
@@ -302,13 +305,40 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
      */
     protected function killProcesses(): void
     {
-        foreach ($this->launchedProcesses as $process) {
-            // An already terminated sub-process keeps its buffer: it is handled normally at the next call
-            $running = !$process->getProcess()->isTerminated();
-            $process->stop(5);
-            if ($running) {
-                $process->removeBuffer();
+        // An already terminated sub-process keeps its buffer: it is handled normally at the next call
+        $running = array_filter($this->launchedProcesses, static fn (SubprocessInstance $process): bool => !$process->getProcess()->isTerminated());
+        $this->stopProcesses($running);
+        foreach ($running as $process) {
+            $process->removeBuffer();
+        }
+    }
+
+    /**
+     * Stops the sub-processes together: SIGTERM to all of them, then SIGKILL to the ones still running after the
+     * timeout. Stopped one after the other, each one waiting up to the timeout, 8 sub-processes took up to 40 seconds,
+     * longer than the grace period of docker stop (10 s) or Kubernetes (30 s).
+     *
+     * @param array<SubprocessInstance> $processes
+     */
+    protected function stopProcesses(array $processes, float $timeout = self::STOP_TIMEOUT): void
+    {
+        foreach ($processes as $process) {
+            if ($process->getProcess()->isRunning()) {
+                try {
+                    $process->getProcess()->signal(self::SIGTERM);
+                } catch (\Throwable) {
+                    // Terminated in the meantime, or a signal not supported (Windows): stopped below
+                }
             }
+        }
+        $deadline = microtime(true) + $timeout;
+        while (microtime(true) < $deadline
+            && [] !== array_filter($processes, static fn (SubprocessInstance $process): bool => $process->getProcess()->isRunning())) {
+            usleep(10_000);
+        }
+        foreach ($processes as $process) {
+            // SIGKILL if still running
+            $process->stop(0);
         }
     }
 }
