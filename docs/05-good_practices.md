@@ -71,6 +71,21 @@ See [errors and skips](04-advanced_workflow.md#errors-and-skips).
 - Measure: see the [memory usage cookbook](cookbooks/memory_usage_graph.md), and always check memory in the `prod`
   environment (the `dev` environment keeps logs and debug data in memory).
 
+## Do not execute a process twice at the same time
+
+Nothing prevents two executions of the same process from running at the same time: two `cleverage:process:execute`
+commands (a cron entry whose previous run is not over), or executions launched from a user interface, a scheduler or
+several Messenger workers. Both executions then read the same data and write to the same places: a file written to a
+fixed path (`csv_writer` without `{unique_token}`, `file_mover`) is overwritten or truncated by the other execution, and
+the database writes of both executions mix.
+
+When a process must not run twice at the same time:
+
+- make its outputs unique (`{unique_token}`, `{date_time}` in the file paths) and its writes idempotent;
+- or lock its execution, e.g. with `flock` for a cron entry (`flock -n var/my_process.lock bin/console
+  cleverage:process:execute my_process`), or with the [Lock component](https://symfony.com/doc/current/lock.html) in
+  the code launching it.
+
 ## Do not rely on the execution order of branches
 
 When a task has several `outputs`, each output is fully processed one after the other, in the configured order, but
