@@ -96,7 +96,8 @@ class ProcessHelpCommand extends Command
 
     protected function configure(): void
     {
-        $this->addArgument('process_code', InputArgument::REQUIRED, 'The code of the process');
+        // Shell completion: the codes of the processes whose configuration is valid
+        $this->addArgument('process_code', InputArgument::REQUIRED, 'The code of the process', null, fn (): array => array_keys($this->processConfigRegistry->getProcessConfigurations()));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

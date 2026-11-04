@@ -19,12 +19,14 @@ use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
 #[CoversClass(ProcessHelpCommand::class)]
 #[UsesClass(ProcessConfigurationRegistry::class)]
 #[UsesClass(TaskRegistry::class)]
+#[UsesClass(\CleverAge\ProcessBundle\Configuration\ProcessConfiguration::class)]
 class ProcessHelpCommandTest extends TestCase
 {
     public function testWithContainerIsDeprecated(): void
@@ -41,6 +43,15 @@ class ProcessHelpCommandTest extends TestCase
             [],
             $this->collectDeprecations(static fn (): ProcessHelpCommand => new ProcessHelpCommand(new ProcessConfigurationRegistry([], 'stop'), new TaskRegistry(new ServiceLocator([]))))
         );
+    }
+
+    public function testTheProcessCodesAreCompleted(): void
+    {
+        $process = ['options' => [], 'entry_point' => null, 'end_point' => null, 'description' => '', 'help' => '', 'public' => true, 'tasks' => []];
+        $registry = new ProcessConfigurationRegistry(['demo.first' => $process, 'demo.second' => $process], 'stop');
+        $tester = new CommandCompletionTester(new ProcessHelpCommand($registry, new TaskRegistry(new ServiceLocator([]))));
+
+        self::assertSame(['demo.first', 'demo.second'], $tester->complete(['']));
     }
 
     /**

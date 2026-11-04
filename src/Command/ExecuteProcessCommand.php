@@ -59,7 +59,10 @@ class ExecuteProcessCommand extends Command
         $this->addArgument(
             'processCodes',
             InputArgument::IS_ARRAY | InputArgument::REQUIRED,
-            'The code(s) of the process(es) to execute, separated by a space'
+            'The code(s) of the process(es) to execute, separated by a space',
+            null,
+            // Shell completion: the codes of the processes whose configuration is valid
+            fn (): array => array_keys($this->processRegistry->getProcessConfigurations())
         );
         $this->addOption('input', 'i', InputOption::VALUE_REQUIRED, 'Pass input data to the first task of the process');
         $this->addOption('input-from-stdin', null, InputOption::VALUE_NONE, 'Read input data from stdin');
@@ -77,7 +80,7 @@ class ExecuteProcessCommand extends Command
             'Output path to dump data ("-" to use STDOUT with symfony dumper)',
             self::OUTPUT_STDOUT
         );
-        $this->addOption('output-format', 't', InputOption::VALUE_OPTIONAL, 'Output format');
+        $this->addOption('output-format', 't', InputOption::VALUE_OPTIONAL, 'Output format', null, [self::OUTPUT_FORMAT_DUMP, self::OUTPUT_FORMAT_JSON]);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

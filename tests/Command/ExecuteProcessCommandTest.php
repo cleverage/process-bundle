@@ -24,6 +24,7 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
@@ -180,6 +181,20 @@ class ExecuteProcessCommandTest extends TestCase
 
         self::assertSame(0, $tester->execute(['processCodes' => ['test.process']], ['capture_stderr_separately' => true]));
         self::assertSame('', $tester->getErrorOutput());
+    }
+
+    public function testTheProcessCodesAndTheOutputFormatsAreCompleted(): void
+    {
+        $processManager = $this->createStub(ProcessManager::class);
+        $registry = new ProcessConfigurationRegistry(
+            ['test.process' => ['options' => [], 'entry_point' => null, 'end_point' => null, 'description' => '', 'help' => '', 'public' => false, 'tasks' => []]],
+            'stop'
+        );
+        $tester = new CommandCompletionTester(new ExecuteProcessCommand($processManager, new EventDispatcher(), $registry));
+
+        // Private processes included: they can be executed
+        self::assertSame(['test.process'], $tester->complete(['']));
+        self::assertSame(['dump', 'json-stream'], $tester->complete(['test.process', '--output-format', '']));
     }
 
     private function createTester(\PHPUnit\Framework\MockObject\Rule\InvocationOrder $executions, mixed $result = null): CommandTester
