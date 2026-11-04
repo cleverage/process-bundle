@@ -24,6 +24,7 @@ use CleverAge\ProcessBundle\Model\SubprocessInstance;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -156,6 +157,11 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
         }
         if ($running > 0) {
             $this->logger->warning("{$running} sub-process(es) still running at the end of the process have been stopped");
+        }
+        // Buffers of the terminated sub-processes, not output yet
+        $filesystem = new Filesystem();
+        foreach ($this->finishedBuffers as $bufferPath) {
+            $filesystem->remove($bufferPath);
         }
         $this->launchedProcesses = [];
         $this->finishedBuffers = new \SplQueue();
