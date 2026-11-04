@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#434](https://github.com/cleverage/process-bundle/issues/434) Signals: when the same SIGINT or SIGTERM is received again while a process is running, the command exits right away, as documented. The console application dispatches the same event at each signal, whose exit stayed aborted by the first signal. Add tests.
+
 v5.8
 -----
 
