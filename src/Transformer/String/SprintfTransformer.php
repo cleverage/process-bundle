@@ -47,11 +47,12 @@ class SprintfTransformer implements ConfigurableTransformerInterface
         $resolver->setAllowedTypes('format', 'string');
         // An invalid format (e.g. a "%" alone) is rejected with the configuration, not with the first value
         $resolver->setAllowedValues('format', static function (string $format): bool {
-            // Enough arguments for every conversion specification, positional ones included
-            preg_match_all('/%(\d+)\$/', $format, $positions);
-            $count = max([substr_count($format, '%'), ...array_map(intval(...), $positions[1])]) + 1;
+            // Enough arguments for every conversion specification, positional ones (and positional widths or precisions,
+            // "%1\$*2\$d") included; integers, as a width or a precision given as an argument ("%*d", "%.*f") must be one
+            preg_match_all('/[%*](\d+)\$/', $format, $positions);
+            $count = max([substr_count($format, '%') + substr_count($format, '*'), ...array_map(intval(...), $positions[1])]) + 1;
             try {
-                vsprintf($format, array_fill(0, $count, ''));
+                vsprintf($format, array_fill(0, $count, 0));
             } catch (\ValueError $error) {
                 throw new InvalidOptionsException(\sprintf('Invalid "format" option "%s": %s', $format, $error->getMessage()), 0, $error);
             }
