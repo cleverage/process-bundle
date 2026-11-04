@@ -116,6 +116,31 @@ class ExecuteProcessCommandTest extends TestCase
         self::assertSame('{"foo":"bar"}', trim((string) file_get_contents($this->outputFile)));
     }
 
+    /**
+     * As on STDOUT: a JsonException was thrown (e.g. for the buffer of the process_launcher task).
+     */
+    public function testInvalidUtf8IsReplacedInTheFile(): void
+    {
+        $tester = $this->createTester($this->once(), ['name' => "Caf\xe9"]);
+
+        self::assertSame(0, $tester->execute(['processCodes' => ['test.process'], '--output' => $this->outputFile, '--output-format' => 'json-stream']));
+        self::assertSame('{"name":"Caf\ufffd"}', trim((string) file_get_contents($this->outputFile)));
+    }
+
+    public function testAnOutputThatCannotBeEncodedAsJsonIsReportedInsteadOfBeingStored(): void
+    {
+        $tester = $this->createTester($this->once(), ['value' => \NAN]);
+
+        self::assertSame(0, $tester->execute(
+            ['processCodes' => ['test.process'], '--output' => $this->outputFile, '--output-format' => 'json-stream'],
+            ['capture_stderr_separately' => true],
+        ));
+        self::assertStringContainsString(
+            "Output not stored in '{$this->outputFile}': it cannot be encoded as JSON (Inf and NaN cannot be JSON encoded)",
+            $tester->getErrorOutput()
+        );
+    }
+
     public function testANonArrayOutputIsReportedInsteadOfBeingSilentlyLost(): void
     {
         $tester = $this->createTester($this->once(), 'scalar');

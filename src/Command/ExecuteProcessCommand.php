@@ -190,8 +190,16 @@ class ExecuteProcessCommand extends Command
 
             return;
         }
-        $outputFile = new JsonStreamFile($input->getOption('output'), 'wb');
-        $outputFile->writeLine($data);
+        // As on STDOUT, the invalid UTF-8 sequences are replaced (e.g. a value read from a Latin-1 file); the buffer of
+        // the process_launcher task is written here too
+        $outputFile = new JsonStreamFile($input->getOption('output'), 'wb', null, [\JSON_THROW_ON_ERROR, \JSON_INVALID_UTF8_SUBSTITUTE]);
+        try {
+            $outputFile->writeLine($data);
+        } catch (\JsonException $exception) {
+            $this->getErrorOutput($output)->writeln(\sprintf("<comment>Output not stored in '%s': it cannot be encoded as JSON (%s)</comment>", $input->getOption('output'), $exception->getMessage()));
+
+            return;
+        }
         if ($output->isVerbose()) {
             $output->writeln(\sprintf("Output stored in '%s'", $input->getOption('output')));
         }
