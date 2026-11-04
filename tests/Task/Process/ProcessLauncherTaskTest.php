@@ -200,6 +200,26 @@ class ProcessLauncherTaskTest extends TestCase
         $this->assertFalse($task->next($state));
     }
 
+    /**
+     * The buffers of the terminated sub-processes, not output yet when the process fails, are removed too: they were
+     * left in the temporary directory.
+     */
+    public function testFinishedBuffersNotOutputAreRemovedWhenTheTaskIsFinalized(): void
+    {
+        [$task, $state, $firstBufferPath] = $this->launch('write');
+        [, , $secondBufferPath] = $this->launch('write', $task, $state);
+        // Both terminated sub-processes are handled: their buffers are waiting to be output
+        $this->assertTrue($task->next($state));
+        $this->assertFileExists($firstBufferPath);
+        $this->assertFileExists($secondBufferPath);
+
+        $task->finalize($state);
+
+        $this->assertFileDoesNotExist($firstBufferPath);
+        $this->assertFileDoesNotExist($secondBufferPath);
+        $this->assertFalse($task->next($state));
+    }
+
     public function testFinalizeWithoutSubprocess(): void
     {
         $task = $this->createTask();
