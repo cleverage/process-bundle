@@ -153,10 +153,12 @@ class XpathEvaluatorTransformer implements ConfigurableTransformerInterface
             libxml_clear_errors();
             libxml_use_internal_errors($previousUseErrors);
         }
-        if (false === $nodeList) {
+        // false is also the result of a boolean expression (e.g. boolean(), not(), a comparison): an invalid query
+        // reports libxml errors
+        if (false === $nodeList && [] !== $errors) {
             $messages = array_map(static fn (\LibXMLError $error): string => trim($error->message), $errors);
 
-            throw new UnexpectedValueException(\sprintf("Invalid xpath query '%s': %s", $query, [] !== $messages ? implode('; ', $messages) : 'unknown error'));
+            throw new UnexpectedValueException(\sprintf("Invalid xpath query '%s': %s", $query, implode('; ', $messages)));
         }
         if (!$nodeList instanceof \DOMNodeList) {
             return $nodeList;

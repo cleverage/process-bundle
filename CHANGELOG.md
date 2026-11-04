@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#436](https://github.com/cleverage/process-bundle/issues/436) `xpath_evaluator`: a boolean expression whose value is `false` (`boolean()`, `not()`, a false comparison) returns `false`, instead of throwing `Invalid xpath query '...': unknown error`. Only an expression reporting libxml errors is invalid. Add tests.
+
 v5.8
 -----
 
