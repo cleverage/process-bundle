@@ -24,6 +24,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class CallbackTransformer implements ConfigurableTransformerInterface
 {
+    /** Whether the deprecation of "additional_parameters" has been triggered: once */
+    private static bool $additionalParametersDeprecated = false;
+
     /**
      * Must return the transformed $value.
      *
@@ -78,7 +81,9 @@ class CallbackTransformer implements ConfigurableTransformerInterface
         $resolver->setNormalizer(
             'additional_parameters',
             static function (Options $options, $value) {
-                if ($value) {
+                // Once: it was triggered each time the options were resolved
+                if ($value && !self::$additionalParametersDeprecated) {
+                    self::$additionalParametersDeprecated = true;
                     trigger_deprecation(
                         'cleverage/process-bundle',
                         '2.0.4',
