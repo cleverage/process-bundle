@@ -61,6 +61,11 @@ clever_age_process:
     configurations:
         app.demo:
             tasks:
+                read:
+                    task: constant_output
+                    options:
+                        output: { name: 'My Product' }
+                    outputs: [transform]
                 transform:
                     task: transformer
                     options:
@@ -72,7 +77,12 @@ clever_age_process:
                                         transformers:
                                             app_slug_prefix:
                                                 prefix: product
+                    outputs: [debug]
+                debug:
+                    task: debug
 ```
+
+`bin/console cleverage:process:execute app.demo` dumps `["slug" => "product-my_product"]`.
 
 As any transformer code, generic transformer codes must be unique: use a prefix to avoid conflicts. A dash is kept in
 the code (it was replaced by an underscore before 5.7, the former name is deprecated), as in the codes of the
