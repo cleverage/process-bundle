@@ -59,3 +59,8 @@ Notes
 
 * Files written by [JsonStreamWriterTask](json_stream_writer_task.md) can be read by this task, as long as no flag
   producing multi-line JSON (like `JSON_PRETTY_PRINT`) was used.
+* The path is opened with `SplFileObject`, so any PHP stream wrapper is accepted (`http://`, `ftp://`, `data://`,
+  `php://filter`, `phar://`...), as with `fopen()`. This is intended (e.g. `php://stdin` or a remote JSON Lines file),
+  but never give a path built from untrusted input (an HTTP parameter, a queue message, an uploaded file name, a
+  `{{ key }}` context placeholder...): it would allow requests to internal hosts (SSRF) or reading local files. Validate
+  such a path before this task.

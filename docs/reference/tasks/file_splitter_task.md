@@ -58,3 +58,8 @@ Notes
 * An empty source file produces no output (the task is skipped).
 * Temporary files are not deleted by the task, use [FileRemoverTask](file_remover_task.md) if needed.
 * For CSV files, prefer [CsvSplitterTask](csv_splitter_task.md) which keeps the headers in each produced file.
+* The `file_path` (option or input) is opened with `SplFileObject`, so any PHP stream wrapper is accepted (`http://`,
+  `ftp://`, `data://`, `php://filter`, `phar://`...), as with `fopen()`. This is intended (e.g. a remote file), but
+  never give a path built from untrusted input (an HTTP parameter, a queue message, an uploaded file name, a
+  `{{ key }}` context placeholder...): it would allow requests to internal hosts (SSRF) or reading local files. Validate
+  such a path before this task.

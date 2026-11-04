@@ -40,8 +40,17 @@ final class SignalStopChecker implements ProcessStopCheckerInterface, ResetInter
 
     private bool $stopLogged = false;
 
+    /**
+     * The exit codes that the signal events had before their exit was aborted: the console application dispatches the
+     * same event object each time the command receives its signal.
+     *
+     * @var \WeakMap<ConsoleSignalEvent, int|false>
+     */
+    private \WeakMap $abortedExitCodes;
+
     public function __construct(private readonly ?LoggerInterface $logger = null)
     {
+        $this->abortedExitCodes = new \WeakMap();
     }
 
     public function onConsoleSignal(ConsoleSignalEvent $event): void
@@ -51,11 +60,18 @@ final class SignalStopChecker implements ProcessStopCheckerInterface, ResetInter
             return;
         }
         if (0 === $this->runningProcesses || null !== $this->signal) {
-            // No process to stop, or a second signal: the default behavior (exit, unless another listener aborts it)
+            // No process to stop, or a second signal: the default behavior (exit, unless another listener aborts it),
+            // with the exit code that the event had before a previous signal aborted its exit
+            $exitCode = $this->abortedExitCodes[$event] ?? false;
+            if (false !== $exitCode) {
+                $event->setExitCode($exitCode);
+            }
+
             return;
         }
         // No logging here: the signal may interrupt any code, e.g. a logger writing a record
         $this->signal = $signal;
+        $this->abortedExitCodes[$event] ??= $event->getExitCode();
         $event->abortExit();
     }
 
