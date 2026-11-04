@@ -63,6 +63,58 @@ class SignalStopCheckerTest extends TestCase
     }
 
     /**
+     * The console application creates one event per signal and dispatches it again each time the signal is received.
+     */
+    public function testSameSignalReceivedAgainExits(): void
+    {
+        $checker = new SignalStopChecker();
+        $checker->onProcessStart();
+        $event = $this->createEvent(\SIGINT);
+
+        $checker->onConsoleSignal($event);
+        self::assertFalse($event->getExitCode(), 'The command does not exit');
+
+        $checker->onConsoleSignal($event);
+        self::assertSame(0, $event->getExitCode(), 'A second signal exits right away');
+
+        // After a reset (e.g. the next message of a Messenger worker), the same event stops the next process again
+        $checker->reset();
+        $checker->onProcessStart();
+        $checker->onConsoleSignal($event);
+        self::assertFalse($event->getExitCode());
+        $checker->onConsoleSignal($event);
+        self::assertSame(0, $event->getExitCode());
+    }
+
+    public function testSameSignalReceivedAgainWithoutRunningProcessExits(): void
+    {
+        $checker = new SignalStopChecker();
+        $checker->onProcessStart();
+        $event = $this->createEvent(\SIGTERM);
+        $checker->onConsoleSignal($event);
+        $checker->reset();
+
+        $checker->onConsoleSignal($event);
+
+        self::assertSame(0, $event->getExitCode());
+    }
+
+    /**
+     * Inside another console application handling the signal, the outer application decides if the process exits.
+     */
+    public function testSameSignalReceivedAgainKeepsAnAbortedExit(): void
+    {
+        $checker = new SignalStopChecker();
+        $checker->onProcessStart();
+        $event = new ConsoleSignalEvent(new Command('test'), new ArrayInput([]), new NullOutput(), \SIGTERM, false);
+
+        $checker->onConsoleSignal($event);
+        $checker->onConsoleSignal($event);
+
+        self::assertFalse($event->getExitCode());
+    }
+
+    /**
      * The stop request is kept for the next processes of the command, until the services are reset.
      */
     public function testStopRequestIsKeptUntilReset(): void

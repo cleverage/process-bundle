@@ -125,6 +125,18 @@ class XpathEvaluatorTransformerTest extends TestCase
         $transformer->query($transformer->buildXpath($domDocument), '//[', $domDocument, ['unwrap_value' => false, 'single_result' => false]);
     }
 
+    public function testUnknownFunctionThrows(): void
+    {
+        $domDocument = new \DOMDocument();
+        $domDocument->loadXML('<a>ok</a>');
+        $transformer = new XpathEvaluatorTransformer();
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage("Invalid xpath query 'unknown(1)': ");
+
+        $transformer->query($transformer->buildXpath($domDocument), 'unknown(1)', $domDocument, ['unwrap_value' => false, 'single_result' => false]);
+    }
+
     public function testNamespaceNodeCannotBeUnwrapped(): void
     {
         $domDocument = new \DOMDocument();
@@ -158,6 +170,10 @@ class XpathEvaluatorTransformerTest extends TestCase
         yield 'number' => ['count(//item)', 2.0];
         yield 'string' => ['string(//item[2]/@id)', 'b'];
         yield 'boolean' => ['//item = "2"', true];
+        // false was taken for the failure of an invalid query
+        yield 'false comparison' => ['//item = "3"', false];
+        yield 'false boolean()' => ['boolean(//missing)', false];
+        yield 'false not()' => ['not(//item)', false];
         yield 'sum' => ['sum(//item)', 3.0];
     }
 
