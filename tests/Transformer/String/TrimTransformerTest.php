@@ -87,4 +87,17 @@ class TrimTransformerTest extends TestCase
         // A single-byte charlist keeps the ranges of trim()
         $this->assertSame('123', $transformer->transform('abc123cba', ['charlist' => 'a..c']));
     }
+
+    /**
+     * mb_trim() does not support the ranges: "a..zé" removed "a", "." and "z" only, and kept "b" to "y".
+     */
+    public function testRangesWithAMultibyteCharlist(): void
+    {
+        $transformer = new TrimTransformer();
+
+        $this->assertSame('-word-', $transformer->transform('bcé-word-zé', ['charlist' => 'a..zé']));
+        $this->assertSame('.1.', $transformer->transform('é.1.é', ['charlist' => 'é0..0']));
+        // An invalid range (from a greater character) is not expanded, as with trim()
+        $this->assertSame('b', $transformer->transform('z.b.a', ['charlist' => 'z..aé']));
+    }
 }
