@@ -82,9 +82,8 @@ the database writes of both executions mix.
 When a process must not run twice at the same time:
 
 - make its outputs unique (`{unique_token}`, `{date_time}` in the file paths) and its writes idempotent;
-- or lock its execution, e.g. with `flock` for a cron entry (`flock -n var/my_process.lock bin/console
-  cleverage:process:execute my_process`), or with the [Lock component](https://symfony.com/doc/current/lock.html) in
-  the code launching it.
+- or make it [exclusive](reference/01-process_definition.md) (`exclusive: true`, with symfony/lock): another
+  execution fails while it is running.
 
 ## Do not rely on the execution order of branches
 

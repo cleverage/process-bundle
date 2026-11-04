@@ -54,6 +54,7 @@ class ProcessConfiguration
         protected bool $public = true,
         protected string $successLogLevel = LogLevel::INFO,
         protected string $failedLogLevel = LogLevel::DEBUG,
+        protected bool $exclusive = false,
     ) {
     }
 
@@ -117,6 +118,14 @@ class ProcessConfiguration
     public function getFailedLogLevel(): string
     {
         return $this->failedLogLevel;
+    }
+
+    /**
+     * Whether two executions of the process cannot run at the same time (lock of the ProcessManager).
+     */
+    public function isExclusive(): bool
+    {
+        return $this->exclusive;
     }
 
     public function isPrivate(): bool

@@ -244,6 +244,21 @@ class ConfigurationTest extends TestCase
         );
     }
 
+    public function testExclusive(): void
+    {
+        $config = $this->process(['configurations' => [
+            'test.default' => ['tasks' => []],
+            'test.exclusive' => ['exclusive' => true, 'tasks' => []],
+        ]]);
+
+        self::assertFalse($config['configurations']['test.default']['exclusive']);
+        self::assertTrue($config['configurations']['test.exclusive']['exclusive']);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid type for path "clever_age_process.configurations.test.process.exclusive". Expected "bool"');
+        $this->process(['configurations' => ['test.process' => ['exclusive' => 'yes', 'tasks' => []]]]);
+    }
+
     public function testPublicMustBeABoolean(): void
     {
         $this->expectException(InvalidConfigurationException::class);

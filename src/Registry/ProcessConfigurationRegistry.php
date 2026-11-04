@@ -247,7 +247,8 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
             $rawProcessConfiguration['help'],
             $rawProcessConfiguration['public'],
             $rawProcessConfiguration['logs']['success_level'] ?? $this->defaultLogLevels['success_level'] ?? LogLevel::INFO,
-            $rawProcessConfiguration['logs']['failed_level'] ?? $this->defaultLogLevels['failed_level'] ?? LogLevel::DEBUG
+            $rawProcessConfiguration['logs']['failed_level'] ?? $this->defaultLogLevels['failed_level'] ?? LogLevel::DEBUG,
+            (bool) ($rawProcessConfiguration['exclusive'] ?? false)
         );
 
         // Check the task references, the links below would fail with a message naming neither the process nor the task
