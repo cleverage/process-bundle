@@ -18,6 +18,7 @@ use Psr\Log\LogLevel;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Lock\LockFactory;
 
 /**
  * This is the class that validates and merges configuration from your app/config files.
@@ -162,6 +163,14 @@ class Configuration implements ConfigurationInterface
             ->booleanNode('public')
             ->info('Whether the process is listed by the cleverage:process:list command')
             ->defaultTrue()
+            ->end()
+            ->booleanNode('exclusive')
+            ->info('Whether an execution of the process fails when another one is running (lock of symfony/lock)')
+            ->defaultFalse()
+            ->validate()
+            ->ifTrue(static fn (bool $exclusive): bool => $exclusive && !class_exists(LockFactory::class))
+            ->thenInvalid('An exclusive process requires the symfony/lock component: composer require symfony/lock')
+            ->end()
             ->end()
             ->arrayNode('options')
             ->info('Free options of the process, read by other bundles (e.g. "ui" for the CleverAge UI process bundle)')

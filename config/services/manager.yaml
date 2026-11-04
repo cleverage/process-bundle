@@ -11,6 +11,7 @@ services:
             - '@event_dispatcher'
             - !tagged_iterator cleverage_process.stop_checker
             - '@cleverage_process.registry.task'
+            - '@?lock.factory'
         tags:
             - { name: kernel.reset, method: reset }
 

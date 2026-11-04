@@ -17,6 +17,7 @@ clever_age_process:
             entry_point: <task_code>
             end_point: <task_code>
             public: <true|false>
+            exclusive: <true|false>
             options: <array>
             logs:
                 success_level: <emergency|alert|critical|error|warning|notice|info|debug>
@@ -67,6 +68,23 @@ be in the main branch of the process.
 **public**: optional boolean (default is true) to mark a process as public or private. Private processes are filtered
 from the process list (unless `--all` is used) but execution is still allowed. A value other than a boolean is rejected
 when the container is compiled.
+
+**exclusive**: optional boolean (default is false). An execution of an exclusive process fails with a
+`ProcessAlreadyRunningException` while another execution of it is running, from the same PHP process or from another one
+sharing the lock store (cron entries, user interface, schedulers, Messenger workers): it is not executed, and the
+failure is dispatched as any process failure (`EVENT_PROCESS_FAILED`). It requires the
+[Lock component](https://symfony.com/doc/current/lock.html) (`composer require symfony/lock`, `lock.factory` service of
+the FrameworkBundle): an exclusive process without it is rejected when the container is compiled.
+
+- the lock is acquired when the process starts and released when it ends (succeeded, failed or stopped), named
+  `cleverage_process.exclusive.<process_code>`;
+- the default lock store of the FrameworkBundle (`semaphore` or `flock`) only works on one host: for executions on
+  several hosts or containers, configure a shared store (e.g. `framework.lock: '%env(DATABASE_URL)%'`);
+- on a store whose locks expire (database, Redis...), the lock has a TTL of 300 seconds, refreshed before the tasks
+  once half of it has elapsed: a single task running longer than 150 seconds may let the lock expire, and another
+  execution start; the lock of a killed process expires after its TTL.
+
+An exclusive process executed as a sub-process is locked as well.
 
 **options**: optional free array (default is empty), not used by this bundle itself. It is available to other bundles
 through `ProcessConfiguration::getOptions()`, e.g. [cleverage/ui-process-bundle](https://github.com/cleverage/ui-process-bundle)

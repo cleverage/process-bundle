@@ -18,6 +18,8 @@ use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
 use CleverAge\ProcessBundle\Event\ProcessEvent;
 use CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException;
+use CleverAge\ProcessBundle\Exception\LogicException;
+use CleverAge\ProcessBundle\Exception\ProcessAlreadyRunningException;
 use CleverAge\ProcessBundle\Exception\ProcessFailedException;
 use CleverAge\ProcessBundle\Exception\ProcessStoppedException;
 use CleverAge\ProcessBundle\Exception\RuntimeException;
@@ -38,6 +40,8 @@ use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 use Symfony\Contracts\Service\ResetInterface;
 
 /**
@@ -52,6 +56,12 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
     protected const EXECUTE_PROCEED = 2;
 
     protected const EXECUTE_FLUSH = 4;
+
+    /** Prefix of the lock resource of an exclusive process, followed by its code */
+    final public const LOCK_PREFIX = 'cleverage_process.exclusive.';
+
+    /** TTL of the lock of an exclusive process (seconds), refreshed before the tasks */
+    final public const LOCK_TTL = 300;
 
     /**
      * Indexed by task configuration (spl_object_id()): a sub-process may have a task with the same code.
@@ -75,6 +85,13 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected array $runningProcessCodes = [];
 
+    /**
+     * Locks of the exclusive processes being executed, indexed by spl_object_id().
+     *
+     * @var array<int, LockInterface>
+     */
+    protected array $locks = [];
+
     protected ?ProcessHistory $processHistory = null;
 
     protected ?TaskConfiguration $taskConfiguration = null;
@@ -93,6 +110,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
         protected EventDispatcherInterface $eventDispatcher,
         protected iterable $stopCheckers = [],
         ?TaskRegistryInterface $taskRegistry = null,
+        protected ?LockFactory $lockFactory = null,
     ) {
         if (!$taskRegistry instanceof TaskRegistryInterface) {
             trigger_deprecation(
@@ -116,6 +134,10 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
         $this->processedIterables = [];
         $this->processedBlockings = [];
         $this->runningProcessCodes = [];
+        foreach ($this->locks as $lock) {
+            $lock->release();
+        }
+        $this->locks = [];
         $this->processHistory = null;
         $this->taskConfiguration = null;
     }
@@ -160,11 +182,17 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                     implode(' -> ', [...$this->runningProcessCodes, $processCode]),
                 );
             }
+            // After the start event: the failure of an exclusive process already running is dispatched as any failure
+            $lock = $this->acquireLock($processCode);
             $this->runningProcessCodes[] = $processCode;
             try {
                 $result = $this->doExecute($processCode, $input, $context);
             } finally {
                 array_pop($this->runningProcessCodes);
+                if ($lock instanceof LockInterface) {
+                    unset($this->locks[spl_object_id($lock)]);
+                    $lock->release();
+                }
             }
             // doExecute() leaves the history of the executed process, read before restoring the one of the parent
             $processStopped = $this->processHistory?->isStopped() ?? false;
@@ -490,6 +518,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
         }
         $state = $taskConfiguration->getState();
 
+        $this->refreshLocks();
         if ($this->isStopRequested($state)) {
             $state->reset(self::EXECUTE_PROCESS !== $executionFlag);
             $this->processLogger->info("Process stop requested, the task {$taskConfiguration->getCode()} is not executed");
@@ -556,6 +585,44 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 $state->stop($exception);
             } else {
                 throw new UnexpectedValueException("Unknown error strategy '{$taskConfiguration->getErrorStrategy()}'");
+            }
+        }
+    }
+
+    /**
+     * The lock of an exclusive process, acquired without waiting: null if the process is not exclusive.
+     *
+     * @throws ProcessAlreadyRunningException when another execution of the process holds the lock
+     */
+    protected function acquireLock(string $processCode): ?LockInterface
+    {
+        $processConfiguration = $this->processConfigurationRegistry->getProcessConfiguration($processCode);
+        if (!$processConfiguration->isExclusive()) {
+            return null;
+        }
+        if (!$this->lockFactory instanceof LockFactory) {
+            throw new LogicException("The process {$processConfiguration->getCode()} is exclusive: it requires the lock.factory service of symfony/lock (framework.lock).");
+        }
+        // Named after the code of the configuration: the deprecated name of a process (see DeprecatedCodeAliases)
+        // shares its lock
+        $lock = $this->lockFactory->createLock(self::LOCK_PREFIX.$processConfiguration->getCode(), self::LOCK_TTL);
+        if (!$lock->acquire()) {
+            throw ProcessAlreadyRunningException::create($processConfiguration->getCode());
+        }
+
+        return $this->locks[spl_object_id($lock)] = $lock;
+    }
+
+    /**
+     * Before each task: the locks of the exclusive processes expire after LOCK_TTL seconds on the stores with
+     * expiration (e.g. a database, Redis), a task running longer than LOCK_TTL / 2 seconds may lose its lock.
+     */
+    protected function refreshLocks(): void
+    {
+        foreach ($this->locks as $lock) {
+            $remainingLifetime = $lock->getRemainingLifetime();
+            if (null !== $remainingLifetime && $remainingLifetime < self::LOCK_TTL / 2) {
+                $lock->refresh();
             }
         }
     }
