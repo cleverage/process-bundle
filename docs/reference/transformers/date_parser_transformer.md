@@ -20,7 +20,8 @@ Accepted inputs
 
 A string that cannot be parsed with the given format throws an `UnexpectedValueException`, and so does a date or a
 time out of range (e.g. `2024-02-31` or `25:61`, that `\DateTime::createFromFormat()` parses with a warning, the date
-overflowing to `2024-03-02`). An array or another object throws an `UnexpectedValueException`.
+overflowing to `2024-03-02`). The trailing data allowed by a `+` in the format (e.g. `!Y-m-d+` for
+`2024-02-29T10:00:00Z`) is ignored. An array or another object throws an `UnexpectedValueException`.
 
 Possible outputs
 ----------------
