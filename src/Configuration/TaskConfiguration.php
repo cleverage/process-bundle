@@ -50,7 +50,7 @@ class TaskConfiguration
     protected bool $inErrorBranch = false;
 
     /**
-     * @deprecated not used, will be removed in v6.0
+     * @deprecated since 5.4, not used, will be removed in v6.0
      */
     protected bool $logErrors;
 

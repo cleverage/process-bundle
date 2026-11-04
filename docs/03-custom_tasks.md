@@ -153,7 +153,7 @@ abstract class allows you to implement its `configureOptions` method to add your
 normalizers. Options are resolved (once) during the task initialization, and can be read with `getOptions($state)` or
 `getOption($state, $code)`. If the resolution fails during initialization, the error is logged and the options are
 resolved again (failing the process) when the task is first executed. Going on with the process after an
-initialization failure is deprecated since v5: in v6.0, the process will fail before any task is executed (see
+initialization failure is deprecated since 5.1: in v6.0, the process will fail before any task is executed (see
 [initializable tasks](02-task_types.md#initializable-tasks)).
 
 ```php
