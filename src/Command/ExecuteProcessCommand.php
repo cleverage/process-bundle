@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Command;
 
+use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Event\ConsoleProcessEvent;
 use CleverAge\ProcessBundle\Exception\InvalidArgumentException;
 use CleverAge\ProcessBundle\Filesystem\JsonStreamFile;
@@ -97,6 +98,9 @@ class ExecuteProcessCommand extends Command
             }
         }
         $this->checkOutputFormat($input);
+        if (null !== $inputData) {
+            $this->warnAboutIgnoredInput($input->getArgument('processCodes'), $output);
+        }
 
         $this->eventDispatcher->dispatch(new ConsoleProcessEvent($input, $output, $inputData, $context));
 
@@ -137,6 +141,27 @@ class ExecuteProcessCommand extends Command
         }
 
         return $context;
+    }
+
+    /**
+     * The input of a process without entry point is ignored: only logged as a warning by the process manager, which
+     * is not displayed without -v (or without the MonologBundle).
+     *
+     * @param array<string> $processCodes
+     */
+    protected function warnAboutIgnoredInput(array $processCodes, OutputInterface $output): void
+    {
+        foreach ($processCodes as $code) {
+            try {
+                $hasEntryPoint = $this->processRegistry->getProcessConfiguration($code)->getEntryPoint() instanceof TaskConfiguration;
+            } catch (\Throwable) {
+                // An invalid configuration fails when the process is executed
+                continue;
+            }
+            if (!$hasEntryPoint) {
+                $this->getErrorOutput($output)->writeln("<comment>The input is ignored by the process '{$code}': it has no entry_point</comment>");
+            }
+        }
     }
 
     /**

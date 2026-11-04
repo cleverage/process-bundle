@@ -156,6 +156,31 @@ class ExecuteProcessCommandTest extends TestCase
         );
     }
 
+    /**
+     * Only logged as a warning by the process manager, not displayed without -v: the most common mistake went unnoticed.
+     */
+    public function testAnInputIgnoredByAProcessWithoutEntryPointIsReported(): void
+    {
+        $tester = $this->createTester($this->exactly(2));
+
+        self::assertSame(0, $tester->execute(
+            ['processCodes' => ['test.process', 'test.entry_point'], '--input' => 'data.csv'],
+            ['capture_stderr_separately' => true],
+        ));
+        self::assertSame(
+            "The input is ignored by the process 'test.process': it has no entry_point",
+            trim($tester->getErrorOutput())
+        );
+    }
+
+    public function testNoWarningWithoutInput(): void
+    {
+        $tester = $this->createTester($this->once());
+
+        self::assertSame(0, $tester->execute(['processCodes' => ['test.process']], ['capture_stderr_separately' => true]));
+        self::assertSame('', $tester->getErrorOutput());
+    }
+
     private function createTester(\PHPUnit\Framework\MockObject\Rule\InvocationOrder $executions, mixed $result = null): CommandTester
     {
         $processManager = $this->createMock(ProcessManager::class);
@@ -170,6 +195,25 @@ class ExecuteProcessCommandTest extends TestCase
                     'help' => '',
                     'public' => true,
                     'tasks' => [],
+                ],
+                'test.entry_point' => [
+                    'options' => [],
+                    'entry_point' => 'first',
+                    'end_point' => null,
+                    'description' => '',
+                    'help' => '',
+                    'public' => true,
+                    'tasks' => ['first' => [
+                        'service' => '@test.task',
+                        'options' => [],
+                        'description' => '',
+                        'help' => '',
+                        'outputs' => [],
+                        'errors' => [],
+                        'error_outputs' => [],
+                        'error_strategy' => null,
+                        'log_level' => null,
+                    ]],
                 ],
             ],
             'stop'
