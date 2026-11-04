@@ -34,6 +34,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[UsesClass(ConsoleProcessEvent::class)]
 #[UsesClass(JsonStreamFile::class)]
 #[UsesClass(\CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases::class)]
+#[UsesClass(\CleverAge\ProcessBundle\Configuration\DidYouMean::class)]
 class ExecuteProcessCommandTest extends TestCase
 {
     private string $outputFile;
@@ -220,5 +221,29 @@ class ExecuteProcessCommandTest extends TestCase
         );
 
         return new CommandTester(new ExecuteProcessCommand($processManager, new EventDispatcher(), $registry));
+    }
+
+    public function testUnknownProcessSuggestsTheClosestOne(): void
+    {
+        $tester = $this->createTester($this->never());
+
+        $this->expectExceptionMessage('Unknown process test.proces. Did you mean "test.process"? The processes are listed by the cleverage:process:list command.');
+        $tester->execute(['processCodes' => ['test.proces']]);
+    }
+
+    public function testInvalidContextGivesTheExpectedFormat(): void
+    {
+        $tester = $this->createTester($this->never());
+
+        $this->expectExceptionMessage('Invalid context foo: expected key:value, e.g. -c date:2024-01-01 (the value is parsed as YAML)');
+        $tester->execute(['processCodes' => ['test.process'], '--context' => ['foo']]);
+    }
+
+    public function testUnknownOutputFormatGivesTheFormats(): void
+    {
+        $tester = $this->createTester($this->never());
+
+        $this->expectExceptionMessage("Cannot handle data output with format 'jsn-stream': use 'dump' (STDOUT only) or 'json-stream'. Did you mean \"json-stream\"?");
+        $tester->execute(['processCodes' => ['test.process'], '--output-format' => 'jsn-stream']);
     }
 }

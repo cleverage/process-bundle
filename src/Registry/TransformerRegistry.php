@@ -99,7 +99,7 @@ class TransformerRegistry implements TransformerRegistryInterface
             return $this->transformers[$code];
         }
         if (!$this->locator?->has($code)) {
-            throw MissingTransformerException::create($code);
+            throw MissingTransformerException::create($code, array_keys($this->locator?->getProvidedServices() ?? []));
         }
 
         $transformer = $this->locator->get($code);

@@ -51,6 +51,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 #[\PHPUnit\Framework\Attributes\UsesClass(CallbackTransformer::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(MappingTransformer::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(TrimTransformer::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\CleverAge\ProcessBundle\Configuration\DidYouMean::class)]
 class TransformerTaskTest extends TestCase
 {
     public function testInputIsOutputUnchangedWithoutTransformers(): void

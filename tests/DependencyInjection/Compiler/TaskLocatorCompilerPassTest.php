@@ -33,6 +33,7 @@ use Symfony\Component\DependencyInjection\ServiceLocator;
 #[UsesClass(CleverAgeProcessExtension::class)]
 #[UsesClass(Configuration::class)]
 #[UsesClass(DeprecatedCodeAliases::class)]
+#[UsesClass(\CleverAge\ProcessBundle\Configuration\DidYouMean::class)]
 class TaskLocatorCompilerPassTest extends TestCase
 {
     use IgnoreDeprecationsTrait;
@@ -104,11 +105,11 @@ class TaskLocatorCompilerPassTest extends TestCase
 
     public function testUnknownTaskCodeThrows(): void
     {
-        $container = $this->createContainerWithTask(['task' => 'unknown']);
+        $container = $this->createContainerWithTask(['task' => 'app_tsak']);
         $container->setDefinition('app.task', (new Definition(DummyTask::class))->addTag('cleverage.task', ['code' => 'app_task']));
 
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown task code "unknown" for the task "my_task" of the process "test.process". Known codes: "app_task".');
+        $this->expectExceptionMessage('Unknown task code "app_tsak" for the task "my_task" of the process "test.process". Did you mean "app_task"? A task of the application is given a code with the #[AsTask(code: \'...\')] attribute or the "code" attribute of its "cleverage.task" tag. Known codes: "app_task".');
 
         (new TaskLocatorCompilerPass())->process($container);
     }

@@ -204,9 +204,18 @@ class Configuration implements ConfigurationInterface
             ->performNoDeepMerging()
             ->cannotBeOverwritten()
             ->info('Unique custom task code')
+            ->beforeNormalization()
+            // e.g. "outputs: [next]" indented as a task: the list was reported as an unknown option "0"
+            ->ifTrue(static fn (mixed $task): bool => \is_array($task) && [] !== $task && array_is_list($task))
+            ->thenInvalid('A task is defined by a mapping ("task", "options", "outputs"...), not by a list: check the indentation of the "outputs" or "error_outputs" of the previous task. Given: %s')
+            ->end()
             ->validate()
-            ->ifTrue(static fn (array $task): bool => (null === $task['service']) === (null === $task['task']))
+            ->ifTrue(static fn (array $task): bool => null !== $task['service'] && null !== $task['task'])
             ->thenInvalid('A task must define either its code ("task: <code>") or, deprecated, its "service", not both: %s')
+            ->end()
+            ->validate()
+            ->ifTrue(static fn (array $task): bool => null === $task['service'] && null === $task['task'])
+            ->thenInvalid('A task must define its code ("task: <code>", given on the reference page of each task), it defines neither "task" nor, deprecated, "service": %s')
             ->end()
             ->children();
 

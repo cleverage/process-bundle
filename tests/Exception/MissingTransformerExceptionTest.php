@@ -13,11 +13,13 @@ declare(strict_types=1);
 
 namespace Exception;
 
+use CleverAge\ProcessBundle\Configuration\DidYouMean;
 use CleverAge\ProcessBundle\Exception\MissingTransformerException;
 use PHPUnit\Framework\TestCase;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(MissingTransformerException::class)]
 #[\PHPUnit\Framework\Attributes\CoversMethod(MissingTransformerException::class, 'create')]
+#[\PHPUnit\Framework\Attributes\UsesClass(DidYouMean::class)]
 class MissingTransformerExceptionTest extends TestCase
 {
     public function testCreate(): void
@@ -26,5 +28,12 @@ class MissingTransformerExceptionTest extends TestCase
 
         $this->assertInstanceOf(\UnexpectedValueException::class, $exception);
         $this->assertEquals('No transformer with code : my_transformer', $exception->getMessage());
+    }
+
+    public function testCreateSuggestsTheClosestCode(): void
+    {
+        $exception = MissingTransformerException::create('uppercas', ['lowercase', 'uppercase']);
+
+        $this->assertSame('No transformer with code : uppercas Did you mean "uppercase"?', $exception->getMessage());
     }
 }
