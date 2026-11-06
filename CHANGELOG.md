@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#483](https://github.com/cleverage/process-bundle/issues/483) Documentation: an exception thrown by `IterableTaskInterface::next()` makes the process fail right away with this exception, the `error_strategy` and the `error_outputs` of the task do not apply.
+
 v5.9
 -----
 
