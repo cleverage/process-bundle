@@ -28,6 +28,13 @@ cleverage/process-bundle 5.10: The transformer "array-first" of the generic tran
 "the-prefix" of the generic transformer...`), and will not work in 6.0: write the code of the transformer as registered
 (`array_first`), and the contextual option as defined in `contextual_options` (`the-prefix`, `{{ the-prefix }}`).
 
+### A stop only stops its flow
+
+A stop without error (a `StopTask`, or a task calling `ProcessState::stop()`) only stops the flow it happened in, as
+documented. The outputs of another root task, of a blocking task proceeded or of a flushable task flushed after the stop
+now go on through the tasks of the stopped flow: they were dropped silently by the first task that had stopped. Check
+the processes with several root tasks, or with a blocking task (e.g. `aggregate_iterable`) fed before a stop.
+
 ## v5.8
 
 ### Unknown task references

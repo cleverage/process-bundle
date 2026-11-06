@@ -25,6 +25,7 @@ use CleverAge\ProcessBundle\Logger\TaskLogger;
 use CleverAge\ProcessBundle\Manager\ProcessManager;
 use CleverAge\ProcessBundle\Model\BlockingTaskInterface;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
+use CleverAge\ProcessBundle\Model\InitializableTaskInterface;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
@@ -169,6 +170,80 @@ class ProcessManagerFlowTest extends TestCase
         ]);
 
         self::assertSame(['check:execute:1', 'check:execute:2', 'errors:execute:2'], $this->getExecutions());
+    }
+
+    /**
+     * A stop only stops the flow it happened in: another root task goes on through the tasks of the stopped flow (its
+     * items were dropped by the task that had stopped).
+     */
+    public function testAnotherRootTaskGoesOnThroughTheTasksOfAStoppedFlow(): void
+    {
+        $this->execute([
+            'first' => ['type' => 'iterable', 'items' => [1, 2], 'outputs' => ['shared']],
+            'second' => ['type' => 'iterable', 'items' => [3, 4], 'outputs' => ['shared']],
+            'shared' => ['outputs' => ['check']],
+            'check' => ['stop_on' => 1, 'outputs' => ['after']],
+            'after' => [],
+        ]);
+
+        self::assertSame(
+            ['shared:execute:1', 'check:execute:1', 'shared:execute:3', 'check:execute:3', 'after:execute:3', 'shared:execute:4', 'check:execute:4', 'after:execute:4'],
+            $this->getExecutions()
+        );
+    }
+
+    /**
+     * A blocking task that received items before a stop is proceeded: its output goes on through the task that has
+     * stopped (it was dropped).
+     */
+    public function testABlockingTaskProceededAfterAStopGoesOnThroughTheTaskThatHasStopped(): void
+    {
+        $this->execute([
+            'items' => ['type' => 'iterable', 'items' => [1, 2, 3], 'outputs' => ['aggregate', 'check']],
+            'aggregate' => ['type' => 'blocking', 'outputs' => ['check']],
+            'check' => ['stop_on' => 2, 'outputs' => ['after']],
+            'after' => [],
+        ]);
+
+        self::assertSame(
+            ['aggregate:execute:1', 'check:execute:1', 'after:execute:1', 'aggregate:execute:2', 'check:execute:2', 'aggregate:proceed', 'check:execute:1,2', 'after:execute:1,2'],
+            \array_slice($this->events, 0, 8)
+        );
+    }
+
+    /**
+     * An iterable task whose iteration has been interrupted by a stop stays stopped: it would resume its interrupted
+     * iteration.
+     */
+    public function testAnIterableTaskInterruptedByAStopStaysStopped(): void
+    {
+        $this->execute([
+            'first' => ['type' => 'iterable', 'items' => [1], 'outputs' => ['inner']],
+            'second' => ['type' => 'iterable', 'items' => [2], 'outputs' => ['inner']],
+            'inner' => ['type' => 'iterable', 'items' => [10, 20], 'outputs' => ['check']],
+            'check' => ['stop_on' => 10],
+        ]);
+
+        self::assertSame(['check:execute:10'], $this->getExecutions());
+    }
+
+    /**
+     * A task whose initialization has failed (deprecated) stays stopped: none of its executions goes on.
+     */
+    public function testATaskWhoseInitializationHasFailedStaysStopped(): void
+    {
+        set_error_handler(static fn (): bool => true, \E_USER_DEPRECATED);
+        try {
+            $this->execute([
+                'items' => ['type' => 'iterable', 'items' => [1, 2], 'outputs' => ['bad']],
+                'bad' => ['type' => 'failed_initialization', 'outputs' => ['after']],
+                'after' => [],
+            ]);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame(['bad:execute:1'], $this->getExecutions());
     }
 
     /**
@@ -523,6 +598,22 @@ class ProcessManagerFlowTest extends TestCase
                     ($this->record)("{$this->code}:proceed");
                     $state->setOutput($this->inputs);
                     $this->inputs = [];
+                }
+            },
+            // Its initialization fails, not its executions
+            'failed_initialization' => new class($execute) implements InitializableTaskInterface {
+                public function __construct(private readonly \Closure $execute)
+                {
+                }
+
+                public function initialize(ProcessState $state): void
+                {
+                    throw new \InvalidArgumentException('Invalid configuration');
+                }
+
+                public function execute(ProcessState $state): void
+                {
+                    ($this->execute)($state);
                 }
             },
             default => new class($execute) implements TaskInterface {
