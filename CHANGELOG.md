@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#485](https://github.com/cleverage/process-bundle/issues/485) The process returns the last output of its `end_point` passed on to the next tasks: the output of an execution whose output is ignored (skipped, filtered, failed with the `skip` strategy) was returned, e.g. `""` for a `skip_empty` end point whose last item is empty, or `null` for a filtered last item. Update documentation, add tests.
+
 v5.9
 -----
 
