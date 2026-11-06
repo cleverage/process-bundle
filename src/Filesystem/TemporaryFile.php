@@ -29,7 +29,9 @@ final class TemporaryFile
     public static function create(string $prefix, string $suffix = ''): string
     {
         $path = sys_get_temp_dir().\DIRECTORY_SEPARATOR.$prefix.bin2hex(random_bytes(16)).$suffix;
-        // Never readable by other users, not even before the chmod()
+        // Never readable by other users, not even before the chmod(). The umask is the one of the whole PHP process: with
+        // a thread-safe SAPI running several requests in threads (e.g. FrankenPHP), a file created by another thread in
+        // the meantime gets it too
         $umask = umask(0o077);
         try {
             $file = @fopen($path, 'x');

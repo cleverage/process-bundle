@@ -172,21 +172,24 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             );
             $this->processLogger->debug('Process start');
 
+            // The code of the configuration: a process executed by its former name (underscores instead of dashes, see
+            // DeprecatedCodeAliases) is the same process, the deprecation of the name is triggered here only
+            $code = $this->processConfigurationRegistry->getProcessConfiguration($processCode)->getCode();
             // @deprecated since 5.6, in v6.0 an exception will be thrown
-            if (\in_array($processCode, $this->runningProcessCodes, true)) {
+            if (\in_array($code, $this->runningProcessCodes, true)) {
                 trigger_deprecation(
                     'cleverage/process-bundle',
                     '5.6',
                     'Executing the process "%s" while it is already running (%s) is deprecated: it resets the states and task instances of the running process. In v6.0, an exception will be thrown.',
-                    $processCode,
-                    implode(' -> ', [...$this->runningProcessCodes, $processCode]),
+                    $code,
+                    implode(' -> ', [...$this->runningProcessCodes, $code]),
                 );
             }
             // After the start event: the failure of an exclusive process already running is dispatched as any failure
-            $lock = $this->acquireLock($processCode);
-            $this->runningProcessCodes[] = $processCode;
+            $lock = $this->acquireLock($code);
+            $this->runningProcessCodes[] = $code;
             try {
-                $result = $this->doExecute($processCode, $input, $context);
+                $result = $this->doExecute($code, $input, $context);
             } finally {
                 array_pop($this->runningProcessCodes);
                 if ($lock instanceof LockInterface) {

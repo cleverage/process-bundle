@@ -40,6 +40,14 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
     private ?array $deprecatedProcessCodes = null;
 
     /**
+     * The invalid processes already logged by getProcessConfigurations(), not reset: the configurations do not change
+     * during a PHP process.
+     *
+     * @var array<string, true>
+     */
+    private array $loggedInvalidProcesses = [];
+
+    /**
      * @param array<string, array<string, mixed>>                  $rawConfiguration
      * @param array{success_level?: string, failed_level?: string} $defaultLogLevels
      */
@@ -75,6 +83,11 @@ class ProcessConfigurationRegistry implements ProcessConfigurationRegistryInterf
             try {
                 $this->resolveConfiguration($processCode);
             } catch (InvalidProcessConfigurationException|LogicException $exception) {
+                // Once per process: the listing is done on each page of a user interface
+                if (isset($this->loggedInvalidProcesses[$processCode])) {
+                    continue;
+                }
+                $this->loggedInvalidProcesses[$processCode] = true;
                 $this->logger?->error(
                     "The process {$processCode} is left out of the process list, its configuration is not valid: {$exception->getMessage()}",
                     ['process_code' => $processCode, 'exception' => $exception]

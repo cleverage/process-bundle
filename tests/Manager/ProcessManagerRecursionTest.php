@@ -61,6 +61,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[\PHPUnit\Framework\Attributes\UsesClass(AggregateIterableTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessExecutorTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(StopTask::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(\CleverAge\ProcessBundle\Configuration\DeprecatedCodeAliases::class)]
 class ProcessManagerRecursionTest extends TestCase
 {
     private ProcessManager $processManager;
@@ -89,6 +90,10 @@ class ProcessManagerRecursionTest extends TestCase
                 ], 'recurse'),
                 'test.b' => $this->createProcessConfiguration([
                     'recurse' => $this->createTaskConfiguration('@test.recurse', ['process' => 'test.a']),
+                ], 'recurse'),
+                // Executes itself by its former name (dashes replaced by underscores before 5.7)
+                'test.x-y' => $this->createProcessConfiguration([
+                    'recurse' => $this->createTaskConfiguration('@test.recurse', ['process' => 'test.x_y']),
                 ], 'recurse'),
                 'test.parent' => $this->createProcessConfiguration([
                     'iterate' => $this->createTaskConfiguration('@test.parent.iterate', ['output' => [1, 2, 3]], ['execute']),
@@ -192,6 +197,21 @@ class ProcessManagerRecursionTest extends TestCase
         self::assertSame(0, $this->recursions);
         self::assertSame([
             $this->getExpectedDeprecation('test.a', 'test.a -> test.b -> test.a'),
+        ], $this->deprecations);
+    }
+
+    /**
+     * The running processes were identified by the requested name: through its former name, the process was not seen as
+     * already running.
+     */
+    public function testAProcessExecutedAgainByItsFormerNameIsDeprecated(): void
+    {
+        $this->recursions = 1;
+
+        self::assertSame(0, $this->processManager->execute('test.x-y'));
+        self::assertSame([
+            'Since cleverage/process-bundle 5.7: Using the process "test.x-y" by the name "test.x_y", with underscores instead of dashes, is deprecated: use its code "test.x-y". The dashes of the codes were replaced by underscores before 5.7, the former name will not be found in v6.0.',
+            $this->getExpectedDeprecation('test.x-y', 'test.x-y -> test.x-y'),
         ], $this->deprecations);
     }
 
