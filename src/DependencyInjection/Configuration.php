@@ -106,6 +106,7 @@ class Configuration implements ConfigurationInterface
             ->info('Options of the transformer (code: definition with required, default, default_is_null), injected in the "transformers" with "{{ code }}"')
             ->example(['delimiter' => ['default' => ',']])
             // Keep the dashes of the option codes, as written in the options given to the transformer and in "{{ code }}"
+            // (their former name, with underscores, is deprecated, see GenericTransformer)
             ->normalizeKeys(false)
             ->variablePrototype()
             ->end()
@@ -113,7 +114,8 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('transformers')
             ->info('Transformers applied in sequence, by code, with their options')
             ->example(['explode' => ['delimiter' => '{{ separator }}']])
-            // Keep the dashes of the transformer codes (the former name of a generic transformer is deprecated)
+            // Keep the dashes of the transformer codes (the former name of a generic transformer is deprecated, as the
+            // former name of a transformer code that is only registered with underscores, see GenericTransformer)
             ->normalizeKeys(false)
             ->variablePrototype()
             ->end()
