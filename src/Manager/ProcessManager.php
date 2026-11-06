@@ -673,6 +673,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             $previousTaskConfiguration = $this->taskConfiguration;
             $this->taskConfiguration = $taskConfiguration;
             $state = $taskConfiguration->getState();
+            $previousException = $state->getException();
             try {
                 $task->finalize($taskConfiguration->getState());
             } catch (\Throwable $e) {
@@ -682,7 +683,11 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 $this->taskLogger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
             }
-            $this->handleState($state);
+            // Only a failure of the finalization: the state may keep the error of an item skipped before, whose error
+            // branch has stopped the process on purpose (e.g. with a StopTask)
+            if ($state->getException() !== $previousException) {
+                $this->handleState($state);
+            }
             $this->taskConfiguration = $previousTaskConfiguration;
         }
     }

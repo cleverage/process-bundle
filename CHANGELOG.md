@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#477](https://github.com/cleverage/process-bundle/issues/477) "Stop the process on the first invalid item" (`error_strategy: skip` and an error branch ending on a `StopTask`) ends as stopped when the failing task is finalizable (`csv_reader`, `xml_stream_reader`, `stat_counter`...): the error of the skipped item, kept by its state, was taken for a finalization failure and the process ended as failed. Add tests.
+
 v5.9
 -----
 
