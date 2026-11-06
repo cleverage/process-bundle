@@ -43,7 +43,7 @@ class EventDispatcherTask extends AbstractConfigurableTask
 
         $this->eventDispatcher->dispatch($event, $options['event_name']);
 
-        // @deprecated BC layer since v5, remove me in v6.0: from v4.0 to v5.0, the event was only dispatched under its
+        // @deprecated BC layer since 5.1, remove me in v6.0: from v4.0 to v5.0, the event was only dispatched under its
         // class name, even when event_name was set
         if (null !== $options['event_name']
             && EventDispatcherTaskEvent::class !== $options['event_name']

@@ -402,7 +402,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 ];
                 $this->taskLogger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
-                // @deprecated since v5, in v6.0 the process will fail right away, before any task is executed
+                // @deprecated since 5.1, in v6.0 the process will fail right away, before any task is executed
                 trigger_deprecation(
                     'cleverage/process-bundle',
                     '5.1',
