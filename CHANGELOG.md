@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#473](https://github.com/cleverage/process-bundle/issues/473) A task failing with the `stop` error strategy makes the process fail even when its error branch stops the flow (`StopTask`, `ProcessState::stop()`): the failure was swallowed, the process ended as succeeded or stopped (`cleverage_process.end` event, exit code 0) and a parent process went on with a `null` output. Update documentation, add tests.
+
 v5.9
 -----
 
