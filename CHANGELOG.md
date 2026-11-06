@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#487](https://github.com/cleverage/process-bundle/issues/487) Shell completion of the process codes (`cleverage:process:execute`, `cleverage:process:help`): the error logged for each process whose configuration is not valid is no longer completed as a process code, the configurations are no longer resolved (all the process codes are completed). Update documentation, add tests.
+
 v5.9
 -----
 
