@@ -2,6 +2,7 @@ Latest
 ------
 
 ## Changes
+* [#503](https://github.com/cleverage/process-bundle/issues/503) `ProcessState::getReturnCode()` / `setReturnCode()`, used nowhere, are deprecated (removed in 6.0). Add tests.
 * [#479](https://github.com/cleverage/process-bundle/issues/479) Performance: the `Processing task <task_code>` debug log is written at the first execution of each task by execution of its process, instead of for each item (a record was built for each item even when debug records are not handled: 100,000 lines through 3 tasks took 7.7 s of CPU instead of 2.3 s). Update documentation, add tests.
 * [#497](https://github.com/cleverage/process-bundle/issues/497) Documentation: the default error output of a task is `null` when the task has no input: a root task (except the `entry_point`), a failure of `proceed` or `flush`.
 * [#495](https://github.com/cleverage/process-bundle/issues/495) Documentation: `symfony/lock` (exclusive processes) in the optional packages of the quick start; in the good practices, `{date_time}` (one second resolution) does not make a file path unique, `{unique_token}` does.

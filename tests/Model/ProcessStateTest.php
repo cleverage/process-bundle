@@ -77,6 +77,29 @@ class ProcessStateTest extends TestCase
         self::assertSame(['foo' => 'baz'], $state->getContextualizedOptions());
     }
 
+    public function testReturnCodeIsDeprecated(): void
+    {
+        $state = $this->createState();
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            $state->setReturnCode(2);
+            $returnCode = $state->getReturnCode();
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertSame(2, $returnCode);
+        $this->assertSame([
+            'Since cleverage/process-bundle 5.10: The "CleverAge\\ProcessBundle\\Model\\ProcessState::setReturnCode()" method is deprecated: it is used nowhere (the exit code of the command does not depend on it) and will be removed in 6.0.',
+            'Since cleverage/process-bundle 5.10: The "CleverAge\\ProcessBundle\\Model\\ProcessState::getReturnCode()" method is deprecated: it is used nowhere and will be removed in 6.0.',
+        ], $deprecations);
+    }
+
     private function createState(): ProcessState
     {
         $processConfiguration = new ProcessConfiguration('test', []);

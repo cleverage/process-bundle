@@ -60,6 +60,9 @@ class ProcessState
      */
     protected array $errorContext = [];
 
+    /**
+     * @deprecated since 5.10, used nowhere, will be removed in v6.0
+     */
     protected ?int $returnCode = null;
 
     protected bool $skipped;
@@ -235,13 +238,23 @@ class ProcessState
         unset($this->errorContext[$key]);
     }
 
+    /**
+     * @deprecated since 5.10, used nowhere, will be removed in v6.0
+     */
     public function getReturnCode(): int
     {
+        trigger_deprecation('cleverage/process-bundle', '5.10', 'The "%s()" method is deprecated: it is used nowhere and will be removed in 6.0.', __METHOD__);
+
         return $this->returnCode ?? 0;
     }
 
+    /**
+     * @deprecated since 5.10, used nowhere (the exit code of the command does not depend on it), will be removed in v6.0
+     */
     public function setReturnCode(int $returnCode): void
     {
+        trigger_deprecation('cleverage/process-bundle', '5.10', 'The "%s()" method is deprecated: it is used nowhere (the exit code of the command does not depend on it) and will be removed in 6.0.', __METHOD__);
+
         $this->returnCode = $returnCode;
     }
 
