@@ -35,6 +35,12 @@ documented. The outputs of another root task, of a blocking task proceeded or of
 now go on through the tasks of the stopped flow: they were dropped silently by the first task that had stopped. Check
 the processes with several root tasks, or with a blocking task (e.g. `aggregate_iterable`) fed before a stop.
 
+### Return code of the process state
+
+`ProcessState::getReturnCode()` / `setReturnCode()` are deprecated since 5.10 (`Since cleverage/process-bundle 5.10: The
+"CleverAge\ProcessBundle\Model\ProcessState::setReturnCode()" method is deprecated...`) and will be removed in 6.0: they
+are used nowhere, the exit code of `cleverage:process:execute` does not depend on them. Remove their calls.
+
 ## v5.8
 
 ### Unknown task references
