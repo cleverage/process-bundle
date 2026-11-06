@@ -6,6 +6,7 @@ Latest
 * [#483](https://github.com/cleverage/process-bundle/issues/483) Documentation: an exception thrown by `IterableTaskInterface::next()` makes the process fail right away with this exception, the `error_strategy` and the `error_outputs` of the task do not apply.
 
 ## Fixes
+* [#491](https://github.com/cleverage/process-bundle/issues/491) `CounterTask`: `flush_every: 0` is rejected when the options are resolved, with a clear message, instead of failing on the first execution with `Modulo by zero`; a negative `flush_every`, which works as its absolute value, is deprecated. Update documentation, add tests.
 * [#477](https://github.com/cleverage/process-bundle/issues/477) "Stop the process on the first invalid item" (`error_strategy: skip` and an error branch ending on a `StopTask`) ends as stopped when the failing task is finalizable (`csv_reader`, `xml_stream_reader`, `stat_counter`...): the error of the skipped item, kept by its state, was taken for a finalization failure and the process ended as failed. Add tests.
 * [#473](https://github.com/cleverage/process-bundle/issues/473) A task failing with the `stop` error strategy makes the process fail even when its error branch stops the flow (`StopTask`, `ProcessState::stop()`): the failure was swallowed, the process ended as succeeded or stopped (`cleverage_process.end` event, exit code 0) and a parent process went on with a `null` output. Update documentation, add tests.
 * [#485](https://github.com/cleverage/process-bundle/issues/485) The process returns the last output of its `end_point` passed on to the next tasks: the output of an execution whose output is ignored (skipped, filtered, failed with the `skip` strategy) was returned, e.g. `""` for a `skip_empty` end point whose last item is empty, or `null` for a filtered last item. Update documentation, add tests.
@@ -397,7 +398,6 @@ v3.2.2
 * `\CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException` now displays the failing process code
 * `\CleverAge\ProcessBundle\Transformer\TransformerTrait` now displays a more explicit message on wrong options type
 
-
 v3.2.1
 ------
 
@@ -417,8 +417,6 @@ v3.2.0
 
 There is no BC break for this version, but note that `sidus/base-bundle` has been removed from dependencies.
 If you use it, it should already be inside your own composer.json.
-
-
 
 Release v3.1
 ============
@@ -445,14 +443,12 @@ v3.1.5
 
 * [GITHUB-120](https://github.com/cleverage/process-bundle/pull/120): FolderBrowserTask: Accept array type for `name_pattern` option
 
-
 v3.1.4
 ------
 
 ### Features
 
 * (_backport from v3.0.9_) Adding simple task to launch system commands
-
 
 v3.1.3
 ------
@@ -509,7 +505,6 @@ v3.1.0
 * [GITHUB-106](https://github.com/cleverage/process-bundle/issues/106): an entry-point cannot have an ancestor anymore.
   The behaviour was undefined, and now it will throw an exception.
 
-
 UPGRADE TO 2.0
 ==============
 
@@ -532,7 +527,6 @@ options:
             mapping:
                 <key>: <options>
 ```
-
 
 UPGRADE TO 1.1
 ==============

@@ -16,6 +16,8 @@ namespace CleverAge\ProcessBundle\Task;
 use CleverAge\ProcessBundle\Model\AbstractConfigurableTask;
 use CleverAge\ProcessBundle\Model\FlushableTaskInterface;
 use CleverAge\ProcessBundle\Model\ProcessState;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
@@ -64,5 +66,23 @@ class CounterTask extends AbstractConfigurableTask implements FlushableTaskInter
     {
         $resolver->setRequired(['flush_every']);
         $resolver->setAllowedTypes('flush_every', ['int']);
+        $resolver->setNormalizer('flush_every', static function (Options $options, int $value): int {
+            // Modulo by zero
+            if (0 === $value) {
+                throw new InvalidOptionsException('The option "flush_every" of the counter task must be a positive integer (the count is output every "flush_every" executions), 0 given.');
+            }
+            // Works as its absolute value (sign of the modulo)
+            if ($value < 0) {
+                trigger_deprecation(
+                    'cleverage/process-bundle',
+                    '5.10',
+                    'A negative "flush_every" option of the counter task (%d) is deprecated, it works as %d: use a positive integer. It will be rejected in v6.0.',
+                    $value,
+                    -$value,
+                );
+            }
+
+            return $value;
+        });
     }
 }
