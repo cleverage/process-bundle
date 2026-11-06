@@ -17,7 +17,8 @@ A process that has already failed (e.g. a task whose initialization failed, see 
 [initializable tasks](../../02-task_types.md)) stays **failed**: the `StopTask` still stops the flow of the
 tasks, but it does not turn the failure into a stop.
 
-To stop a process because of an error, let the error fail the process instead (error strategy `stop`).
+To stop a process because of an error, let the error fail the process instead (error strategy `stop`). A `StopTask` in
+the error branch of a task with the `stop` strategy does not turn its failure into a stop: the process fails.
 
 Task reference
 --------------
