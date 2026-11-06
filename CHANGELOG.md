@@ -1,6 +1,9 @@
 Latest
 ------
 
+v5.9
+-----
+
 ## Changes
 * [#467](https://github.com/cleverage/process-bundle/issues/467) Documentation: the example of the generic transformers reference can be executed (source and debug tasks, expected result).
 * [#465](https://github.com/cleverage/process-bundle/issues/465) Shell completion: `cleverage:process:execute` and `cleverage:process:help` suggest the process codes, and `--output-format` its values. Update documentation, add tests.

@@ -1,6 +1,8 @@
 Upgrade Guide
 =============
 
+## Latest
+
 ## v5.8
 
 ### Unknown task references
