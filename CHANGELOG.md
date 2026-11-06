@@ -2,6 +2,7 @@ Latest
 ------
 
 ## Changes
+* [#467](https://github.com/cleverage/process-bundle/issues/467) Documentation: the example of the generic transformers reference can be executed (source and debug tasks, expected result).
 * [#465](https://github.com/cleverage/process-bundle/issues/465) Shell completion: `cleverage:process:execute` and `cleverage:process:help` suggest the process codes, and `--output-format` its values. Update documentation, add tests.
 * [#463](https://github.com/cleverage/process-bundle/issues/463) Error messages give the fix: a "Did you mean" suggestion for an unknown process (with a hint about `cleverage:process:list`), transformer, task code (with a hint about `#[AsTask]` / the `cleverage.task` tag) or output format (with the valid formats); the `key:value` format of an invalid context; the value of a `callback` that is not callable; a task given as a list (e.g. `outputs` badly indented) instead of `Unrecognized option "0"`; "neither" for a task without `task` nor `service`. New `ProcessConfigurationRegistry::getProcessCodes()`. Add tests.
 * [#461](https://github.com/cleverage/process-bundle/issues/461) `cleverage:process:execute`: an input (`--input`, `--input-from-stdin`) given to a process without `entry_point` is reported on the error output of the command (only logged as a warning, not displayed without `-v`). Update documentation, add tests.
