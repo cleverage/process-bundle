@@ -63,7 +63,9 @@ execute command, or `$input` argument of `ProcessManager::execute()`). The refer
 must be in the [main branch](#main-branch) of the process.
 
 **end_point**: optional task code (default is none) whose last output will be returned as the process output. It must
-be in the main branch of the process.
+be in the main branch of the process. An ignored output (the task is skipped, filters its input or fails with the
+`skip` strategy) is not returned: the process returns the last output passed on to the next tasks, `null` if there is
+none.
 
 **public**: optional boolean (default is true) to mark a process as public or private. Private processes are filtered
 from the process list (unless `--all` is used) but execution is still allowed. A value other than a boolean is rejected
