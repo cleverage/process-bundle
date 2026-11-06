@@ -37,6 +37,12 @@ Each execution produces one output (one item) that is immediately sent to the ne
 Then the `next` method is called: while it returns `true`, the task is executed again to produce the next item, until
 all data have been processed. This way only one item at a time is in memory.
 
+An exception thrown by `next` is not an error of an item: the `error_strategy` and the `error_outputs` of the task do
+not apply, the process fails right away with this exception (not wrapped in a `ProcessFailedException`), whatever the
+error strategies of its tasks (the task executing a sub-process applies its own strategy to the failure of the
+sub-process), after the finalization of the tasks (see [process execution flow](04-advanced_workflow.md#process-execution-flow)).
+With the `skip` strategy, going on would either end the iteration silently or call a failing `next` again forever.
+
 The main condition to use them is to have no interaction between each chunk of data. If it's not the case, you might
 have to look for another way to organize your data, in order to find bigger chunks.
 
