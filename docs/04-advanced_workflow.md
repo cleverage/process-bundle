@@ -162,7 +162,9 @@ A task may also control the flow without any error:
 - `ProcessState::setStopped(true)` / `ProcessState::stop()`: without exception, only the current flow stops: the stop
   signal goes back up to the root task, which stops iterating. The rest of the resolution still happens: other root
   tasks are executed, blocking tasks that already received inputs are proceeded, flushable tasks are flushed and every
-  task is finalized. It is not a failure for the process manager: the `cleverage_process.end` event is dispatched (not
+  task is finalized. Their outputs go on through the tasks of the stopped flow, except through an iterable task whose
+  iteration has been interrupted by the stop: it stays stopped (it would resume its interrupted iteration), and stops
+  the flows reaching it. It is not a failure for the process manager: the `cleverage_process.end` event is dispatched (not
   `cleverage_process.fail`) and the command exits with code 0. The [StopTask](reference/tasks/stop_task.md) also flags
   the process history as stopped: the process ends as stopped on purpose, not as a failure
 

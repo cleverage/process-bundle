@@ -108,6 +108,14 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected ?\WeakMap $loggedStates = null;
 
+    /**
+     * Tasks whose initialization has failed (deprecated since 5.1), indexed by task configuration (spl_object_id()):
+     * they stay stopped.
+     *
+     * @var array<int, TaskConfiguration>
+     */
+    protected array $failedInitializations = [];
+
     protected ?ProcessHistory $processHistory = null;
 
     protected ?TaskConfiguration $taskConfiguration = null;
@@ -157,6 +165,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
         $this->locks = [];
         $this->endPointOutputs = new \WeakMap();
         $this->loggedStates = null;
+        $this->failedInitializations = [];
         $this->processHistory = null;
         $this->taskConfiguration = null;
     }
@@ -353,6 +362,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             foreach ($processConfiguration->getTaskConfigurations() as $taskConfiguration) {
                 $this->removeProcessedIterable($taskConfiguration);
                 $this->removeProcessedBlocking($taskConfiguration);
+                unset($this->failedInitializations[spl_object_id($taskConfiguration)]);
             }
         }
 
@@ -427,6 +437,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 ];
                 $this->taskLogger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
+                $this->failedInitializations[spl_object_id($taskConfiguration)] = $taskConfiguration;
                 // @deprecated since 5.1, in v6.0 the process will fail right away, before any task is executed
                 trigger_deprecation(
                     'cleverage/process-bundle',
@@ -550,6 +561,17 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             throw new RuntimeException("Missing task for configuration {$taskConfiguration->getCode()}");
         }
         $state = $taskConfiguration->getState();
+
+        // A stop only stops the flow it happened in: a later execution of the task (from another root task, by a
+        // blocking task proceeded or a flushable task flushed after the stop...) goes on. Except for a task whose
+        // initialization has failed (deprecated), and for an iterable task, whose iteration has been interrupted (it
+        // would resume it)
+        if ($state->isStopped()
+            && !$task instanceof IterableTaskInterface
+            && !isset($this->failedInitializations[spl_object_id($taskConfiguration)])
+        ) {
+            $state->setStopped(false);
+        }
 
         $this->refreshLocks();
         if ($this->isStopRequested($state)) {
