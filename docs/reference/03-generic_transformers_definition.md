@@ -86,4 +86,7 @@ clever_age_process:
 
 As any transformer code, generic transformer codes must be unique: use a prefix to avoid conflicts. A dash is kept in
 the code (it was replaced by an underscore before 5.7, the former name is deprecated), as in the codes of the
-transformers and of the contextual options of a generic transformer.
+transformers and of the contextual options of a generic transformer (replaced by an underscore before 5.9, unless the
+code also had an underscore: `array-first` was found as the `array_first` transformer, and the `the-prefix` contextual
+option was given and used as `the_prefix` / `{{ the_prefix }}`; these former names still work but are deprecated since
+5.10, write the code of the transformer and of the contextual option as registered).

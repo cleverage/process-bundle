@@ -18,6 +18,16 @@ A negative `flush_every` option of the `counter` task works as its absolute valu
 and will be rejected in 6.0: use a positive integer. `flush_every: 0`, which failed on the first execution (`Modulo by
 zero`), is now rejected when the options are resolved.
 
+### Dashes in the generic transformers
+
+Since 5.9, the codes of the transformers and of the contextual options of a generic transformer keep their dashes, as
+written. Before 5.9, they were replaced by underscores (unless the code also had an underscore), and only their former
+name worked: `array-first` was found as the `array_first` transformer, and a `the-prefix` contextual option was given
+and used as `the_prefix` / `{{ the_prefix }}`. These former names work again but are deprecated since 5.10 (`Since
+cleverage/process-bundle 5.10: The transformer "array-first" of the generic transformer...`, `Using the contextual option
+"the-prefix" of the generic transformer...`), and will not work in 6.0: write the code of the transformer as registered
+(`array_first`), and the contextual option as defined in `contextual_options` (`the-prefix`, `{{ the-prefix }}`).
+
 ## v5.8
 
 ### Unknown task references
