@@ -81,7 +81,8 @@ the database writes of both executions mix.
 
 When a process must not run twice at the same time:
 
-- make its outputs unique (`{unique_token}`, `{date_time}` in the file paths) and its writes idempotent;
+- make its outputs unique (`{unique_token}` in the file paths: `{date_time}` has a resolution of one second, two
+  executions started in the same second get the same path) and its writes idempotent;
 - or make it [exclusive](reference/01-process_definition.md) (`exclusive: true`, with symfony/lock): another
   execution fails while it is running.
 
