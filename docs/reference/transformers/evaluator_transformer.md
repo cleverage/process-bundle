@@ -57,3 +57,6 @@ Notes
 This transformer uses its own `ExpressionLanguage` instance, not the bundle's `cleverage_process.expression_language`
 service: the extra functions registered on that service (e.g. `preg_match`) are not available here, unlike in
 [RulesTransformer](rules_transformer.md) and [ExpressionLanguageMapTransformer](expression_language_map_transformer.md).
+
+The `constant()` built-in function of ExpressionLanguage is deprecated since Symfony 8.2 (Symfony asks to register a
+`ConstantFunctionProvider` listing the allowed constants instead): avoid it in expressions.
