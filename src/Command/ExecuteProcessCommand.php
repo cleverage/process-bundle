@@ -224,14 +224,17 @@ class ExecuteProcessCommand extends Command
         }
         // As on STDOUT, the invalid UTF-8 sequences are replaced (e.g. a value read from a Latin-1 file); the buffer of
         // the process_launcher task is written here too
-        $outputFile = new JsonStreamFile($input->getOption('output'), 'wb', null, [\JSON_THROW_ON_ERROR, \JSON_INVALID_UTF8_SUBSTITUTE]);
+        $jsonFlags = [\JSON_THROW_ON_ERROR, \JSON_INVALID_UTF8_SUBSTITUTE];
+        // Encoded before opening the file: an existing file is not truncated when the output cannot be stored
         try {
-            $outputFile->writeLine($data);
+            json_encode($data, array_sum($jsonFlags));
         } catch (\JsonException $exception) {
             $this->getErrorOutput($output)->writeln(\sprintf("<comment>Output not stored in '%s': it cannot be encoded as JSON (%s)</comment>", $input->getOption('output'), $exception->getMessage()));
 
             return;
         }
+        $outputFile = new JsonStreamFile($input->getOption('output'), 'wb', null, $jsonFlags);
+        $outputFile->writeLine($data);
         if ($output->isVerbose()) {
             $output->writeln(\sprintf("Output stored in '%s'", $input->getOption('output')));
         }

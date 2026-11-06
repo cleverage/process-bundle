@@ -10,6 +10,7 @@ Latest
 * [#473](https://github.com/cleverage/process-bundle/issues/473) A task failing with the `stop` error strategy makes the process fail even when its error branch stops the flow (`StopTask`, `ProcessState::stop()`): the failure was swallowed, the process ended as succeeded or stopped (`cleverage_process.end` event, exit code 0) and a parent process went on with a `null` output. Update documentation, add tests.
 * [#485](https://github.com/cleverage/process-bundle/issues/485) The process returns the last output of its `end_point` passed on to the next tasks: the output of an execution whose output is ignored (skipped, filtered, failed with the `skip` strategy) was returned, e.g. `""` for a `skip_empty` end point whose last item is empty, or `null` for a filtered last item. Update documentation, add tests.
 * [#487](https://github.com/cleverage/process-bundle/issues/487) Shell completion of the process codes (`cleverage:process:execute`, `cleverage:process:help`): the error logged for each process whose configuration is not valid is no longer completed as a process code, the configurations are no longer resolved (all the process codes are completed). Update documentation, add tests.
+* [#489](https://github.com/cleverage/process-bundle/issues/489) `cleverage:process:execute --output=<file> --output-format=json-stream`: an output that cannot be encoded as JSON (`Output not stored in '<file>'...`) no longer truncates the existing file, the output is encoded before the file is opened. Update documentation, add tests.
 
 v5.9
 -----
