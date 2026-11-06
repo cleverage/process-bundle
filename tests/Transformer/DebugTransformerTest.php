@@ -26,14 +26,20 @@ class DebugTransformerTest extends TestCase
     {
         $transformer = new DebugTransformer();
         $value = 123;
+        // Capture the dump instead of writing it to the output of PHPUnit
+        $dumped = [];
+        $previousHandler = VarDumper::setHandler(static function (mixed $var) use (&$dumped): void {
+            $dumped[] = $var;
+        });
 
-        $transformedValue = $transformer->transform($value);
+        try {
+            $transformedValue = $transformer->transform($value);
+        } finally {
+            VarDumper::setHandler($previousHandler);
+        }
 
         $this->assertSame($value, $transformedValue);
-
-        if (class_exists(VarDumper::class)) {
-            VarDumper::dump($value);
-        }
+        $this->assertSame([$value], $dumped);
     }
 
     public function testGetCodeReturnsCorrectCode(): void
