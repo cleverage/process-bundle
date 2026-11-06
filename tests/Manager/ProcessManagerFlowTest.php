@@ -32,6 +32,7 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -266,6 +267,34 @@ class ProcessManagerFlowTest extends TestCase
     }
 
     /**
+     * The process returns the last output passed on by its end point: the output of an execution whose output is
+     * ignored (skipped, failed with the skip strategy) does not replace it (it was returned).
+     *
+     * @param array<string, mixed> $endPoint
+     */
+    #[DataProvider('provideEndPointsIgnoringTheLastItem')]
+    public function testEndPointIgnoringItsLastItem(array $endPoint, mixed $expected): void
+    {
+        $result = $this->execute([
+            'items' => ['type' => 'iterable', 'items' => [1, 2, 3], 'outputs' => ['last']],
+            'last' => $endPoint,
+        ], ['end_point' => 'last']);
+
+        self::assertSame(['last:execute:1', 'last:execute:2', 'last:execute:3'], $this->getExecutions());
+        self::assertSame($expected, $result);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>, mixed}>
+     */
+    public static function provideEndPointsIgnoringTheLastItem(): iterable
+    {
+        yield 'skipped' => [['skip_on' => [3]], 2];
+        yield 'failed with the skip strategy' => [['fail_on' => 3, 'error_strategy' => 'skip'], 2];
+        yield 'every item skipped' => [['skip_on' => [1, 2, 3]], null];
+    }
+
+    /**
      * A task which is not iterable nor blocking is flushed once resolved.
      */
     public function testRootTaskIsFlushed(): void
@@ -389,6 +418,13 @@ class ProcessManagerFlowTest extends TestCase
             }
             if ($options['record_context'] ?? false) {
                 $record("{$code}:context:".json_encode($state->getContext()));
+            }
+            // skip_on: the items skipped, with an output (e.g. an empty value skipped by skip_empty)
+            if (\in_array($input, $options['skip_on'] ?? [], true)) {
+                $state->setOutput("skipped {$inputString}");
+                $state->setSkipped(true);
+
+                return;
             }
             if (isset($options['stop_on']) && $options['stop_on'] === $input) {
                 $state->stop();
