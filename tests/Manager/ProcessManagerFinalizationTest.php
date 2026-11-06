@@ -30,6 +30,7 @@ use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
+use CleverAge\ProcessBundle\Task\StopTask;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger as PsrAbstractLogger;
 use Symfony\Component\DependencyInjection\Container;
@@ -49,6 +50,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessHistory::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessConfigurationRegistry::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(StopTask::class)]
 class ProcessManagerFinalizationTest extends TestCase
 {
     private Container $container;
@@ -114,6 +116,8 @@ class ProcessManagerFinalizationTest extends TestCase
         }
         $this->container->set('test.finalizable_throwing', $this->createFinalizableTask('throwing', failFinalization: true));
         $this->container->set('test.finalizable_bad_init', $this->createFinalizableTask('bad_init', failInitialization: true));
+        $this->container->set('test.finalizable_failing', $this->createFinalizableTask('failing', failExecution: true));
+        $this->container->set('test.stop', new StopTask());
 
         $this->eventDispatcher = new EventDispatcher();
     }
@@ -233,6 +237,31 @@ class ProcessManagerFinalizationTest extends TestCase
         self::assertNull($this->processManager->getTaskConfiguration());
     }
 
+    /**
+     * "Stop the process on the first invalid item" (skip strategy, error branch ending on a StopTask) on a finalizable
+     * task: the error of the skipped item kept by its state is not a finalization failure, the process ends as stopped.
+     */
+    public function testAFinalizableTaskWhoseErrorBranchStopsTheProcessIsNotAFinalizationFailure(): void
+    {
+        $events = [];
+        $this->eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_ENDED, static function (ProcessEvent $event) use (&$events): void {
+            $events[] = $event->isProcessStopped() ? 'end (stopped)' : 'end';
+        });
+        $this->eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_FAILED, static function () use (&$events): void {
+            $events[] = 'fail';
+        });
+
+        $this->execute([
+            'failing' => $this->createTaskConfiguration('@test.finalizable_failing', ['second'], errorStrategy: 'skip', errorOutputs: ['stop']),
+            'second' => $this->createTaskConfiguration('@test.finalizable_second'),
+            'stop' => $this->createTaskConfiguration('@test.stop'),
+        ]);
+
+        self::assertSame(['failing (failing)', 'second (second)'], $this->finalized);
+        self::assertSame([false, false], $this->failedAtFinalization);
+        self::assertSame(['end (stopped)'], $events);
+    }
+
     public function testAFinalizationFailureOfASubProcessMakesItsParentTaskFail(): void
     {
         $this->createProcessManager([
@@ -303,13 +332,15 @@ class ProcessManagerFinalizationTest extends TestCase
         string $code,
         bool $failFinalization = false,
         bool $failInitialization = false,
+        bool $failExecution = false,
     ): TaskInterface {
-        return new class($this, $code, $failFinalization, $failInitialization) implements InitializableTaskInterface, FinalizableTaskInterface {
+        return new class($this, $code, $failFinalization, $failInitialization, $failExecution) implements InitializableTaskInterface, FinalizableTaskInterface {
             public function __construct(
                 private readonly ProcessManagerFinalizationTest $test,
                 private readonly string $code,
                 private readonly bool $failFinalization,
                 private readonly bool $failInitialization,
+                private readonly bool $failExecution,
             ) {
             }
 
@@ -326,6 +357,9 @@ class ProcessManagerFinalizationTest extends TestCase
             public function execute(ProcessState $state): void
             {
                 $this->initialize($state);
+                if ($this->failExecution) {
+                    throw new \LogicException('Invalid item');
+                }
                 $state->setOutput($state->getInput());
             }
 
@@ -430,6 +464,7 @@ class ProcessManagerFinalizationTest extends TestCase
     /**
      * @param list<string>         $outputs
      * @param array<string, mixed> $options
+     * @param list<string>         $errorOutputs
      *
      * @return array<string, mixed>
      */
@@ -438,6 +473,7 @@ class ProcessManagerFinalizationTest extends TestCase
         array $outputs = [],
         array $options = [],
         ?string $errorStrategy = null,
+        array $errorOutputs = [],
     ): array {
         return [
             'service' => $service,
@@ -446,7 +482,7 @@ class ProcessManagerFinalizationTest extends TestCase
             'help' => '',
             'outputs' => $outputs,
             'errors' => [],
-            'error_outputs' => [],
+            'error_outputs' => $errorOutputs,
             'error_strategy' => $errorStrategy,
             'log_level' => null,
         ];

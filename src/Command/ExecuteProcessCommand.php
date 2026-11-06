@@ -61,8 +61,9 @@ class ExecuteProcessCommand extends Command
             InputArgument::IS_ARRAY | InputArgument::REQUIRED,
             'The code(s) of the process(es) to execute, separated by a space',
             null,
-            // Shell completion: the codes of the processes whose configuration is valid
-            fn (): array => array_keys($this->processRegistry->getProcessConfigurations())
+            // Shell completion: the codes of the processes, without resolving their configuration (getProcessConfigurations()
+            // logs the invalid ones, the log would be completed)
+            fn (): array => $this->processRegistry->getProcessCodes()
         );
         $this->addOption('input', 'i', InputOption::VALUE_REQUIRED, 'Pass input data to the first task of the process');
         $this->addOption('input-from-stdin', null, InputOption::VALUE_NONE, 'Read input data from stdin');

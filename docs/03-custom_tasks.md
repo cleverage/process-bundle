@@ -197,7 +197,10 @@ Defining your tasks as Iterable or Blocking is as simple as implementing one of 
 [task types](02-task_types.md) for the complete lifecycle):
 * `CleverAge\ProcessBundle\Model\IterableTaskInterface`: the `next` method should behave almost the same as PHP's
 native [next](https://www.php.net/manual/en/function.next.php) function for arrays, except it only returns a boolean:
-`true` if there is another item to output (the task is then executed again), `false` when the iteration is over
+`true` if there is another item to output (the task is then executed again), `false` when the iteration is over.
+Read or compute the item in `execute` rather than in `next` when it may fail: an exception thrown by `next` makes the
+process fail right away, the `error_strategy` and the `error_outputs` of the task do not apply (see
+[iterable tasks](02-task_types.md#iterable-tasks))
 * `CleverAge\ProcessBundle\Model\BlockingTaskInterface`: every `execute` method call should only accumulate data from
 the input, and once every previous task is _resolved_ (all their executions and iterations are over), the `proceed`
 method should provide an output
