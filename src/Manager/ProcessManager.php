@@ -443,6 +443,10 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
 
                         // Bubble up the stop signal
                         if ($errorTask->getState()->isStopped()) {
+                            // Already stopped by the failure (stop strategy): the process fails anyway, below
+                            if ($state->isStopped()) {
+                                break;
+                            }
                             $state->setStopped(true);
 
                             return;

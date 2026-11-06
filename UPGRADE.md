@@ -3,6 +3,14 @@ Upgrade Guide
 
 ## Latest
 
+### Stop strategy and error branch ending on a stop
+
+A task failing with the `stop` error strategy (the default) makes the process fail, even when its error branch stops
+the flow (a `StopTask`, or a task calling `ProcessState::stop()`). Before, the failure was swallowed: the process ended
+as succeeded or stopped. To stop the process on purpose on the first error (not a failure), set `error_strategy: skip`
+on the failing task, as in the "Stop the process on the first invalid item" example of the
+[StopTask](docs/reference/tasks/stop_task.md).
+
 ## v5.8
 
 ### Unknown task references
