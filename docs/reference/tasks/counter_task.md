@@ -25,9 +25,9 @@ Possible outputs
 Options
 -------
 
-| Code          | Type  | Required | Default | Description                                           |
-|---------------|-------|:--------:|---------|-------------------------------------------------------|
-| `flush_every` | `int` |  **X**   |         | Output the count every N executions (N = this option) |
+| Code          | Type  | Required | Default | Description                                                                          |
+|---------------|-------|:--------:|---------|--------------------------------------------------------------------------------------|
+| `flush_every` | `int` |  **X**   |         | Output the count every N executions (N = this option, a positive integer, see notes) |
 
 Examples
 --------
@@ -55,3 +55,6 @@ Notes
 * `flush()` can be called several times during a process (see
   [Advanced workflow](../../04-advanced_workflow.md)), e.g. once at the end of the upstream iteration and once when
   the counter itself is resolved. The final count is only outputted by the first call; the next ones are skipped.
+* `flush_every: 0` is rejected when the options are resolved (`InvalidOptionsException`) since 5.10: it failed on the
+  first execution (`Modulo by zero`). A negative value works as its absolute value (`-3` as `3`): it is deprecated since
+  5.10 and will be rejected in v6.0.

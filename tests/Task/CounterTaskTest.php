@@ -21,6 +21,7 @@ use CleverAge\ProcessBundle\Model\ProcessHistory;
 use CleverAge\ProcessBundle\Model\ProcessState;
 use CleverAge\ProcessBundle\Task\CounterTask;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CounterTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(AbstractConfigurableTask::class)]
@@ -72,6 +73,39 @@ class CounterTaskTest extends TestCase
         $this->executeAll($task, $state, 2);
         self::assertSame(4, $this->flush($task, $state));
         self::assertNull($this->flush($task, $state));
+    }
+
+    /**
+     * A modulo by zero failed when executed.
+     */
+    public function testZeroFlushEveryIsRejected(): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+        $this->expectExceptionMessage('The option "flush_every" of the counter task must be a positive integer (the count is output every "flush_every" executions), 0 given.');
+
+        $this->createTask(0);
+    }
+
+    /**
+     * A negative value works as its absolute value (sign of the modulo): deprecated.
+     */
+    public function testNegativeFlushEveryIsDeprecated(): void
+    {
+        $deprecations = [];
+        set_error_handler(static function (int $errno, string $errstr) use (&$deprecations): bool {
+            $deprecations[] = $errstr;
+
+            return true;
+        }, \E_USER_DEPRECATED);
+        try {
+            [$task, $state] = $this->createTask(-2);
+        } finally {
+            restore_error_handler();
+        }
+
+        self::assertSame(['Since cleverage/process-bundle 5.10: A negative "flush_every" option of the counter task (-2) is deprecated, it works as 2: use a positive integer. It will be rejected in v6.0.'], $deprecations);
+        self::assertSame([null, 2, null, 4, null], $this->executeAll($task, $state, 5));
+        self::assertSame(5, $this->flush($task, $state));
     }
 
     /**
