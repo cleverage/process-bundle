@@ -12,6 +12,9 @@ Latest
 * [#487](https://github.com/cleverage/process-bundle/issues/487) Shell completion of the process codes (`cleverage:process:execute`, `cleverage:process:help`): the error logged for each process whose configuration is not valid is no longer completed as a process code, the configurations are no longer resolved (all the process codes are completed). Update documentation, add tests.
 * [#489](https://github.com/cleverage/process-bundle/issues/489) `cleverage:process:execute --output=<file> --output-format=json-stream`: an output that cannot be encoded as JSON (`Output not stored in '<file>'...`) no longer truncates the existing file, the output is encoded before the file is opened. Update documentation, add tests.
 
+* [#493](https://github.com/cleverage/process-bundle/issues/493) Documentation: the `constant()` function of the `evaluator` expressions is deprecated by Symfony 8.2 (a `ConstantFunctionProvider` must be registered), avoid it. The test no longer uses it.
+* [#483](https://github.com/cleverage/process-bundle/issues/483) Documentation: an exception thrown by `IterableTaskInterface::next()` makes the process fail right away with this exception, the `error_strategy` and the `error_outputs` of the task do not apply.
+
 v5.9
 -----
 
@@ -397,7 +400,6 @@ v3.2.2
 * `\CleverAge\ProcessBundle\Exception\InvalidProcessConfigurationException` now displays the failing process code
 * `\CleverAge\ProcessBundle\Transformer\TransformerTrait` now displays a more explicit message on wrong options type
 
-
 v3.2.1
 ------
 
@@ -417,8 +419,6 @@ v3.2.0
 
 There is no BC break for this version, but note that `sidus/base-bundle` has been removed from dependencies.
 If you use it, it should already be inside your own composer.json.
-
-
 
 Release v3.1
 ============
@@ -445,14 +445,12 @@ v3.1.5
 
 * [GITHUB-120](https://github.com/cleverage/process-bundle/pull/120): FolderBrowserTask: Accept array type for `name_pattern` option
 
-
 v3.1.4
 ------
 
 ### Features
 
 * (_backport from v3.0.9_) Adding simple task to launch system commands
-
 
 v3.1.3
 ------
@@ -509,7 +507,6 @@ v3.1.0
 * [GITHUB-106](https://github.com/cleverage/process-bundle/issues/106): an entry-point cannot have an ancestor anymore.
   The behaviour was undefined, and now it will throw an exception.
 
-
 UPGRADE TO 2.0
 ==============
 
@@ -532,7 +529,6 @@ options:
             mapping:
                 <key>: <options>
 ```
-
 
 UPGRADE TO 1.1
 ==============
