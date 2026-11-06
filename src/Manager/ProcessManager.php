@@ -92,6 +92,14 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected array $locks = [];
 
+    /**
+     * Last output passed on by the end point of each process being executed (not the output of an execution whose output
+     * is ignored: skipped, filtered, failed with the skip strategy...), in a list, indexed by the state of the end point.
+     *
+     * @var \WeakMap<ProcessState, array{mixed}>
+     */
+    protected \WeakMap $endPointOutputs;
+
     protected ?ProcessHistory $processHistory = null;
 
     protected ?TaskConfiguration $taskConfiguration = null;
@@ -124,6 +132,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             $taskRegistry = new TaskRegistry($this->container, $this->container);
         }
         $this->taskRegistry = $taskRegistry;
+        $this->endPointOutputs = new \WeakMap();
     }
 
     /**
@@ -138,6 +147,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             $lock->release();
         }
         $this->locks = [];
+        $this->endPointOutputs = new \WeakMap();
         $this->processHistory = null;
         $this->taskConfiguration = null;
     }
@@ -270,6 +280,11 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 $this->processLogger->warning('Process has no entry point for input');
             }
 
+            $endPoint = $processConfiguration->getEndPoint();
+            if ($endPoint instanceof TaskConfiguration) {
+                $this->endPointOutputs[$endPoint->getState()] = [null];
+            }
+
             // Resolve task from main branch, starting by the end
             $taskList = array_reverse($processConfiguration->getTaskConfigurations());
             $allowedTasks = $processConfiguration->getMainTaskGroup();
@@ -305,12 +320,10 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
 
             $this->endProcess($processHistory);
 
-            // If defined, return the output of a task
+            // If defined, return the last output passed on by a task
             $returnValue = null;
-            if ($processConfiguration->getEndPoint() instanceof TaskConfiguration) {
-                $returnValue = $processConfiguration->getEndPoint()
-                    ->getState()
-                    ->getOutput();
+            if ($endPoint instanceof TaskConfiguration) {
+                $returnValue = ($this->endPointOutputs[$endPoint->getState()] ?? [null])[0];
             }
         } catch (\Throwable $error) {
             // Before the finalization: the tasks can tell the process has failed (ProcessHistory::isFailed())
@@ -443,6 +456,10 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
 
                         // Bubble up the stop signal
                         if ($errorTask->getState()->isStopped()) {
+                            // Already stopped by the failure (stop strategy): the process fails anyway, below
+                            if ($state->isStopped()) {
+                                break;
+                            }
                             $state->setStopped(true);
 
                             return;
@@ -465,6 +482,10 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                     && !$state->isSkipped();
 
                 if ($shouldContinue) {
+                    if (isset($this->endPointOutputs[$state])) {
+                        // The output returned by the process: an ignored output does not replace it
+                        $this->endPointOutputs[$state] = [$state->getOutput()];
+                    }
                     if ($task instanceof IterableTaskInterface) {
                         // Register the task as not empty
                         $this->addProcessedIterable($taskConfiguration);
@@ -673,6 +694,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
             $previousTaskConfiguration = $this->taskConfiguration;
             $this->taskConfiguration = $taskConfiguration;
             $state = $taskConfiguration->getState();
+            $previousException = $state->getException();
             try {
                 $task->finalize($taskConfiguration->getState());
             } catch (\Throwable $e) {
@@ -682,7 +704,11 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
                 $this->taskLogger->critical($e->getMessage(), $logContext);
                 $state->stop($e);
             }
-            $this->handleState($state);
+            // Only a failure of the finalization: the state may keep the error of an item skipped before, whose error
+            // branch has stopped the process on purpose (e.g. with a StopTask)
+            if ($state->getException() !== $previousException) {
+                $this->handleState($state);
+            }
             $this->taskConfiguration = $previousTaskConfiguration;
         }
     }

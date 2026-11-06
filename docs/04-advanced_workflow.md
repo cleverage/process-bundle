@@ -19,9 +19,10 @@ When a process is executed (with the `cleverage:process:execute` command or with
 5. **resolves** the tasks of the main branch (see below)
 6. **finalizes** every task, in the order they are configured (see
    [finalizable tasks](02-task_types.md#finalizable-tasks))
-7. returns the last output of the `end_point` task (or `null` if there is none) and dispatches the
-   `cleverage_process.end` event (`ProcessEvent::isProcessStopped()` tells whether the process was stopped on purpose by
-   a [StopTask](reference/tasks/stop_task.md))
+7. returns the last output of the `end_point` task passed on to its next tasks (or `null` if there is none: an output
+   that is ignored, when the task is skipped, filters its input or fails with the `skip` strategy, does not replace it)
+   and dispatches the `cleverage_process.end` event (`ProcessEvent::isProcessStopped()` tells whether the process was
+   stopped on purpose by a [StopTask](reference/tasks/stop_task.md))
 
 If an exception is thrown at any point, the tasks that have been initialized (and not finalized yet) are finalized,
 the `cleverage_process.fail` event is dispatched and the exception is rethrown (see
@@ -134,7 +135,8 @@ Those tasks form an *error branch*: they are only executed
 when an error output is set, and they are never considered as root tasks. A task can also send a value to its error
 branch without failing, by calling `setErrorOutput()` (e.g. [FilterTask](reference/tasks/filter_task.md) sends
 rejected items to its error outputs). With the `stop` strategy, the error branch is executed before the process
-stops.
+stops, and the process fails even if the error branch stops the flow (e.g. with a
+[StopTask](reference/tasks/stop_task.md)).
 
 ```yaml
 transform:

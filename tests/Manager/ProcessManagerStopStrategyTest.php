@@ -29,6 +29,8 @@ use CleverAge\ProcessBundle\Model\TaskInterface;
 use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use CleverAge\ProcessBundle\Task\ConstantOutputTask;
+use CleverAge\ProcessBundle\Task\StopTask;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\AbstractLogger as PsrAbstractLogger;
 use Psr\Log\LogLevel;
@@ -48,6 +50,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessState::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ProcessConfigurationRegistry::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(ConstantOutputTask::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(StopTask::class)]
 class ProcessManagerStopStrategyTest extends TestCase
 {
     /**
@@ -106,6 +109,48 @@ class ProcessManagerStopStrategyTest extends TestCase
     }
 
     /**
+     * An error branch ending on a stop (StopTask, or a task calling ProcessState::stop()) does not swallow the failure
+     * of a task with the stop strategy: the process fails (it ended as succeeded, without the original exception).
+     */
+    #[DataProvider('provideStoppingErrorBranches')]
+    public function testStopStrategyFailsWhenTheErrorBranchStops(string $errorBranchService): void
+    {
+        $originalException = new \LogicException('Something went wrong');
+        $eventDispatcher = new EventDispatcher();
+        $events = [];
+        $eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_ENDED, static function () use (&$events): void {
+            $events[] = 'end';
+        });
+        $eventDispatcher->addListener(ProcessEvent::EVENT_PROCESS_FAILED, static function () use (&$events): void {
+            $events[] = 'fail';
+        });
+        $processManager = $this->createProcessManager(
+            $originalException,
+            errorOutputs: ['error_branch'],
+            eventDispatcher: $eventDispatcher,
+            errorBranchService: $errorBranchService,
+        );
+
+        try {
+            $processManager->execute('test.process');
+            self::fail('The process should have failed');
+        } catch (ProcessFailedException $exception) {
+            self::assertSame($originalException, $exception->getPrevious());
+        }
+
+        self::assertSame(['fail'], $events);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function provideStoppingErrorBranches(): iterable
+    {
+        yield 'StopTask' => ['@test.stop'];
+        yield 'ProcessState::stop()' => ['@test.stop_flow'];
+    }
+
+    /**
      * An error thrown by a listener of the process failure is logged, the error of the process is still thrown (it was
      * replaced by the error of the listener).
      */
@@ -147,6 +192,7 @@ class ProcessManagerStopStrategyTest extends TestCase
         string $errorStrategy = 'stop',
         array $errorOutputs = [],
         EventDispatcher $eventDispatcher = new EventDispatcher(),
+        string $errorBranchService = '@test.error_branch',
     ): ProcessManager {
         $errorBranchTask = new class(function (mixed $input): void {
             $this->errorBranchInputs[] = $input;
@@ -191,6 +237,13 @@ class ProcessManagerStopStrategyTest extends TestCase
         $container->set('test.constant', new ConstantOutputTask());
         $container->set('test.failing', $failingTask);
         $container->set('test.error_branch', $errorBranchTask);
+        $container->set('test.stop', new StopTask());
+        $container->set('test.stop_flow', new class implements TaskInterface {
+            public function execute(ProcessState $state): void
+            {
+                $state->stop();
+            }
+        });
 
         $registry = new ProcessConfigurationRegistry(
             [
@@ -204,7 +257,7 @@ class ProcessManagerStopStrategyTest extends TestCase
                     'tasks' => [
                         'entry' => $this->createTaskConfiguration('@test.constant', ['output' => 'value'], ['fail']),
                         'fail' => $this->createTaskConfiguration('@test.failing', [], [], $errorStrategy, $errorOutputs),
-                        'error_branch' => $this->createTaskConfiguration('@test.error_branch'),
+                        'error_branch' => $this->createTaskConfiguration($errorBranchService),
                     ],
                 ],
             ],
