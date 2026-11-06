@@ -130,7 +130,8 @@ set a specific value with `ProcessState::setErrorOutput()`). Those tasks form an
 when an error output is set, and they are never considered as root tasks. A task can also send a value to its error
 branch without failing, by calling `setErrorOutput()` (e.g. [FilterTask](reference/tasks/filter_task.md) sends
 rejected items to its error outputs). With the `stop` strategy, the error branch is executed before the process
-stops.
+stops, and the process fails even if the error branch stops the flow (e.g. with a
+[StopTask](reference/tasks/stop_task.md)).
 
 ```yaml
 transform:
