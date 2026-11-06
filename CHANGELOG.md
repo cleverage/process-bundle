@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Fixes
+* [#489](https://github.com/cleverage/process-bundle/issues/489) `cleverage:process:execute --output=<file> --output-format=json-stream`: an output that cannot be encoded as JSON (`Output not stored in '<file>'...`) no longer truncates the existing file, the output is encoded before the file is opened. Update documentation, add tests.
+
 v5.9
 -----
 

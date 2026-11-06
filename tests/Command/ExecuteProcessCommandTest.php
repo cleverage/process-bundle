@@ -143,6 +143,22 @@ class ExecuteProcessCommandTest extends TestCase
         );
     }
 
+    /**
+     * The output is encoded before opening the file: an existing file is kept as it is.
+     */
+    public function testAnOutputThatCannotBeEncodedAsJsonDoesNotTruncateTheFile(): void
+    {
+        file_put_contents($this->outputFile, '{"previous":"run"}'.\PHP_EOL);
+        $tester = $this->createTester($this->once(), ['value' => \NAN]);
+
+        self::assertSame(0, $tester->execute(
+            ['processCodes' => ['test.process'], '--output' => $this->outputFile, '--output-format' => 'json-stream'],
+            ['capture_stderr_separately' => true],
+        ));
+        self::assertStringContainsString("Output not stored in '{$this->outputFile}'", $tester->getErrorOutput());
+        self::assertSame('{"previous":"run"}'.\PHP_EOL, file_get_contents($this->outputFile));
+    }
+
     public function testANonArrayOutputIsReportedInsteadOfBeingSilentlyLost(): void
     {
         $tester = $this->createTester($this->once(), 'scalar');
