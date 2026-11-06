@@ -100,6 +100,14 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
      */
     protected \WeakMap $endPointOutputs;
 
+    /**
+     * States of the tasks whose first execution has been logged: a task executed for each item is logged once by
+     * execution of its process (a new state), not for each item.
+     *
+     * @var \WeakMap<ProcessState, true>|null
+     */
+    protected ?\WeakMap $loggedStates = null;
+
     protected ?ProcessHistory $processHistory = null;
 
     protected ?TaskConfiguration $taskConfiguration = null;
@@ -148,6 +156,7 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
         }
         $this->locks = [];
         $this->endPointOutputs = new \WeakMap();
+        $this->loggedStates = null;
         $this->processHistory = null;
         $this->taskConfiguration = null;
     }
@@ -555,7 +564,12 @@ class ProcessManager implements ProcessManagerInterface, ResetInterface
         try {
             if (self::EXECUTE_PROCESS === $executionFlag) {
                 $state->reset(false);
-                $this->processLogger->debug("Processing task {$taskConfiguration->getCode()}");
+                // Once by execution of the process: a record built for each item is costly, even if not handled
+                $this->loggedStates ??= new \WeakMap();
+                if (!isset($this->loggedStates[$state])) {
+                    $this->loggedStates[$state] = true;
+                    $this->processLogger->debug("Processing task {$taskConfiguration->getCode()}");
+                }
                 $task->execute($state);
                 if ($task instanceof BlockingTaskInterface) {
                     $this->addProcessedBlocking($taskConfiguration);

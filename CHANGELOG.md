@@ -2,7 +2,9 @@ Latest
 ------
 
 ## Changes
+* [#479](https://github.com/cleverage/process-bundle/issues/479) Performance: the `Processing task <task_code>` debug log is written at the first execution of each task by execution of its process, instead of for each item (a record was built for each item even when debug records are not handled: 100,000 lines through 3 tasks took 7.7 s of CPU instead of 2.3 s). Update documentation, add tests.
 * [#497](https://github.com/cleverage/process-bundle/issues/497) Documentation: the default error output of a task is `null` when the task has no input: a root task (except the `entry_point`), a failure of `proceed` or `flush`.
+* [#495](https://github.com/cleverage/process-bundle/issues/495) Documentation: `symfony/lock` (exclusive processes) in the optional packages of the quick start; in the good practices, `{date_time}` (one second resolution) does not make a file path unique, `{unique_token}` does.
 * [#483](https://github.com/cleverage/process-bundle/issues/483) Documentation: an exception thrown by `IterableTaskInterface::next()` makes the process fail right away with this exception, the `error_strategy` and the `error_outputs` of the task do not apply.
 
 ## Fixes
@@ -12,9 +14,6 @@ Latest
 * [#485](https://github.com/cleverage/process-bundle/issues/485) The process returns the last output of its `end_point` passed on to the next tasks: the output of an execution whose output is ignored (skipped, filtered, failed with the `skip` strategy) was returned, e.g. `""` for a `skip_empty` end point whose last item is empty, or `null` for a filtered last item. Update documentation, add tests.
 * [#487](https://github.com/cleverage/process-bundle/issues/487) Shell completion of the process codes (`cleverage:process:execute`, `cleverage:process:help`): the error logged for each process whose configuration is not valid is no longer completed as a process code, the configurations are no longer resolved (all the process codes are completed). Update documentation, add tests.
 * [#489](https://github.com/cleverage/process-bundle/issues/489) `cleverage:process:execute --output=<file> --output-format=json-stream`: an output that cannot be encoded as JSON (`Output not stored in '<file>'...`) no longer truncates the existing file, the output is encoded before the file is opened. Update documentation, add tests.
-
-* [#495](https://github.com/cleverage/process-bundle/issues/495) Documentation: `symfony/lock` (exclusive processes) in the optional packages of the quick start; in the good practices, `{date_time}` (one second resolution) does not make a file path unique, `{unique_token}` does.
-* [#483](https://github.com/cleverage/process-bundle/issues/483) Documentation: an exception thrown by `IterableTaskInterface::next()` makes the process fail right away with this exception, the `error_strategy` and the `error_outputs` of the task do not apply.
 
 v5.9
 -----

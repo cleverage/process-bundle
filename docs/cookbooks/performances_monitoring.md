@@ -56,9 +56,11 @@ Before profiling, the process logs already give some timing information:
   `cleverage_process`) or `Process <process_code> failed` (level `debug` by default), with the total `duration` of
   the process, in seconds, in the record context. Both levels can be configured, see the `logs` option of the
   [process definition](../reference/01-process_definition.md)
-- at `debug` level, the same channel logs each task execution (`Processing task <task_code>`, `Proceeding task ...`,
-  `Flushing task ...`): with a formatter displaying milliseconds, it shows where the time is spent. With the Monolog
-  console handler of the Symfony recipe, `-vvv` displays debug records in the console:
+- at `debug` level, the same channel logs the first execution of each task by execution of its process
+  (`Processing task <task_code>`, not repeated for the next items: a log record for each item would slow down the
+  process, even when debug records are not handled), each proceeding of a blocking task (`Proceeding task ...`) and
+  each flush (`Flushing task ...`): with a formatter displaying milliseconds, it shows when each task starts. With
+  the Monolog console handler of the Symfony recipe, `-vvv` displays debug records in the console:
 
 ```bash
 $ ./bin/console cleverage:process:execute app.file_import -vvv
