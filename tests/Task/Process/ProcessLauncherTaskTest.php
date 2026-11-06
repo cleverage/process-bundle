@@ -202,6 +202,31 @@ class ProcessLauncherTaskTest extends TestCase
     }
 
     /**
+     * A process stopped by a StopTask does not wait for the running sub-processes in the flush of the task: they are
+     * stopped when the task is finalized.
+     */
+    public function testAStoppedProcessDoesNotWaitForTheSubprocesses(): void
+    {
+        [$task, $state] = $this->launch('sleep', wait: false);
+        $launchedProcesses = (new \ReflectionProperty($task, 'launchedProcesses'))->getValue($task);
+        $this->assertIsArray($launchedProcesses);
+        $runningSubprocess = reset($launchedProcesses);
+        $this->assertInstanceOf(SubprocessInstance::class, $runningSubprocess);
+
+        $state->getProcessHistory()->setStopped();
+        $state->reset(true);
+        $task->flush($state);
+
+        $this->assertTrue($state->isSkipped());
+        $this->assertFalse($task->next($state));
+        $this->assertTrue($runningSubprocess->getProcess()->isRunning());
+
+        $task->finalize($state);
+
+        $this->assertFalse($runningSubprocess->getProcess()->isRunning());
+    }
+
+    /**
      * The buffers of the terminated sub-processes, not output yet when the process fails, are removed too: they were
      * left in the temporary directory.
      */

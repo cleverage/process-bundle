@@ -112,6 +112,13 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
 
     public function flush(ProcessState $state): void
     {
+        // A stopped process does not wait for its sub-processes: they are stopped when the task is finalized
+        if ($state->getProcessHistory()->isStopped()) {
+            $this->flushMode = false;
+            $state->setSkipped(true);
+
+            return;
+        }
         $this->flushMode = true;
         if (!$this->finishedBuffers->isEmpty()) {
             $state->setOutput($this->finishedBuffers->dequeue());
@@ -127,6 +134,11 @@ class ProcessLauncherTask extends AbstractConfigurableTask implements FlushableT
 
     public function next(ProcessState $state): bool
     {
+        if ($state->getProcessHistory()->isStopped()) {
+            $this->flushMode = false;
+
+            return false;
+        }
         $this->handleProcesses($state);
 
         // if there is some data waiting, handle it in priority
