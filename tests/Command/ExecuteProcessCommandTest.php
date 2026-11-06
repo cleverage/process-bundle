@@ -23,6 +23,7 @@ use CleverAge\ProcessBundle\Registry\ProcessConfigurationRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -195,6 +196,28 @@ class ExecuteProcessCommandTest extends TestCase
         // Private processes included: they can be executed
         self::assertSame(['test.process'], $tester->complete(['']));
         self::assertSame(['dump', 'json-stream'], $tester->complete(['test.process', '--output-format', '']));
+    }
+
+    /**
+     * The configurations are not resolved: an invalid process is not logged (the log would be completed by the shell).
+     */
+    public function testTheCompletionDoesNotLogTheInvalidProcesses(): void
+    {
+        $logger = new class extends AbstractLogger {
+            /** @var list<string> */
+            public array $records = [];
+
+            public function log($level, \Stringable|string $message, array $context = []): void
+            {
+                $this->records[] = (string) $message;
+            }
+        };
+        $process = ['options' => [], 'entry_point' => null, 'end_point' => null, 'description' => '', 'help' => '', 'public' => true, 'tasks' => []];
+        $registry = new ProcessConfigurationRegistry(['test.invalid' => ['entry_point' => 'missing'] + $process, 'test.valid' => $process], 'stop', [], $logger);
+        $tester = new CommandCompletionTester(new ExecuteProcessCommand($this->createStub(ProcessManager::class), new EventDispatcher(), $registry));
+
+        self::assertSame(['test.invalid', 'test.valid'], $tester->complete(['']));
+        self::assertSame([], $logger->records);
     }
 
     private function createTester(\PHPUnit\Framework\MockObject\Rule\InvocationOrder $executions, mixed $result = null): CommandTester

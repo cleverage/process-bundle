@@ -239,7 +239,8 @@ Once your processes are defined, you want to use them. Some console commands are
 
 With the [shell completion](https://symfony.com/doc/current/console.html#console-completion) of the Symfony console
 (`bin/console completion --help`), the process codes of `cleverage:process:help` and `cleverage:process:execute`, and
-the values of `--output-format`, are completed.
+the values of `--output-format`, are completed. All the process codes are completed, including the ones left out of
+`cleverage:process:list` because their configuration is not valid (executing them gives the error).
 
 Applied to previous example, it will show:
 

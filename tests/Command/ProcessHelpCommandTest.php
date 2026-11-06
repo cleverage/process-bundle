@@ -19,6 +19,7 @@ use CleverAge\ProcessBundle\Registry\TaskRegistry;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
 use Symfony\Component\Console\Tester\CommandCompletionTester;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\DependencyInjection\ServiceLocator;
@@ -52,6 +53,28 @@ class ProcessHelpCommandTest extends TestCase
         $tester = new CommandCompletionTester(new ProcessHelpCommand($registry, new TaskRegistry(new ServiceLocator([]))));
 
         self::assertSame(['demo.first', 'demo.second'], $tester->complete(['']));
+    }
+
+    /**
+     * The configurations are not resolved: an invalid process is not logged (the log would be completed by the shell).
+     */
+    public function testTheCompletionDoesNotLogTheInvalidProcesses(): void
+    {
+        $logger = new class extends AbstractLogger {
+            /** @var list<string> */
+            public array $records = [];
+
+            public function log($level, \Stringable|string $message, array $context = []): void
+            {
+                $this->records[] = (string) $message;
+            }
+        };
+        $process = ['options' => [], 'entry_point' => null, 'end_point' => null, 'description' => '', 'help' => '', 'public' => true, 'tasks' => []];
+        $registry = new ProcessConfigurationRegistry(['demo.invalid' => ['entry_point' => 'missing'] + $process, 'demo.valid' => $process], 'stop', [], $logger);
+        $tester = new CommandCompletionTester(new ProcessHelpCommand($registry, new TaskRegistry(new ServiceLocator([]))));
+
+        self::assertSame(['demo.invalid', 'demo.valid'], $tester->complete(['']));
+        self::assertSame([], $logger->records);
     }
 
     /**
