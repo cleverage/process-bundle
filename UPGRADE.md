@@ -1,7 +1,7 @@
 Upgrade Guide
 =============
 
-## Latest
+## v5.10
 
 ### Stop strategy and error branch ending on a stop
 

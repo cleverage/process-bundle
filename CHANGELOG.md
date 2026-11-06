@@ -1,6 +1,9 @@
 Latest
 ------
 
+v5.10
+-----
+
 ## Changes
 * [#503](https://github.com/cleverage/process-bundle/issues/503) `ProcessState::getReturnCode()` / `setReturnCode()`, used nowhere, are deprecated (removed in 6.0). Add tests.
 * [#479](https://github.com/cleverage/process-bundle/issues/479) Performance: the `Processing task <task_code>` debug log is written at the first execution of each task by execution of its process, instead of for each item (a record was built for each item even when debug records are not handled: 100,000 lines through 3 tasks took 7.7 s of CPU instead of 2.3 s). Update documentation, add tests.
