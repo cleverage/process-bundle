@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#497](https://github.com/cleverage/process-bundle/issues/497) Documentation: the default error output of a task is `null` when the task has no input: a root task (except the `entry_point`), a failure of `proceed` or `flush`.
+
 v5.9
 -----
 

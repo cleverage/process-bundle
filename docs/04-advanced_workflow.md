@@ -126,7 +126,11 @@ default):
   [process execution flow](#process-execution-flow))
 
 Before applying the strategy, the task input is sent to the tasks listed in `error_outputs` (unless the task already
-set a specific value with `ProcessState::setErrorOutput()`). Those tasks form an *error branch*: they are only executed
+set a specific value with `ProcessState::setErrorOutput()`). This input is `null` when the task has none: a root task
+(except the `entry_point`, which receives the process input), and a failure of `proceed` (blocking tasks) or `flush`
+(flushable tasks), which are called without input. A task being flushed several times, a `flush` failing with the
+`skip` strategy (e.g. keeping the items it could not write) sends `null` to its error branch at each flush.
+Those tasks form an *error branch*: they are only executed
 when an error output is set, and they are never considered as root tasks. A task can also send a value to its error
 branch without failing, by calling `setErrorOutput()` (e.g. [FilterTask](reference/tasks/filter_task.md) sends
 rejected items to its error outputs). With the `stop` strategy, the error branch is executed before the process
