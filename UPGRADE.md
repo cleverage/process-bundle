@@ -11,6 +11,13 @@ as succeeded or stopped. To stop the process on purpose on the first error (not 
 on the failing task, as in the "Stop the process on the first invalid item" example of the
 [StopTask](docs/reference/tasks/stop_task.md).
 
+### Counter task
+
+A negative `flush_every` option of the `counter` task works as its absolute value (`-3` as `3`): it is deprecated since
+5.10 (`Since cleverage/process-bundle 5.10: A negative "flush_every" option of the counter task (-3) is deprecated...`)
+and will be rejected in 6.0: use a positive integer. `flush_every: 0`, which failed on the first execution (`Modulo by
+zero`), is now rejected when the options are resolved.
+
 ## v5.8
 
 ### Unknown task references
