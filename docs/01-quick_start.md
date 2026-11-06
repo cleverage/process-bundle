@@ -85,6 +85,7 @@ Some features rely on optional packages, suggested by the bundle:
 | Package | Needed by |
 | ------- | --------- |
 | `ext-intl` (PHP extension) | the [SlugifyTransformer](reference/transformers/slugify_transformer.md) |
+| `symfony/lock` | the [exclusive](reference/01-process_definition.md) processes (`exclusive: true`): an exclusive process without it is rejected when the container is compiled |
 | `symfony/process` | the [CommandRunnerTask](reference/tasks/command_runner_task.md) and the [ProcessLauncherTask](reference/tasks/process_launcher_task.md) |
 | `symfony/stopwatch` | the [StopwatchTask](reference/tasks/stopwatch_task.md) |
 | `symfony/var-dumper` | the dumps of the [DebugTask](reference/tasks/debug_task.md), of the `debug` transformer and of `cleverage:process:execute --output-format=dump` (required by this format: the command fails without it) |
