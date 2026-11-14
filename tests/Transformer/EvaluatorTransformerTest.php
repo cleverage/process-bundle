@@ -68,7 +68,7 @@ class EvaluatorTransformerTest extends TestCase
         yield 'ternary' => ['value ? "yes" : "no"', ['value' => false], 'no'];
         yield 'array access' => ['item["name"]', ['item' => ['name' => 'foo']], 'foo'];
         yield 'constant expression with empty input' => ['1 + 1', [], 2];
-        yield 'built-in function' => ['constant("PHP_INT_MAX")', [], \PHP_INT_MAX];
+        yield 'string concatenation' => ['"foo" ~ "bar"', [], 'foobar'];
     }
 
     /**

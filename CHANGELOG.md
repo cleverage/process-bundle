@@ -22,6 +22,9 @@ v5.10
 * [#487](https://github.com/cleverage/process-bundle/issues/487) Shell completion of the process codes (`cleverage:process:execute`, `cleverage:process:help`): the error logged for each process whose configuration is not valid is no longer completed as a process code, the configurations are no longer resolved (all the process codes are completed). Update documentation, add tests.
 * [#489](https://github.com/cleverage/process-bundle/issues/489) `cleverage:process:execute --output=<file> --output-format=json-stream`: an output that cannot be encoded as JSON (`Output not stored in '<file>'...`) no longer truncates the existing file, the output is encoded before the file is opened. Update documentation, add tests.
 
+* [#493](https://github.com/cleverage/process-bundle/issues/493) Documentation: the `constant()` function of the `evaluator` expressions is deprecated by Symfony 8.2 (a `ConstantFunctionProvider` must be registered), avoid it. The test no longer uses it.
+* [#483](https://github.com/cleverage/process-bundle/issues/483) Documentation: an exception thrown by `IterableTaskInterface::next()` makes the process fail right away with this exception, the `error_strategy` and the `error_outputs` of the task do not apply.
+
 v5.9
 -----
 
