@@ -14,67 +14,102 @@ declare(strict_types=1);
 namespace CleverAge\ProcessBundle\Tests\Transformer\Array;
 
 use CleverAge\ProcessBundle\Transformer\Array\ArrayFirstTransformer;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(ArrayFirstTransformer::class)]
-#[\PHPUnit\Framework\Attributes\CoversMethod(ArrayFirstTransformer::class, 'transform')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(ArrayFirstTransformer::class, 'getCode')]
-#[\PHPUnit\Framework\Attributes\CoversMethod(ArrayFirstTransformer::class, 'configureOptions')]
 class ArrayFirstTransformerTest extends TestCase
 {
-    public function testTransformReturnsFirstElementIfIterableAndAllowed(): void
+    /**
+     * @return iterable<string, array{iterable<mixed>, mixed}>
+     */
+    public static function iterableProvider(): iterable
     {
-        $transformer = new ArrayFirstTransformer();
-        $value = [1, 2, 3];
-        $options = ['allow_not_iterable' => false];
-
-        $result = $transformer->transform($value, $options);
-
-        $this->assertEquals(1, $result);
+        yield 'list' => [[1, 2, 3], 1];
+        yield 'associative array' => [['a' => 'foo', 'b' => 'bar'], 'foo'];
+        yield 'empty array' => [[], false];
+        yield 'iterator' => [new \ArrayIterator(['foo', 'bar']), 'foo'];
+        yield 'generator' => [(static function (): \Generator {
+            yield 'foo';
+            yield 'bar';
+        })(), 'foo'];
+        yield 'empty iterator' => [new \ArrayIterator([]), false];
     }
 
-    public function testTransformReturnsValueIfNotIterableAndAllowed(): void
-    {
-        $this->expectException(\TypeError::class);
-
-        $transformer = new ArrayFirstTransformer();
-        $value = 'not_iterable_value';
-        $options = ['allow_not_iterable' => true];
-
-        $result = $transformer->transform($value, $options);
-
-        $this->assertEquals('not_iterable_value', $result);
-    }
-
-    public function testTransformThrowsExceptionIfNotIterableAndNotAllowed(): void
-    {
-        $transformer = new ArrayFirstTransformer();
-        $value = 'not_iterable_value';
-        $options = ['allow_not_iterable' => false];
-
-        $result = $transformer->transform($value, $options);
-
-        $this->assertEquals($value, $result);
-    }
-
-    public function testGetCodeReturnsCorrectCode(): void
+    /**
+     * @param iterable<mixed> $value
+     */
+    #[DataProvider('iterableProvider')]
+    public function testTransformReturnsTheFirstElement(iterable $value, mixed $expected): void
     {
         $transformer = new ArrayFirstTransformer();
 
-        $code = $transformer->getCode();
-
-        $this->assertEquals('array_first', $code);
+        self::assertSame($expected, $transformer->transform($value, $this->resolveOptions($transformer)));
     }
 
-    public function testConfigureOptionsSetsDefaultOptions(): void
+    public function testAllowNotIterableDoesNotChangeIterableValues(): void
+    {
+        $transformer = new ArrayFirstTransformer();
+        $options = $this->resolveOptions($transformer, ['allow_not_iterable' => true]);
+
+        self::assertSame(1, $transformer->transform([1, 2, 3], $options));
+        self::assertSame('foo', $transformer->transform(new \ArrayIterator(['foo', 'bar']), $options));
+    }
+
+    /**
+     * @return iterable<string, array{mixed}>
+     */
+    public static function notIterableProvider(): iterable
+    {
+        yield 'string' => ['not_iterable_value'];
+        yield 'int' => [42];
+        yield 'null' => [null];
+        yield 'object' => [new \stdClass()];
+    }
+
+    #[DataProvider('notIterableProvider')]
+    public function testNotIterableValueThrowsByDefault(mixed $value): void
+    {
+        $transformer = new ArrayFirstTransformer();
+
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Given value is not iterable');
+
+        $transformer->transform($value, $this->resolveOptions($transformer));
+    }
+
+    #[DataProvider('notIterableProvider')]
+    public function testNotIterableValueIsReturnedUnchangedWhenAllowed(mixed $value): void
+    {
+        $transformer = new ArrayFirstTransformer();
+
+        self::assertSame($value, $transformer->transform($value, $this->resolveOptions($transformer, ['allow_not_iterable' => true])));
+    }
+
+    public function testAllowNotIterableMustBeABoolean(): void
+    {
+        $this->expectException(InvalidOptionsException::class);
+
+        $this->resolveOptions(new ArrayFirstTransformer(), ['allow_not_iterable' => 'yes']);
+    }
+
+    public function testGetCode(): void
+    {
+        self::assertSame('array_first', (new ArrayFirstTransformer())->getCode());
+    }
+
+    /**
+     * @param array<string, mixed> $options
+     *
+     * @return array<string, mixed>
+     */
+    private function resolveOptions(ArrayFirstTransformer $transformer, array $options = []): array
     {
         $resolver = new OptionsResolver();
-        $transformer = new ArrayFirstTransformer();
-
         $transformer->configureOptions($resolver);
-        $resolvedOptions = $resolver->resolve();
 
-        $this->assertEquals(['allow_not_iterable' => false], $resolvedOptions);
+        return $resolver->resolve($options);
     }
 }
