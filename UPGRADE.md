@@ -1,6 +1,14 @@
 Upgrade Guide
 =============
 
+## v6.0
+
+### Error output of the CSV readers
+
+A line that `csv_reader` or `input_csv_reader` cannot read (number of columns not matching the headers, line that
+cannot be parsed) sends `['csv_file' => <path>, 'csv_line' => <line number>, 'csv_values' => <values read>]` to the
+error output. Before, `input_csv_reader` sent its input, the file path: read it from `[csv_file]` in the error branch.
+
 ## v5.10
 
 ### Stop strategy and error branch ending on a stop

@@ -1,6 +1,9 @@
 Latest
 ------
 
+## Changes
+* [#507](https://github.com/cleverage/process-bundle/issues/507) `csv_reader`, `input_csv_reader`: a line that cannot be read (number of columns not matching the headers, line that cannot be parsed) sends `['csv_file' => <path>, 'csv_line' => <line number>, 'csv_values' => <values read>]` to the error output, instead of the input of the task (`null`, or the file path for `input_csv_reader`, see `UPGRADE.md`), and `csv_file` / `csv_line` are in the error context of the logged error. `CsvResource::readLine()` throws an `InvalidCsvLineException` (an `UnexpectedValueException`) carrying the values read. Update documentation, add tests.
+
 v5.10
 -----
 

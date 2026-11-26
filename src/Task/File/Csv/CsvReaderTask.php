@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Task\File\Csv;
 
+use CleverAge\ProcessBundle\Exception\InvalidCsvLineException;
 use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Model\IterableTaskInterface;
@@ -47,7 +48,20 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
             throw new LogicException('No CSV File initialized');
         }
         $lineNumber = $csv->getLineNumber();
-        $output = $csv->readLine();
+        $state->addErrorContextValue('csv_file', $csv->getFilePath());
+        $state->addErrorContextValue('csv_line', $lineNumber);
+        try {
+            $output = $csv->readLine();
+        } catch (InvalidCsvLineException $e) {
+            // The error branch gets the invalid line instead of the input of the task
+            $state->setErrorOutput([
+                'csv_file' => $csv->getFilePath(),
+                'csv_line' => $lineNumber,
+                'csv_values' => $e->getValues(),
+            ]);
+
+            throw $e;
+        }
 
         if (null === $output) {
             if ($this->getOption($state, 'log_empty_lines')) {
@@ -61,8 +75,6 @@ class CsvReaderTask extends AbstractCsvTask implements IterableTaskInterface
             $state->setSkipped(true);
         }
 
-        $state->addErrorContextValue('csv_file', $csv->getFilePath());
-        $state->addErrorContextValue('csv_line', $lineNumber);
         $state->setOutput($output);
     }
 

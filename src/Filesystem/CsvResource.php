@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace CleverAge\ProcessBundle\Filesystem;
 
+use CleverAge\ProcessBundle\Exception\InvalidCsvLineException;
 use CleverAge\ProcessBundle\Exception\LogicException;
 use CleverAge\ProcessBundle\Exception\RuntimeException;
 use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
@@ -176,6 +177,8 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
      * @param int<0, max>|null $length
      *
      * @return array<string, string|null>|null
+     *
+     * @throws InvalidCsvLineException when the line cannot be parsed or its number of columns does not match the headers
      */
     public function readLine(?int $length = null): ?array
     {
@@ -187,14 +190,14 @@ class CsvResource implements WritableStructuredFileInterface, SeekableFileInterf
                 return null;
             }
             $message = "Unable to parse data {$filePosition} for {$this->getResourceName()}";
-            throw new UnexpectedValueException($message);
+            throw new InvalidCsvLineException($message);
         }
 
         $count = \count($values);
         if ($count !== $this->headerCount) {
             $message = "Number of columns not matching {$filePosition} for {$this->getResourceName()}: ";
             $message .= "{$count} columns for {$this->headerCount} headers";
-            throw new UnexpectedValueException($message);
+            throw new InvalidCsvLineException($message, $values);
         }
 
         try {

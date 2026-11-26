@@ -25,6 +25,18 @@ Underlying method is [fgetcsv](https://www.php.net/manual/en/function.fgetcsv.ph
 When no line can be read (typically the trailing empty line at the end of the file), no output is produced and the
 task is skipped for this iteration.
 
+When a line cannot be read (its number of columns does not match the headers, or it cannot be parsed), an
+`InvalidCsvLineException` is thrown, handled according to the task `error_strategy`, and the error output is the
+invalid line instead of the input of the task:
+
+```php
+[
+    'csv_file' => '/path/to/file.csv', // path of the file
+    'csv_line' => 7,                   // physical line number, the header being line 1
+    'csv_values' => ['Dracula', 'Bram'], // values read by fgetcsv(), null when the line cannot be parsed
+]
+```
+
 Options
 -------
 
@@ -67,13 +79,32 @@ entry:
   outputs: [transform]
 ```
 
+* Reject the invalid lines to a CSV file and go on with the following lines
+
+```yaml
+# Task configuration level
+read:
+  task: csv_reader
+  options:
+    file_path: '%kernel.project_dir%/var/data/catalog.csv'
+  outputs: [import]
+  error_strategy: skip
+  error_outputs: [write_rejects]
+write_rejects:
+  task: csv_writer # csv_file;csv_line;csv_values, the values joined by "|"
+  options:
+    file_path: '%kernel.project_dir%/var/data/catalog_rejects.csv'
+```
+
 Notes
 -----
 
-* Each line must contain exactly as many columns as there are headers, otherwise an `UnexpectedValueException` is thrown.
+* Each line must contain exactly as many columns as there are headers, otherwise an `InvalidCsvLineException` (an
+  `UnexpectedValueException`) is thrown and the line is sent to the error output (see [Possible outputs](#possible-outputs)).
 * A UTF-8 BOM is removed from the first header when headers are read from the file. If the first line is blank, an
   `UnexpectedValueException` is thrown.
-* `csv_file` and `csv_line` are added to the error context of the process.
+* `csv_file` and `csv_line` (the line being read) are added to the error context of the process, also when the line
+  cannot be read.
 * The file is closed once fully read: if the task is executed again (e.g. for a new input), the file is read again
   from its beginning.
 * See also [InputCsvReaderTask](input_csv_reader_task.md) to read a file path given as input.

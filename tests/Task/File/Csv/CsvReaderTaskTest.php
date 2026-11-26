@@ -16,6 +16,7 @@ namespace CleverAge\ProcessBundle\Tests\Task\File\Csv;
 use CleverAge\ProcessBundle\Configuration\ProcessConfiguration;
 use CleverAge\ProcessBundle\Configuration\TaskConfiguration;
 use CleverAge\ProcessBundle\Context\ContextualOptionResolver;
+use CleverAge\ProcessBundle\Exception\InvalidCsvLineException;
 use CleverAge\ProcessBundle\Exception\UnexpectedValueException;
 use CleverAge\ProcessBundle\Filesystem\CsvFile;
 use CleverAge\ProcessBundle\Filesystem\CsvResource;
@@ -33,6 +34,7 @@ use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 #[\PHPUnit\Framework\Attributes\CoversClass(CsvReaderTask::class)]
 #[\PHPUnit\Framework\Attributes\CoversClass(InputCsvReaderTask::class)]
+#[\PHPUnit\Framework\Attributes\UsesClass(InvalidCsvLineException::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(UnexpectedValueException::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(AbstractCsvTask::class)]
 #[\PHPUnit\Framework\Attributes\UsesClass(AbstractCsvResourceTask::class)]
@@ -130,6 +132,64 @@ class CsvReaderTaskTest extends TestCase
         $this->expectException(InvalidOptionsException::class);
 
         $this->iterate(new InputCsvReaderTask(new NullLogger()), $this->createState(['base_path' => ['a']]), 'b.csv');
+    }
+
+    /**
+     * A line that cannot be read sends its file, physical line number and values to the error branch, and they are in
+     * the error context of the logged error; the following lines are still read.
+     */
+    public function testInvalidLineErrorOutputHasItsLineNumberAndValues(): void
+    {
+        $path = $this->tmpDir.'/invalid.csv';
+        (new Filesystem())->dumpFile($path, "id;name\n1;foo\n2\n3;bar;extra\n4;baz\n");
+        $expectedErrors = [
+            ['csv_file' => $path, 'csv_line' => 3, 'csv_values' => ['2']],
+            ['csv_file' => $path, 'csv_line' => 4, 'csv_values' => ['3', 'bar', 'extra']],
+        ];
+        $expectedOutputs = [['id' => '1', 'name' => 'foo'], ['id' => '4', 'name' => 'baz']];
+
+        $task = new CsvReaderTask(new NullLogger());
+        $state = $this->createState(['file_path' => $path]);
+        self::assertSame([$expectedOutputs, $expectedErrors], $this->iterateWithErrors($task, $state));
+        $task->finalize($state);
+
+        $task = new InputCsvReaderTask(new NullLogger());
+        $state = $this->createState([]);
+        self::assertSame([$expectedOutputs, $expectedErrors], $this->iterateWithErrors($task, $state, $path));
+        $task->finalize($state);
+    }
+
+    /**
+     * Mimics the ProcessManager loop over an iterable task with the skip error strategy: returns the outputs and the
+     * error outputs, checking that the error context matches the error output.
+     *
+     * @return array{list<mixed>, list<mixed>}
+     */
+    private function iterateWithErrors(CsvReaderTask $task, ProcessState $state, mixed $input = null): array
+    {
+        $outputs = [];
+        $errors = [];
+        do {
+            $state->reset(true);
+            $state->setInput($input);
+            try {
+                $task->execute($state);
+                if (!$state->isSkipped()) {
+                    $outputs[] = $state->getOutput();
+                }
+            } catch (InvalidCsvLineException) {
+                self::assertTrue($state->hasErrorOutput());
+                $errorOutput = $state->getErrorOutput();
+                self::assertIsArray($errorOutput);
+                self::assertSame(
+                    ['csv_file' => $errorOutput['csv_file'], 'csv_line' => $errorOutput['csv_line']],
+                    $state->getErrorContext(),
+                );
+                $errors[] = $errorOutput;
+            }
+        } while ($task->next($state));
+
+        return [$outputs, $errors];
     }
 
     /**

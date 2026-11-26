@@ -28,6 +28,18 @@ Underlying method is [fgetcsv](https://www.php.net/manual/en/function.fgetcsv.ph
 When no line can be read (typically the trailing empty line at the end of the file), no output is produced and the
 task is skipped for this iteration.
 
+When a line cannot be read (its number of columns does not match the headers, or it cannot be parsed), an
+`InvalidCsvLineException` is thrown, handled according to the task `error_strategy`, and the error output is the
+invalid line instead of the input of the task (the file path, given as `csv_file`; it was the error output before v6.0):
+
+```php
+[
+    'csv_file' => '/path/to/file.csv', // path of the file
+    'csv_line' => 7,                   // physical line number, the header being line 1
+    'csv_values' => ['Dracula', 'Bram'], // values read by fgetcsv(), null when the line cannot be parsed
+]
+```
+
 Options
 -------
 
